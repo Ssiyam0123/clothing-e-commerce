@@ -85,7 +85,7 @@ export default function FlashSaleClient() {
           initial="hidden" 
           animate="visible" 
           variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+          className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8"
         >
           {products.map((p) => (
             <motion.div key={p._id} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
