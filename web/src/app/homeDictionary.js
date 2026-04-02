@@ -1,0 +1,40 @@
+export const DICTIONARY = {
+  en: {
+    heroBtn: 'Shop Collection',
+    saleBtn: 'View Sale',
+    catTitle: 'The Architecture of Style',
+    catSub: 'Explore by Category',
+    featTitle: 'Handpicked Vanguard',
+    featSub: 'Curated Essentials',
+    newTitle: 'The Latest Drops',
+    newSub: 'Fresh Arrivals',
+    loadMore: 'View All',
+    newsletterTitle: 'Join the Syndicate',
+    newsletterSub: 'Subscribe for early access and exclusive drops.',
+    subscribe: 'Subscribe',
+    usp: [
+      { title: 'Ethical Sourcing', desc: 'GLOBAL STANDARDS', icon: '☁️' },
+      { title: 'Premium Ash', desc: 'MATTE FINISH TEXTURES', icon: '🌑' },
+      { title: 'Swift Transit', desc: 'WORLDWIDE SHIPPING', icon: '✈️' }
+    ]
+  },
+  bn: {
+    heroBtn: 'কালেকশন দেখুন',
+    saleBtn: 'অফার দেখুন',
+    catTitle: 'স্টাইলের নতুন সংজ্ঞা',
+    catSub: 'ক্যাটাগরি এক্সপ্লোর করুন',
+    featTitle: 'বাছাইকৃত সেরা স্টাইল',
+    featSub: 'কিউরেটেড এসেনশিয়ালস',
+    newTitle: 'নতুন কালেকশন',
+    newSub: 'সদ্য আগত',
+    loadMore: 'সবগুলো দেখুন',
+    newsletterTitle: 'আমাদের সাথে যোগ দিন',
+    newsletterSub: 'নতুন ড্রপ এবং এক্সক্লুসিভ অফারের জন্য সাবস্ক্রাইব করুন।',
+    subscribe: 'সাবস্ক্রাইব',
+    usp: [
+      { title: 'টেকসই উৎপাদন', desc: 'গ্লোবাল স্ট্যান্ডার্ড', icon: '☁️' },
+      { title: 'প্রিমিয়াম কোয়ালিটি', desc: 'ম্যাট ফিনিশ টেক্সচার', icon: '🌑' },
+      { title: 'দ্রুত ডেলিভারি', desc: 'সারাদেশে শিপিং', icon: '✈️' }
+    ]
+  }
+};
