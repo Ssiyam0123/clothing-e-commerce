@@ -51,7 +51,7 @@ export default function RegisterPage() {
   const { lang } = useAppStore();
   
   const [isRegistering, setIsRegistering] = useState(false);
-  const redirectUrl = searchParams.get("redirect") || "/profile";
+  const redirectUrl = searchParams.get("redirect") || "/";
 
   const { register, handleSubmit, formState: { errors } } = useForm();
   const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY["en"], [lang]);
