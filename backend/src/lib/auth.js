@@ -8,7 +8,7 @@ import {
 
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL || process.env.BACKEND_URL,
+  baseURL: process.env.BETTER_AUTH_URL || process.env.BACKEND_URL ||"https://ecowear-backend.vercel.app/api/auth"
 
   database: mongodbAdapter(mongoose.connection.db, {
     user: "users",
@@ -63,25 +63,19 @@ export const auth = betterAuth({
     },
   },
 
-  /**
-   * 🚀 SESSION & COOKIE CONFIGURATION
-   * Cross-site cookie শেয়ারিং এর জন্য এটি অত্যন্ত জরুরি
-   */
+
   session: {
     cookieOptions: {
-      // Vercel-এ আলাদা ডোমেইন হওয়ার কারণে এটি 'none' হতে হবে
       sameSite: "none", 
-      secure: true,      // HTTPS ছাড়া 'none' কাজ করবে না
+      secure: true,      
       httpOnly: true,
     }
   },
 
   advanced: {
-    // কুকি প্রিফিক্স আপনার আগের কোড অনুযায়ী 'vanguard' রাখা হলো
     cookiePrefix: "vanguard",
-    useSecureCookies: true, // প্রোডাকশনে অবশ্যই true থাকতে হবে
-    
-    // 💡 প্রো-ফিক্স: Cross-domain sharing এনাবল করা হলো
+    useSecureCookies: true, 
+    trustProxy: true, 
     crossDomain: {
         enabled: true,
     }
