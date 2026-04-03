@@ -9,14 +9,14 @@ import { getImageUrl } from '@/utils/imageUtils';
 import Loader from '@/components/common/Loader';
 import ProductCard from '@/components/store/ProductCard';
 import { useAuth } from '@/hooks/useAuth';
-import { useCart } from '@/hooks/useCart';
+import { useProductCondition } from '@/store/productCondition'; // ✅ new store
 import ReviewSection from '@/components/store/ReviewSection';
 import StarRating from '@/components/store/StarRating';
 import { useAppStore } from '@/store/appStore';
 import { useTrackingStore } from '@/store/trackingStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- Senior Configuration: Localization ---
+// Dictionary (unchanged)
 const DICTIONARY = {
   en: {
     home: 'Home',
@@ -30,14 +30,15 @@ const DICTIONARY = {
     save: 'Save',
     about: 'About this item',
     freeShip: 'Free Shipping',
-    freeSub: 'On orders over ৳5000', // 🚀 Updated to Taka reference
+    freeSub: 'On orders over ৳5000',
     ecoReturn: 'Eco Returns',
     ecoSub: '30 days easy policy',
     outOfStock: 'Currently Out of Stock',
     reviews: 'Reviews',
     relatedTitle: 'You May Also Like',
     relatedSub: 'Continue Shopping',
-    added: '✨ Added to bag successfully!'
+    added: '✨ Added to bag successfully!',
+    goToCart: 'Go to Cart',
   },
   bn: {
     home: 'হোম',
@@ -51,18 +52,19 @@ const DICTIONARY = {
     save: 'সাশ্রয়',
     about: 'প্রোডাক্ট সম্পর্কে',
     freeShip: 'ফ্রি শিপিং',
-    freeSub: '৳৫০০০ এর উপরের অর্ডারে', // 🚀 Updated to Taka reference
+    freeSub: '৳৫০০০ এর উপরের অর্ডারে',
     ecoReturn: 'ইকো রিটার্নস',
     ecoSub: '৩০ দিনের সহজ পলিসি',
     outOfStock: 'বর্তমানে স্টক নেই',
     reviews: 'রিভিউ',
     relatedTitle: 'আপনার পছন্দ হতে পারে',
     relatedSub: 'আরও কেনাকাটা করুন',
-    added: '✨ ব্যাগে সফলভাবে যোগ করা হয়েছে!'
+    added: '✨ ব্যাগে সফলভাবে যোগ করা হয়েছে!',
+    goToCart: 'কার্টে যান',
   }
 };
 
-// --- Framer Motion Variants ---
+// Framer Motion Variants (unchanged)
 const staggerContainer = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -77,10 +79,12 @@ export default function ProductDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
   const { user } = useAuth();
-  const { addToCart } = useCart();
   const { lang, isMounted } = useAppStore();
   const trackViewContent = useTrackingStore((state) => state.trackViewContent);
   const trackAddToCart = useTrackingStore((state) => state.trackAddToCart);
+
+  // ✅ Use Zustand store for cart actions
+  const addToCart = useProductCondition((state) => state.addToCart);
 
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -92,7 +96,7 @@ export default function ProductDetailsPage() {
   const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY['en'], [lang]);
   const isBn = lang === 'bn';
 
-  // --- Data Fetching ---
+  // Data fetching (unchanged)
   const { data: product, isLoading, error, refetch: refetchProduct } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => (await api.get(`/products/${id}`)).data,
@@ -119,13 +123,11 @@ export default function ProductDetailsPage() {
     }
   }, [productsData, id]);
 
-  // Track ViewContent and 🚀 FIX: Auto-select first available size
   useEffect(() => {
     if (product) {
       const discountedPrice = product.price - (product.price * (product.discount || 0) / 100);
       trackViewContent(product._id, product.name, discountedPrice, product.category?.name);
       
-      // Auto select first size if not already selected
       const availableSizes = product.sizes?.filter(s => s.stock > 0) || [];
       if (!selectedSize && availableSizes.length > 0) {
         setSelectedSize(availableSizes[0].size._id);
@@ -133,16 +135,24 @@ export default function ProductDetailsPage() {
     }
   }, [product, trackViewContent, selectedSize]);
 
+  // ✅ Updated add to cart handler using Zustand store
   const handleAddToCart = async () => {
     const availableSizes = product.sizes?.filter(s => s.stock > 0) || [];
-    if (!selectedSize && availableSizes.length > 0) return alert('Please select a size first.');
+    if (!selectedSize && availableSizes.length > 0) {
+      alert('Please select a size first.');
+      return;
+    }
     setIsAdding(true);
     try {
-      await addToCart({ productId: product._id, sizeId: selectedSize, quantity });
+      // Optimistic add to cart via Zustand store
+      await addToCart(product, selectedSize, quantity);
+      
       setShowAddedToCart(true);
       const discountedPrice = product.price - (product.price * (product.discount || 0) / 100);
       trackAddToCart(product._id, discountedPrice, quantity);
-      setTimeout(() => setShowAddedToCart(false), 3000);
+      
+      // Auto-hide success message after 5 seconds
+      setTimeout(() => setShowAddedToCart(false), 5000);
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to add to cart');
     } finally {
@@ -152,7 +162,10 @@ export default function ProductDetailsPage() {
 
   const handleBuyNow = () => {
     const availableSizes = product.sizes?.filter(s => s.stock > 0) || [];
-    if (!selectedSize && availableSizes.length > 0) return alert('Please select a size first.');
+    if (!selectedSize && availableSizes.length > 0) {
+      alert('Please select a size first.');
+      return;
+    }
     const directItem = {
       product,
       size: availableSizes.find(s => s.size._id === selectedSize)?.size,
@@ -162,7 +175,7 @@ export default function ProductDetailsPage() {
     router.push('/checkout?type=direct');
   };
 
-  // --- UI States ---
+  // Loading & error states (unchanged)
   if (!isMounted || isLoading) return <div className="min-h-screen flex items-center justify-center dark:bg-[#050505]"><Loader /></div>;
 
   if (error || !product) return (
@@ -182,14 +195,12 @@ export default function ProductDetailsPage() {
 
   return (
     <div className="min-h-screen bg-[#fcfcfc] dark:bg-[#050505] font-sans pb-20 transition-colors duration-700 relative overflow-hidden">
-      {/* Decorative Background Top with Deep Dark Gradient */}
+      {/* Background decorations (unchanged) */}
       <div className="h-[40vh] bg-zinc-900 dark:bg-black absolute w-full top-0 left-0 -z-10 rounded-b-[3rem] sm:rounded-b-[5rem] opacity-95 dark:opacity-100 transition-colors duration-700 border-b border-zinc-200/10 dark:border-white/5 shadow-2xl"></div>
-
-      {/* Ambient Premium Glow */}
       <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-500/10 dark:bg-indigo-500/15 rounded-full blur-[120px] pointer-events-none -z-10"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 relative z-10">
-        {/* Breadcrumb */}
+        {/* Breadcrumb (unchanged) */}
         <motion.nav
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -202,7 +213,7 @@ export default function ProductDetailsPage() {
           <span className="text-white truncate max-w-[150px] sm:max-w-[250px]">{product.name}</span>
         </motion.nav>
 
-        {/* Main Product Container */}
+        {/* Main Product Container (mostly unchanged, only success message changed) */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -210,7 +221,7 @@ export default function ProductDetailsPage() {
           className="bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-3xl rounded-[2rem] sm:rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden"
         >
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 p-6 sm:p-10 lg:p-16">
-            {/* LEFT: Media Gallery */}
+            {/* LEFT: Media Gallery (unchanged) */}
             <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-6">
               <motion.div variants={fadeUp} className="relative aspect-[3/4] bg-zinc-100 dark:bg-zinc-900 rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden group border border-zinc-200/50 dark:border-white/5">
                 {product.images && product.images[selectedImage] ? (
@@ -222,8 +233,6 @@ export default function ProductDetailsPage() {
                 ) : (
                   <div className="flex items-center justify-center h-full text-zinc-300 text-6xl">👕</div>
                 )}
-
-                {/* Badges */}
                 {product.discount > 0 && (
                   <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white px-4 py-2 rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg border border-zinc-200 dark:border-zinc-800">
                     -{product.discount}%
@@ -235,8 +244,6 @@ export default function ProductDetailsPage() {
                   </div>
                 )}
               </motion.div>
-
-              {/* Thumbnails */}
               {product.images && product.images.length > 1 && (
                 <motion.div variants={fadeUp} className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 no-scrollbar">
                   {product.images.map((img, idx) => (
@@ -258,9 +265,9 @@ export default function ProductDetailsPage() {
               )}
             </motion.div>
 
-            {/* RIGHT: Product Details */}
+            {/* RIGHT: Product Details (unchanged except success message) */}
             <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="flex flex-col h-full">
-              {/* Category & Rating */}
+              {/* Category & Rating (unchanged) */}
               <motion.div variants={fadeUp} className="mb-6 flex flex-wrap gap-2 sm:gap-3 items-center">
                 <Link
                   href={`/products?category=${product.category?.slug}`}
@@ -285,7 +292,6 @@ export default function ProductDetailsPage() {
                 {product.name}
               </motion.h1>
 
-              {/* Reviews Star */}
               <motion.div variants={fadeUp} className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
                 <div className="bg-zinc-50 dark:bg-[#111] px-3 py-1.5 rounded-xl flex items-center gap-2 border border-zinc-100 dark:border-zinc-800 shadow-inner">
                   <StarRating rating={reviewsData?.averageRating || 0} size="small" />
@@ -298,7 +304,6 @@ export default function ProductDetailsPage() {
                 </span>
               </motion.div>
 
-              {/* 🚀 Pricing Block (Updated to Taka ৳) */}
               <motion.div variants={fadeUp} className="mb-8 sm:mb-10 p-6 sm:p-8 bg-zinc-50 dark:bg-[#0d0d0d] rounded-[2rem] sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-inner">
                 <p className="text-[8px] sm:text-[9px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-2">{ui.price}</p>
                 <div className="flex flex-wrap items-end gap-4 sm:gap-6">
@@ -318,7 +323,6 @@ export default function ProductDetailsPage() {
                 </div>
               </motion.div>
 
-              {/* Description */}
               <motion.div variants={fadeUp} className="mb-10 sm:mb-12">
                 <h3 className="text-[9px] sm:text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-3 sm:mb-4">{ui.about}</h3>
                 <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium text-xs sm:text-sm">
@@ -335,9 +339,7 @@ export default function ProductDetailsPage() {
                 )}
               </motion.div>
 
-              {/* CTA Section */}
               <motion.div variants={fadeUp} className="mt-auto border-t border-zinc-100 dark:border-zinc-800/80 pt-8">
-                {/* Sizes */}
                 {availableSizes.length > 0 ? (
                   <div className="mb-8 sm:mb-10">
                     <h3 className="text-[9px] sm:text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-4">{ui.selectSize}</h3>
@@ -368,7 +370,6 @@ export default function ProductDetailsPage() {
                   </div>
                 )}
 
-                {/* Add to Cart Group */}
                 {availableSizes.length > 0 && (
                   <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
                     <div className="flex items-center justify-between bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-full w-full sm:w-36 h-12 sm:h-14 px-2 shadow-inner">
@@ -400,7 +401,7 @@ export default function ProductDetailsPage() {
                   </div>
                 )}
 
-                {/* Success Message */}
+                {/* ✅ Updated Success Message with "Go to Cart" link */}
                 <AnimatePresence>
                   {showAddedToCart && (
                     <motion.div
@@ -409,14 +410,22 @@ export default function ProductDetailsPage() {
                       exit={{ opacity: 0, y: 10, height: 0 }}
                       className="mt-4 sm:mt-6 overflow-hidden"
                     >
-                      <div className="p-3 sm:p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-2xl text-center text-[9px] sm:text-[10px] font-black uppercase tracking-widest">
-                        {ui.added}
+                      <div className="p-3 sm:p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-center">
+                        <p className="text-emerald-600 dark:text-emerald-400 text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2">
+                          {ui.added}
+                        </p>
+                        <Link
+                          href="/cart"
+                          className="inline-block text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-300 underline underline-offset-2 hover:text-emerald-800 transition-colors"
+                        >
+                          {ui.goToCart} →
+                        </Link>
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                {/* Service Promises */}
+                {/* Service Promises (unchanged) */}
                 <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-zinc-100 dark:border-zinc-800/80 grid grid-cols-2 gap-4 sm:gap-6">
                   <div className="flex items-center gap-3 sm:gap-4">
                     <span className="text-xl sm:text-2xl grayscale opacity-60">✈️</span>
@@ -438,7 +447,7 @@ export default function ProductDetailsPage() {
           </div>
         </motion.div>
 
-        {/* --- Review Section --- */}
+        {/* Review Section (unchanged) */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -448,7 +457,7 @@ export default function ProductDetailsPage() {
           <ReviewSection productId={id} onReviewChange={() => { refetchProduct(); refetchReviews(); }} />
         </motion.div>
 
-        {/* --- Related Products --- */}
+        {/* Related Products (unchanged) */}
         {relatedProducts.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 40 }}

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-/* 1. Enable manual class-based dark mode for Tailwind v4 */
+/* Enable manual class-based dark mode for Tailwind v4 */
 @variant dark (&:where(.dark, .dark *));
-/* src/app/globals.css */
+
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
@@ -12,29 +12,113 @@
   position: relative;
   overflow: hidden;
 }
-/* 2. Base Theme Variables */
+
+/* ============================================
+   THEME VARIABLES (Semantic Color Tokens)
+   ============================================ */
 :root {
-  --background: #fcfcfc;
-  --foreground: #09090b; /* zinc-950 */
+  /* Base backgrounds */
+  --bg-page: #fcfcfc;
+  --bg-surface: #ffffff;
+  --bg-surface-alt: #fcfcfc;
+  --bg-elevated: #ffffff;
+  --bg-overlay: rgba(0, 0, 0, 0.04);
+  
+  /* Text colors */
+  --text-primary: #09090b;
+  --text-secondary: #71717a;
+  --text-muted: #a1a1aa;
+  --text-inverse: #ffffff;
+  
+  /* Borders */
+  --border-light: #e4e4e7;
+  --border-medium: #d4d4d8;
+  --border-dark: #a1a1aa;
+  
+  /* Accent / Brand */
+  --accent-primary: #18181b;
+  --accent-primary-hover: #27272a;
+  --accent-primary-text: #ffffff;
+  
+  --accent-secondary: #f43f5e;
+  --accent-secondary-hover: #e11d48;
+  --accent-secondary-text: #ffffff;
+  
+  --accent-tertiary: #6366f1;
+  --accent-tertiary-hover: #4f46e5;
+  
+  /* Status */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  
+  /* Gradients */
+  --gradient-overlay: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.2));
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  
   scroll-behavior: smooth;
 }
 
-/* 3. Dark Mode Variables */
 .dark {
-  --background: #0a0a0a; /* premium matte black */
-  --foreground: #fafafa; /* zinc-50 */
+  /* Base backgrounds */
+  --bg-page: #050505;
+  --bg-surface: #0a0a0a;
+  --bg-surface-alt: #111111;
+  --bg-elevated: #1a1a1a;
+  --bg-overlay: rgba(255, 255, 255, 0.03);
+  
+  /* Text colors */
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #52525b;
+  --text-inverse: #09090b;
+  
+  /* Borders */
+  --border-light: #27272a;
+  --border-medium: #3f3f46;
+  --border-dark: #52525b;
+  
+  /* Accent / Brand */
+  --accent-primary: #ffffff;
+  --accent-primary-hover: #e4e4e7;
+  --accent-primary-text: #09090b;
+  
+  --accent-secondary: #f43f5e;
+  --accent-secondary-hover: #fb7185;
+  --accent-secondary-text: #ffffff;
+  
+  --accent-tertiary: #818cf8;
+  --accent-tertiary-hover: #6366f1;
+  
+  /* Status */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #f43f5e;
+  
+  /* Gradients */
+  --gradient-overlay: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.3));
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6);
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
 }
 
-/* 4. Premium Thin Scrollbar */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
 }
@@ -42,28 +126,17 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46; /* zinc-700 */
+  background: var(--border-medium);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #52525b; /* zinc-600 */
+  background: var(--border-dark);
 }
 
-/* Hide scrollbar completely where needed */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-
-
-@layer utilities {
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

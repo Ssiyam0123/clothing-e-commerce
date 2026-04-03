@@ -52,9 +52,14 @@ export default function FlashSaleClient() {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-6">
         <span className="text-8xl mb-8 grayscale opacity-20">⏳</span>
-        <h2 className="text-4xl font-black uppercase dark:text-white mb-4">{ui.emptyTitle}</h2>
-        <p className="text-zinc-500 mb-10">{ui.emptySub}</p>
-        <Link href="/products" className="bg-zinc-900 dark:bg-white text-white dark:text-black px-12 py-5 rounded-full font-black uppercase text-[11px] tracking-widest">{ui.explore}</Link>
+        <h2 className="text-4xl font-black uppercase text-primary mb-4">{ui.emptyTitle}</h2>
+        <p className="text-muted mb-10">{ui.emptySub}</p>
+        <Link
+          href="/products"
+          className="bg-primary text-on-primary px-12 py-5 rounded-full font-black uppercase text-[11px] tracking-widest hover:bg-primary-hover transition-colors"
+        >
+          {ui.explore}
+        </Link>
       </div>
     );
   }
@@ -66,29 +71,32 @@ export default function FlashSaleClient() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <div className="flex justify-between items-end mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-8">
+        <div className="flex justify-between items-end mb-12 border-b border-border-light pb-8">
           <div>
-            <p className="text-rose-500 font-black text-[10px] uppercase tracking-[0.4em] mb-4 flex items-center gap-2">
+            <p className="text-secondary font-black text-[10px] uppercase tracking-[0.4em] mb-4 flex items-center gap-2">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
               </span>
               {ui.liveDeals}
             </p>
-            <h2 className="text-5xl md:text-7xl font-black text-zinc-900 dark:text-white uppercase tracking-tighter leading-none">
+            <h2 className="text-5xl md:text-7xl font-black text-primary uppercase tracking-tighter leading-none">
               {activeSale.name}
             </h2>
           </div>
         </div>
 
-        <motion.div 
-          initial="hidden" 
-          animate="visible" 
+        <motion.div
+          initial="hidden"
+          animate="visible"
           variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
           className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8"
         >
           {products.map((p) => (
-            <motion.div key={p._id} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+            <motion.div
+              key={p._id}
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+            >
               <FlashSaleProductCard product={p} />
             </motion.div>
           ))}

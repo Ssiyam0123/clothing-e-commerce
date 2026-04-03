@@ -6,12 +6,8 @@ import {
   sendPasswordResetEmail,
 } from "../services/email.service.js";
 
-/**
- * 🛡️ VANGUARD AUTH PROTOCOL
- * Optimized for Cross-Domain Production Deployment (Vercel)
- */
+
 export const auth = betterAuth({
-  // ১. সলিড বেস ইউআরএল (ব্যাকএন্ড ডোমেইন)
   baseURL: process.env.BETTER_AUTH_URL || process.env.BACKEND_URL,
 
   database: mongodbAdapter(mongoose.connection.db, {
@@ -21,9 +17,8 @@ export const auth = betterAuth({
     verification: "verifications",
   }),
 
-  // ২. ট্রাস্টেড অরিজিন (ফ্রন্টএন্ড ডোমেইন গুলো এখানে মাস্ট থাকতে হবে)
   trustedOrigins: [
-    "https://clothing-e-commerce-web.vercel.app", // আপনার প্রোডাকশন ফ্রন্টএন্ড
+    "https://clothing-e-commerce-web.vercel.app", 
     "http://localhost:3000",
   ],
 

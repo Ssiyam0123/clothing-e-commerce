@@ -46,17 +46,14 @@ export const useAuth = () => {
     return data;
   };
 
- 
   const loginWithSocial = async (provider, redirectPath = "/") => {
     const cleanPath = redirectPath.startsWith("/") ? redirectPath : `/${redirectPath}`;
-    
-
-    const callbackURL = `${window.location.origin}${cleanPath}`;
+    const callbackURL = `${'https://clothing-e-commerce-web.vercel.app'}${cleanPath}`;
 
     const { error } = await authClient.signIn.social({
       provider,
       callbackURL: callbackURL, 
-      errorCallbackURL: `${window.location.origin}/login?error=auth_failed`,
+      errorCallbackURL: `https://clothing-e-commerce-web.vercel.app/login?error=auth_failed`,
     });
 
     if (error) throw new Error(error.message || `${provider} synchronization failed.`);

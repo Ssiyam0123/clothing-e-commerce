@@ -5,15 +5,20 @@ import { usePathname } from "next/navigation";
 import { useAppStore } from "@/store/appStore";
 import { useSettings } from "@/hooks/useSettings";
 import { useTrackingStore } from "@/store/trackingStore";
+import { useProductCondition } from "@/store/productCondition";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Script from "next/script";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ClientWrapper({ children, isAdminRoute }) {
   const pathname = usePathname();
   const { theme, lang, isMounted, initApp } = useAppStore();
-  const { settings } = useSettings(); // 🚀 এখন এখানে আর এরর দিবে না
+  const { settings } = useSettings();
   const trackPageView = useTrackingStore((state) => state.trackPageView);
+  const fetchInitialData = useProductCondition((state) => state.fetchInitialData);
+  const resetStore = useProductCondition((state) => state.resetStore);
+  const { user } = useAuth(); // need auth to know if logged in
 
   const branding = settings?.branding || {};
   const config = settings?.config || {};
@@ -22,6 +27,14 @@ export default function ClientWrapper({ children, isAdminRoute }) {
   useEffect(() => {
     initApp();
   }, [initApp]);
+
+  useEffect(() => {
+    if (user) {
+      fetchInitialData();
+    } else {
+      resetStore();
+    }
+  }, [user, fetchInitialData, resetStore]);
 
   useEffect(() => {
     if (!isMounted) return;
@@ -41,7 +54,6 @@ export default function ClientWrapper({ children, isAdminRoute }) {
 
   return (
     <>
-      {/* Dynamic Header Info */}
       {pixelId && (
         <Script
           id="fb-pixel"

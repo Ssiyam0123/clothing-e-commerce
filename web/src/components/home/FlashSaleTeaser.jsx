@@ -1,72 +1,87 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import FlashSaleProductCard from '@/components/store/FlashSaleProductCard';
-import { motion } from 'framer-motion';
+import Link from "next/link";
+import FlashSaleProductCard from "@/components/store/FlashSaleProductCard";
+import { motion } from "framer-motion";
+import { ArrowRight, Zap } from "lucide-react";
 
-export default function FlashSaleTeaser({ activeSale, flashSaleProducts, ui, lang }) {
-  // 🛡️ Guard Clause
+export default function FlashSaleTeaser({
+  activeSale,
+  flashSaleProducts,
+  ui,
+  lang,
+}) {
   if (!activeSale || !flashSaleProducts?.products?.length) return null;
 
-  // ফ্রেমার মোশন ভ্যারিয়েন্ট
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
+  const isBn = lang === "bn";
 
   return (
-    <section className="py-20 bg-rose-500/[0.02] border-b border-zinc-100 dark:border-zinc-900 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        
-        {/* Header Area */}
-        <div className="flex justify-between items-end mb-10">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
+    <section className="relative py-24 overflow-hidden bg-white dark:bg-[#050505]">
+      {/* 🌌 Subtle Background Glows */}
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-rose-600/5 blur-[100px] rounded-full -z-10" />
+      <div className="absolute bottom-0 left-0 w-[250px] h-[250px] bg-indigo-600/5 blur-[80px] rounded-full -z-10" />
+
+      <div className="max-w-[1700px] mx-auto px-4 sm:px-10">
+        {/* --- Header Section --- */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16">
+          <div className="space-y-6">
+            {/* Live Badge */}
+            <div className="flex items-center gap-2.5 bg-rose-600/10 dark:bg-rose-600/20 w-fit px-4 py-2 rounded-full border border-rose-600/10">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
               </span>
-              <p className="text-rose-500 font-black text-[9px] sm:text-[10px] uppercase tracking-[0.4em]">
-                Live Now
+              <p className="text-rose-600 dark:text-rose-400 font-black text-[10px] uppercase tracking-[0.4em]">
+                {isBn ? "লাইভ ড্রপ" : "Live Drop"}
               </p>
             </div>
-            <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase text-zinc-900 dark:text-white leading-none">
-              Flash <span className="text-rose-600 italic">Sale</span>
+
+            {/* Title with Outline Effect */}
+            <h2 className="text-6xl md:text-9xl font-black tracking-tighter uppercase italic text-gray-900 dark:text-white leading-[0.8] transition-all">
+              Flash <br />
+              <span
+                className="text-transparent stroke-rose-600 dark:stroke-white opacity-40"
+                style={{ WebkitTextStroke: "1.5px currentColor" }}
+              >
+                Vault
+              </span>
             </h2>
           </div>
-          
-          <Link 
-            href="/flash-sale" 
-            className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-rose-500 transition-colors border-b border-zinc-200 dark:border-zinc-800 pb-1"
-          >
-            {lang === 'en' ? 'View All' : 'সব দেখুন'} →
-          </Link>
+
+          {/* Action Link */}
+          <div className="flex flex-col items-start md:items-end gap-2">
+            <Link
+              href="/flash-sale"
+              className="group flex items-center gap-3 text-xs font-black uppercase tracking-[0.3em] text-zinc-900 dark:text-white bg-zinc-100 dark:bg-white/5 px-8 py-5 rounded-2xl hover:bg-rose-600 hover:text-white transition-all duration-500"
+            >
+              {isBn ? "সবগুলো দেখুন" : "Enter the Vault"}
+              <ArrowRight
+                size={16}
+                className="group-hover:translate-x-2 transition-transform"
+              />
+            </Link>
+          </div>
         </div>
 
-        {/* 🚀 Grid: Mobile 2 cols, Desktop 4 cols */}
-        {/* gap-4 for mobile, gap-8 for desktop */}
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
+        {/* --- Product Grid --- */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10"
         >
-          {flashSaleProducts.products.slice(0, 4).map((p) => (
-            <motion.div key={p._id} variants={itemVariants}>
+          {flashSaleProducts.products.slice(0, 4).map((p, idx) => (
+            <motion.div
+              key={p._id}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: idx * 0.1, type: "spring", stiffness: 100 }}
+            >
               <FlashSaleProductCard product={p} />
             </motion.div>
           ))}
         </motion.div>
-        
       </div>
     </section>
   );

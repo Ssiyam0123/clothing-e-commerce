@@ -17,7 +17,6 @@ const NewsletterSkeleton = () => (
 export default function Newsletter({ ui, lang = 'en' }) {
   const isBn = lang === 'bn';
 
-  // 🛡️ Defensive Guard: যদি ui না থাকে তবে স্কেলিটন দেখাবে
   if (!ui) {
     return (
       <section className="py-40 bg-black text-white relative overflow-hidden">

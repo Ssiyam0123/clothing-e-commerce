@@ -46,17 +46,15 @@ export default function LoginPage() {
   
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   
-  // 🚀 প্রো-ফিক্স: রিডাইরেক্ট পাথ স্যানিটাইজেশন
-  const redirectPath = searchParams.get("redirect") || "/profile";
+  const redirectPath = searchParams.get("redirect") || "/";
 
   const { register, handleSubmit, formState: { errors } } = useForm();
   const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY["en"], [lang]);
 
-  // 📧 Email Login Handler
+  //  Email Login Handler
   const onSubmit = async (data) => {
     setIsLoggingIn(true);
     try {
-      // ইমেইল লগইন সরাসরি ক্লায়েন্ট সাইড থেকে রাউটার পুশ করে
       await login({ 
         email: data.email, 
         password: data.password 
@@ -64,7 +62,6 @@ export default function LoginPage() {
       
       swalToast(lang === 'bn' ? "সফলভাবে লগইন হয়েছে" : "Authentication Successful", "success");
       
-      // লগইন শেষে ইউজারকে কাঙ্ক্ষিত পেজে পাঠিয়ে দাও
       router.push(redirectPath);
       router.refresh();
     } catch (err) {
@@ -74,10 +71,9 @@ export default function LoginPage() {
     }
   };
 
-  // 🌐 Social Login Wrapper
+  //  Social Login Wrapper
   const handleSocialLogin = async (provider) => {
     try {
-      // useAuth হুকে আমরা অলরেডি absolute URL লজিক সেট করেছি
       await loginWithSocial(provider, redirectPath);
     } catch (err) {
       swalError("Social Auth Failed", err.message);

@@ -1,42 +1,110 @@
+'use client';
+
 import Link from 'next/link';
 import ProductCard from '@/components/store/ProductCard';
+import { motion } from 'framer-motion';
+import { ArrowRight, Plus } from 'lucide-react';
 
 export default function ProductSection({ title, subTitle, products, lang, isDarkBg = false, showLoadMore = false, ui }) {
   if (!products || products.length === 0) return null;
 
+  // 🚀 Animation Variants for Staggered Entry
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { type: 'spring', stiffness: 100, damping: 20 } 
+    },
+  };
+
   return (
-    <section className={`py-20 md:py-32 ${isDarkBg ? 'bg-zinc-50 dark:bg-[#080808] border-y border-zinc-100 dark:border-zinc-900' : ''}`}>
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
+    <section className={`md:py-36 transition-colors duration-700 ${
+      isDarkBg ? 'bg-zinc-50 dark:bg-[#080808]' : 'bg-transparent'
+    }`}>
+      <div className="max-w-[1700px] mx-auto px-4 md:px-10">
         
-        {/* Header Logic */}
-        <div className={`flex ${showLoadMore ? 'flex-col items-center text-center mb-16 md:mb-20' : 'justify-between items-end mb-12 md:mb-16 border-b border-zinc-200 dark:border-zinc-800 pb-8'}`}>
-          <div>
-            <p className="text-zinc-400 font-black text-[9px] md:text-[10px] uppercase tracking-[0.4em] mb-3">{subTitle}</p>
-            <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase text-zinc-900 dark:text-white leading-tight">
+        {/* --- Header Area --- */}
+        <div className={`flex flex-col md:flex-row gap-6 ${
+          showLoadMore ? 'items-center text-center mb-20' : 'justify-between items-end mb-16'
+        }`}>
+          <div className="space-y-3">
+            <motion.p 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="text-rose-600 font-black text-[9px] md:text-[10px] uppercase tracking-[0.5em] flex items-center gap-2"
+            >
+              <span className="w-8 h-[1px] bg-rose-600 hidden md:block" />
+              {subTitle}
+            </motion.p>
+            
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic text-gray-900 dark:text-white leading-[0.9]"
+            >
               {title}
-            </h2>
+            </motion.h2>
           </div>
+
           {!showLoadMore && (
-            <Link href="/products" className="hidden md:block text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-              View All
+            <Link 
+              href="/products" 
+              className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-rose-600 transition-all"
+            >
+              {lang === 'bn' ? 'সব দেখুন' : 'Explore All'}
+              <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
             </Link>
           )}
         </div>
-        
-        {/* 🚀 Grid: Mobile 2 columns, Desktop 4 columns */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-          {products.map(p => (
-            <ProductCard key={p._id} product={p} lang={lang} />
-          ))}
-        </div>
 
-        {/* Load More Button */}
+        {/* --- Product Grid with Motion --- */}
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10"
+        >
+          {products.map((p) => (
+            <motion.div key={p._id} variants={itemVariants}>
+              <ProductCard product={p} lang={lang} />
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* --- Load More Button --- */}
         {showLoadMore && (
-          <div className="mt-16 md:mt-20 text-center">
-            <Link href="/products" className="inline-block border border-zinc-300 dark:border-zinc-800 px-10 md:px-12 py-3.5 md:py-4 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-all active:scale-95">
-              {ui?.loadMore || 'Load More'}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="mt-20 md:mt-24 text-center"
+          >
+            <Link 
+              href="/products" 
+              className="relative inline-flex items-center gap-3 overflow-hidden bg-black dark:bg-white text-white dark:text-black px-12 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.25em] hover:scale-105 active:scale-95 transition-all group shadow-2xl"
+            >
+              <Plus size={16} className="group-hover:rotate-90 transition-transform duration-500" />
+              {ui?.loadMore || (lang === 'bn' ? 'আরও দেখুন' : 'Load Artifacts')}
+              
+              {/* Subtle hover overlay */}
+              <div className="absolute inset-0 bg-rose-600 translate-y-full group-hover:translate-y-0 transition-transform duration-500 -z-10" />
             </Link>
-          </div>
+          </motion.div>
         )}
       </div>
     </section>

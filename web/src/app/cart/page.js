@@ -1,11 +1,11 @@
 'use client';
 
 import { useMemo, useEffect } from 'react';
-import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { getImageUrl } from '@/utils/imageUtils';
 import { useAppStore } from '@/store/appStore';
+import { useProductCondition } from '@/store/productCondition';
 import { useTrackingStore } from '@/store/trackingStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CartItemSkeleton, CartSummarySkeleton } from '@/components/common/Skeletons';
@@ -29,7 +29,6 @@ const DICTIONARY = {
 
 export default function CartPage() {
   const { user } = useAuth();
-  const { cart, isLoading: cartLoading, updateCartItem, removeFromCart } = useCart();
   const { lang, isMounted } = useAppStore();
   const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY['en'], [lang]);
   const isBn = lang === 'bn';
@@ -37,18 +36,31 @@ export default function CartPage() {
   const trackViewCart = useTrackingStore((state) => state.trackViewCart);
   const trackRemoveFromCart = useTrackingStore((state) => state.trackRemoveFromCart);
 
+  // Use store
+  const cart = useProductCondition((state) => state.cart);
+  const updateCartItem = useProductCondition((state) => state.updateCartItem);
+  const removeFromCart = useProductCondition((state) => state.removeFromCart);
+  const addToCart = useProductCondition((state) => state.addToCart); // not needed directly here
+
   useEffect(() => {
     if (cart?.items?.length > 0) trackViewCart(cart.items, cart.totalPrice);
   }, [cart, trackViewCart]);
 
   const handleRemoveItem = async (productId, sizeId, price) => {
     try {
-      await removeFromCart({ productId, sizeId });
+      await removeFromCart(productId, sizeId);
       trackRemoveFromCart(productId, price);
     } catch (err) { console.error(err); }
   };
 
-  // 🚀 Shell Render: পেজে ঢোকার সাথে সাথে এই অংশটুকু দেখা যাবে
+  const handleUpdateQuantity = (productId, sizeId, newQuantity) => {
+    if (newQuantity < 1) {
+      handleRemoveItem(productId, sizeId, 0);
+    } else {
+      updateCartItem(productId, sizeId, newQuantity);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#fcfcfc] dark:bg-[#050505] py-12 lg:py-24 transition-colors duration-700 relative overflow-hidden">
       <div className="absolute top-20 left-0 w-[500px] h-[500px] bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
@@ -58,7 +70,7 @@ export default function CartPage() {
            <h1 className={`text-5xl md:text-8xl font-black tracking-tighter uppercase mb-4 leading-none text-zinc-900 dark:text-white ${isBn ? 'font-sans' : ''}`}>
              {ui.title}
            </h1>
-           {!cartLoading && cart?.items?.length > 0 && (
+           {cart?.items?.length > 0 && (
              <div className="flex items-center gap-4">
                 <span className="h-1.5 w-1.5 rounded-full bg-zinc-900 dark:bg-white animate-pulse"></span>
                 <p className="text-zinc-500 uppercase text-[10px] font-black tracking-[0.4em]">
@@ -71,12 +83,7 @@ export default function CartPage() {
         <div className="grid lg:grid-cols-12 gap-16 lg:gap-24 items-start">
           <div className="lg:col-span-7">
             <AnimatePresence mode="wait">
-              {cartLoading ? (
-                <motion.div key="skeleton" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-12">
-                   <CartItemSkeleton />
-                   <CartItemSkeleton />
-                </motion.div>
-              ) : !cart?.items?.length ? (
+              {!cart?.items?.length ? (
                 <motion.div key="empty" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="py-20 text-center">
                   <span className="text-7xl mb-8 block grayscale opacity-20">👜</span>
                   <h2 className="text-4xl font-black uppercase mb-6 text-zinc-900 dark:text-white">{ui.empty}</h2>
@@ -88,7 +95,7 @@ export default function CartPage() {
                     const basePrice = item.product.price;
                     const discountedPrice = item.product.discount > 0 ? basePrice - (basePrice * item.product.discount / 100) : basePrice;
                     return (
-                      <div key={`${item.product._id}-${item.size?._id}`} className="group flex flex-col md:flex-row gap-8 pb-12 border-b border-zinc-100 dark:border-white/5">
+                      <div key={`${item.product._id}-${item.size._id}`} className="group flex flex-col md:flex-row gap-8 pb-12 border-b border-zinc-100 dark:border-white/5">
                         <div className="w-full md:w-48 lg:w-52 aspect-[3/4] bg-zinc-100 dark:bg-[#0a0a0a] rounded-[2rem] overflow-hidden border dark:border-white/5 relative shrink-0">
                           <img src={getImageUrl(item.product.images?.[0])} alt={item.product.name} className="w-full h-full object-cover grayscale-[15%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" />
                         </div>
@@ -96,15 +103,15 @@ export default function CartPage() {
                           <div className="flex justify-between items-start mb-8 gap-4">
                             <div className="min-w-0">
                               <Link href={`/products/${item.product._id}`} className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-zinc-900 dark:text-white hover:text-zinc-500 transition-colors leading-tight block truncate">{item.product.name}</Link>
-                              <p className="text-zinc-500 uppercase text-[9px] font-black tracking-[0.3em] mt-3">{ui.size}: <span className="text-zinc-900 dark:text-zinc-200">{item.size?.name}</span></p>
+                              <p className="text-zinc-500 uppercase text-[9px] font-black tracking-[0.3em] mt-3">{ui.size}: <span className="text-zinc-900 dark:text-zinc-200">{item.size.name}</span></p>
                             </div>
                             <button onClick={() => handleRemoveItem(item.product._id, item.size._id, discountedPrice)} className="w-10 h-10 rounded-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:text-rose-500 transition-colors flex items-center justify-center shrink-0">✕</button>
                           </div>
                           <div className="mt-auto flex flex-wrap items-end justify-between gap-6">
                             <div className="flex items-center bg-white dark:bg-[#0a0a0a] rounded-full p-1 border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                              <button onClick={() => updateCartItem({ productId: item.product._id, sizeId: item.size._id, quantity: item.quantity - 1 })} className="w-10 h-10 flex items-center justify-center text-lg text-zinc-400">-</button>
+                              <button onClick={() => handleUpdateQuantity(item.product._id, item.size._id, item.quantity - 1)} className="w-10 h-10 flex items-center justify-center text-lg text-zinc-400">-</button>
                               <span className="w-8 text-center text-xs font-black">{item.quantity}</span>
-                              <button onClick={() => updateCartItem({ productId: item.product._id, sizeId: item.size._id, quantity: item.quantity + 1 })} className="w-10 h-10 flex items-center justify-center text-lg text-zinc-400">+</button>
+                              <button onClick={() => handleUpdateQuantity(item.product._id, item.size._id, item.quantity + 1)} className="w-10 h-10 flex items-center justify-center text-lg text-zinc-400">+</button>
                             </div>
                             <div className="text-right">
                               <p className="text-[8px] font-black text-zinc-400 uppercase tracking-widest mb-1">{ui.valAssess}</p>
@@ -122,9 +129,7 @@ export default function CartPage() {
 
           <div className="lg:col-span-5 relative">
             <div className="sticky top-32">
-              {cartLoading ? (
-                <CartSummarySkeleton />
-              ) : cart?.items?.length > 0 ? (
+              {cart?.items?.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-8 md:p-12 rounded-[3rem] bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-2xl border border-zinc-200 dark:border-white/5 shadow-xl">
                   <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter mb-8 border-b border-zinc-100 dark:border-zinc-800 pb-6">{ui.summary}</h2>
                   <div className="space-y-6 mb-10">
@@ -148,7 +153,7 @@ export default function CartPage() {
                     </div>
                   </Link>
                 </motion.div>
-              ) : null}
+              )}
             </div>
           </div>
         </div>
