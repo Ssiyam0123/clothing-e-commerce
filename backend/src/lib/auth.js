@@ -8,7 +8,7 @@ import {
 
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL || process.env.BACKEND_URL ||"https://ecowear-backend.vercel.app/api/auth"
+  baseURL: process.env.BETTER_AUTH_URL || process.env.BACKEND_URL ||"https://ecowear-backend.vercel.app/api/auth",
 
   database: mongodbAdapter(mongoose.connection.db, {
     user: "users",
