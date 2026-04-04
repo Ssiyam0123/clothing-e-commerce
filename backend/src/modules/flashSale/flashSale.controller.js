@@ -1,6 +1,15 @@
 import FlashSale from './flashSale.model.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 
+
+const populatedProductsConfig = {
+  path: 'products',
+  populate: {
+    path: 'sizes.size',
+    select: 'name'
+  }
+};
+
 // Create a new flash sale
 export const createFlashSale = asyncHandler(async (req, res) => {
   const { 
@@ -14,7 +23,7 @@ export const createFlashSale = asyncHandler(async (req, res) => {
 
   let finalStartDate = startDate ? new Date(startDate) : new Date();
   if (startImmediately === true || startImmediately === 'true') {
-    finalStartDate = new Date(); // now
+    finalStartDate = new Date();
   }
 
   const end = new Date(endDate);
@@ -45,22 +54,17 @@ export const updateFlashSale = asyncHandler(async (req, res) => {
 
   const updateData = { ...req.body };
 
-  // Handle startImmediately flag
   if (updateData.startImmediately !== undefined) {
     const startNow = updateData.startImmediately === true || updateData.startImmediately === 'true';
-    if (startNow) {
-      updateData.startDate = new Date();
-    }
+    if (startNow) updateData.startDate = new Date();
   }
 
-  // Convert discount to number
   if (updateData.discount !== undefined) {
     const discount = Number(updateData.discount);
     if (isNaN(discount)) return res.status(400).json({ message: 'Invalid discount value' });
     updateData.discount = discount;
   }
 
-  // Clean products array
   if (updateData.products && Array.isArray(updateData.products)) {
     updateData.products = updateData.products.filter(id => id && typeof id === 'string');
   }
@@ -69,21 +73,18 @@ export const updateFlashSale = asyncHandler(async (req, res) => {
     id,
     { $set: updateData },
     { returnDocument: 'after', runValidators: true }
-  ).populate('products', 'name price images');
+  ).populate(populatedProductsConfig); // 🚀 সাইজ সিঙ্ক করা হলো
 
   res.json(updatedSale);
 });
 
-// ... rest of the controller (getAllFlashSales, deleteFlashSale, etc.) unchanged ...
-
-
 // Get all flash sales (admin)
 export const getAllFlashSales = asyncHandler(async (req, res) => {
-  const flashSales = await FlashSale.find({}).sort('-createdAt').populate('products', 'name price images');
+  const flashSales = await FlashSale.find({})
+    .sort('-createdAt')
+    .populate(populatedProductsConfig); 
   res.json(flashSales);
 });
-
-
 
 // Delete a flash sale
 export const deleteFlashSale = asyncHandler(async (req, res) => {
@@ -94,36 +95,35 @@ export const deleteFlashSale = asyncHandler(async (req, res) => {
 // Get all active flash sales (public)
 export const getActiveFlashSales = asyncHandler(async (req, res) => {
   const now = new Date();
-  // Return all sales that are active and not yet ended
   const sales = await FlashSale.find({ 
     isActive: true, 
     endDate: { $gte: now } 
-  }).sort('startDate'); // sort by start date ascending
+  }).sort('startDate');
   res.json(sales);
 });
+
 export const getFlashSaleProducts = asyncHandler(async (req, res) => {
   const now = new Date();
   const sale = await FlashSale.findOne({
     isActive: true,
     startDate: { $lte: now },
     endDate: { $gte: now },
-  }).populate('products');
+  }).populate(populatedProductsConfig); // 🚀 Deep Populate Applied
   
   if (!sale) return res.json({ flashSale: null, products: [] });
   
   const productsWithDiscount = sale.products.map(product => {
     const p = product.toObject();
     
-    // লজিক: প্রোডাক্টের নিজস্ব ডিসকাউন্ট ইগনোর করে মেইন প্রাইস থেকে ফ্ল্যাশ সেল ডিসকাউন্ট কাটা হবে
     const basePrice = p.price; 
     const flashDiscount = sale.discount;
     const finalFlashPrice = basePrice - (basePrice * flashDiscount / 100);
 
     return {
       ...p,
-      originalPrice: basePrice, // একদম আসল দাম (No product discount)
-      discountedPrice: finalFlashPrice, // শুধু ফ্ল্যাশ সেল ডিসকাউন্ট অ্যাপ্লাই করা দাম
-      discountPercentage: flashDiscount, // শুধু ফ্ল্যাশ সেলের পার্সেন্টেজ
+      originalPrice: basePrice,
+      discountedPrice: finalFlashPrice,
+      discountPercentage: flashDiscount,
       flashSaleEnds: sale.endDate,
     };
   });
@@ -132,10 +132,9 @@ export const getFlashSaleProducts = asyncHandler(async (req, res) => {
 });
 
 export const getFlashSaleById = asyncHandler(async (req, res) => {
-  const sale = await FlashSale.findById(req.params.id).populate('products');
+  const sale = await FlashSale.findById(req.params.id).populate(populatedProductsConfig); // 🚀 Deep Populate Applied
   if (!sale) return res.status(404).json({ message: 'Sale not found' });
 
-  // এখানেও সেম লজিক অ্যাপ্লাই করতে হবে যাতে ডাটা কনসিস্টেন্ট থাকে
   const productsWithDiscount = sale.products.map(p => {
     const productObj = p.toObject();
     const basePrice = productObj.price;
@@ -150,9 +149,7 @@ export const getFlashSaleById = asyncHandler(async (req, res) => {
   });
 
   const saleObj = sale.toObject();
-  saleObj.products = productsWithDiscount; // ওভাররাইড করা হলো
+  saleObj.products = productsWithDiscount; 
   
   res.json(saleObj);
 });
-
-

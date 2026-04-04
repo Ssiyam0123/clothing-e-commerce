@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import api from "@/lib/api";
+import { useProductCondition } from "./productCondition";
 
 export const useAuthStore = create(
   persist(
@@ -22,6 +23,8 @@ export const useAuthStore = create(
 
       logout: () => {
         localStorage.removeItem("token");
+        // Reset product store (clear cart & wishlist)
+        useProductCondition.getState().resetStore();
         set({
           user: null,
           token: null,
@@ -40,6 +43,8 @@ export const useAuthStore = create(
         try {
           const { data } = await api.get("/auth/me");
           set({ user: data, token, isAuthenticated: true, isLoading: false });
+          // After session check, sync guest data if any
+          await useProductCondition.getState().syncGuestDataWithUser();
         } catch (error) {
           console.error("Auth sync failed:", error);
           get().logout();
@@ -51,6 +56,8 @@ export const useAuthStore = create(
         try {
           const { data } = await api.post("/auth/login", { email, password });
           get().setCredentials(data.user, data.token);
+          // Merge guest cart/wishlist into user account
+          await useProductCondition.getState().syncGuestDataWithUser();
           return data;
         } catch (error) {
           set({ isLoading: false });
@@ -76,7 +83,7 @@ export const useAuthStore = create(
           const { data } = await api.put("/users/profile", profileData, {
             headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
           });
-          set({ user: data }); 
+          set({ user: data });
           return data;
         } catch (error) {
           throw error;
@@ -98,9 +105,9 @@ export const useAuthStore = create(
     {
       name: "auth-vault",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ 
-        user: state.user, 
-        isAuthenticated: state.isAuthenticated 
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated
       }),
     }
   )
