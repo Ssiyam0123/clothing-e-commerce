@@ -1,26 +1,25 @@
 'use client';
-import { useAuth } from '@/hooks/useAuth';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Loader from '../common/Loader';
 import { motion } from 'framer-motion';
+import { useAuthStore } from '@/store/authStore';
 
 export default function ProtectedRoute({ children, adminOnly = false }) {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (isLoading) return; // 👈 সেশন চেক শেষ না হওয়া পর্যন্ত ওয়েট
+    if (isLoading) return; 
 
     if (!isAuthenticated) {
-      // 🌟 লগইন পেজে পাঠানোর সময় রিডাইরেক্ট URL দিয়ে পাঠানো স্মার্ট আইডিয়া
       router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
     } else if (adminOnly && user?.role !== 'admin') {
       router.replace('/');
     } else {
-      setIsAuthorized(true); // 👈 সব চেক পাস করলে তবেই কম্পোনেন্ট রেন্ডার হবে
+      setIsAuthorized(true); 
     }
   }, [isLoading, isAuthenticated, user, router, adminOnly, pathname]);
 

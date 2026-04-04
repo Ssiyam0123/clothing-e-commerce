@@ -3,9 +3,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Minus, Plus, ShoppingCart, Zap } from "lucide-react";
 import { useProductCondition } from "@/store/productCondition";
-import useAuth from "@/hooks/useAuth";
 import { swalToast } from "@/utils/swal";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
 
 export default function QuickSelectModal({ isOpen, onClose, product, lang }) {
   const router = useRouter();
@@ -14,7 +14,7 @@ export default function QuickSelectModal({ isOpen, onClose, product, lang }) {
 
   //  Store Actions
   const { addToCart, initiateBuyNow } = useProductCondition();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthStore();
 
   if (!isOpen) return null;
 

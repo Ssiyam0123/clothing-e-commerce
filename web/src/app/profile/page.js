@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import  useAuth  from '@/hooks/useAuth';
 import { useOrders } from '@/hooks/useOrders';
 import { getImageUrl } from '@/utils/imageUtils';
 import Alert from '@/components/common/Alert';
@@ -11,6 +10,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/store/appStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuthStore } from '@/store/authStore';
 
 const DICTIONARY = {
   en: {
@@ -89,7 +89,7 @@ const staggerContainer = {
 
 function ProfileContent() {
   const searchParams = useSearchParams();
-  const { user, isLoading: authLoading, changePassword, updateProfile, uploadAvatar } = useAuth();
+  const { user, isLoading: authLoading, changePassword, updateProfile, uploadAvatar } = useAuthStore();
   const { myOrders, myOrdersLoading } = useOrders();
 
   const [loading, setLoading] = useState(false);

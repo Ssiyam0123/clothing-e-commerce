@@ -3,15 +3,15 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useProductCondition } from '@/store/productCondition';
-import useAuth from '@/hooks/useAuth';
 import OptimizedImage from '@/components/common/OptimizedImage'; 
 import { Heart, ShoppingBag, Zap, Star } from 'lucide-react';
 import QuickSelectModal from '../store/QuickSelectModal';
+import { useAuthStore } from '@/store/authStore';
 
 export default function ProductCard({ product, lang = 'en' }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { wishlistItems, toggleWishlist } = useProductCondition();
-  const { user } = useAuth(); // God store updated version logic
+  const { user } = useAuthStore(); // God store updated version logic
 
   if (!product) return null;
 

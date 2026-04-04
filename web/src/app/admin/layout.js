@@ -1,16 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import  useAuth  from '@/hooks/useAuth';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { getImageUrl } from '@/utils/imageUtils';
 import Sidebar from '@/components/admin/Sidebar';
 import Loader from '@/components/common/Loader';
 import { useAppStore } from '@/store/appStore';
+import { useAuthStore } from '@/store/authStore';
 
 export default function AdminLayout({ children }) {
-  const { user, isLoading: authLoading, logout } = useAuth();
+  const { user, isLoading: authLoading, logout } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

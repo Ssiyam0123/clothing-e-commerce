@@ -2,13 +2,13 @@
 
 import React, { memo, useCallback } from "react";
 import { useProductCondition } from "@/store/productCondition";
-import  useAuth  from "@/hooks/useAuth";
 import { swalToast } from "@/utils/swal";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuthStore } from "@/store/authStore";
 
 const WishlistButton = memo(({ product, lang }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthStore();
   
   // 🚀 INDUSTRY STANDARD: এই সিলেক্টরটি নিশ্চিত করে যে অন্য প্রোডাক্টের জন্য 
   // এই বাটন রি-রেন্ডার হবে না।

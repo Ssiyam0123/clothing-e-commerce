@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '@/hooks/useAuth';
 import { getImageUrl } from '@/utils/imageUtils';
 import api from '@/lib/api';
 import Alert from '@/components/common/Alert';
 import Loader from '@/components/common/Loader';
 import ProtectedRoute from '@/components/admin/ProtectedRoute';
 import AdminLayout from '../layout';
+import { useAuthStore } from '@/store/authStore';
 
 export default function AdminProfile() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');

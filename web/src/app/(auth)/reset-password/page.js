@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, Suspense } from "react";
-import  useAuth  from "@/hooks/useAuth";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { swalToast, swalError } from "@/utils/swal";
+import { useAuthStore } from "@/store/authStore";
 
 function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { resetPassword } = useAuth();
+  const { resetPassword } = useAuthStore();
   const token = searchParams.get("token");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

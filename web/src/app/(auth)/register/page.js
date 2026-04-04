@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import  useAuth  from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { swalToast, swalError } from "@/utils/swal";
+import { useAuthStore } from "@/store/authStore";
 
 export default function RegisterPage() {
-  const { register } = useAuth();
+  const { register } = useAuthStore();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

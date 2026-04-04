@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import  useAuth  from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { swalToast, swalError } from "@/utils/swal";
+import { useAuthStore } from "@/store/authStore";
 
 export default function ForgotPasswordPage() {
-  const { forgotPassword } = useAuth();
+  const { forgotPassword } = useAuthStore();
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);

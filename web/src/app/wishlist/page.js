@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo } from 'react';
-import  useAuth  from '@/hooks/useAuth';
 import Link from 'next/link';
 import { getImageUrl } from '@/utils/imageUtils';
 import Loader from '@/components/common/Loader';
@@ -11,6 +10,7 @@ import { useAppStore } from '@/store/appStore';
 import { useTrackingStore } from '@/store/trackingStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, X, ArrowRight, Info } from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
 
 const DICTIONARY = {
   en: {
@@ -28,7 +28,7 @@ const DICTIONARY = {
 };
 
 export default function WishlistPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuthStore();
   const { lang, isMounted } = useAppStore();
   const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY['en'], [lang]);
 

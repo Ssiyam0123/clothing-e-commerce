@@ -1,11 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
-import { useAuth } from './useAuth';
 import { getGuestId } from '@/utils/guestId';
+import { useAuthStore } from '@/store/authStore';
 
 export const useWishlist = () => {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const guestId = getGuestId();
   const userId = user?._id || guestId;
 
