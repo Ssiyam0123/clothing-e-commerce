@@ -34,7 +34,11 @@ app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: ["http://localhost:3000","https://clothing-e-commerce-web.vercel.app/"],
+    // 🚀 প্রো-টিপ: ডোমেইনের শেষে কখনো "/" দেবেন না
+    origin: [
+      "http://localhost:3000",
+      "https://clothing-e-commerce-web.vercel.app" 
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
