@@ -68,6 +68,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     }
 });
 
+
 export const getProducts = asyncHandler(async (req, res) => {
     const {
         category,
@@ -83,55 +84,43 @@ export const getProducts = asyncHandler(async (req, res) => {
 
     const matchStage = {};
 
-    // Handle isActive filter (admin can pass 'all' or 'false')
+    // 1. Filtering Logic
     if (isActive === 'all') {
-        // no condition – show both active & inactive
+        // Show both
     } else if (isActive === 'false') {
         matchStage.isActive = false;
     } else {
         matchStage.isActive = true;
     }
 
-    // Category filter by slug
     if (category && category !== 'all') {
         const catDoc = await Category.findOne({ slug: category }).select('_id');
-        if (catDoc) {
-            matchStage.category = catDoc._id;
-        } else {
-            return res.json({
-                success: true,
-                total: 0,
-                pages: 0,
-                currentPage: 1,
-                pageSize: 0,
-                products: []
-            });
-        }
+        if (catDoc) matchStage.category = catDoc._id;
+        else return res.json({ success: true, total: 0, pages: 0, products: [] });
     }
 
-    // Search
     if (search) {
         const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         matchStage.name = { $regex: safeSearch, $options: 'i' };
     }
 
-    // Price range
     if (minPrice || maxPrice) {
         matchStage.price = {};
         if (minPrice) matchStage.price.$gte = Number(minPrice);
         if (maxPrice) matchStage.price.$lte = Number(maxPrice);
     }
 
-    // Aggregation pipeline
+    // 2. Base Pipeline
     const pipeline = [];
     pipeline.push({ $match: matchStage });
+    
+    // Calculate totalStock for filtering
     pipeline.push({
         $addFields: {
             totalStock: { $sum: '$sizes.stock' }
         }
     });
 
-    // Stock status filter
     if (stockStatus) {
         if (stockStatus === 'lowStock') {
             pipeline.push({ $match: { totalStock: { $lt: 10, $gt: 0 } } });
@@ -140,49 +129,77 @@ export const getProducts = asyncHandler(async (req, res) => {
         }
     }
 
-    // Count total (after stock filter)
+    // 3. Count total items for pagination
     const countPipeline = [...pipeline, { $count: 'total' }];
     const countResult = await Product.aggregate(countPipeline);
     const total = countResult.length > 0 ? countResult[0].total : 0;
 
-    // Sorting
-    let sortStage = { $sort: {} };
-    if (sort === '-createdAt') sortStage.$sort = { createdAt: -1 };
-    else if (sort === 'price') sortStage.$sort = { price: 1 };
-    else if (sort === '-price') sortStage.$sort = { price: -1 };
-    else if (sort === 'oldest') sortStage.$sort = { createdAt: 1 };
-    else if (sort === 'stockHigh') sortStage.$sort = { totalStock: -1 };
-    else if (sort === 'stockLow') sortStage.$sort = { totalStock: 1 };
-    else sortStage.$sort = { createdAt: -1 };
-    pipeline.push(sortStage);
+    // 4. Sorting & Pagination
+    let sortObj = { createdAt: -1 };
+    if (sort === 'price') sortObj = { price: 1 };
+    else if (sort === '-price') sortObj = { price: -1 };
+    else if (sort === 'oldest') sortObj = { createdAt: 1 };
+    else if (sort === 'stockHigh') sortObj = { totalStock: -1 };
+    else if (sort === 'stockLow') sortObj = { totalStock: 1 };
 
-    // Pagination
+    pipeline.push({ $sort: sortObj });
+    
     const currentPage = Math.max(1, Number(page));
     const itemsLimit = Math.max(1, Number(limit));
     const skip = (currentPage - 1) * itemsLimit;
     pipeline.push({ $skip: skip }, { $limit: itemsLimit });
 
-    // Lookup category
-    pipeline.push({
-        $lookup: {
-            from: 'categories',
-            localField: 'category',
-            foreignField: '_id',
-            as: 'category'
+    // 🚀 5. Populate Sizes (The Fix)
+    pipeline.push(
+        { $unwind: { path: '$sizes', preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: 'sizes', // নিশ্চিত কর কালেকশন নাম 'sizes'
+                localField: 'sizes.size',
+                foreignField: '_id',
+                as: 'sizes.size'
+            }
+        },
+        { $unwind: { path: '$sizes.size', preserveNullAndEmptyArrays: true } },
+        {
+            $group: {
+                _id: '$_id',
+                // $$ROOT দিয়ে পুরো অবজেক্ট রাখা হচ্ছে যাতে কোনো ফিল্ড মিস না হয়
+                productData: { $first: '$$ROOT' },
+                sizes: { $push: '$sizes' }
+            }
+        },
+        {
+            $replaceRoot: {
+                newRoot: { $mergeObjects: ['$productData', { sizes: '$sizes' }] }
+            }
         }
-    });
-    pipeline.push({ $unwind: { path: '$category', preserveNullAndEmptyArrays: true } });
+    );
 
-    // Optionally lookup subcategory
-    pipeline.push({
-        $lookup: {
-            from: 'subcategories',
-            localField: 'subcategory',
-            foreignField: '_id',
-            as: 'subcategory'
-        }
-    });
-    pipeline.push({ $unwind: { path: '$subcategory', preserveNullAndEmptyArrays: true } });
+    // 6. Populate Category & Subcategory
+    pipeline.push(
+        {
+            $lookup: {
+                from: 'categories',
+                localField: 'category',
+                foreignField: '_id',
+                as: 'category'
+            }
+        },
+        { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: 'subcategories',
+                localField: 'subcategory',
+                foreignField: '_id',
+                as: 'subcategory'
+            }
+        },
+        { $unwind: { path: '$subcategory', preserveNullAndEmptyArrays: true } }
+    );
+
+    // Final Sort (Grouping মাঝে মাঝে সর্ট নষ্ট করে দেয়)
+    pipeline.push({ $sort: sortObj });
 
     const products = await Product.aggregate(pipeline);
 

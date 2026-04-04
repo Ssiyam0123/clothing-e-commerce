@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import ProductCard from '@/components/store/ProductCard';
+import ProductCard from '@/components/common/ProductCard';
 import { motion } from 'framer-motion';
 import { ArrowRight, Plus } from 'lucide-react';
 

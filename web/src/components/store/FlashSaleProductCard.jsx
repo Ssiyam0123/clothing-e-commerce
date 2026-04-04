@@ -1,21 +1,23 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { getImageUrl } from '@/utils/imageUtils';
 import { useProductCondition } from '@/store/productCondition';
-import  useAuth  from '@/hooks/useAuth';
 import { useAppStore } from '@/store/appStore';
 import { motion } from 'framer-motion';
 import StarRating from './StarRating';
-import { Heart, Zap } from 'lucide-react';
+import { Heart, Zap, ShoppingBag, Star } from 'lucide-react';
 import { swalToast, swalError } from '@/utils/swal';
+import QuickSelectModal from './QuickSelectModal';
+import { useAuthStore } from '@/store/authStore';
 
 export default function FlashSaleProductCard({ product }) {
-  const { isAuthenticated } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { isAuthenticated } = useAuthStore();
   const { lang } = useAppStore();
   const isBn = lang === 'bn';
 
-  // 🚀 SENIOR FIX: Selector pattern to prevent wishlist glitch
   const toggleWishlist = useProductCondition((state) => state.toggleWishlist);
   const inWishlist = useProductCondition((state) =>
     state.wishlistItems.some((p) => String(p._id) === String(product?._id))
@@ -27,97 +29,111 @@ export default function FlashSaleProductCard({ product }) {
 
   const handleWishlist = async (e) => {
     e.preventDefault();
-    e.stopPropagation(); // 👈 কার্ডের লিঙ্কে ক্লিক হওয়া আটকাবে
+    e.stopPropagation();
     try {
       await toggleWishlist(product, isAuthenticated);
-      swalToast(
-        inWishlist 
-          ? (isBn ? 'ইচ্ছেতালিকা থেকে সরানো হয়েছে' : 'Removed from Vault') 
-          : (isBn ? 'ইচ্ছেতালিকায় যোগ করা হয়েছে' : 'Added to Vault'), 
-        'success'
-      );
     } catch (err) {
       swalError(isBn ? 'ত্রুটি' : 'Sync Error', 'Could not update vault.');
     }
   };
 
   return (
-    <Link href={`/products/${product._id}`} className="group block h-full outline-none">
-      <motion.div
-        whileHover={{ y: -8, scale: 1.01 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        className="relative flex flex-col h-full bg-white dark:bg-[#050505] rounded-[1.25rem] md:rounded-[2rem] border border-rose-100 dark:border-rose-900/20 overflow-hidden shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(244,63,94,0.15)] transition-all duration-500"
-      >
-        {/* Flash Sale Badge */}
-        <div className="absolute top-0 left-0 z-20 bg-rose-600 text-white px-3 py-1.5 rounded-br-2xl flex items-center gap-1 shadow-md">
-          <Zap size={10} fill="white" />
-          <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest">
+    <div className="group relative flex flex-col h-full bg-white dark:bg-[#0a0a0a] rounded-[1.5rem] md:rounded-[2.5rem] border border-rose-100 dark:border-rose-900/20 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(244,63,94,0.15)] overflow-hidden">
+      
+      {/* --- Image Section --- */}
+      <div className="relative aspect-[4/5] overflow-hidden bg-zinc-50 dark:bg-zinc-900">
+        <Link href={`/products/${product._id}`} className="absolute inset-0 z-10" />
+        <motion.img
+          src={getImageUrl(product.images?.[0])}
+          alt={product.name}
+          className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 transition-all duration-1000 ease-out group-hover:scale-110"
+        />
+        
+        {/* ⚡ Flash Sale Zap Badge */}
+        <div className="absolute top-0 left-0 z-20 bg-rose-600 text-white px-3 py-1.5 rounded-br-2xl flex items-center gap-1 shadow-lg">
+          <Zap size={12} fill="white" className="animate-pulse" />
+          <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest">
             {product.discount}% OFF
           </span>
         </div>
 
-        {/* Image Container */}
-        <div className="relative aspect-[4/5] overflow-hidden bg-zinc-50 dark:bg-zinc-900 border-b border-rose-50 dark:border-rose-900/10">
-          <motion.img
-            src={getImageUrl(product.images?.[0])}
-            alt={product.name}
-            className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 transition-all duration-1000 ease-out"
-            whileHover={{ scale: 1.1 }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-rose-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* ⭐ Premium Rating Overlay */}
+        <div className="absolute bottom-3 left-3 z-20 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
+          <Star size={10} className="fill-amber-400 text-amber-400" />
+          <span className="text-[10px] font-black text-white">{product.averageRating || '4.9'}</span>
+        </div>
 
-          {/* 🚀 Wishlist Button: No White Border, Turns Red on Active */}
-          <button
-            type="button"
-            onClick={handleWishlist}
-            className={`absolute top-3 right-3 md:top-5 md:right-5 z-20 p-2 md:p-2.5 rounded-full backdrop-blur-md transition-all duration-300 active:scale-75 ${
-              inWishlist 
-                ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/40' 
-                : 'bg-black/10 dark:bg-white/10 text-zinc-900 dark:text-zinc-100'
-            }`}
+        {/* ❤️ Wishlist Trigger */}
+        <button 
+          onClick={handleWishlist}
+          className={`absolute top-3 right-3 md:top-5 md:right-5 z-20 p-2.5 md:p-3 rounded-full backdrop-blur-md transition-all active:scale-75 ${
+            inWishlist 
+              ? 'bg-rose-500 text-white shadow-lg' 
+              : 'bg-white/80 dark:bg-black/40 text-zinc-900 dark:text-zinc-100 border border-black/5 hover:bg-white'
+          }`}
+        >
+          <Heart size={16} fill={inWishlist ? "currentColor" : "none"} strokeWidth={2.5} />
+        </button>
+      </div>
+
+      {/* --- Content Section --- */}
+      <div className="p-4 md:p-6 flex flex-col flex-1">
+        <p className="text-[8px] md:text-[9px] font-black text-rose-600 uppercase tracking-[0.4em] mb-1 opacity-80">
+          {isBn ? 'ফ্ল্যাশ ড্রপ' : 'Limited Artifact'}
+        </p>
+
+        <h3 className={`text-sm md:text-lg font-black text-zinc-900 dark:text-zinc-100 tracking-tighter uppercase italic line-clamp-1 mb-2 group-hover:text-rose-600 transition-colors ${isBn ? 'font-sans' : ''}`}>
+          {product.name}
+        </h3>
+
+        {/* Pricing Structure */}
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-lg md:text-2xl font-black text-rose-600 dark:text-rose-500 tracking-tighter leading-none">
+            ৳{discountedPrice.toFixed(0)}
+          </span>
+          <span className="text-[10px] md:text-sm font-bold text-zinc-400 line-through tracking-tight">
+            ৳{product.price.toFixed(0)}
+          </span>
+        </div>
+
+        {/* 🚀 Hard Coated Action Bar */}
+        <div className="mt-auto flex items-center gap-1.5">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="w-11 h-11 md:w-14 md:h-14 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-white rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all active:scale-90 shrink-0 border border-transparent dark:border-white/5"
           >
-            <Heart 
-              size={16} 
-              fill={inWishlist ? "currentColor" : "none"} 
-              strokeWidth={inWishlist ? 0 : 2.5}
-            />
+            <ShoppingBag size={18} />
+          </button>
+
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="flex-1 bg-black dark:bg-white text-white dark:text-black font-black h-11 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white transition-all active:scale-[0.98] shadow-lg"
+          >
+            <Zap size={14} fill="currentColor" className="hidden xs:block" />
+            <span className="text-[9px] md:text-[10px] uppercase tracking-widest px-1">
+              {isBn ? 'অর্ডার দিন' : 'Claim Now'}
+            </span>
           </button>
         </div>
+      </div>
 
-        {/* Content Area */}
-        <div className="p-4 md:p-6 flex flex-col flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <StarRating rating={product.averageRating || 0} size="small" />
-            {product.totalReviews > 0 && (
-              <span className="text-[8px] font-bold text-zinc-400">({product.totalReviews})</span>
-            )}
-          </div>
+      {/*  Stock Progress Bar (At the very bottom) */}
+      <div className="h-1.5 w-full bg-zinc-100 dark:bg-rose-950/20">
+        <motion.div 
+          initial={{ width: 0 }}
+          whileInView={{ width: '82%' }} // এখানে তোর স্টক পারসেন্টেজ লজিক বসাতে পারিস
+          transition={{ duration: 1.5, ease: "circOut" }}
+          className="h-full bg-gradient-to-r from-rose-400 to-rose-600 rounded-r-full shadow-[0_0_10px_rgba(225,29,72,0.4)]" 
+        />
+      </div>
 
-          <h3 className={`text-sm md:text-lg font-black text-zinc-900 dark:text-zinc-100 tracking-tight line-clamp-2 min-h-[2.5rem] md:min-h-[3.5rem] mb-2 group-hover:text-rose-600 transition-colors ${isBn ? 'font-sans leading-relaxed' : 'uppercase leading-tight'}`}>
-            {product.name}
-          </h3>
-          
-          <div className="mt-auto flex flex-wrap items-center gap-2 md:gap-3 pt-2">
-            <span className="text-xl md:text-3xl font-black text-rose-600 dark:text-rose-500 tracking-tighter leading-none">
-              ৳{discountedPrice.toFixed(0)}
-            </span>
-            <span className="text-[10px] md:text-sm font-bold text-zinc-400 line-through tracking-tight">
-              ৳{product.price.toFixed(0)}
-            </span>
-          </div>
-        </div>
-
-        {/* Stock Progress Bar */}
-        <div className="h-1 w-full bg-rose-100 dark:bg-rose-950/20">
-          <motion.div 
-            initial={{ width: 0 }}
-            whileInView={{ width: '75%' }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="h-full bg-rose-600 rounded-r-full shadow-[0_0_8px_rgba(225,29,72,0.5)]" 
-          />
-        </div>
-      </motion.div>
-    </Link>
+      {/* Modal Integration */}
+      <QuickSelectModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        product={product} 
+        lang={lang} 
+      />
+    </div>
   );
 }

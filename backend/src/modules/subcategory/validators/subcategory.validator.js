@@ -7,7 +7,7 @@ export const createSubcategorySchema = z.object({
   slug: z.string().min(2).max(100).regex(/^[a-z0-9-]+$/),
   category: z.string().regex(objectIdRegex, "Invalid category ID"),
   description: z.string().optional(),
-  image: z.string().optional(), // Accept any string (file path or URL)
+  image: z.string().optional(),
 });
 
 export const updateSubcategorySchema = createSubcategorySchema.partial();

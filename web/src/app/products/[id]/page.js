@@ -7,67 +7,35 @@ import { useState, useEffect, useMemo } from 'react';
 import api from '@/lib/api';
 import { getImageUrl } from '@/utils/imageUtils';
 import Loader from '@/components/common/Loader';
-import ProductCard from '@/components/store/ProductCard';
-import { useAuth } from '@/hooks/useAuth';
-import { useProductCondition } from '@/store/productCondition'; // ✅ new store
-import ReviewSection from '@/components/store/ReviewSection';
-import StarRating from '@/components/store/StarRating';
+import ProductCard from '@/components/common/ProductCard';
+import { useProductCondition } from '@/store/productCondition'; 
+import { useAuthStore } from '@/store/authStore';
 import { useAppStore } from '@/store/appStore';
 import { useTrackingStore } from '@/store/trackingStore';
-import { motion, AnimatePresence } from 'framer-motion';
 
-// Dictionary (unchanged)
+import ReviewSection from '@/components/store/ReviewSection';
+import StarRating from '@/components/store/StarRating';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Heart, ShoppingBag, Zap, ShieldCheck, Truck, RefreshCcw } from 'lucide-react';
+import { swalError, swalToast } from '@/utils/swal';
+
 const DICTIONARY = {
   en: {
-    home: 'Home',
-    collection: 'Collection',
-    notFound: 'Product Not Found',
-    back: 'Back to Collection',
-    add: 'Add to Bag',
-    buy: 'Buy Now',
-    selectSize: 'Select Size',
-    price: 'Price',
-    save: 'Save',
-    about: 'About this item',
-    freeShip: 'Free Shipping',
-    freeSub: 'On orders over ৳5000',
-    ecoReturn: 'Eco Returns',
-    ecoSub: '30 days easy policy',
-    outOfStock: 'Currently Out of Stock',
-    reviews: 'Reviews',
-    relatedTitle: 'You May Also Like',
-    relatedSub: 'Continue Shopping',
-    added: '✨ Added to bag successfully!',
-    goToCart: 'Go to Cart',
+    home: 'Home', collection: 'Collection', notFound: 'Product Not Found',
+    back: 'Back to Collection', add: 'Add to Bag', buy: 'Order Now',
+    selectSize: 'Select Size', price: 'Price', save: 'Save',
+    about: 'Description', reviews: 'Reviews',
+    relatedTitle: 'Related Artifacts', added: '✨ Artifact Secured in Bag',
+    goToCart: 'View Settlement', outOfStock: 'Out of Stock'
   },
   bn: {
-    home: 'হোম',
-    collection: 'কালেকশন',
-    notFound: 'প্রোডাক্ট পাওয়া যায়নি',
-    back: 'কালেকশনে ফিরে যান',
-    add: 'ব্যাগে যোগ করুন',
-    buy: 'এখনই কিনুন',
-    selectSize: 'সাইজ নির্বাচন করুন',
-    price: 'মূল্য',
-    save: 'সাশ্রয়',
-    about: 'প্রোডাক্ট সম্পর্কে',
-    freeShip: 'ফ্রি শিপিং',
-    freeSub: '৳৫০০০ এর উপরের অর্ডারে',
-    ecoReturn: 'ইকো রিটার্নস',
-    ecoSub: '৩০ দিনের সহজ পলিসি',
-    outOfStock: 'বর্তমানে স্টক নেই',
-    reviews: 'রিভিউ',
-    relatedTitle: 'আপনার পছন্দ হতে পারে',
-    relatedSub: 'আরও কেনাকাটা করুন',
-    added: '✨ ব্যাগে সফলভাবে যোগ করা হয়েছে!',
-    goToCart: 'কার্টে যান',
+    home: 'হোম', collection: 'কালেকশন', notFound: 'প্রোডাক্ট পাওয়া যায়নি',
+    back: 'কালেকশনে ফিরে যান', add: 'ব্যাগে নিন', buy: 'অর্ডার দিন',
+    selectSize: 'সাইজ নির্বাচন করুন', price: 'মূল্য', save: 'সাশ্রয়',
+    about: 'বিবরণ', reviews: 'রিভিউ',
+    relatedTitle: 'আপনার পছন্দ হতে পারে', added: '✨ পণ্যটি ব্যাগে যোগ হয়েছে',
+    goToCart: 'ব্যাগ দেখুন', outOfStock: 'স্টক নেই'
   }
-};
-
-// Framer Motion Variants (unchanged)
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
 const fadeUp = {
@@ -78,25 +46,26 @@ const fadeUp = {
 export default function ProductDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { user } = useAuth();
+  
+  // 🛰️ Global Stores
+  const { isAuthenticated } = useAuthStore();
   const { lang, isMounted } = useAppStore();
+  const { addToCart, initiateBuyNow, toggleWishlist, wishlistItems } = useProductCondition();
+  
+  // 📊 Tracking
   const trackViewContent = useTrackingStore((state) => state.trackViewContent);
   const trackAddToCart = useTrackingStore((state) => state.trackAddToCart);
 
-  // ✅ Use Zustand store for cart actions
-  const addToCart = useProductCondition((state) => state.addToCart);
-
+  // 📝 Local UI State
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [showAddedToCart, setShowAddedToCart] = useState(false);
-  const [relatedProducts, setRelatedProducts] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
 
   const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY['en'], [lang]);
-  const isBn = lang === 'bn';
 
-  // Data fetching (unchanged)
+  // 📥 Data Fetching
   const { data: product, isLoading, error, refetch: refetchProduct } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => (await api.get(`/products/${id}`)).data,
@@ -109,24 +78,27 @@ export default function ProductDetailsPage() {
   });
 
   const { data: productsData } = useQuery({
-    queryKey: ['products', product?.category?._id],
+    queryKey: ['products-related', product?.category?._id],
     queryFn: async () => {
       if (!product?.category?._id) return { products: [] };
-      return (await api.get(`/products?category=${product.category._id}&limit=4`)).data;
+      return (await api.get(`/products?category=${product.category._id}&limit=5`)).data;
     },
     enabled: !!product?.category?._id,
   });
 
-  useEffect(() => {
-    if (productsData?.products) {
-      setRelatedProducts(productsData.products.filter(p => p._id !== id).slice(0, 4));
-    }
-  }, [productsData, id]);
+  const inWishlist = useMemo(() => 
+    wishlistItems.some(p => String(p._id) === String(id)), 
+  [wishlistItems, id]);
 
+  const relatedProducts = useMemo(() => 
+    productsData?.products?.filter(p => p._id !== id).slice(0, 4) || [], 
+  [productsData, id]);
+
+  // ⚙️ Effects
   useEffect(() => {
     if (product) {
-      const discountedPrice = product.price - (product.price * (product.discount || 0) / 100);
-      trackViewContent(product._id, product.name, discountedPrice, product.category?.name);
+      const discPrice = product.price - (product.price * (product.discount || 0) / 100);
+      trackViewContent(product._id, product.name, discPrice, product.category?.name);
       
       const availableSizes = product.sizes?.filter(s => s.stock > 0) || [];
       if (!selectedSize && availableSizes.length > 0) {
@@ -135,347 +107,222 @@ export default function ProductDetailsPage() {
     }
   }, [product, trackViewContent, selectedSize]);
 
-  // ✅ Updated add to cart handler using Zustand store
+  // 🛒 Handlers
   const handleAddToCart = async () => {
-    const availableSizes = product.sizes?.filter(s => s.stock > 0) || [];
-    if (!selectedSize && availableSizes.length > 0) {
-      alert('Please select a size first.');
-      return;
-    }
+    if (!selectedSize) return swalError("Error", ui.selectSize);
     setIsAdding(true);
     try {
-      // Optimistic add to cart via Zustand store
-      await addToCart(product, selectedSize, quantity);
-      
+      await addToCart(product, selectedSize, quantity, isAuthenticated);
       setShowAddedToCart(true);
-      const discountedPrice = product.price - (product.price * (product.discount || 0) / 100);
-      trackAddToCart(product._id, discountedPrice, quantity);
-      
-      // Auto-hide success message after 5 seconds
+      trackAddToCart(product._id, product.price, quantity);
       setTimeout(() => setShowAddedToCart(false), 5000);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to add to cart');
+      swalError("Failed", "Could not synchronize with bag.");
     } finally {
       setIsAdding(false);
     }
   };
 
   const handleBuyNow = () => {
-    const availableSizes = product.sizes?.filter(s => s.stock > 0) || [];
-    if (!selectedSize && availableSizes.length > 0) {
-      alert('Please select a size first.');
-      return;
-    }
-    const directItem = {
-      product,
-      size: availableSizes.find(s => s.size._id === selectedSize)?.size,
-      quantity
-    };
-    sessionStorage.setItem('buyNowItem', JSON.stringify(directItem));
-    router.push('/checkout?type=direct');
+    if (!selectedSize) return swalError("Error", ui.selectSize);
+    // 🚀 Store এ ডাটা সেট করে সরাসরি নতুন Unified Cart এ পাঠানো হচ্ছে
+    initiateBuyNow(product, selectedSize, quantity);
+    router.push('/cart?type=direct');
   };
 
-  // Loading & error states (unchanged)
-  if (!isMounted || isLoading) return <div className="min-h-screen flex items-center justify-center dark:bg-[#050505]"><Loader /></div>;
+  if (!isMounted || isLoading) return <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#050505]"><Loader /></div>;
 
   if (error || !product) return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center bg-[#fcfcfc] dark:bg-[#050505] px-6 text-center transition-colors duration-700">
-      <span className="text-6xl block mb-6 opacity-20 grayscale">🔍</span>
-      <h1 className="text-3xl font-black text-zinc-900 dark:text-zinc-100 mb-4 uppercase tracking-tight">{ui.notFound}</h1>
-      <Link href="/products" className="inline-block bg-zinc-900 dark:bg-white text-white dark:text-black px-8 py-3 rounded-full font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all">
-        {ui.back}
-      </Link>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-[#050505] text-center p-6">
+      <h1 className="text-4xl font-black uppercase mb-6 dark:text-white">{ui.notFound}</h1>
+      <Link href="/products" className="bg-black dark:bg-white text-white dark:text-black px-8 py-3 rounded-full font-black uppercase text-[10px] tracking-widest">{ui.back}</Link>
     </div>
   );
 
   const discountedPrice = product.price - (product.price * (product.discount || 0) / 100);
   const availableSizes = product.sizes?.filter(s => s.stock > 0) || [];
-  const selectedSizeData = availableSizes.find(s => s.size._id === selectedSize);
-  const maxQuantity = selectedSizeData?.stock || 0;
+  const selectedSizeStock = availableSizes.find(s => s.size._id === selectedSize)?.stock || 0;
 
   return (
-    <div className="min-h-screen bg-[#fcfcfc] dark:bg-[#050505] font-sans pb-20 transition-colors duration-700 relative overflow-hidden">
-      {/* Background decorations (unchanged) */}
-      <div className="h-[40vh] bg-zinc-900 dark:bg-black absolute w-full top-0 left-0 -z-10 rounded-b-[3rem] sm:rounded-b-[5rem] opacity-95 dark:opacity-100 transition-colors duration-700 border-b border-zinc-200/10 dark:border-white/5 shadow-2xl"></div>
-      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-500/10 dark:bg-indigo-500/15 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+    <div className="min-h-screen bg-[#fcfcfc] dark:bg-[#050505] transition-colors duration-700">
+      
+      {/* 🌌 Atmospheric Hero Background */}
+      <div className="h-[45vh] bg-zinc-900 dark:bg-black absolute w-full top-0 left-0 z-0 rounded-b-[4rem] border-b border-white/5 shadow-2xl"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 relative z-10">
-        {/* Breadcrumb (unchanged) */}
-        <motion.nav
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap items-center mb-10 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-zinc-400"
-        >
+      <div className="max-w-[1700px] mx-auto px-4 md:px-10 py-10 relative z-10">
+        
+        {/* 🧭 Navigation Breadcrumb */}
+        <nav className="flex items-center mb-12 text-[10px] font-black uppercase tracking-widest text-zinc-400">
           <Link href="/" className="hover:text-white transition-colors">{ui.home}</Link>
-          <span className="mx-2 sm:mx-3 opacity-30">/</span>
+          <span className="mx-3 opacity-30">/</span>
           <Link href="/products" className="hover:text-white transition-colors">{ui.collection}</Link>
-          <span className="mx-2 sm:mx-3 opacity-30">/</span>
-          <span className="text-white truncate max-w-[150px] sm:max-w-[250px]">{product.name}</span>
-        </motion.nav>
+          <span className="mx-3 opacity-30">/</span>
+          <span className="text-white truncate max-w-[200px]">{product.name}</span>
+        </nav>
 
-        {/* Main Product Container (mostly unchanged, only success message changed) */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-          className="bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-3xl rounded-[2rem] sm:rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden"
-        >
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 p-6 sm:p-10 lg:p-16">
-            {/* LEFT: Media Gallery (unchanged) */}
-            <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-6">
-              <motion.div variants={fadeUp} className="relative aspect-[3/4] bg-zinc-100 dark:bg-zinc-900 rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden group border border-zinc-200/50 dark:border-white/5">
-                {product.images && product.images[selectedImage] ? (
-                  <img
-                    src={getImageUrl(product.images[selectedImage])}
-                    alt={product.name}
-                    className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000 ease-in-out"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-zinc-300 text-6xl">👕</div>
-                )}
-                {product.discount > 0 && (
-                  <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white px-4 py-2 rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg border border-zinc-200 dark:border-zinc-800">
-                    -{product.discount}%
-                  </div>
-                )}
-                {product.isFeatured && (
-                  <div className="absolute top-4 right-4 sm:top-6 sm:right-6 bg-black/50 backdrop-blur-md text-white px-4 py-2 rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg">
-                    Featured
-                  </div>
-                )}
-              </motion.div>
-              {product.images && product.images.length > 1 && (
-                <motion.div variants={fadeUp} className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 no-scrollbar">
-                  {product.images.map((img, idx) => (
-                    <motion.button
-                      key={idx}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setSelectedImage(idx)}
-                      className={`relative h-20 w-16 sm:h-24 sm:w-20 flex-shrink-0 rounded-[1rem] sm:rounded-[1.5rem] overflow-hidden border-2 transition-all duration-300 ${
-                        selectedImage === idx
-                          ? 'border-zinc-900 dark:border-white shadow-md grayscale-0'
-                          : 'border-transparent opacity-60 hover:opacity-100 grayscale'
-                      }`}
-                    >
-                      <img src={getImageUrl(img)} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" />
-                    </motion.button>
-                  ))}
-                </motion.div>
+        {/* 📦 Main Product Layout */}
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-20 items-start">
+          
+          {/* --- LEFT: Visuals --- */}
+          <div className="lg:col-span-7 space-y-6">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative aspect-[3/4] bg-zinc-100 dark:bg-zinc-900 rounded-[3rem] overflow-hidden border border-zinc-200/50 dark:border-white/5 shadow-2xl group">
+              <img src={getImageUrl(product.images?.[selectedImage])} alt={product.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+              
+              {/* Wishlist Bubble */}
+              <button 
+                onClick={() => toggleWishlist(product, isAuthenticated)}
+                className={`absolute top-8 right-8 p-4 rounded-full backdrop-blur-xl transition-all active:scale-75 ${inWishlist ? 'bg-rose-500 text-white shadow-rose-500/50 shadow-2xl' : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'}`}
+              >
+                <Heart size={20} fill={inWishlist ? "currentColor" : "none"} strokeWidth={2.5} />
+              </button>
+
+              {product.discount > 0 && (
+                <div className="absolute top-8 left-8 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white px-5 py-2 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl border dark:border-white/10">
+                  -{product.discount}%
+                </div>
               )}
             </motion.div>
 
-            {/* RIGHT: Product Details (unchanged except success message) */}
-            <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="flex flex-col h-full">
-              {/* Category & Rating (unchanged) */}
-              <motion.div variants={fadeUp} className="mb-6 flex flex-wrap gap-2 sm:gap-3 items-center">
-                <Link
-                  href={`/products?category=${product.category?.slug}`}
-                  className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 px-3 sm:px-4 py-1.5 rounded-xl text-[8px] sm:text-[9px] font-black uppercase tracking-widest hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
-                >
-                  {product.category?.name}
-                </Link>
-                {product.subcategory && (
-                  <>
-                    <span className="text-zinc-300 dark:text-zinc-700">→</span>
-                    <Link
-                      href={`/products?subcategory=${product.subcategory?.slug}`}
-                      className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800/50 text-zinc-500 px-3 sm:px-4 py-1.5 rounded-xl text-[8px] sm:text-[9px] font-black uppercase tracking-widest hover:bg-zinc-100 transition-colors"
-                    >
-                      {product.subcategory?.name}
-                    </Link>
-                  </>
-                )}
-              </motion.div>
+            {/* Thumbnails */}
+            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+              {product.images?.map((img, idx) => (
+                <button key={idx} onClick={() => setSelectedImage(idx)} className={`w-24 h-32 rounded-2xl overflow-hidden border-2 transition-all ${selectedImage === idx ? 'border-zinc-900 dark:border-white scale-105' : 'border-transparent opacity-50 grayscale hover:opacity-100'}`}>
+                  <img src={getImageUrl(img)} className="w-full h-full object-cover" alt="" />
+                </button>
+              ))}
+            </div>
+          </div>
 
-              <motion.h1 variants={fadeUp} className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-zinc-900 dark:text-white mb-4 sm:mb-6 tracking-tighter leading-[1.1] ${isBn ? 'font-sans' : 'uppercase'}`}>
-                {product.name}
-              </motion.h1>
-
-              <motion.div variants={fadeUp} className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
-                <div className="bg-zinc-50 dark:bg-[#111] px-3 py-1.5 rounded-xl flex items-center gap-2 border border-zinc-100 dark:border-zinc-800 shadow-inner">
-                  <StarRating rating={reviewsData?.averageRating || 0} size="small" />
-                  <span className="text-sm font-black text-zinc-700 dark:text-zinc-300">
-                    {reviewsData?.averageRating ? reviewsData.averageRating.toFixed(1) : 'New'}
+          {/* --- RIGHT: Information Hub --- */}
+          <div className="lg:col-span-5 flex flex-col pt-4">
+            <motion.div initial="hidden" animate="visible" variants={fadeUp} className="space-y-10">
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <span className="bg-rose-600/10 text-rose-600 dark:text-rose-500 px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-rose-600/10">
+                    {product.category?.name}
                   </span>
+                  <div className="flex items-center gap-2 bg-zinc-100 dark:bg-white/5 px-3 py-1 rounded-lg">
+                    <StarRating rating={reviewsData?.averageRating || 0} size="small" />
+                    <span className="text-[10px] font-black dark:text-white">{reviewsData?.averageRating?.toFixed(1) || '0.0'}</span>
+                  </div>
                 </div>
-                <span className="text-[9px] sm:text-[10px] font-black text-zinc-400 uppercase tracking-widest">
-                  {reviewsData?.totalReviews || 0} {ui.reviews}
-                </span>
-              </motion.div>
+                <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none dark:text-white">
+                  {product.name}
+                </h1>
+              </div>
 
-              <motion.div variants={fadeUp} className="mb-8 sm:mb-10 p-6 sm:p-8 bg-zinc-50 dark:bg-[#0d0d0d] rounded-[2rem] sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-inner">
-                <p className="text-[8px] sm:text-[9px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-2">{ui.price}</p>
-                <div className="flex flex-wrap items-end gap-4 sm:gap-6">
-                  <span className="text-4xl sm:text-5xl md:text-6xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none">
-                    ৳{discountedPrice.toFixed(2)}
-                  </span>
+              {/* Pricing Architecture */}
+              <div className="p-8 bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-100 dark:border-white/5 shadow-sm">
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-4">{ui.price}</p>
+                <div className="flex items-end gap-6">
+                  <span className="text-5xl font-black tracking-tighter dark:text-white">৳{discountedPrice.toFixed(0)}</span>
                   {product.discount > 0 && (
                     <div className="flex flex-col pb-1">
-                      <span className="text-lg sm:text-xl font-bold text-zinc-400 line-through leading-none">
-                        ৳{product.price.toFixed(2)}
-                      </span>
-                      <span className="text-[9px] sm:text-[10px] font-black text-rose-500 uppercase tracking-widest mt-1">
-                        {ui.save} ৳{(product.price - discountedPrice).toFixed(2)}
-                      </span>
+                      <span className="text-xl font-bold text-zinc-400 line-through">৳{product.price}</span>
+                      <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">{ui.save} ৳{(product.price - discountedPrice).toFixed(0)}</span>
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div variants={fadeUp} className="mb-10 sm:mb-12">
-                <h3 className="text-[9px] sm:text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-3 sm:mb-4">{ui.about}</h3>
-                <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium text-xs sm:text-sm">
-                  {product.description}
-                </p>
-                {product.tags && product.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-5 sm:mt-6">
-                    {product.tags.map((tag, idx) => (
-                      <span key={idx} className="text-[8px] sm:text-[9px] font-black text-zinc-500 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 rounded-lg uppercase tracking-[0.2em] shadow-sm">
-                        #{tag}
-                      </span>
+              {/* Size Mapping */}
+              {availableSizes.length > 0 ? (
+                <div className="space-y-5">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 ml-1">{ui.selectSize}</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {availableSizes.map((s) => (
+                      <button 
+                        key={s.size._id} 
+                        onClick={() => setSelectedSize(s.size._id)} 
+                        className={`min-w-[4.5rem] py-4 rounded-2xl font-black text-xs uppercase tracking-widest border-2 transition-all ${selectedSize === s.size._id ? 'bg-zinc-900 dark:bg-white text-white dark:text-black border-transparent shadow-xl' : 'bg-transparent border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:border-zinc-400'}`}
+                      >
+                        {s.size.name}
+                      </button>
                     ))}
                   </div>
-                )}
-              </motion.div>
+                </div>
+              ) : (
+                <div className="p-6 bg-rose-500/5 border border-rose-500/10 rounded-2xl text-center text-rose-500 font-black uppercase text-xs tracking-widest">
+                   {ui.outOfStock}
+                </div>
+              )}
 
-              <motion.div variants={fadeUp} className="mt-auto border-t border-zinc-100 dark:border-zinc-800/80 pt-8">
-                {availableSizes.length > 0 ? (
-                  <div className="mb-8 sm:mb-10">
-                    <h3 className="text-[9px] sm:text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-4">{ui.selectSize}</h3>
-                    <div className="flex flex-wrap gap-2 sm:gap-3">
-                      {availableSizes.map((sizeItem) => (
-                        <motion.button
-                          whileHover={{ scale: selectedSize === sizeItem.size._id ? 1 : 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          key={sizeItem.size._id}
-                          onClick={() => {
-                            setSelectedSize(sizeItem.size._id);
-                            setQuantity(1);
-                          }}
-                          className={`min-w-[4rem] sm:min-w-[4.5rem] h-10 sm:h-12 px-3 sm:px-4 rounded-[1rem] sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all border-2 ${
-                            selectedSize === sizeItem.size._id
-                              ? 'bg-zinc-900 dark:bg-white text-white dark:text-black border-transparent shadow-md'
-                              : 'bg-transparent border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-400 dark:hover:border-zinc-600 bg-white dark:bg-[#111]'
-                          }`}
-                        >
-                          {sizeItem.size.name}
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mb-8 sm:mb-10 p-6 bg-zinc-100 dark:bg-zinc-900/50 rounded-2xl border border-zinc-200 dark:border-zinc-800 font-black text-center uppercase tracking-[0.2em] text-[9px] sm:text-[10px] text-zinc-500 shadow-inner">
-                    {ui.outOfStock}
-                  </div>
-                )}
+              {/* Description */}
+              <div className="space-y-4">
+                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 ml-1">{ui.about}</h3>
+                 <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">{product.description}</p>
+              </div>
 
-                {availableSizes.length > 0 && (
-                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
-                    <div className="flex items-center justify-between bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-full w-full sm:w-36 h-12 sm:h-14 px-2 shadow-inner">
-                      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-10 h-10 flex items-center justify-center text-lg sm:text-xl font-light text-zinc-400 hover:text-black dark:hover:text-white transition-all">-</button>
-                      <span className="font-black text-zinc-900 dark:text-white text-xs sm:text-sm">{quantity}</span>
-                      <button onClick={() => setQuantity(Math.min(maxQuantity || 1, quantity + 1))} className="w-10 h-10 flex items-center justify-center text-lg sm:text-xl font-light text-zinc-400 hover:text-black dark:hover:text-white transition-all">+</button>
-                    </div>
-
-                    <div className="flex flex-1 w-full gap-3">
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={handleAddToCart}
-                        disabled={isAdding || !selectedSize}
-                        className="flex-1 bg-zinc-100 dark:bg-[#111] text-zinc-900 dark:text-white h-12 sm:h-14 rounded-full font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px] hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all disabled:opacity-50 border border-zinc-200 dark:border-zinc-800"
-                      >
-                        {isAdding ? '...' : ui.add}
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={handleBuyNow}
-                        disabled={!selectedSize}
-                        className="flex-1 bg-zinc-900 dark:bg-white text-white dark:text-black h-12 sm:h-14 rounded-full font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px] transition-all disabled:opacity-50 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.15)]"
-                      >
-                        {ui.buy}
-                      </motion.button>
-                    </div>
-                  </div>
-                )}
-
-                {/* ✅ Updated Success Message with "Go to Cart" link */}
+              {/* 🚀 Action Console */}
+              <div className="space-y-4 pt-6">
                 <AnimatePresence>
                   {showAddedToCart && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, height: 0 }}
-                      animate={{ opacity: 1, y: 0, height: 'auto' }}
-                      exit={{ opacity: 0, y: 10, height: 0 }}
-                      className="mt-4 sm:mt-6 overflow-hidden"
-                    >
-                      <div className="p-3 sm:p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-center">
-                        <p className="text-emerald-600 dark:text-emerald-400 text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2">
-                          {ui.added}
-                        </p>
-                        <Link
-                          href="/cart"
-                          className="inline-block text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-300 underline underline-offset-2 hover:text-emerald-800 transition-colors"
-                        >
-                          {ui.goToCart} →
-                        </Link>
-                      </div>
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex justify-between items-center">
+                      <span className="text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-widest">{ui.added}</span>
+                      <Link href="/cart" className="text-[10px] font-black uppercase tracking-widest text-emerald-600 underline">{ui.goToCart} →</Link>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                {/* Service Promises (unchanged) */}
-                <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-zinc-100 dark:border-zinc-800/80 grid grid-cols-2 gap-4 sm:gap-6">
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <span className="text-xl sm:text-2xl grayscale opacity-60">✈️</span>
-                    <div>
-                      <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-zinc-900 dark:text-white">{ui.freeShip}</p>
-                      <p className="text-[9px] sm:text-[10px] font-bold text-zinc-500">{ui.freeSub}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <span className="text-xl sm:text-2xl grayscale opacity-60">♻️</span>
-                    <div>
-                      <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-zinc-900 dark:text-white">{ui.ecoReturn}</p>
-                      <p className="text-[9px] sm:text-[10px] font-bold text-zinc-500">{ui.ecoSub}</p>
-                    </div>
+                <div className="flex gap-4">
+                  <button 
+                    onClick={handleAddToCart} 
+                    disabled={isAdding || availableSizes.length === 0}
+                    className="flex-1 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-zinc-200 dark:hover:bg-white dark:hover:text-black transition-all shadow-sm flex items-center justify-center gap-3 disabled:opacity-30"
+                  >
+                    <ShoppingBag size={16} /> {isAdding ? '...' : ui.add}
+                  </button>
+                  <button 
+                    onClick={handleBuyNow} 
+                    disabled={availableSizes.length === 0}
+                    className="flex-[1.5] bg-zinc-900 dark:bg-white text-white dark:text-black py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-[10px] hover:bg-rose-600 hover:text-white transition-all shadow-2xl flex items-center justify-center gap-3 disabled:opacity-30"
+                  >
+                    <Zap size={16} fill="currentColor" /> {ui.buy}
+                  </button>
+                </div>
+              </div>
+
+              {/* Service Grid */}
+              <div className="grid grid-cols-2 gap-4 pt-8 border-t border-zinc-100 dark:border-zinc-900">
+                <div className="flex items-center gap-4 group">
+                  <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-[#111] flex items-center justify-center text-zinc-400 group-hover:text-rose-500 transition-colors"><Truck size={18}/></div>
+                  <div>
+                    <p className="text-[9px] font-black uppercase dark:text-white tracking-widest leading-none mb-1">Eco Logistics</p>
+                    <p className="text-[8px] text-zinc-500 uppercase font-bold tracking-tighter">Fast & Sustainable</p>
                   </div>
                 </div>
-              </motion.div>
+                <div className="flex items-center gap-4 group">
+                  <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-[#111] flex items-center justify-center text-zinc-400 group-hover:text-indigo-500 transition-colors"><RefreshCcw size={18}/></div>
+                  <div>
+                    <p className="text-[9px] font-black uppercase dark:text-white tracking-widest leading-none mb-1">Authentic Returns</p>
+                    <p className="text-[8px] text-zinc-500 uppercase font-bold tracking-tighter">30 Day Policy</p>
+                  </div>
+                </div>
+              </div>
+
             </motion.div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Review Section (unchanged) */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          className="mt-16 sm:mt-20"
-        >
+        {/* --- REVIEWS --- */}
+        <div className="mt-32">
           <ReviewSection productId={id} onReviewChange={() => { refetchProduct(); refetchReviews(); }} />
-        </motion.div>
+        </div>
 
-        {/* Related Products (unchanged) */}
+        {/* --- RELATED DROPS --- */}
         {relatedProducts.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="mt-24 sm:mt-32"
-          >
-            <div className="text-center mb-10 sm:mb-16">
-              <p className="text-zinc-500 font-black text-[9px] sm:text-[10px] uppercase tracking-[0.4em] mb-3 sm:mb-4">{ui.relatedSub}</p>
-              <h2 className="text-3xl sm:text-4xl font-black text-zinc-900 dark:text-white uppercase tracking-tighter">{ui.relatedTitle}</h2>
+          <div className="mt-40 space-y-16">
+            <div className="text-center">
+              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter dark:text-white leading-none mb-4">{ui.relatedTitle}</h2>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500">Continue the Sequence</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-              {relatedProducts.map((p) => (
-                <ProductCard key={p._id} product={p} />
-              ))}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
+              {relatedProducts.map(p => <ProductCard key={p._id} product={p} lang={lang} />)}
             </div>
-          </motion.div>
+          </div>
         )}
+
       </div>
     </div>
   );

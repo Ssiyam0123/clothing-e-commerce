@@ -12,7 +12,6 @@ export default function ProductFilter() {
   const { categories } = useCategories();
   const trackSearch = useTrackingStore((state) => state.trackSearch);
 
-  // 🚀 100% Optimized Drag-to-Scroll (Zero Re-renders!)
   const sliderRef = useRef(null);
   const dragState = useRef({ isDragging: false, startX: 0, scrollLeft: 0 });
 
@@ -61,8 +60,8 @@ export default function ProductFilter() {
     <div className="mb-12">
       <FilterBar
         search={filters.search}
-        onSearchChange={setSearch}          // 👉 Exclusively handles URL updates
-        onSearchSubmit={handleSearchSubmit} // 👉 Exclusively handles Tracking
+        onSearchChange={setSearch}          
+        onSearchSubmit={handleSearchSubmit} 
         sort={filters.sort}
         onSortChange={setSort}
         sortOptions={[

@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense, useMemo, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
-import { useAuth } from "@/hooks/useAuth";
+import  useAuth  from "@/hooks/useAuth";
 import { useOrders } from "@/hooks/useOrders";
 import { usePathao } from "@/hooks/usePathao";
 import { useCoupons } from "@/hooks/useCoupons";

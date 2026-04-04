@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
-import { useAuth } from './useAuth';
+import  useAuth  from './useAuth';
 import { getGuestId } from '@/utils/guestId';
 
 export const useCart = () => {

@@ -16,7 +16,6 @@ import orderRoutes from "./modules/order/order.routes.js";
 import pathaoRoutes from "./modules/pathao/pathao.routes.js";
 import reviewRoutes from "./modules/review/review.routes.js";
 import flashSaleRoutes from "./modules/flashSale/flashSale.routes.js";
-import bannerRoutes from "./modules/banner/banner.routes.js";
 import bannerCampaignRoutes from "./modules/bannerCampaign/bannerCampaign.routes.js";
 import adminRoutes from "./modules/admin/admin.routes.js";
 import couponRoutes from "./modules/coupon/coupon.routes.js";
@@ -35,7 +34,7 @@ app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000","https://clothing-e-commerce-web.vercel.app/"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
@@ -79,7 +78,6 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/pathao", pathaoRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/flash-sales", flashSaleRoutes);
-app.use("/api/banners", bannerRoutes);
 app.use("/api/banner-campaigns", bannerCampaignRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/coupons", couponRoutes);

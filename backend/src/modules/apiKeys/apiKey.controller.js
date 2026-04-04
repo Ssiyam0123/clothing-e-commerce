@@ -1,7 +1,6 @@
 import ApiKey from './apiKey.model.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 
-// ১. এপিআই কী গেট করা (অ্যাডমিনের জন্য সব ডাটা শো করবে)
 export const getApiKeys = asyncHandler(async (req, res) => {
     const keys = await ApiKey.findOne().select(
         '+sslCommerz.storeId +sslCommerz.storePassword ' +
@@ -12,11 +11,9 @@ export const getApiKeys = asyncHandler(async (req, res) => {
     res.json(keys || {});
 });
 
-// ২. এপিআই কী আপডেট করা
 export const updateApiKeys = asyncHandler(async (req, res) => {
     const updateData = {};
 
-    // 🚀 অবজেক্ট গুলোকে ডট নোটেশনে রূপান্তর করা যাতে সিলেক্টিভ আপডেট হয়
     const flattenKeys = (obj, prefix) => {
         if (!obj) return;
         Object.keys(obj).forEach(key => {
@@ -35,7 +32,7 @@ export const updateApiKeys = asyncHandler(async (req, res) => {
         {}, 
         { $set: updateData }, 
         { new: true, upsert: true, runValidators: true }
-    ).select('+sslCommerz.storeId +bkash.appKey +pathao.clientId'); // জাস্ট ভেরিফিকেশনের জন্য কিছু সিক্রেট রিটার্ন
+    ).select('+sslCommerz.storeId +bkash.appKey +pathao.clientId'); 
 
     res.json(keys);
 });

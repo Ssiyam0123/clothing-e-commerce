@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { useAuth } from '@/hooks/useAuth';
 import { useReviews } from '@/hooks/useReviews';
 import { useRouter } from 'next/navigation';
 import StarRating from './StarRating';
@@ -10,6 +9,7 @@ import { getImageUrl } from '@/utils/imageUtils';
 import { swalConfirm, swalToast, swalError } from '@/utils/swal';
 import { useAppStore } from '@/store/appStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuthStore } from '@/store/authStore';
 
 const DICTIONARY = {
   en: {
@@ -66,7 +66,7 @@ const DICTIONARY = {
 
 export default function ReviewSection({ productId, onReviewChange }) {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const { 
     reviews, 
     userReview,

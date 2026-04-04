@@ -8,8 +8,6 @@ export const getDashboardData = asyncHandler(async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // 1. Unified Aggregation for Financials & Inventory
-    // 💡 টিপ: ইনভেন্টরি লজিক মেমোরিতে না করে ডাটাবেসেই এগ্রিগেট করা হচ্ছে।
     const [stats] = await Order.aggregate([
         {
             $facet: {
@@ -43,8 +41,7 @@ export const getDashboardData = asyncHandler(async (req, res) => {
         }
     ]);
 
-    // 2. Optimized Inventory Aggregation
-    // 💡 টিপ: হাজার হাজার প্রোডাক্ট থাকলেও মেমোরি বিন্দুমাত্র লোড হবে না।
+
     const inventoryStats = await Product.aggregate([
         {
             $project: {
@@ -98,7 +95,7 @@ export const getDashboardData = asyncHandler(async (req, res) => {
     };
 
     // 6. Recent Orders (Bulk User Mapping - NO LOOP AWAIT)
-    // 💡 টিপ: এখানে ১টা কুয়েরিতে ৫টা ইউজারের ডাটা নিয়ে আসা হচ্ছে।
+
     const recentOrdersRaw = await Order.find({}).sort('-createdAt').limit(5).lean();
     const userIds = recentOrdersRaw.map(o => o.user);
     
