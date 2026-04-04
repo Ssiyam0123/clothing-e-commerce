@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useProductCondition } from '@/store/productCondition';
+import { useProductCondition } from '@/store/productStore';
 import OptimizedImage from '@/components/common/OptimizedImage'; 
 import { Heart, ShoppingBag, Zap, Star } from 'lucide-react';
 import QuickSelectModal from '../store/QuickSelectModal';

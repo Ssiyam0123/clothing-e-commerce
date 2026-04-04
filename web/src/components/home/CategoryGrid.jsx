@@ -30,7 +30,7 @@ export default function CategoryGrid({ categories, ui }) {
   if (!categories || categories.length === 0) return null;
 
   return (
-    <section className="py-16 md:py-24 bg-white dark:bg-[#050505] overflow-hidden transition-colors duration-700">
+    <section className="bg-white dark:bg-[#050505] overflow-hidden transition-colors duration-700">
       {/* Header Section */}
       <div className="container mx-auto px-6 mb-10 md:mb-16">
         <div className="flex flex-col items-center text-center space-y-3">

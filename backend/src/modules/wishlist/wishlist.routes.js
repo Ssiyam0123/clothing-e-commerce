@@ -4,10 +4,14 @@ import {
   addToWishlist,
   removeFromWishlist,
   clearWishlist,
+  bulkAddWishlist,
 } from './wishlist.controller.js';
-import { optionalAuth } from '../../middleware/auth.js';
+import { optionalAuth, protect } from '../../middleware/auth.js';
 
 const router = express.Router();
+
+
+router.post('/bulk-add', optionalAuth, bulkAddWishlist); 
 
 router.use(optionalAuth);
 

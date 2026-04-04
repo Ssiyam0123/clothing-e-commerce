@@ -1,0 +1,1263 @@
+[{
+  "_id": {
+    "$oid": "69d0c20f3df91c4df3eb4abc"
+  },
+  "name": "eshtiyak ahmmed siyam",
+  "email": "ssiyam563@gmail.com",
+  "password": "$2b$10$tAhdVg7YwnoItD.9/nvSx.4ot3YhBUkhW9QN9XE/l4zcfGZp/C70C",
+  "avatar": "",
+  "role": "admin",
+  "phone": "",
+  "bio": "",
+  "addresses": [],
+  "isEmailVerified": false,
+  "emailVerificationToken": "1a26b03c53f13538d76d47931658b3659fb03ce16dbb1c4e46d9590a900acbcf",
+  "createdAt": {
+    "$date": "2026-04-04T07:47:27.174Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-04T07:47:27.174Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b4e"
+  },
+  "name": "Rahim Ahmed",
+  "email": "rahim.ahmed1@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000001",
+  "bio": "Tech enthusiast and fashion lover.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b4f"
+  },
+  "name": "Karim Uddin",
+  "email": "karim.uddin2@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000002",
+  "bio": "Always on the lookout for trendy clothes.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b50"
+  },
+  "name": "Fatema Begum",
+  "email": "fatema.begum3@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000003",
+  "bio": "Love shopping for my family.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b51"
+  },
+  "name": "Nurul Islam",
+  "email": "nurul.islam4@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000004",
+  "bio": "Casual and comfortable is my style.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b52"
+  },
+  "name": "Shahida Akter",
+  "email": "shahida.akter5@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000005",
+  "bio": "Fashion blogger and influencer.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b53"
+  },
+  "name": "Mizanur Rahman",
+  "email": "mizanur.rahman6@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000006",
+  "bio": "Like to stay updated with latest trends.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b54"
+  },
+  "name": "Nasrin Sultana",
+  "email": "nasrin.sultana7@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000007",
+  "bio": "Shopping is my therapy.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b55"
+  },
+  "name": "Jahangir Alam",
+  "email": "jahangir.alam8@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000008",
+  "bio": "Looking for quality and style.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b56"
+  },
+  "name": "Farida Khanam",
+  "email": "farida.khanam9@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000009",
+  "bio": "Love to dress up for any occasion.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b57"
+  },
+  "name": "Shamsul Haque",
+  "email": "shamsul.haque10@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000010",
+  "bio": "Simple and elegant choices.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b58"
+  },
+  "name": "Laila Akhter",
+  "email": "laila.akhter11@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000011",
+  "bio": "Passionate about sustainable fashion.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b59"
+  },
+  "name": "Kamal Hossain",
+  "email": "kamal.hossain12@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000012",
+  "bio": "Buying gifts for loved ones.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b5a"
+  },
+  "name": "Salma Khatun",
+  "email": "salma.khatun13@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000013",
+  "bio": "Fashionista at heart.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b5b"
+  },
+  "name": "Rafiqul Islam",
+  "email": "rafiqul.islam14@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000014",
+  "bio": "Appreciates quality over quantity.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b5c"
+  },
+  "name": "Tahmina Begum",
+  "email": "tahmina.begum15@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000015",
+  "bio": "Loves to explore new styles.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b5d"
+  },
+  "name": "Aminul Haque",
+  "email": "aminul.haque16@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000016",
+  "bio": "Budget conscious shopper.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b5e"
+  },
+  "name": "Rokeya Begum",
+  "email": "rokeya.begum17@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000017",
+  "bio": "Mother of two, loves kids' fashion.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b5f"
+  },
+  "name": "Mahbub Alam",
+  "email": "mahbub.alam18@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000018",
+  "bio": "Sporty and active lifestyle.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b60"
+  },
+  "name": "Sultana Razia",
+  "email": "sultana.razia19@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000019",
+  "bio": "Elegant and sophisticated.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b61"
+  },
+  "name": "Habibur Rahman",
+  "email": "habibur.rahman20@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000020",
+  "bio": "Enjoys online shopping deals.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b62"
+  },
+  "name": "Nargis Akter",
+  "email": "nargis.akter21@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000021",
+  "bio": "Fashion is my passion.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b63"
+  },
+  "name": "Zahid Hasan",
+  "email": "zahid.hasan22@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000022",
+  "bio": "Looking for classic pieces.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b64"
+  },
+  "name": "Jasmine Begum",
+  "email": "jasmine.begum23@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000023",
+  "bio": "Always on trend.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b65"
+  },
+  "name": "Shafiqul Islam",
+  "email": "shafiqul.islam24@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000024",
+  "bio": "Shoes and accessories lover.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b66"
+  },
+  "name": "Rina Begum",
+  "email": "rina.begum25@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000025",
+  "bio": "Believes in comfortable style.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b67"
+  },
+  "name": "Moshiur Rahman",
+  "email": "moshiur.rahman26@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000026",
+  "bio": "Minimalist fashion enthusiast.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b68"
+  },
+  "name": "Sharmin Sultana",
+  "email": "sharmin.sultana27@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000027",
+  "bio": "Loves vibrant colors.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b69"
+  },
+  "name": "Tariqul Islam",
+  "email": "tariqul.islam28@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000028",
+  "bio": "Saving for the perfect outfit.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b6a"
+  },
+  "name": "Jahanara Begum",
+  "email": "jahanara.begum29@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000029",
+  "bio": "Traditional and modern fusion.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b6b"
+  },
+  "name": "Anwar Hossain",
+  "email": "anwar.hossain30@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000030",
+  "bio": "Prefers organic and ethical brands.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b6c"
+  },
+  "name": "Nasima Akter",
+  "email": "nasima.akter31@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000031",
+  "bio": "Shopaholic alert!",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b6d"
+  },
+  "name": "Shahjahan Miah",
+  "email": "shahjahan.miah32@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000032",
+  "bio": "Collector of unique items.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b6e"
+  },
+  "name": "Parvin Sultana",
+  "email": "parvin.sultana33@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000033",
+  "bio": "Loves seasonal collections.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b6f"
+  },
+  "name": "Fazlur Rahman",
+  "email": "fazlur.rahman34@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000034",
+  "bio": "Practical and stylish.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b70"
+  },
+  "name": "Maksuda Begum",
+  "email": "maksuda.begum35@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000035",
+  "bio": "Fashion forward.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b71"
+  },
+  "name": "Hafizur Rahman",
+  "email": "hafizur.rahman36@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000036",
+  "bio": "Likes to mix and match.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b72"
+  },
+  "name": "Sabina Yeasmin",
+  "email": "sabina.yeasmin37@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000037",
+  "bio": "Adventurous in style.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b73"
+  },
+  "name": "Ruhul Amin",
+  "email": "ruhul.amin38@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000038",
+  "bio": "Quality over price.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b74"
+  },
+  "name": "Taslima Akter",
+  "email": "taslima.akter39@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000039",
+  "bio": "Always looking for best deals.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b75"
+  },
+  "name": "Shahadat Hossain",
+  "email": "shahadat.hossain40@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000040",
+  "bio": "Street style enthusiast.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b76"
+  },
+  "name": "Nasrin Jahan",
+  "email": "nasrin.jahan41@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000041",
+  "bio": "Eco-conscious shopper.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b77"
+  },
+  "name": "Alamgir Hossain",
+  "email": "alamgir.hossain42@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000042",
+  "bio": "Prefers premium fabrics.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b78"
+  },
+  "name": "Sonia Akter",
+  "email": "sonia.akter43@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000043",
+  "bio": "Loves to accessorize.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b79"
+  },
+  "name": "Khaled Hasan",
+  "email": "khaled.hasan44@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000044",
+  "bio": "Trendy and affordable.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b7a"
+  },
+  "name": "Farzana Akhter",
+  "email": "farzana.akhter45@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000045",
+  "bio": "Shop for all seasons.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b7b"
+  },
+  "name": "Saiful Islam",
+  "email": "saiful.islam46@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000046",
+  "bio": "Fitness and style go together.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b7c"
+  },
+  "name": "Shamima Sultana",
+  "email": "shamima.sultana47@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000047",
+  "bio": "Classic elegance.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b7d"
+  },
+  "name": "Mofizur Rahman",
+  "email": "mofizur.rahman48@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000048",
+  "bio": "Likes to stay cozy.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b7e"
+  },
+  "name": "Razia Sultana",
+  "email": "razia.sultana49@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000049",
+  "bio": "Impulse buyer!",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b7f"
+  },
+  "name": "Abul Kalam",
+  "email": "abul.kalam50@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000050",
+  "bio": "Brand conscious.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b80"
+  },
+  "name": "Mumtaz Begum",
+  "email": "mumtaz.begum51@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000051",
+  "bio": "Loves handmade items.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b81"
+  },
+  "name": "Shahinur Rahman",
+  "email": "shahinur.rahman52@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000052",
+  "bio": "Sneakerhead.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b82"
+  },
+  "name": "Shahana Akter",
+  "email": "shahana.akter53@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000053",
+  "bio": "Loves bright and bold.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b83"
+  },
+  "name": "Nazrul Islam",
+  "email": "nazrul.islam54@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000054",
+  "bio": "Minimalist.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b84"
+  },
+  "name": "Sultana Jahan",
+  "email": "sultana.jahan55@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000055",
+  "bio": "Loves to gift fashion.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b85"
+  },
+  "name": "Mukul Hossain",
+  "email": "mukul.hossain56@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000056",
+  "bio": "Tech and fashion blend.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b86"
+  },
+  "name": "Tania Akter",
+  "email": "tania.akter57@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000057",
+  "bio": "Fashion student.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b87"
+  },
+  "name": "Ratan Mia",
+  "email": "ratan.mia58@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000058",
+  "bio": "Likes to keep it simple.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b88"
+  },
+  "name": "Dilruba Begum",
+  "email": "dilruba.begum59@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000059",
+  "bio": "Traditional wear lover.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b89"
+  },
+  "name": "Kamrun Nahar",
+  "email": "kamrun.nahar60@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000060",
+  "bio": "Collects unique jewelry.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b8a"
+  },
+  "name": "Habibul Islam",
+  "email": "habibul.islam61@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000061",
+  "bio": "Outdoor and sporty.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b8b"
+  },
+  "name": "Hasina Begum",
+  "email": "hasina.begum62@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000062",
+  "bio": "Loves ethnic wear.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b8c"
+  },
+  "name": "Ferdous Ahmed",
+  "email": "ferdous.ahmed63@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000063",
+  "bio": "Prefers comfortable fabrics.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b8d"
+  },
+  "name": "Rasheda Akter",
+  "email": "rasheda.akter64@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000064",
+  "bio": "Fashion for all occasions.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b8e"
+  },
+  "name": "Mahfuzur Rahman",
+  "email": "mahfuzur.rahman65@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000065",
+  "bio": "Budget savvy shopper.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b8f"
+  },
+  "name": "Jesmin Akter",
+  "email": "jesmin.akter66@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000066",
+  "bio": "Loves to follow trends.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b90"
+  },
+  "name": "Sabbir Hossain",
+  "email": "sabbir.hossain67@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000067",
+  "bio": "Sneakers and streetwear.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b91"
+  },
+  "name": "Nasreen Sultana",
+  "email": "nasreen.sultana68@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000068",
+  "bio": "Elegant and sophisticated.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b92"
+  },
+  "name": "Sirajul Islam",
+  "email": "sirajul.islam69@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000069",
+  "bio": "Classic style.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b93"
+  },
+  "name": "Mafruha Akter",
+  "email": "mafruha.akter70@example.com",
+  "password": "password123",
+  "avatar": "",
+  "role": "customer",
+  "phone": "01710000070",
+  "bio": "Fashion enthusiast.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b94"
+  },
+  "name": "Admin User",
+  "email": "admin@example.com",
+  "password": "admin123",
+  "avatar": "",
+  "role": "admin",
+  "phone": "01710000999",
+  "bio": "Super admin of the store.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b95"
+  },
+  "name": "Staff One",
+  "email": "staff1@example.com",
+  "password": "staff123",
+  "avatar": "",
+  "role": "admin",
+  "phone": "01710000998",
+  "bio": "Store manager.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+},
+{
+  "_id": {
+    "$oid": "69d171d519953b7130bf1b96"
+  },
+  "name": "Staff Two",
+  "email": "staff2@example.com",
+  "password": "staff123",
+  "avatar": "",
+  "role": "admin",
+  "phone": "01710000997",
+  "bio": "Customer support lead.",
+  "addresses": [],
+  "isEmailVerified": true,
+  "emailVerificationToken": null,
+  "passwordResetToken": null,
+  "passwordResetExpires": null
+}]

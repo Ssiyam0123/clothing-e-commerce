@@ -174,3 +174,47 @@ export const clearCart = asyncHandler(async (req, res) => {
   }
   res.json({ message: 'Cart cleared', items: [], totalItems: 0, totalPrice: 0 });
 });
+
+
+
+
+// controllers/cart.controller.js
+
+export const bulkAddCart = async (req, res) => {
+  try {
+    const { items } = req.body; 
+    const userId = req.user.id || req.user._id;
+
+    if (!Array.isArray(items)) {
+      return res.status(400).json({ message: "Items must be an array" });
+    }
+
+    let cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      cart = new Cart({ user: userId, items: [] });
+    }
+
+    for (const newItem of items) {
+      const existingItemIndex = cart.items.findIndex(
+        (item) => 
+          item.product.toString() === newItem.productId && 
+          item.size.toString() === newItem.sizeId
+      );
+
+      if (existingItemIndex > -1) {
+        cart.items[existingItemIndex].quantity += newItem.quantity;
+      } else {
+        cart.items.push({
+          product: newItem.productId,
+          size: newItem.sizeId,
+          quantity: newItem.quantity
+        });
+      }
+    }
+
+    await cart.save();
+    res.status(200).json(cart);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

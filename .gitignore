@@ -24,6 +24,7 @@ backend/uploads/
 backend/dbdata/
 backend/images/
 backend/combined_codebase.txt
+backend/josns/
 backend/extract.js
 
 web/combined_codebase.txt

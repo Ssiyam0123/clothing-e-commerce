@@ -82,3 +82,35 @@ export const clearWishlist = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+
+
+export const bulkAddWishlist = async (req, res) => {
+  try {
+    const { productIds } = req.body; 
+    const userId = req.user.id || req.user._id;
+
+    if (!Array.isArray(productIds)) {
+      return res.status(400).json({ message: 'productIds must be an array' });
+    }
+
+    let wishlist = await Wishlist.findOne({ user: userId });
+    if (!wishlist) {
+      wishlist = await Wishlist.create({ user: userId, products: [] });
+    }
+
+    productIds.forEach(id => {
+      if (!wishlist.products.includes(id)) {
+        wishlist.products.push(id);
+      }
+    });
+
+    await wishlist.save();
+    await wishlist.populate(populateConfig);
+    
+    res.json(wishlist);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

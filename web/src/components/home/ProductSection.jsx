@@ -35,41 +35,7 @@ export default function ProductSection({ title, subTitle, products, lang, isDark
     }`}>
       <div className="max-w-[1700px] mx-auto px-4 md:px-10">
         
-        {/* --- Header Area --- */}
-        <div className={`flex flex-col md:flex-row gap-6 ${
-          showLoadMore ? 'items-center text-center mb-20' : 'justify-between items-end mb-16'
-        }`}>
-          <div className="space-y-3">
-            <motion.p 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="text-rose-600 font-black text-[9px] md:text-[10px] uppercase tracking-[0.5em] flex items-center gap-2"
-            >
-              <span className="w-8 h-[1px] bg-rose-600 hidden md:block" />
-              {subTitle}
-            </motion.p>
-            
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic text-gray-900 dark:text-white leading-[0.9]"
-            >
-              {title}
-            </motion.h2>
-          </div>
-
-          {!showLoadMore && (
-            <Link 
-              href="/products" 
-              className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-rose-600 transition-all"
-            >
-              {lang === 'bn' ? 'সব দেখুন' : 'Explore All'}
-              <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
-            </Link>
-          )}
-        </div>
+       
 
         {/* --- Product Grid with Motion --- */}
         <motion.div 

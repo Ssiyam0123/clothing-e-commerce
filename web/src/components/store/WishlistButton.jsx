@@ -1,7 +1,7 @@
 "use client";
 
 import React, { memo, useCallback } from "react";
-import { useProductCondition } from "@/store/productCondition";
+import { useProductCondition } from "@/store/productStore";
 import { swalToast } from "@/utils/swal";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
