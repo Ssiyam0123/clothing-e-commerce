@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Heart, ShoppingBag, Menu, X, Sun, Moon, Languages } from 'lucide-react';
+import { Search, Heart, ShoppingBag, Menu, X, Sun, Moon, Languages, User, LogOut, LayoutDashboard } from 'lucide-react';
 
 // Hooks & Stores
-import { useAuth } from '@/hooks/useAuth';
+import useAuth from '@/hooks/useAuth';
 import { useAppStore } from '@/store/appStore';
 import { useProductCondition } from '@/store/productCondition';
 import { getImageUrl } from '@/utils/imageUtils';
@@ -31,12 +31,25 @@ export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-  // 🚀 Gap & Scroll Fix: No gap between navbar and banner
+  // Scroll effect
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleSearchSubmit = (e) => {
@@ -47,10 +60,25 @@ export default function Navbar() {
     }
   };
 
+  // Toggle dropdown on click for mobile/touch devices
+  const handleProfileClick = (e) => {
+    if (window.innerWidth < 1024) {
+      e.preventDefault();
+      setIsProfileDropdownOpen((prev) => !prev);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsProfileDropdownOpen(false);
+    router.push('/');
+  };
+
+  const isAdmin = user?.role === 'admin';
+
   return (
     <>
       <motion.nav 
-        // 🚀 Senior Fix: Ensure top-0 and absolute highest z-index for the bar itself
         className={`fixed top-0 left-0 right-0 w-full z-[999] transition-all duration-500 ${
           isScrolled || isSearchOpen
             ? 'bg-white/70 dark:bg-black/70 backdrop-blur-2xl dark:border-white/10 py-4 shadow-lg' 
@@ -112,16 +140,74 @@ export default function Navbar() {
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            {/* Profile Section */}
-            <div className="hidden sm:block">
+            {/* Profile Section with Dropdown */}
+            <div className="hidden sm:block relative" ref={dropdownRef}>
               {authLoading ? (
-                <div className="w-8 h-8 rounded-full bg-zinc-200 animate-pulse" />
+                <div className="w-9 h-9 rounded-full bg-zinc-200 animate-pulse" />
               ) : user ? (
-                <Link href="/profile" className="w-9 h-9 rounded-full border-2 border-zinc-200 dark:border-white/20 overflow-hidden block">
-                  <img src={getImageUrl(user.avatar)} className="w-full h-full object-cover" alt="user" />
-                </Link>
+                <div
+                  className="relative cursor-pointer"
+                  onMouseEnter={() => setIsProfileDropdownOpen(true)}
+                  onMouseLeave={() => setIsProfileDropdownOpen(false)}
+                  onClick={handleProfileClick}
+                >
+                  <div className="w-9 h-9 rounded-full border-2 border-zinc-200 dark:border-white/20 overflow-hidden">
+                    <img
+                      src={getImageUrl(user.avatar)}
+                      className="w-full h-full object-cover"
+                      alt={user.name}
+                    />
+                  </div>
+                  
+                  <AnimatePresence>
+                    {isProfileDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute right-0 mt-3 w-56 bg-white dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl overflow-hidden z-50"
+                      >
+                        <div className="py-2">
+                          <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800">
+                            <p className="text-xs font-black text-zinc-900 dark:text-white truncate">{user.name}</p>
+                            <p className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 truncate">{user.email}</p>
+                          </div>
+                          <Link
+                            href="/profile"
+                            className="flex items-center gap-3 px-4 py-3 text-xs font-black uppercase tracking-widest text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                          >
+                            <User size={14} />
+                            Profile
+                          </Link>
+                          {isAdmin && (
+                            <Link
+                              href="/admin"
+                              className="flex items-center gap-3 px-4 py-3 text-xs font-black uppercase tracking-widest text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+                              onClick={() => setIsProfileDropdownOpen(false)}
+                            >
+                              <LayoutDashboard size={14} />
+                              Dashboard
+                            </Link>
+                          )}
+                          <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-xs font-black uppercase tracking-widest text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors border-t border-zinc-100 dark:border-zinc-800 mt-1"
+                          >
+                            <LogOut size={14} />
+                            Logout
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               ) : (
-                <Link href="/login" className="text-[9px] font-black uppercase tracking-widest px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-full transition-all hover:scale-105">
+                <Link
+                  href="/login"
+                  className="text-[9px] font-black uppercase tracking-widest px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-full transition-all hover:scale-105"
+                >
                   JOIN
                 </Link>
               )}
@@ -154,18 +240,16 @@ export default function Navbar() {
         </AnimatePresence>
       </motion.nav>
 
-      {/* 📱 Mobile Sidebar - Placed OUTSIDE the nav content for highest stacking */}
+      {/* Mobile Sidebar */}
       <AnimatePresence>
         {isSidebarOpen && (
           <div className="fixed inset-0 z-[9999] lg:hidden"> 
-            {/* Overlay */}
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
               onClick={() => setIsSidebarOpen(false)} 
               className="absolute inset-0 bg-black/60 backdrop-blur-md" 
             />
             
-            {/* 🚀 Sidebar: Adaptive Theme Background */}
             <motion.div 
               initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
@@ -192,6 +276,11 @@ export default function Navbar() {
                 <Link href="/profile" onClick={() => setIsSidebarOpen(false)} className="block text-5xl font-black uppercase tracking-tighter text-zinc-300 dark:text-zinc-700">
                   PROFILE
                 </Link>
+                {isAdmin && (
+                  <Link href="/admin" onClick={() => setIsSidebarOpen(false)} className="block text-5xl font-black uppercase tracking-tighter text-zinc-300 dark:text-zinc-700">
+                    DASHBOARD
+                  </Link>
+                )}
               </nav>
 
               <div className="pt-8 border-t border-zinc-100 dark:border-white/10 space-y-4">

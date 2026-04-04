@@ -1,14 +1,14 @@
 'use client';
 
 import { useMemo, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import  useAuth  from '@/hooks/useAuth';
 import Link from 'next/link';
 import { getImageUrl } from '@/utils/imageUtils';
 import { useAppStore } from '@/store/appStore';
 import { useProductCondition } from '@/store/productCondition';
 import { useTrackingStore } from '@/store/trackingStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CartItemSkeleton, CartSummarySkeleton } from '@/components/common/Skeletons';
+
 
 const DICTIONARY = {
   en: {

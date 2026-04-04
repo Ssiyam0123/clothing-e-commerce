@@ -1,10 +1,21 @@
-import express from 'express';
-import { toNodeHandler } from "better-auth/node";
-import { auth } from '../../lib/auth.js';
+import express from "express";
+import {
+  register,
+  login,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
+  getMe,
+} from "./auth.controller.js";
+import { protect } from "../../middleware/auth.js";
 
 const router = express.Router();
 
-// SENIOR FIX: Using RegExp matches everything inside /api/auth cleanly
-router.all(/.*/, toNodeHandler(auth));
+router.post("/register", register);
+router.post("/login", login);
+router.get("/verify-email", verifyEmail);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
+router.get("/me", protect, getMe);
 
 export default router;

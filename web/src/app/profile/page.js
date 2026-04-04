@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '@/hooks/useAuth';
+import  useAuth  from '@/hooks/useAuth';
 import { useOrders } from '@/hooks/useOrders';
 import { getImageUrl } from '@/utils/imageUtils';
 import Alert from '@/components/common/Alert';

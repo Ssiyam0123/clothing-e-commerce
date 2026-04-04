@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { getImageUrl } from '@/utils/imageUtils';
 import { useProductCondition } from '@/store/productCondition';
-import { useAuth } from '@/hooks/useAuth';
+import  useAuth  from '@/hooks/useAuth';
 import { useAppStore } from '@/store/appStore';
 import { motion } from 'framer-motion';
 import StarRating from './StarRating';

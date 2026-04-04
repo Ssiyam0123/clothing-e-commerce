@@ -2,7 +2,7 @@
 
 import React, { memo, useCallback } from "react";
 import { useProductCondition } from "@/store/productCondition";
-import { useAuth } from "@/hooks/useAuth";
+import  useAuth  from "@/hooks/useAuth";
 import { swalToast } from "@/utils/swal";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";

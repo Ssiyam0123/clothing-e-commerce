@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import  useAuth  from '@/hooks/useAuth';
 import Link from 'next/link';
 import { getImageUrl } from '@/utils/imageUtils';
 import Loader from '@/components/common/Loader';

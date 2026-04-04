@@ -1,74 +1,50 @@
-import { auth } from '../lib/auth.js';
+import jwt from "jsonwebtoken";
+import User from "../modules/user/user.model.js";
 
-/**
- * 🔒 Strict Authentication: Only for logged-in users (no guest fallback).
- * Used for admin routes, profile updates, etc.
- */
-export const requireAuth = async (req, res, next) => {
-    try {
-        const sessionData = await auth.api.getSession({ headers: req.headers });
+export const protect = async (req, res, next) => {
+  let token;
 
-        if (!sessionData || !sessionData.session) {
-            return res.status(401).json({ message: 'Unauthorized. Please log in.' });
-        }
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
 
-        req.user = { 
-            ...sessionData.user, 
-            _id: sessionData.user.id 
-        };
-        req.session = sessionData.session;
-        next();
-    } catch (error) {
-        console.error('Auth middleware error:', error);
-        res.status(500).json({ message: 'Authentication protocol error.' });
+  if (!token) {
+    return res.status(401).json({ message: "Not authorized, no token" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
     }
+    req.user = user;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Not authorized, token failed" });
+  }
 };
 
-/**
- * 🛡️ Admin: Checks if user has admin role.
- */
 export const admin = (req, res, next) => {
-    if (req.user && req.user.role === 'admin') {
-        next();
-    } else {
-        res.status(403).json({ message: 'Access denied. Admin clearance required.' });
-    }
+  if (req.user && req.user.role === "admin") return next();
+  res.status(403).json({ message: "Forbidden. Admin clearance required." });
 };
 
-/**
- * 👁️ Optional Authentication: For routes that work with guests (cart, wishlist, orders).
- * If session exists, attach user; otherwise, attach guest ID from header.
- */
 export const optionalAuth = async (req, res, next) => {
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+  if (token) {
     try {
-        const sessionData = await auth.api.getSession({ headers: req.headers });
-        if (sessionData && sessionData.session) {
-            req.user = { 
-                ...sessionData.user, 
-                _id: sessionData.user.id 
-            };
-            req.session = sessionData.session;
-        } else {
-            // Guest fallback
-            const guestId = req.headers['x-guest-id'];
-            if (guestId) {
-                req.user = { 
-                    id: guestId, 
-                    _id: guestId, 
-                    role: 'guest',
-                    name: 'Guest',
-                    email: 'guest@vanguard.os'
-                };
-            }
-        }
-        next();
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id).select("-password");
+      if (user) req.user = user;
     } catch (error) {
-        // Even on error, allow the request to continue as guest (but log)
-        console.error('Optional auth error:', error);
-        next();
     }
+  }
+  next();
 };
 
-// Alias for backward compatibility
-export const protect = requireAuth;
+export const requireAuth = protect;
 export const extractUser = optionalAuth;

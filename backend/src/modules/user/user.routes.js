@@ -1,32 +1,27 @@
-import express from 'express';
+import express from "express";
 import {
-  getUsers,
+  getMe,
+  updateProfile,
+  changePassword,
+  getAllUsers,
   getUserById,
   updateUser,
   deleteUser,
-  updateProfile,
-  uploadAvatar,
-} from './user.controller.js';
-import { protect, admin } from '../../middleware/auth.js';
-import upload from '../../middleware/upload.js';
-import { validate } from '../../middleware/validate.js';
-import { updateUserSchema } from './validators/user.validator.js';
+} from "./user.controller.js";
+import { protect, admin } from "../../middleware/auth.js";
+import upload from "../../middleware/upload.js";
 
 const router = express.Router();
 
+// Authenticated user routes
+router.get("/me", protect, getMe);
+router.put("/profile", protect, upload.single("avatar"), updateProfile);
+router.put("/change-password", protect, changePassword);
 
-router.route('/profile')
-  .put(protect, upload.single('avatar'), updateProfile);
-
-router.post('/upload-avatar', protect, upload.single('avatar'), uploadAvatar);
-
-
-router.route('/')
-  .get(protect, admin, getUsers);
-
-router.route('/:id')
-  .get(protect, admin, getUserById)
-  .put(protect, admin, upload.single('avatar'), validate(updateUserSchema), updateUser)
-  .delete(protect, admin, deleteUser);
+// Admin only routes
+router.get("/", protect, admin, getAllUsers);
+router.get("/:id", protect, admin, getUserById);
+router.put("/:id", protect, admin, upload.single("avatar"), updateUser);
+router.delete("/:id", protect, admin, deleteUser);
 
 export default router;

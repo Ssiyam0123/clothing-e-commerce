@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import  useAuth  from "@/hooks/useAuth";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { swalToast, swalError } from "@/utils/swal";
 
-export default function RegisterPage() {
-  const { register } = useAuth();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+function ResetPasswordContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { resetPassword } = useAuth();
+  const token = searchParams.get("token");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -17,8 +19,8 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !email || !password) {
-      return swalError("Missing Fields", "Please fill in all fields");
+    if (!token) {
+      return swalError("Invalid Link", "Reset token is missing");
     }
 
     if (password !== confirmPassword) {
@@ -31,16 +33,11 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      await register(name, email, password);
-      swalToast(
-        "Registration Successful!",
-        "Please check your email to verify your account."
-      );
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 3000);
+      await resetPassword(token, password);
+      swalToast("Password Reset!", "You can now login with your new password.");
+      setTimeout(() => router.push("/login"), 2000);
     } catch (err) {
-      swalError("Registration Failed", err.response?.data?.message || "Something went wrong");
+      swalError("Reset Failed", err.response?.data?.message || "Invalid or expired token");
     } finally {
       setIsSubmitting(false);
     }
@@ -54,45 +51,17 @@ export default function RegisterPage() {
           animate={{ opacity: 1, x: 0 }}
           className="text-4xl md:text-5xl font-black text-zinc-900 dark:text-white uppercase tracking-tighter mb-3"
         >
-          Create Account
+          New Password
         </motion.h1>
         <p className="text-zinc-500 dark:text-zinc-400 text-[10px] font-black uppercase tracking-[0.3em] leading-relaxed">
-          Join the syndicate and curate your aesthetic journey.
+          Enter your new secure password
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">
-            Full Name
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="w-full bg-zinc-50 dark:bg-[#0d0d0d] border border-zinc-200 dark:border-zinc-800 rounded-2xl px-5 py-4 outline-none focus:border-zinc-900 dark:focus:border-white transition-all font-bold text-sm"
-            placeholder="John Doe"
-          />
-        </div>
-
-        <div>
-          <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">
-            Email Address
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full bg-zinc-50 dark:bg-[#0d0d0d] border border-zinc-200 dark:border-zinc-800 rounded-2xl px-5 py-4 outline-none focus:border-zinc-900 dark:focus:border-white transition-all font-bold text-sm"
-            placeholder="name@example.com"
-          />
-        </div>
-
-        <div>
-          <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">
-            Password
+            New Password
           </label>
           <input
             type="password"
@@ -119,27 +88,32 @@ export default function RegisterPage() {
         </div>
 
         <motion.button
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-xl transition-all disabled:opacity-50"
+          className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-xl transition-all disabled:opacity-50"
         >
-          {isSubmitting ? "CREATING ACCOUNT..." : "Create Account"}
+          {isSubmitting ? "UPDATING..." : "Update Password"}
         </motion.button>
-      </form>
 
-      <div className="mt-12 text-center">
-        <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest">
-          Already have an account?{" "}
+        <div className="text-center">
           <Link
             href="/login"
-            className="text-zinc-900 dark:text-white border-b-2 border-zinc-900 dark:border-white pb-0.5 ml-1"
+            className="text-[10px] font-black text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
           >
-            Sign In
+            ← Back to Login
           </Link>
-        </p>
-      </div>
+        </div>
+      </form>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

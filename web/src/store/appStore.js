@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 
 export const useAppStore = create((set) => ({
-  theme: 'dark', // default fallback
+  user: null,
+  setUser: (user) => set({ user }),
+  logout: () => set({ user: null }),
+  theme: 'dark',
   lang: 'en',
   isMounted: false,
 
-  // Initialize from localStorage on client mount
   initApp: () => {
     const savedTheme = localStorage.getItem('ecowear-theme') || 'dark';
     const savedLang = localStorage.getItem('ecowear-lang') || 'en';

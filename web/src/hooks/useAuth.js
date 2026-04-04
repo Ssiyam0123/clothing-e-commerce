@@ -1,121 +1,112 @@
-"use client";
-
-import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 import api from "@/lib/api";
+import { useAppStore } from "@/store/appStore";
 
-export const useAuth = () => {
-  const router = useRouter();
-  const { data: sessionData, isPending: isLoading } = authClient.useSession();
+export default function useAuth() {
+  const { setUser } = useAppStore();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const user = useMemo(() => {
-    if (!sessionData?.user) return null;
-
-    const rawUser = sessionData.user;
-    let parsedAddresses = [];
-
-    try {
-      if (typeof rawUser.addresses === 'string') {
-        parsedAddresses = JSON.parse(rawUser.addresses || "[]");
-      } else if (Array.isArray(rawUser.addresses)) {
-        parsedAddresses = rawUser.addresses;
-      }
-    } catch (e) {
-      console.error("Failed to parse addresses sequence:", e);
-      parsedAddresses = [];
+  const checkAuth = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setIsLoading(false);
+      setIsAuthenticated(false);
+      return;
     }
 
-    return {
-      ...rawUser,
-      _id: rawUser.id,
-      avatar: rawUser.image || rawUser.avatar || "",
-      addresses: parsedAddresses
-    };
-  }, [sessionData]);
-
-  const login = async ({ email, password }) => {
-    const { data, error } = await authClient.signIn.email({ email, password });
-    if (error) throw new Error(error.message || "Authentication rejected.");
-    return data;
+    try {
+      const response = await api.get("/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(response.data);
+      setIsAuthenticated(true);
+    } catch (error) {
+      localStorage.removeItem("token");
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const registerUser = async ({ email, password, name }) => {
-    const { data, error } = await authClient.signUp.email({ email, password, name });
-    if (error) throw new Error(error.message || "Identity registration failed.");
-    return data;
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const login = async (email, password) => {
+    const response = await api.post("/auth/login", { email, password });
+    if (response.data.token) {
+      localStorage.setItem("token", response.data.token);
+      setUser(response.data.user);
+      setIsAuthenticated(true);
+    }
+    return response.data;
   };
 
-  const loginWithSocial = async (provider, redirectPath = "/") => {
-    const cleanPath = redirectPath.startsWith("/") ? redirectPath : `/${redirectPath}`;
-    const callbackURL = `${'https://clothing-e-commerce-web.vercel.app'}${cleanPath}`;
+  const register = async (name, email, password) => {
+    const response = await api.post("/auth/register", { name, email, password });
+    return response.data;
+  };
 
-    const { error } = await authClient.signIn.social({
-      provider,
-      callbackURL: callbackURL, 
-      errorCallbackURL: `https://clothing-e-commerce-web.vercel.app/login?error=auth_failed`,
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    setIsAuthenticated(false);
+  };
+
+  const forgotPassword = async (email) => {
+    const response = await api.post("/auth/forgot-password", { email });
+    return response.data;
+  };
+
+  const resetPassword = async (token, password) => {
+    const response = await api.post(`/auth/reset-password?token=${token}`, { password });
+    return response.data;
+  };
+
+  // ✅ Add updateProfile
+  const updateProfile = async (userData) => {
+    const formData = new FormData();
+    if (userData.name) formData.append("name", userData.name);
+    if (userData.phone) formData.append("phone", userData.phone);
+    if (userData.bio) formData.append("bio", userData.bio);
+    if (userData.image) formData.append("avatar", userData.image);
+
+    const response = await api.put("/users/profile", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
-
-    if (error) throw new Error(error.message || `${provider} synchronization failed.`);
+    setUser(response.data);
+    return response.data;
   };
 
-  const logout = async () => {
-    const { error } = await authClient.signOut();
-    if (error) throw new Error(error.message || "Termination protocol failed.");
-    
-    localStorage.removeItem("user");
-    router.push("/login");
-    router.refresh(); 
-  };
-
-  const changePassword = async ({ currentPassword, newPassword }) => {
-    const { error } = await authClient.changePassword({
-      newPassword,
-      currentPassword,
-      revokeOtherSessions: true,
-    });
-    if (error) throw new Error(error.message || "Password update rejected.");
-  };
-
-  const forgetPassword = async (email) => {
-    const { error } = await authClient.forgetPassword({
-      email,
-      redirectTo: "/reset-password",
-    });
-    if (error) throw new Error(error.message || "Reset link delivery failed.");
-  };
-
-  const resetPassword = async (newPassword) => {
-    const { error } = await authClient.resetPassword({ newPassword });
-    if (error) throw new Error(error.message || "New password assignment failed.");
-  };
-
-  const updateProfile = async (data) => {
-    const { error } = await authClient.updateUser(data);
-    if (error) throw new Error(error.message || "Identity update failed.");
-    
-    await authClient.getSession({ fetchOptions: { force: true } });
-  };
-
+  // ✅ Add uploadAvatar (convenience)
   const uploadAvatar = async (file) => {
     const formData = new FormData();
-    formData.append('avatar', file);
-    const { data } = await api.post('/users/upload-avatar', formData);
-    return data.url; 
+    formData.append("avatar", file);
+    const response = await api.put("/users/profile", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    setUser(response.data);
+    return response.data.avatar;
+  };
+
+  // ✅ Add changePassword
+  const changePassword = async (passwords) => {
+    const response = await api.put("/users/change-password", passwords);
+    return response.data;
   };
 
   return {
-    user,
-    isAuthenticated: !!user,
+    user: useAppStore((state) => state.user),
+    isAuthenticated,
     isLoading,
     login,
-    registerUser,
-    loginWithSocial,
+    register,
     logout,
-    changePassword,
-    forgetPassword,
+    forgotPassword,
     resetPassword,
     updateProfile,
     uploadAvatar,
+    changePassword,
   };
-};
+}

@@ -1,126 +1,157 @@
-import { asyncHandler } from '../../middleware/asyncHandler.js';
-import { uploadImage, deleteImage } from '../../services/imageUploadService.js';
-import mongoose from 'mongoose';
+import User from "./user.model.js";
+import { asyncHandler } from "../../middleware/asyncHandler.js";
+import { uploadImage, deleteImage } from "../../services/imageUploadService.js";
 
-// src/modules/user/user.controller.js
-export const updateProfile = asyncHandler(async (req, res) => {
-    const db = mongoose.connection.db;
-    const userId = req.user.id || req.user._id; 
-    
-    // 🌟 গুগলের 'image' অথবা আমাদের 'avatar' যেটা থাকে সেটা নিবো
-    let newImageUrl = req.user.avatar || req.user.image;
-
-    if (req.file) {
-        newImageUrl = await uploadImage(req.file, 'users', newImageUrl);
-    }
-
-    const updateData = {
-        name: req.body.name || req.user.name,
-        phone: req.body.phone !== undefined ? req.body.phone : req.user.phone,
-        bio: req.body.bio !== undefined ? req.body.bio : req.user.bio,
-        image: newImageUrl,   // 👈 Better Auth-কে খুশি রাখার জন্য
-        avatar: newImageUrl,  // 👈 আমাদের কাস্টম লজিক ঠিক রাখার জন্য
-        updatedAt: new Date()
-    };
-
-    await db.collection('user').updateOne(
-        { id: userId },
-        { $set: updateData }
-    );
-
-    res.json({ message: 'Identity synchronized.', user: { ...req.user, ...updateData } });
+// @desc    Get current logged-in user
+// @route   GET /api/users/me
+// @access  Private
+export const getMe = asyncHandler(async (req, res) => {
+  // req.user is attached by protect middleware
+  const user = await User.findById(req.user._id).select("-password");
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  res.json(user);
 });
 
-
-
-
-
-
-
-
-export const uploadAvatar = asyncHandler(async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: 'No image file provided.' });
+// @desc    Update user profile (name, phone, bio, avatar)
+// @route   PUT /api/users/profile
+// @access  Private
+export const updateProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
   }
 
-  const avatarUrl = await uploadImage(req.file, 'users');
-  res.json({ url: avatarUrl });
+  // Handle avatar upload if file provided
+  let avatarUrl = user.avatar;
+  if (req.file) {
+    avatarUrl = await uploadImage(req.file, "avatars", user.avatar);
+  }
+
+  // Update fields
+  user.name = req.body.name || user.name;
+  user.phone = req.body.phone || user.phone;
+  user.bio = req.body.bio || user.bio;
+  user.avatar = avatarUrl;
+
+  await user.save();
+
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    bio: user.bio,
+    avatar: user.avatar,
+    role: user.role,
+  });
 });
 
+// @desc    Change password
+// @route   PUT /api/users/change-password
+// @access  Private
+export const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
 
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: "Both current and new password are required" });
+  }
 
+  if (newPassword.length < 6) {
+    return res.status(400).json({ message: "New password must be at least 6 characters" });
+  }
 
+  const user = await User.findById(req.user._id).select("+password");
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
 
-export const getUsers = asyncHandler(async (req, res) => {
-    const db = mongoose.connection.db;
-    // পাসওয়ার্ড বা সেনসিটিভ ডেটা ফিল্টার আউট করা ভালো, তবে Better Auth ডিফল্টভাবে পাসওয়ার্ড হ্যাশ আলাদা টেবিলে রাখে (accounts)
-    const users = await db.collection('users').find({}).sort({ createdAt: -1 }).toArray();
-    res.json(users);
+  const isMatch = await user.comparePassword(currentPassword);
+  if (!isMatch) {
+    return res.status(401).json({ message: "Current password is incorrect" });
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  res.json({ message: "Password updated successfully" });
 });
 
+// ==================== ADMIN ONLY ====================
+
+// @desc    Get all users (admin)
+// @route   GET /api/users
+// @access  Private/Admin
+export const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await User.find({}).select("-password");
+  res.json(users);
+});
+
+// @desc    Get single user by ID (admin)
+// @route   GET /api/users/:id
+// @access  Private/Admin
 export const getUserById = asyncHandler(async (req, res) => {
-    const db = mongoose.connection.db;
-    const { id } = req.params;
-    
-    const user = await db.collection('users').findOne({ id: id });
-    
-    if (!user) {
-        return res.status(404).json({ message: 'User identity not found in databanks.' });
-    }
-    
-    res.json(user);
+  const user = await User.findById(req.params.id).select("-password");
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  res.json(user);
 });
 
+// @desc    Update user (admin) – can change role, name, email, etc.
+// @route   PUT /api/users/:id
+// @access  Private/Admin
 export const updateUser = asyncHandler(async (req, res) => {
-    const db = mongoose.connection.db;
-    const { id } = req.params;
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
 
-    const existingUser = await db.collection('users').findOne({ id: id });
-    if (!existingUser) {
-        return res.status(404).json({ message: 'User not found.' });
-    }
+  // Only allow specific fields to be updated by admin
+  user.name = req.body.name || user.name;
+  user.email = req.body.email || user.email;
+  user.role = req.body.role || user.role;
+  user.phone = req.body.phone || user.phone;
+  user.bio = req.body.bio || user.bio;
 
-    let avatarUrl = existingUser.avatar;
-    if (req.file) {
-        avatarUrl = await uploadImage(req.file, 'users', existingUser.avatar);
-    }
+  // Handle avatar upload if provided
+  if (req.file) {
+    user.avatar = await uploadImage(req.file, "avatars", user.avatar);
+  }
 
-    const updateData = {
-        name: req.body.name || existingUser.name,
-        email: req.body.email || existingUser.email,
-        role: req.body.role || existingUser.role,
-        phone: req.body.phone !== undefined ? req.body.phone : existingUser.phone,
-        bio: req.body.bio !== undefined ? req.body.bio : existingUser.bio,
-        avatar: avatarUrl,
-        updatedAt: new Date()
-    };
+  await user.save();
 
-    await db.collection('users').updateOne(
-        { id: id },
-        { $set: updateData }
-    );
-
-    res.json({ ...existingUser, ...updateData });
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    phone: user.phone,
+    bio: user.bio,
+    avatar: user.avatar,
+  });
 });
 
+// @desc    Delete user (admin)
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
 export const deleteUser = asyncHandler(async (req, res) => {
-    const db = mongoose.connection.db;
-    const { id } = req.params;
-    
-    const user = await db.collection('users').findOne({ id: id });
-    if (!user) {
-        return res.status(404).json({ message: 'User not found.' });
-    }
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
 
-    // ছবি থাকলে ডিলিট করো
-    if (user.avatar) {
-        await deleteImage(user.avatar);
-    }
-    
-    // Better Auth এর অন্যান্য টেবিল থেকেও ডেটা সরানো
-    await db.collection('users').deleteOne({ id: id });
-    await db.collection('sessions').deleteMany({ userId: id });
-    await db.collection('accounts').deleteMany({ userId: id });
-    
-    res.json({ message: 'User purged from system.' });
+  // Prevent admin from deleting themselves
+  if (user._id.toString() === req.user._id.toString()) {
+    return res.status(400).json({ message: "You cannot delete your own account" });
+  }
+
+  // Delete avatar from storage if exists
+  if (user.avatar) {
+    await deleteImage(user.avatar);
+  }
+
+  await user.deleteOne();
+  res.json({ message: "User removed successfully" });
 });
