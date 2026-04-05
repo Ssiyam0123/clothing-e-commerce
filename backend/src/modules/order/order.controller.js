@@ -26,17 +26,22 @@ const finalizeOrderProcessing = async (order) => {
       update: { $inc: { "sizes.$.stock": -item.quantity } },
     },
   }));
+  
   if (bulkOps.length > 0) await Product.bulkWrite(bulkOps);
-  if (order.couponCode)
+  
+  if (order.couponCode) {
     await Coupon.findOneAndUpdate(
       { code: order.couponCode },
       { $inc: { usedCount: 1 } }
     );
-  if (!order.isDirectBuy)
+  }
+
+  // 🚀 FIXED: শুধুমাত্র রেজিস্টার্ড ইউজার হলে কার্ট ক্লিয়ার করো
+  if (!order.isDirectBuy && order.user) {
     await Cart.findOneAndUpdate({ user: order.user }, { $set: { items: [] } });
+  }
 };
 
-// Helper to get user ID from request (authenticated or guest)
 const getUserIdFromReq = (req) => {
   if (req.user && (req.user._id || req.user.id)) {
     return req.user._id || req.user.id;
@@ -52,32 +57,25 @@ export const initPayment = asyncHandler(async (req, res) => {
     couponCode,
     paymentMethod = "ssl",
   } = req.body;
+  
   const userId = getUserIdFromReq(req);
 
   if (!userId) {
     return res.status(401).json({
       success: false,
-      message:
-        "Identity required. Please login or provide a Guest Session protocol.",
+      message: "Identity required. Please provide a Guest Session or Login.",
     });
   }
 
-  const settings = await PageSetting.findOne();
+  // 🕵️ CRITICAL FIX: চেক করো ইউজার কি মেম্বার নাকি গেস্ট
+  const isRegisteredUser = mongoose.Types.ObjectId.isValid(userId);
 
+  const settings = await PageSetting.findOne();
   const keys = await ApiKey.findOne().select(
-    "+sslCommerz.storeId +sslCommerz.storePassword " +
-      "+bkash.appKey +bkash.appSecret +bkash.userName +bkash.password " +
-      "+pathao.clientId +pathao.clientSecret +pathao.userName +pathao.password"
+    "+sslCommerz.storeId +sslCommerz.storePassword +bkash.appKey +bkash.appSecret"
   );
 
-  if (!settings) throw new Error("Central settings not initialized.");
-
-  if (paymentMethod === "cod" && !settings.paymentOptions?.cod)
-    return res.status(400).json({ message: "COD is disabled." });
-  if (paymentMethod === "ssl" && !settings.paymentOptions?.online)
-    return res.status(400).json({ message: "Online payment is disabled." });
-  if (paymentMethod === "bkash" && !settings.paymentOptions?.bkash)
-    return res.status(400).json({ message: "bKash is disabled." });
+  if (!settings) throw new Error("Settings not initialized.");
 
   const orderData = await calculateValidatedOrder(
     orderItems,
@@ -86,7 +84,9 @@ export const initPayment = asyncHandler(async (req, res) => {
   );
 
   const order = new Order({
-    user: String(userId),
+    // ✅ যদি রেজিস্টার্ড ইউজার হয় তবে আইডি দাও, গেস্ট হলে undefined রাখো
+    user: isRegisteredUser ? userId : undefined, 
+    isGuest: !isRegisteredUser, // 🚀 গেস্ট ট্র্যাকিং
     orderItems: orderData.validatedItems,
     shippingAddress: normalizeShippingAddress(shippingAddress),
     itemsPrice: orderData.itemsPrice,
@@ -95,50 +95,33 @@ export const initPayment = asyncHandler(async (req, res) => {
     totalPrice: orderData.totalPrice,
     couponCode: orderData.couponCode,
     isDirectBuy: !!isDirectBuy,
-    paymentMethod:
-      paymentMethod === "cod"
-        ? "COD"
-        : paymentMethod === "bkash"
-        ? "bKash"
-        : "SSLCommerz",
+    paymentMethod: paymentMethod === "cod" ? "COD" : paymentMethod === "bkash" ? "bKash" : "SSLCommerz",
     paymentResult: {
       transactionId: new mongoose.Types.ObjectId().toString(),
       status: "Pending",
     },
   });
 
-  let paymentResponse;
-
   if (paymentMethod === "cod") {
     order.paymentResult.status = "COD";
     order.orderStatus = "Processing";
     await order.save();
     await finalizeOrderProcessing(order);
-    paymentResponse = await handleCODGateway(order);
+    res.json(await handleCODGateway(order));
   } else if (paymentMethod === "bkash") {
-    if (!keys?.bkash?.isActive || !keys?.bkash?.appKey)
-      return res
-        .status(400)
-        .json({ message: "bKash terminal is offline or not configured." });
-
     await order.save();
     const bkashData = await initiateBkash(order, keys.bkash);
     order.paymentResult.bkashPaymentID = bkashData.paymentID;
     await order.save();
-    paymentResponse = { url: bkashData.url };
+    res.json({ url: bkashData.url });
   } else {
-    if (!keys?.sslCommerz?.isActive || !keys?.sslCommerz?.storeId)
-      return res
-        .status(400)
-        .json({ message: "SSLCommerz terminal is offline or not configured." });
-
     await order.save();
     const sslUrl = await initiateSSLCommerz(order, keys.sslCommerz);
-    paymentResponse = { url: sslUrl };
+    res.json({ url: sslUrl });
   }
-
-  res.json(paymentResponse);
 });
+
+
 
 // --- Callbacks & Webhooks ---
 export const paymentSuccess = asyncHandler(async (req, res) => {
@@ -269,30 +252,96 @@ export const getOrders = asyncHandler(async (req, res) => {
 });
 
 // --- User: Get My Orders (handles guest via guest ID header) ---
+// export const getMyOrders = asyncHandler(async (req, res) => {
+//   const userId = getUserIdFromReq(req);
+//   if (!userId) {
+//     return res.status(401).json({ message: "Authentication required." });
+//   }
+//   const orders = await Order.find({ user: String(userId) }).sort("-createdAt");
+//   res.json(orders);
+// });
+
+
+
+
+
+
+// --- User: Get My Orders (মেম্বার এবং গেস্ট উভয়ের জন্য ফিক্সড) ---
 export const getMyOrders = asyncHandler(async (req, res) => {
-  const userId = getUserIdFromReq(req);
+  const userId = getUserIdFromReq(req); // এটা তোর ওই হেল্পার ফাংশন
+
   if (!userId) {
-    return res.status(401).json({ message: "Authentication required." });
+    return res.status(401).json({ message: "Identification required." });
   }
-  const orders = await Order.find({ user: String(userId) }).sort("-createdAt");
+
+  let query;
+  // 🕵️ সিনিয়র লজিক: আইডি ভ্যালিড হলে ইউজার ফিল্ডে সার্চ করো, নাহলে অন্যভাবে (যেমন ফোন বা ইমেইল)
+  // তবে সেরা উপায় হলো অর্ডারে একটি guestId ফিল্ড রাখা। আপাতত তোর বর্তমান স্ট্রাকচারে ফিক্স করছি:
+  if (mongoose.Types.ObjectId.isValid(userId)) {
+    query = { user: userId };
+  } else {
+    // যদি গেস্ট হয়, তবে আমরা অর্ডারগুলো খুঁজবো shippingAddress-এর ফোন দিয়ে 
+    // অথবা তুই যদি গেস্ট আইডি অর্ডারে সেভ করে থাকিস তবে সেটা দিয়ে।
+    // আপাতত ৫00 এরর বন্ধ করতে এখানে খালি অ্যারে পাঠানো নিরাপদ যদি গেস্ট ট্র্যাকিং না থাকে।
+    query = { "shippingAddress.phone": req.user?.phone || "" }; 
+    
+    // নোট: যদি তুই চাস গেস্ট তার সব অর্ডার দেখুক, তবে অর্ডার স্কিমাতে guestId: String যোগ করতে হবে।
+    if (!req.user?.phone && !mongoose.Types.ObjectId.isValid(userId)) {
+        return res.json([]); 
+    }
+  }
+
+  const orders = await Order.find(query).sort("-createdAt");
   res.json(orders);
 });
 
-// --- Get Single Order by ID (admin or owner) ---
+// --- Get Single Order by ID (৪0১ এবং ৫00 ফিক্সড) ---
 export const getOrderById = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id).populate(
+  const { id } = req.params;
+
+  // ১. আইডি ভ্যালিড কি না চেক করো যাতে সার্ভার ক্রাশ না করে (৫00 ফিক্স)
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid Order Protocol ID" });
+  }
+
+  const order = await Order.findById(id).populate(
     "orderItems.product",
     "name images slug"
   );
+
   if (!order) return res.status(404).json({ message: "Protocol not found." });
 
-  // Allow access if user is admin or order owner
-  const userId = getUserIdFromReq(req);
-  if (req.user?.role !== "admin" && order.user !== String(userId)) {
-    return res.status(403).json({ message: "Access denied." });
+  // ২. এক্সেস কন্ট্রোল লজিক (৪0১ ফিক্স)
+  const currentUserId = getUserIdFromReq(req);
+  const isAdmin = req.user?.role === "admin";
+  
+  // চেক করো অর্ডারটি কি এই ইউজারের (মেম্বার) অথবা এই গেস্টের?
+  const isOwner = order.user?.toString() === currentUserId || 
+                  (order.isGuest && order.shippingAddress.phone === req.user?.phone);
+
+  if (!isAdmin && !isOwner) {
+    return res.status(401).json({ message: "Access Denied. Identity mismatch." });
   }
+
   res.json(order);
 });
+
+
+// --- Get Single Order by ID (admin or owner) ---
+// export const getOrderById = asyncHandler(async (req, res) => {
+//   const order = await Order.findById(req.params.id).populate(
+//     "orderItems.product",
+//     "name images slug"
+//   );
+//   if (!order) return res.status(404).json({ message: "Protocol not found." });
+
+//   // Allow access if user is admin or order owner
+//   const userId = getUserIdFromReq(req);
+//   if (req.user?.role !== "admin" && order.user !== String(userId)) {
+//     return res.status(403).json({ message: "Access denied." });
+//   }
+//   res.json(order);
+// });
 
 // --- Sync Order to Pathao (with auto‑resolve fallback) ---
 export const syncOrderToPathao = asyncHandler(async (req, res) => {

@@ -17829,70 +17829,66 @@ const products = [{
   "__v": 0
 }]
 
-const cities = ["Dhaka", "Chittagong", "Sylhet", "Rajshahi", "Khulna"];
+
+
+
+
+
+
+
+
+
+
+
+
+
+const cities = [
+    "Dhaka", "Chittagong", "Sylhet", "Rajshahi", "Khulna", "Barisal", "Rangpur", 
+    "Mymensingh", "Gazipur", "Narayanganj", "Comilla", "Noakhali", "Feni", 
+    "Cox's Bazar", "Bogra", "Jessore", "Tangail", "Dinajpur"
+];
+
 const statuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
 
 const generateData = (count) => {
     const orders = [];
-
     for (let i = 0; i < count; i++) {
         const user = users[Math.floor(Math.random() * users.length)];
-        const itemsCount = Math.floor(Math.random() * 2) + 1;
-        const orderItems = [];
-        let itemsPrice = 0;
-
-        for (let j = 0; j < itemsCount; j++) {
-            const product = products[Math.floor(Math.random() * products.length)];
-            const qty = Math.floor(Math.random() * 2) + 1;
-            
-            orderItems.push({
-                product: { "$oid": product.id }, // ObjectId ফরম্যাট
-                name: product.name,
-                size: { "$oid": product.sizes[Math.floor(Math.random() * product.sizes.length)] },
-                quantity: qty,
-                price: product.price,
-                image: product.image
-            });
-            itemsPrice += product.price * qty;
-        }
-
-        const totalPrice = itemsPrice + 60;
-        const randomDate = new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000));
+        const product = products[Math.floor(Math.random() * products.length)];
+        const itemsPrice = product.price;
 
         orders.push({
-            user: user.id,
-            orderItems,
+            user: user.id, // Plain string
+            orderItems: [{
+                product: product.id, // Plain string
+                name: product.name,
+                size: product.sizes[0], // Plain string
+                quantity: 1,
+                price: product.price,
+                image: product.image
+            }],
             shippingAddress: {
                 name: user.name,
                 email: user.email,
                 phone: user.phone,
-                street: "House " + (i + 1),
+                street: "Sector " + (i % 15),
                 city: cities[Math.floor(Math.random() * cities.length)],
                 state: "Bangladesh",
-                zip: "1212"
+                zip: "1230"
             },
-            paymentMethod: "SSLCommerz",
-            paymentResult: { status: "Completed", transactionId: "TXN" + i },
+            paymentMethod: "COD",
+            paymentResult: { status: "COD" },
             itemsPrice,
             shippingPrice: 60,
             discountAmount: 0,
-            totalPrice,
+            totalPrice: itemsPrice + 60,
             orderStatus: statuses[Math.floor(Math.random() * statuses.length)],
             pathaoStatus: "Not Synced",
-            isDirectBuy: false,
-            // MongoDB Extended JSON format for Dates
-            createdAt: { "$date": randomDate.toISOString() }, 
-            updatedAt: { "$date": new Date().toISOString() }
+            createdAt: new Date(Date.now() - Math.floor(Math.random() * 1000000000)).toISOString() // ISO String
         });
     }
     return orders;
 };
 
-const finalData = generateData(1000);
-
-try {
-    fs.writeFileSync('orders.json', JSON.stringify(finalData, null, 2));
-    console.log("✅ 1000 records generated with correct MongoDB Date format.");
-} catch (err) {
-    console.error("❌ Error:", err);
-}
+fs.writeFileSync('orders.json', JSON.stringify(generateData(1000), null, 2));
+console.log("✅ orders.json created!");

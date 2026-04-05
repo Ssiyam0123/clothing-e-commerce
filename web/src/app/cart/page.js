@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShoppingBag, X, Plus, Minus, ShieldCheck, MapPin, 
-  CreditCard, Wallet, Truck, CheckCircle2, Trash2,
-  ChevronRight, Phone, NotepadText, ArrowLeft
+  CreditCard, Wallet, Truck, Trash2, Phone, Mail,
+  ArrowLeft
 } from 'lucide-react';
 
 // Stores & Hooks
@@ -16,11 +16,11 @@ import { useOrders } from '@/hooks/useOrders';
 import { useCoupons } from '@/hooks/useCoupons';
 import { useSettings } from '@/hooks/useSettings';
 import { useAppStore } from '@/store/appStore';
-import { useProductCondition } from '@/store/productStore';
 import { useTrackingStore } from '@/store/trackingStore';
 import { getImageUrl } from '@/utils/imageUtils';
 import { swalError, swalToast, swalConfirm } from '@/utils/swal';
 import Loader from '@/components/common/Loader';
+import { useProductCondition } from '@/store/productStore';
 
 const DICTIONARY = {
   en: {
@@ -34,7 +34,7 @@ const DICTIONARY = {
   bn: {
     title: 'অর্ডার সেটেলমেন্ট', manifest: 'পণ্যের তালিকা', destination: 'শিপিং তথ্য',
     payment: 'পেমেন্ট পদ্ধতি', subtotal: 'উপ-মোট', transit: 'ডেলিভারি ফি',
-    total: 'সর্বমোট বিনিয়োগ', promo: 'ভাউচার', apply: 'কোড দিন',
+    total: 'সর্বমোট বিনিয়োগ', promo: 'ভাউচার', apply: 'কোড দিন',
     confirm: 'অর্ডার কনফার্ম করুন', processing: 'প্রসেসিং হচ্ছে...',
     dhaka: 'ঢাকার ভেতরে', outside: 'ঢাকার বাইরে',
     empty: 'ভল্ট খালি আছে', browse: 'কালেকশন দেখুন'
@@ -63,24 +63,33 @@ function UnifiedSettlementContent() {
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [deliveryZone, setDeliveryZone] = useState('dhaka');
-  const [shippingInfo, setShippingInfo] = useState({ name: '', street: '', phone: '' });
+  
+  // 📧 Email added to shipping info
+  const [shippingInfo, setShippingInfo] = useState({ 
+    name: '', 
+    email: '', 
+    street: '', 
+    phone: '' 
+  });
 
-  // 🛒 🚀 FIXED: Items Memo logic for Map Structure
+  // 🛒 Items Memo
   const items = useMemo(() => {
     if (isDirectBuy && buyNowItem) return [buyNowItem];
     return cart?.itemsMap ? Object.values(cart.itemsMap) : [];
   }, [isDirectBuy, buyNowItem, cart?.itemsMap]);
 
-  // 🧮 🚀 FIXED: Subtotal logic with reduce error fix
+  // 🧮 Subtotal logic
   const subtotal = useMemo(() => {
     if (!items.length) return 0;
     return items.reduce((sum, i) => sum + ((i.discountedPrice || 0) * (i.quantity || 0)), 0);
   }, [items]);
 
+  // 🔄 Sync User Data including Email
   useEffect(() => {
     if (user) {
       setShippingInfo({ 
         name: user.name || "", 
+        email: user.email || "", // 🚀 Email Sync
         phone: user.phone || "", 
         street: user.addresses?.[0]?.street || "" 
       });
@@ -129,9 +138,11 @@ function UnifiedSettlementContent() {
   };
 
   const handlePlaceOrder = async () => {
-    if (!shippingInfo.phone || !shippingInfo.street || !shippingInfo.name) {
-      return swalError("Manifest Incomplete", "Please provide all logistics data.");
+    // 🛡️ Validation with Email
+    if (!shippingInfo.phone || !shippingInfo.street || !shippingInfo.name || !shippingInfo.email) {
+      return swalError("Manifest Incomplete", "Please provide all logistics data including email.");
     }
+    
     setIsProcessing(true);
     try {
       const result = await initOrder.mutateAsync({
@@ -165,59 +176,48 @@ function UnifiedSettlementContent() {
     <div className="min-h-screen bg-[#fcfcfc] dark:bg-[#050505] transition-colors duration-700">
       <div className="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-0">
         
-        {/* LEFT: Manifest & Logistics (Scrollable on Desktop) */}
-        <div className="lg:col-span-7 p-4 sm:p-10 lg:p-20 bg-white dark:bg-[#080808] border-r dark:border-zinc-900 overflow-y-auto">
+        {/* LEFT: Manifest & Logistics */}
+        <div className="lg:col-span-7 p-4 sm:p-10 lg:p-20 bg-white dark:bg-[#080808] border-r dark:border-zinc-900">
           <header className="mb-12 flex items-center gap-4">
-             <Link href="/products" className="p-3 bg-zinc-100 dark:bg-zinc-900 rounded-full hover:scale-110 transition-transform">
-               <ArrowLeft size={18} className="dark:text-white" />
-             </Link>
-             <h1 className="text-4xl md:text-7xl font-black uppercase tracking-tighter italic dark:text-white">
+              <Link href="/products" className="p-3 bg-zinc-100 dark:bg-zinc-900 rounded-full hover:scale-110 transition-transform">
+                <ArrowLeft size={18} className="dark:text-white" />
+              </Link>
+              <h1 className="text-4xl md:text-7xl font-black uppercase tracking-tighter italic dark:text-white leading-none">
                 Settlement
-             </h1>
+              </h1>
           </header>
 
           <div className="space-y-24">
-            {/* 01. Manifest */}
+            {/* 01. Manifest Section */}
             <section>
               <div className="flex justify-between items-end mb-10 border-b dark:border-zinc-800 pb-4">
                 <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">01. {ui.manifest}</h2>
                 <span className="text-xs font-black dark:text-white">{items.length} Artifacts</span>
               </div>
-              <div className="space-y-8">
+              <div className="space-y-6">
                 {items.map((item) => (
-                  <div key={`${item.product._id}-${item.size._id}`} className="flex gap-4 sm:gap-10 group bg-zinc-50/50 dark:bg-white/5 p-4 rounded-[2rem] border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all">
-                    <div className="w-24 sm:w-32 aspect-[3/4] bg-zinc-100 dark:bg-zinc-900 rounded-2xl overflow-hidden shrink-0 shadow-lg">
-                      <img src={getImageUrl(item.product.images?.[0])} className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700" alt="" />
+                  <div key={`${item.product._id}-${item.size._id}`} className="flex gap-4 sm:gap-8 bg-zinc-50/50 dark:bg-white/5 p-5 rounded-[2.5rem] border border-zinc-100 dark:border-white/5 transition-all">
+                    <div className="w-20 sm:w-28 aspect-[3/4] bg-zinc-200 dark:bg-zinc-900 rounded-2xl overflow-hidden shrink-0">
+                      <img src={getImageUrl(item.product.images?.[0])} className="w-full h-full object-cover" alt="" />
                     </div>
-                    <div className="flex-1 py-1 flex flex-col justify-between">
-                      <div className="flex justify-between items-start">
+                    <div className="flex-1 flex flex-col justify-between">
+                      <div className="flex justify-between">
                         <div className="space-y-1">
-                          <h3 className="text-lg md:text-xl font-black uppercase tracking-tight dark:text-white line-clamp-1">{item.product.name}</h3>
-                          <span className="inline-block px-3 py-1 bg-zinc-900 dark:bg-white text-white dark:text-black text-[9px] font-black rounded-full uppercase tracking-widest">
-                            {item.size?.name || 'Standard'}
-                          </span>
+                          <h3 className="text-base font-black uppercase tracking-tight dark:text-white">{item.product.name}</h3>
+                          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{item.size?.name || 'Standard'}</p>
                         </div>
                         {!isDirectBuy && (
-                          <button onClick={() => handleRemove(item.product._id, item.size._id)} className="text-zinc-300 hover:text-rose-500 transition-colors p-2">
-                            <Trash2 size={18}/>
-                          </button>
+                          <button onClick={() => handleRemove(item.product._id, item.size._id)} className="text-zinc-300 hover:text-rose-500 p-1"><Trash2 size={16}/></button>
                         )}
                       </div>
-                      <div className="flex items-center justify-between mt-6">
-                        {!isDirectBuy ? (
-                          <div className="flex items-center gap-4 bg-white dark:bg-zinc-800 p-1.5 rounded-2xl border dark:border-white/10 shadow-sm">
-                            <button onClick={() => handleQuantityChange(item.product._id, item.size._id, item.quantity, -1)} className="w-8 h-8 rounded-xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all">
-                              <Minus size={14}/>
-                            </button>
-                            <span className="font-black text-sm w-4 text-center dark:text-white tabular-nums">{item.quantity}</span>
-                            <button onClick={() => handleQuantityChange(item.product._id, item.size._id, item.quantity, 1)} className="w-8 h-8 rounded-xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all">
-                              <Plus size={14}/>
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="text-[10px] font-black uppercase text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-4 py-2 rounded-full">Qty: {item.quantity}</span>
-                        )}
-                        <p className="text-2xl font-black dark:text-white tracking-tighter">৳{(item.discountedPrice * item.quantity).toFixed(0)}</p>
+                      <div className="flex items-center justify-between mt-4">
+                        <QuantitySelector 
+                          qty={item.quantity} 
+                          disabled={isDirectBuy} 
+                          onDec={() => handleQuantityChange(item.product._id, item.size._id, item.quantity, -1)}
+                          onInc={() => handleQuantityChange(item.product._id, item.size._id, item.quantity, 1)}
+                        />
+                        <p className="text-xl font-black dark:text-white tracking-tighter">৳{(item.discountedPrice * item.quantity).toFixed(0)}</p>
                       </div>
                     </div>
                   </div>
@@ -225,35 +225,38 @@ function UnifiedSettlementContent() {
               </div>
             </section>
 
-            {/* 02. Logistics */}
+            {/* 02. Logistics Section */}
             <section className="space-y-12">
               <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400 border-b dark:border-zinc-800 pb-4">02. {ui.destination}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InputField label="Identity Name *" value={shippingInfo.name} onChange={v => setShippingInfo({...shippingInfo, name: v})} placeholder="FULL NAME" />
-                <InputField label="Contact Protocol *" value={shippingInfo.phone} onChange={v => setShippingInfo({...shippingInfo, phone: v})} placeholder="+880 1XXXXXXXXX" />
-              </div>
-              <div className="space-y-4">
-                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Transit Zone</label>
-                <div className="grid grid-cols-2 gap-4">
-                  {['dhaka', 'outside'].map(z => (
-                    <button key={z} onClick={() => setDeliveryZone(z)} className={`py-5 rounded-3xl font-black text-[10px] uppercase border-2 transition-all ${deliveryZone === z ? 'bg-black text-white border-black dark:bg-white dark:text-black shadow-xl scale-[1.02]' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border-transparent'}`}>
-                      {ui[z]}
-                    </button>
-                  ))}
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <InputField label="Identity Name" value={shippingInfo.name} onChange={v => setShippingInfo({...shippingInfo, name: v})} placeholder="FULL NAME" />
+                <InputField label="Neural Address (Email)" value={shippingInfo.email} onChange={v => setShippingInfo({...shippingInfo, email: v})} placeholder="EMAIL ADDRESS" icon={<Mail size={14}/>} />
+                <InputField label="Contact Protocol" value={shippingInfo.phone} onChange={v => setShippingInfo({...shippingInfo, phone: v})} placeholder="+880" icon={<Phone size={14}/>} />
+                
+                <div className="space-y-3">
+                  <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Transit Zone</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {['dhaka', 'outside'].map(z => (
+                      <button key={z} onClick={() => setDeliveryZone(z)} className={`py-4 rounded-2xl font-black text-[9px] uppercase border-2 transition-all ${deliveryZone === z ? 'bg-black text-white border-black dark:bg-white dark:text-black shadow-lg scale-[1.02]' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border-transparent'}`}>
+                        {ui[z]}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <InputField label="Detailed Address *" value={shippingInfo.street} onChange={v => setShippingInfo({...shippingInfo, street: v})} placeholder="STREET, HOUSE, AREA DETAILS" />
+
+              <InputField label="Detailed Deployment Base (Address)" value={shippingInfo.street} onChange={v => setShippingInfo({...shippingInfo, street: v})} placeholder="STREET, HOUSE, AREA DETAILS" />
             </section>
           </div>
         </div>
 
-        {/* RIGHT: Financials & Auth (Sticky on Desktop) */}
-        <div className="lg:col-span-5 bg-zinc-50 dark:bg-[#0a0a0a] p-6 sm:p-12 lg:p-24 border-l dark:border-zinc-900">
+        {/* RIGHT: Financial Summary */}
+        <div className="lg:col-span-5 bg-zinc-50 dark:bg-[#0a0a0a] p-6 lg:p-24 border-l dark:border-zinc-900">
           <div className="sticky top-32 space-y-12">
             <h2 className="text-xs font-black uppercase tracking-[0.4em] text-zinc-400">03. Financial Summary</h2>
             
             <div className="bg-white dark:bg-zinc-950 p-10 rounded-[3rem] shadow-2xl border dark:border-white/5 space-y-6 relative overflow-hidden">
-               <div className="absolute top-0 right-0 p-6 opacity-5"><ShoppingBag size={120} /></div>
                <LedgerRow label={ui.subtotal} value={subtotal} />
                {appliedCoupon && <LedgerRow label={ui.promo} value={`- ${appliedCoupon.discountAmount}`} highlight />}
                <LedgerRow label={ui.transit} value={shippingCharge} />
@@ -264,7 +267,7 @@ function UnifiedSettlementContent() {
             </div>
 
             {/* Voucher Area */}
-            <div className="flex gap-2 bg-white dark:bg-zinc-900 p-2 rounded-3xl border dark:border-white/5 shadow-sm">
+            <div className="flex gap-2 bg-white dark:bg-zinc-900 p-2 rounded-3xl border dark:border-white/5 shadow-inner">
               <input value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())} className="flex-1 bg-transparent px-6 text-[10px] font-black uppercase outline-none dark:text-white" placeholder="PROMO CODE" />
               <button onClick={handleApplyCoupon} className="bg-black dark:bg-white text-white dark:text-black px-8 py-4 rounded-2xl font-black text-[10px] uppercase hover:bg-rose-600 hover:text-white transition-all">{ui.apply}</button>
             </div>
@@ -272,20 +275,20 @@ function UnifiedSettlementContent() {
             {/* Payment Method Selector */}
             <div className="grid gap-3">
               {paymentOptions.ssl && <MethodBtn active={paymentMethod === 'ssl'} onClick={() => setPaymentMethod('ssl')} icon={<CreditCard size={18}/>} title="Digital Payment" />}
-              {paymentOptions.bkash && <MethodBtn active={paymentMethod === 'bkash'} onClick={() => setPaymentMethod('bkash')} icon={<Wallet size={18}/>} title="bKash Transfer" />}
+              {paymentOptions.bkash && <MethodBtn active={paymentMethod === 'bkash'} onClick={() => setPaymentMethod('bkash')} icon={<Wallet size={18}/>} title="bKash Wallet" />}
               {paymentOptions.cod && <MethodBtn active={paymentMethod === 'cod'} onClick={() => setPaymentMethod('cod')} icon={<Truck size={18}/>} title="Cash on Delivery" />}
             </div>
 
-            {/* Final Action */}
+            {/* Authorize Button */}
             <motion.button 
-              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
               onClick={handlePlaceOrder} disabled={isProcessing}
               className="w-full bg-black dark:bg-white text-white dark:text-black py-8 rounded-[2.5rem] font-black uppercase tracking-[0.4em] text-xs shadow-2xl transition-all hover:bg-rose-600 hover:text-white disabled:opacity-50 flex items-center justify-center gap-4"
             >
               {isProcessing ? <Loader size="small" /> : <><ShieldCheck size={18} /> {ui.confirm}</>}
             </motion.button>
             
-            <p className="text-center text-[8px] font-bold text-zinc-500 uppercase tracking-widest opacity-50">Secure 256-bit SSL encrypted settlement vault</p>
+            <p className="text-center text-[8px] font-bold text-zinc-500 uppercase tracking-[0.3em] opacity-50 italic">Secure 256-bit encrypted settlement vault / VANGUARD OS</p>
           </div>
         </div>
       </div>
@@ -293,16 +296,30 @@ function UnifiedSettlementContent() {
   );
 }
 
-// 🧱 Clean Internal Components
-function InputField({ label, value, onChange, placeholder }) {
+// 🧱 Internal Utilities
+function InputField({ label, value, onChange, placeholder, icon }) {
   return (
     <div className="space-y-3 w-full group">
-      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 group-focus-within:text-zinc-900 dark:group-focus-within:text-white transition-colors">{label}</label>
+      <div className="flex items-center gap-2 text-zinc-500 group-focus-within:text-zinc-900 dark:group-focus-within:text-white transition-colors">
+        {icon}
+        <label className="text-[9px] font-black uppercase tracking-[0.2em]">{label}</label>
+      </div>
       <input 
         value={value} onChange={e => onChange?.(e.target.value)} 
         className="w-full bg-zinc-50 dark:bg-zinc-900/50 border-2 border-transparent focus:border-zinc-900 dark:focus:border-white p-5 rounded-[1.5rem] outline-none transition-all text-xs font-bold uppercase dark:text-white shadow-inner" 
         placeholder={placeholder} 
       />
+    </div>
+  );
+}
+
+function QuantitySelector({ qty, onInc, onDec, disabled }) {
+  if (disabled) return <span className="text-[10px] font-black uppercase text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-4 py-2 rounded-full">Sequence: {qty}</span>;
+  return (
+    <div className="flex items-center gap-4 bg-white dark:bg-zinc-800 p-1 rounded-2xl border dark:border-white/10 shadow-sm">
+      <button onClick={onDec} className="w-8 h-8 rounded-xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"><Minus size={14}/></button>
+      <span className="font-black text-sm w-4 text-center dark:text-white tabular-nums">{qty}</span>
+      <button onClick={onInc} className="w-8 h-8 rounded-xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all"><Plus size={14}/></button>
     </div>
   );
 }

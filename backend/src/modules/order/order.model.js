@@ -4,9 +4,9 @@ const orderItemSchema = new mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
-    required: true,
+    required: false,
   },
-  name: String,
+  name: { type: String, required: true }, 
   size: { type: mongoose.Schema.Types.ObjectId, ref: "Size", required: true },
   quantity: { type: Number, required: true },
   price: { type: Number, required: true },
@@ -15,13 +15,21 @@ const orderItemSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema(
   {
-    user: { type: String, required: true },
+    user: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "User", 
+      required: false, // 🚀 FIXED: গেস্টের জন্য এটা অপশনাল
+    },
+    isGuest: { 
+      type: Boolean, 
+      default: false 
+    }, // 🕵️ গেস্ট ইউজার ট্র্যাকিংয়ের জন্য
     orderItems: [orderItemSchema],
     shippingAddress: {
-      name: String,
-      email: String,
-      phone: String,
-      street: String,
+      name: { type: String, required: true }, 
+      email: { type: String, required: true },
+      phone: { type: String, required: true },
+      street: { type: String, required: true },
       city: String,
       state: String,
       zip: String,
@@ -40,10 +48,10 @@ const orderSchema = new mongoose.Schema(
         default: "Pending",
       },
     },
-    itemsPrice: Number,
-    shippingPrice: Number,
-    discountAmount: Number,
-    totalPrice: Number,
+    itemsPrice: { type: Number, default: 0 },
+    shippingPrice: { type: Number, default: 0 },
+    discountAmount: { type: Number, default: 0 },
+    totalPrice: { type: Number, required: true },
     couponCode: String,
     orderStatus: {
       type: String,
