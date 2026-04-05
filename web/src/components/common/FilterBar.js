@@ -128,7 +128,8 @@ export default function FilterBar({
                 {suggestions.map((prod) => (
                   <Link 
                     key={prod._id} 
-                    href={`/products/${prod._id}`}
+                    // FIXED: Use slug instead of _id
+                    href={`/products/${prod.slug}`}
                     onClick={() => setIsFocused(false)}
                     className="flex items-center gap-4 p-4 hover:bg-zinc-50 dark:hover:bg-[#111] transition-colors border-b border-zinc-100 dark:border-zinc-800/50 last:border-0"
                   >
@@ -158,7 +159,7 @@ export default function FilterBar({
         )}
       </div>
       
-      {/* 🔽 Premium Sort Dropdown */}
+      {/* Sort Dropdown */}
       <div className="w-full md:w-auto flex items-center pr-2 group">
         {sortLabel && (
           <span className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em] hidden sm:block mr-4 shrink-0 transition-colors group-hover:text-zinc-900 dark:group-hover:text-zinc-300">
@@ -177,7 +178,6 @@ export default function FilterBar({
               </option>
             ))}
           </select>
-          {/* Custom Animated Chevron */}
           <span className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500 font-bold transition-transform duration-300 group-hover:translate-y-[-30%]">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path></svg>
           </span>

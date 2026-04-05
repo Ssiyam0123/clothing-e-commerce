@@ -3,9 +3,9 @@
 import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { 
-  ShoppingBag, X, Plus, Minus, ShieldCheck, MapPin, 
+  ShoppingBag, X, Plus, Minus, ShieldCheck, 
   CreditCard, Wallet, Truck, Trash2, Phone, Mail,
   ArrowLeft
 } from 'lucide-react';
@@ -46,7 +46,7 @@ function UnifiedSettlementContent() {
   const searchParams = useSearchParams();
   const isDirectBuy = searchParams.get("type") === "direct";
 
-  // 🛰️ Stores
+  // Stores
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStore();
   const { lang } = useAppStore();
   const { cart, buyNowItem, updateCartItem, removeFromCart, clearCart } = useProductStore();
@@ -55,7 +55,7 @@ function UnifiedSettlementContent() {
   const { validateCoupon } = useCoupons();
   const trackPurchase = useTrackingStore((state) => state.trackPurchase);
 
-  const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY['en'], [lang]);
+  const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY.en, [lang]);
 
   // Local UI States
   const [isProcessing, setIsProcessing] = useState(false);
@@ -64,32 +64,27 @@ function UnifiedSettlementContent() {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [deliveryZone, setDeliveryZone] = useState('dhaka');
   
-  // 📧 Email added to shipping info
   const [shippingInfo, setShippingInfo] = useState({ 
-    name: '', 
-    email: '', 
-    street: '', 
-    phone: '' 
+    name: '', email: '', street: '', phone: '' 
   });
 
-  // 🛒 Items Memo
+  // Items Memo
   const items = useMemo(() => {
     if (isDirectBuy && buyNowItem) return [buyNowItem];
     return cart?.itemsMap ? Object.values(cart.itemsMap) : [];
   }, [isDirectBuy, buyNowItem, cart?.itemsMap]);
 
-  // 🧮 Subtotal logic
   const subtotal = useMemo(() => {
     if (!items.length) return 0;
     return items.reduce((sum, i) => sum + ((i.discountedPrice || 0) * (i.quantity || 0)), 0);
   }, [items]);
 
-  // 🔄 Sync User Data including Email
+  // Sync User Data
   useEffect(() => {
     if (user) {
       setShippingInfo({ 
         name: user.name || "", 
-        email: user.email || "", // 🚀 Email Sync
+        email: user.email || "",
         phone: user.phone || "", 
         street: user.addresses?.[0]?.street || "" 
       });
@@ -138,7 +133,6 @@ function UnifiedSettlementContent() {
   };
 
   const handlePlaceOrder = async () => {
-    // 🛡️ Validation with Email
     if (!shippingInfo.phone || !shippingInfo.street || !shippingInfo.name || !shippingInfo.email) {
       return swalError("Manifest Incomplete", "Please provide all logistics data including email.");
     }
@@ -179,12 +173,16 @@ function UnifiedSettlementContent() {
         {/* LEFT: Manifest & Logistics */}
         <div className="lg:col-span-7 p-4 sm:p-10 lg:p-20 bg-white dark:bg-[#080808] border-r dark:border-zinc-900">
           <header className="mb-12 flex items-center gap-4">
-              <Link href="/products" className="p-3 bg-zinc-100 dark:bg-zinc-900 rounded-full hover:scale-110 transition-transform">
-                <ArrowLeft size={18} className="dark:text-white" />
-              </Link>
-              <h1 className="text-4xl md:text-7xl font-black uppercase tracking-tighter italic dark:text-white leading-none">
-                Settlement
-              </h1>
+            <Link 
+              href="/products" 
+              className="p-3 bg-zinc-100 dark:bg-zinc-900 rounded-full hover:scale-110 transition-transform"
+              aria-label="Back to products"
+            >
+              <ArrowLeft size={18} className="dark:text-white" />
+            </Link>
+            <h1 className="text-4xl md:text-7xl font-black uppercase tracking-tighter italic dark:text-white leading-none">
+              Settlement
+            </h1>
           </header>
 
           <div className="space-y-24">
@@ -197,8 +195,15 @@ function UnifiedSettlementContent() {
               <div className="space-y-6">
                 {items.map((item) => (
                   <div key={`${item.product._id}-${item.size._id}`} className="flex gap-4 sm:gap-8 bg-zinc-50/50 dark:bg-white/5 p-5 rounded-[2.5rem] border border-zinc-100 dark:border-white/5 transition-all">
-                    <div className="w-20 sm:w-28 aspect-[3/4] bg-zinc-200 dark:bg-zinc-900 rounded-2xl overflow-hidden shrink-0">
-                      <img src={getImageUrl(item.product.images?.[0])} className="w-full h-full object-cover" alt="" />
+                    <div className="relative w-20 sm:w-28 aspect-[3/4] bg-zinc-200 dark:bg-zinc-900 rounded-2xl overflow-hidden shrink-0">
+                      <Image
+                        src={getImageUrl(item.product.images?.[0], 200, 75)}
+                        alt={item.product.name}
+                        fill
+                        sizes="(max-width: 768px) 80px, 112px"
+                        className="object-cover"
+                        loading="lazy"
+                      />
                     </div>
                     <div className="flex-1 flex flex-col justify-between">
                       <div className="flex justify-between">
@@ -207,7 +212,13 @@ function UnifiedSettlementContent() {
                           <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{item.size?.name || 'Standard'}</p>
                         </div>
                         {!isDirectBuy && (
-                          <button onClick={() => handleRemove(item.product._id, item.size._id)} className="text-zinc-300 hover:text-rose-500 p-1"><Trash2 size={16}/></button>
+                          <button 
+                            onClick={() => handleRemove(item.product._id, item.size._id)} 
+                            className="text-zinc-300 hover:text-rose-500 p-1"
+                            aria-label="Remove item"
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         )}
                       </div>
                       <div className="flex items-center justify-between mt-4">
@@ -238,7 +249,12 @@ function UnifiedSettlementContent() {
                   <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Transit Zone</label>
                   <div className="grid grid-cols-2 gap-3">
                     {['dhaka', 'outside'].map(z => (
-                      <button key={z} onClick={() => setDeliveryZone(z)} className={`py-4 rounded-2xl font-black text-[9px] uppercase border-2 transition-all ${deliveryZone === z ? 'bg-black text-white border-black dark:bg-white dark:text-black shadow-lg scale-[1.02]' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border-transparent'}`}>
+                      <button 
+                        key={z} 
+                        onClick={() => setDeliveryZone(z)} 
+                        className={`py-4 rounded-2xl font-black text-[9px] uppercase border-2 transition-all ${deliveryZone === z ? 'bg-black text-white border-black dark:bg-white dark:text-black shadow-lg scale-[1.02]' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border-transparent'}`}
+                        aria-label={`Select ${z} delivery zone`}
+                      >
                         {ui[z]}
                       </button>
                     ))}
@@ -257,38 +273,74 @@ function UnifiedSettlementContent() {
             <h2 className="text-xs font-black uppercase tracking-[0.4em] text-zinc-400">03. Financial Summary</h2>
             
             <div className="bg-white dark:bg-zinc-950 p-10 rounded-[3rem] shadow-2xl border dark:border-white/5 space-y-6 relative overflow-hidden">
-               <LedgerRow label={ui.subtotal} value={subtotal} />
-               {appliedCoupon && <LedgerRow label={ui.promo} value={`- ${appliedCoupon.discountAmount}`} highlight />}
-               <LedgerRow label={ui.transit} value={shippingCharge} />
-               <div className="pt-8 border-t dark:border-zinc-800 flex justify-between items-end">
-                  <span className="text-xs font-black uppercase text-zinc-400">{ui.total}</span>
-                  <span className="text-6xl font-black tracking-tighter dark:text-white leading-none">৳{finalTotal}</span>
-               </div>
+              <LedgerRow label={ui.subtotal} value={subtotal} />
+              {appliedCoupon && <LedgerRow label={ui.promo} value={`- ${appliedCoupon.discountAmount}`} highlight />}
+              <LedgerRow label={ui.transit} value={shippingCharge} />
+              <div className="pt-8 border-t dark:border-zinc-800 flex justify-between items-end">
+                <span className="text-xs font-black uppercase text-zinc-400">{ui.total}</span>
+                <span className="text-6xl font-black tracking-tighter dark:text-white leading-none">৳{finalTotal}</span>
+              </div>
             </div>
 
             {/* Voucher Area */}
             <div className="flex gap-2 bg-white dark:bg-zinc-900 p-2 rounded-3xl border dark:border-white/5 shadow-inner">
-              <input value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())} className="flex-1 bg-transparent px-6 text-[10px] font-black uppercase outline-none dark:text-white" placeholder="PROMO CODE" />
-              <button onClick={handleApplyCoupon} className="bg-black dark:bg-white text-white dark:text-black px-8 py-4 rounded-2xl font-black text-[10px] uppercase hover:bg-rose-600 hover:text-white transition-all">{ui.apply}</button>
+              <input 
+                value={couponCode} 
+                onChange={e => setCouponCode(e.target.value.toUpperCase())} 
+                className="flex-1 bg-transparent px-6 text-[10px] font-black uppercase outline-none dark:text-white" 
+                placeholder="PROMO CODE"
+                aria-label="Promo code"
+              />
+              <button 
+                onClick={handleApplyCoupon} 
+                className="bg-black dark:bg-white text-white dark:text-black px-8 py-4 rounded-2xl font-black text-[10px] uppercase hover:bg-rose-600 hover:text-white transition-all"
+                aria-label="Apply promo code"
+              >
+                {ui.apply}
+              </button>
             </div>
 
             {/* Payment Method Selector */}
             <div className="grid gap-3">
-              {paymentOptions.ssl && <MethodBtn active={paymentMethod === 'ssl'} onClick={() => setPaymentMethod('ssl')} icon={<CreditCard size={18}/>} title="Digital Payment" />}
-              {paymentOptions.bkash && <MethodBtn active={paymentMethod === 'bkash'} onClick={() => setPaymentMethod('bkash')} icon={<Wallet size={18}/>} title="bKash Wallet" />}
-              {paymentOptions.cod && <MethodBtn active={paymentMethod === 'cod'} onClick={() => setPaymentMethod('cod')} icon={<Truck size={18}/>} title="Cash on Delivery" />}
+              {paymentOptions.ssl && (
+                <MethodBtn 
+                  active={paymentMethod === 'ssl'} 
+                  onClick={() => setPaymentMethod('ssl')} 
+                  icon={<CreditCard size={18}/>} 
+                  title="Digital Payment"
+                />
+              )}
+              {paymentOptions.bkash && (
+                <MethodBtn 
+                  active={paymentMethod === 'bkash'} 
+                  onClick={() => setPaymentMethod('bkash')} 
+                  icon={<Wallet size={18}/>} 
+                  title="bKash Wallet"
+                />
+              )}
+              {paymentOptions.cod && (
+                <MethodBtn 
+                  active={paymentMethod === 'cod'} 
+                  onClick={() => setPaymentMethod('cod')} 
+                  icon={<Truck size={18}/>} 
+                  title="Cash on Delivery"
+                />
+              )}
             </div>
 
             {/* Authorize Button */}
-            <motion.button 
-              whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
-              onClick={handlePlaceOrder} disabled={isProcessing}
+            <button 
+              onClick={handlePlaceOrder} 
+              disabled={isProcessing}
               className="w-full bg-black dark:bg-white text-white dark:text-black py-8 rounded-[2.5rem] font-black uppercase tracking-[0.4em] text-xs shadow-2xl transition-all hover:bg-rose-600 hover:text-white disabled:opacity-50 flex items-center justify-center gap-4"
+              aria-label={ui.confirm}
             >
               {isProcessing ? <Loader size="small" /> : <><ShieldCheck size={18} /> {ui.confirm}</>}
-            </motion.button>
+            </button>
             
-            <p className="text-center text-[8px] font-bold text-zinc-500 uppercase tracking-[0.3em] opacity-50 italic">Secure 256-bit encrypted settlement vault / VANGUARD OS</p>
+            <p className="text-center text-[8px] font-bold text-zinc-500 uppercase tracking-[0.3em] opacity-50 italic">
+              Secure 256-bit encrypted settlement vault / VANGUARD OS
+            </p>
           </div>
         </div>
       </div>
@@ -296,7 +348,7 @@ function UnifiedSettlementContent() {
   );
 }
 
-// 🧱 Internal Utilities
+// Internal Utilities
 function InputField({ label, value, onChange, placeholder, icon }) {
   return (
     <div className="space-y-3 w-full group">
@@ -305,21 +357,41 @@ function InputField({ label, value, onChange, placeholder, icon }) {
         <label className="text-[9px] font-black uppercase tracking-[0.2em]">{label}</label>
       </div>
       <input 
-        value={value} onChange={e => onChange?.(e.target.value)} 
+        value={value} 
+        onChange={e => onChange?.(e.target.value)} 
         className="w-full bg-zinc-50 dark:bg-zinc-900/50 border-2 border-transparent focus:border-zinc-900 dark:focus:border-white p-5 rounded-[1.5rem] outline-none transition-all text-xs font-bold uppercase dark:text-white shadow-inner" 
-        placeholder={placeholder} 
+        placeholder={placeholder}
+        aria-label={label}
       />
     </div>
   );
 }
 
 function QuantitySelector({ qty, onInc, onDec, disabled }) {
-  if (disabled) return <span className="text-[10px] font-black uppercase text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-4 py-2 rounded-full">Sequence: {qty}</span>;
+  if (disabled) {
+    return (
+      <span className="text-[10px] font-black uppercase text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-4 py-2 rounded-full">
+        Sequence: {qty}
+      </span>
+    );
+  }
   return (
     <div className="flex items-center gap-4 bg-white dark:bg-zinc-800 p-1 rounded-2xl border dark:border-white/10 shadow-sm">
-      <button onClick={onDec} className="w-8 h-8 rounded-xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"><Minus size={14}/></button>
+      <button 
+        onClick={onDec} 
+        className="w-8 h-8 rounded-xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"
+        aria-label="Decrease quantity"
+      >
+        <Minus size={14}/>
+      </button>
       <span className="font-black text-sm w-4 text-center dark:text-white tabular-nums">{qty}</span>
-      <button onClick={onInc} className="w-8 h-8 rounded-xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all"><Plus size={14}/></button>
+      <button 
+        onClick={onInc} 
+        className="w-8 h-8 rounded-xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all"
+        aria-label="Increase quantity"
+      >
+        <Plus size={14}/>
+      </button>
     </div>
   );
 }
@@ -338,8 +410,12 @@ function MethodBtn({ active, onClick, icon, title }) {
     <button 
       onClick={onClick} 
       className={`flex items-center gap-4 p-5 rounded-3xl border-2 transition-all ${active ? 'border-zinc-900 dark:border-white bg-white dark:bg-white/5 shadow-xl scale-[1.01]' : 'border-zinc-100 dark:border-zinc-900 opacity-40 hover:opacity-100'}`}
+      aria-label={`Select ${title} payment method`}
+      aria-pressed={active}
     >
-      <div className={`p-2.5 rounded-xl ${active ? 'bg-zinc-900 text-white dark:bg-white dark:text-black' : 'bg-zinc-100 dark:bg-zinc-800'}`}>{icon}</div>
+      <div className={`p-2.5 rounded-xl ${active ? 'bg-zinc-900 text-white dark:bg-white dark:text-black' : 'bg-zinc-100 dark:bg-zinc-800'}`}>
+        {icon}
+      </div>
       <span className="text-[10px] font-black uppercase tracking-widest dark:text-white">{title}</span>
       {active && <div className="ml-auto w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,1)]" />}
     </button>
@@ -353,7 +429,11 @@ function EmptyState({ ui }) {
         <ShoppingBag size={48} className="text-zinc-300 dark:text-zinc-700" />
       </div>
       <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-10 dark:text-white">{ui.empty}</h2>
-      <Link href="/products" className="bg-black dark:bg-white text-white dark:text-black px-12 py-5 rounded-full font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-all shadow-2xl">
+      <Link 
+        href="/products" 
+        className="bg-black dark:bg-white text-white dark:text-black px-12 py-5 rounded-full font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-all shadow-2xl"
+        aria-label={ui.browse}
+      >
         {ui.browse}
       </Link>
     </div>

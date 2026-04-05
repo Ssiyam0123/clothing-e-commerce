@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo } from 'react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useAppStore } from '@/store/appStore';
 import { useFlashSales } from '@/hooks/useFlashSale';
@@ -30,7 +29,7 @@ const DICTIONARY = {
 
 export default function FlashSaleClient() {
   const { lang, isMounted } = useAppStore();
-  const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY['en'], [lang]);
+  const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY.en, [lang]);
 
   const { flashSaleProducts, isLoading } = useFlashSales();
 
@@ -51,12 +50,13 @@ export default function FlashSaleClient() {
   if (!activeSale) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-6">
-        <span className="text-8xl mb-8 grayscale opacity-20">⏳</span>
+        <span className="text-8xl mb-8 grayscale opacity-20" aria-hidden="true">⏳</span>
         <h2 className="text-4xl font-black uppercase text-primary mb-4">{ui.emptyTitle}</h2>
         <p className="text-muted mb-10">{ui.emptySub}</p>
         <Link
           href="/products"
           className="bg-primary text-on-primary px-12 py-5 rounded-full font-black uppercase text-[11px] tracking-widest hover:bg-primary-hover transition-colors"
+          aria-label={ui.explore}
         >
           {ui.explore}
         </Link>
@@ -86,21 +86,14 @@ export default function FlashSaleClient() {
           </div>
         </div>
 
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-          className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8"
-        >
+        {/* Static grid – no animations, products appear immediately */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {products.map((p) => (
-            <motion.div
-              key={p._id}
-              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-            >
+            <div key={p._id}>
               <FlashSaleProductCard product={p} />
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </div>
   );

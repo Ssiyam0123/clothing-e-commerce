@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { getImageUrl } from '@/utils/imageUtils';
@@ -42,7 +43,6 @@ export default function ProductFilter() {
     sliderRef.current.scrollLeft = dragState.current.scrollLeft - walk;
   };
 
-  // 🚀 Decoupled Search Logic
   const handleSearchSubmit = useCallback((val) => {
     if (val && val.trim().length > 1) {
       trackSearch(val.trim(), filters.category !== 'all' ? filters.category : null); 
@@ -57,7 +57,7 @@ export default function ProductFilter() {
   }, [setCategory, trackSearch]);
 
   return (
-    <div className="mb-12">
+    <div className="mb-12" aria-label="Product filters">
       <FilterBar
         search={filters.search}
         onSearchChange={setSearch}          
@@ -72,7 +72,7 @@ export default function ProductFilter() {
         ]}
       />
 
-      {/* Premium Category Filter Buttons */}
+      {/* Category Filter Buttons with drag-to-scroll */}
       <div 
         ref={sliderRef}
         onMouseDown={handleMouseDown}
@@ -80,6 +80,8 @@ export default function ProductFilter() {
         onMouseUp={handleMouseLeaveOrUp}
         onMouseMove={handleMouseMove}
         className="mt-8 flex overflow-x-auto w-full no-scrollbar gap-4 pb-4 px-1 snap-x snap-mandatory scroll-smooth touch-pan-x transition-transform cursor-grab"
+        role="region"
+        aria-label="Category filter carousel"
       >
         {/* All Categories button */}
         <button
@@ -89,6 +91,8 @@ export default function ProductFilter() {
               ? 'bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.15)]'
               : 'bg-white dark:bg-[#111] border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 shadow-sm'
           }`}
+          aria-label="Show all categories"
+          aria-pressed={filters.category === 'all'}
         >
           <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg transition-colors pointer-events-none ${
              filters.category === 'all' ? 'bg-zinc-800 dark:bg-zinc-100' : 'bg-zinc-100 dark:bg-[#0a0a0a] grayscale opacity-50 group-hover:opacity-100'
@@ -102,7 +106,7 @@ export default function ProductFilter() {
           </span>
         </button>
 
-        {/* Dynamic Category Buttons */}
+        {/* Dynamic Category Buttons with optimized images */}
         {categories?.map((cat) => {
           const isSelected = filters.category === cat.slug;
           return (
@@ -114,14 +118,19 @@ export default function ProductFilter() {
                   ? 'bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.15)]'
                   : 'bg-white dark:bg-[#111] border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 shadow-sm'
               }`}
+              aria-label={`Filter by ${cat.name}`}
+              aria-pressed={isSelected}
             >
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-700/50 pointer-events-none">
-                <img
-                  src={getImageUrl(cat.image)}
+              <div className="relative w-10 h-10 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-700/50 pointer-events-none shrink-0">
+                <Image
+                  src={getImageUrl(cat.image, 80, 75)}
                   alt={cat.name}
-                  className={`w-full h-full object-cover transition-all duration-500 pointer-events-none ${
+                  fill
+                  sizes="40px"
+                  className={`object-cover transition-all duration-500 ${
                     isSelected ? 'grayscale-0 scale-110' : 'grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100'
                   }`}
+                  loading="lazy"
                 />
               </div>
               <span className={`text-[10px] font-black uppercase tracking-widest transition-colors pointer-events-none ${
