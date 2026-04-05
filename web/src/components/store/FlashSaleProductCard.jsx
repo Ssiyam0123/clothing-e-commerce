@@ -24,8 +24,16 @@ export default function FlashSaleProductCard({ product }) {
 
   if (!product) return null;
 
-  const discountedPrice = product.price - (product.price * (product.discount || 0) / 100);
-  const stockPercentage = Math.min(82, (product.totalStock / (product.totalStock + 10)) * 100) || 82; // fallback to 82%
+  // 🚀 Logic Fix: Priority to Flash Sale Data
+  // ব্যাকএন্ড থেকে আসা discountPercentage (৩০%) কে আগে ধরবে
+  const displayDiscount = product.discountPercentage || product.discount || 0;
+  
+  // ব্যাকএন্ডে ক্যালকুলেট করা discountedPrice নেবে, না থাকলে ম্যানুয়ালি ক্যালকুলেট করবে
+  const finalPrice = product.discountedPrice || (product.price - (product.price * displayDiscount / 100));
+  const originalPrice = product.originalPrice || product.price;
+
+  // Stock Progress Logic
+  const stockPercentage = Math.min(82, (product.totalStock / (product.totalStock + 10)) * 100) || 82;
 
   const handleWishlist = async (e) => {
     e.preventDefault();
@@ -53,11 +61,11 @@ export default function FlashSaleProductCard({ product }) {
           loading="lazy"
         />
         
-        {/* Flash Sale Zap Badge */}
+        {/* 🔥 FIX: Flash Sale Badge (Shows consistent 30% or current sale %) */}
         <div className="absolute top-0 left-0 z-20 bg-rose-600 text-white px-3 py-1.5 rounded-br-2xl flex items-center gap-1 shadow-lg border-r border-b border-white/10">
           <Zap size={12} fill="white" className="animate-pulse" />
           <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest">
-            {product.discount}% OFF
+            {displayDiscount}% OFF
           </span>
         </div>
 
@@ -91,13 +99,13 @@ export default function FlashSaleProductCard({ product }) {
           {product.name}
         </h3>
 
-        {/* Pricing Structure */}
+        {/* 🚀 FIX: Correct Pricing UI */}
         <div className="flex items-center gap-2 mb-4">
           <span className="text-lg md:text-2xl font-black text-rose-600 dark:text-rose-500 tracking-tighter leading-none">
-            ৳{discountedPrice.toFixed(0)}
+            ৳{finalPrice.toFixed(0)}
           </span>
           <span className="text-[10px] md:text-sm font-bold text-zinc-400 line-through tracking-tight">
-            ৳{product.price.toFixed(0)}
+            ৳{originalPrice.toFixed(0)}
           </span>
         </div>
 
@@ -124,7 +132,7 @@ export default function FlashSaleProductCard({ product }) {
         </div>
       </div>
 
-      {/* Stock Progress Bar – CSS only, no JS animation */}
+      {/* Stock Progress Bar */}
       <div className="h-1.5 w-full bg-zinc-100 dark:bg-rose-950/20 overflow-hidden">
         <div 
           className="h-full bg-gradient-to-r from-rose-400 to-rose-600 rounded-r-full shadow-[0_0_10px_rgba(225,29,72,0.4)] transition-all duration-1000 ease-out"
@@ -136,7 +144,7 @@ export default function FlashSaleProductCard({ product }) {
       <QuickSelectModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        product={product} 
+        product={{...product, discountedPrice: finalPrice}} // ফিক্সড প্রাইস মডালে পাস করা হলো
         lang={lang} 
       />
     </div>

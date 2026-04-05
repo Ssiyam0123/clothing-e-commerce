@@ -44,17 +44,14 @@ const flashSaleSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-flashSaleSchema.pre('save', async function () {
-  // 🚀 লজিক আপডেট: যদি নাম মডিফাই হয় অথবা স্লাগ একদমই না থাকে (Undefined/Null)
-  if (!this.isModified('name') && this.slug) return;
+flashSaleSchema.pre("save", async function () {
+  if (!this.isModified("name") && this.slug) return;
 
-  // স্লাগ তৈরি করা
   let generatedSlug = slugify(this.name, { lower: true, strict: true });
 
-  // ডুপ্লিকেট চেক (নিজের আইডি বাদে)
-  const slugExists = await mongoose.models.FlashSale.findOne({ 
-    slug: generatedSlug, 
-    _id: { $ne: this._id } 
+  const slugExists = await mongoose.models.FlashSale.findOne({
+    slug: generatedSlug,
+    _id: { $ne: this._id },
   });
 
   if (slugExists) {
@@ -62,7 +59,6 @@ flashSaleSchema.pre('save', async function () {
   }
 
   this.slug = generatedSlug;
-  // মঙ্গুজ অটোমেটিক সেভ করে নিবে কারণ এটা pre-save হুক
 });
 
 flashSaleSchema.index({ startDate: 1, endDate: 1, isActive: 1 });
