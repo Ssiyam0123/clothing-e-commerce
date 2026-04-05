@@ -11,7 +11,6 @@ export const useAuthStore = create(
       isLoading: true,
       isAuthenticated: false,
 
-      // 🚀 ১. লগইন সাকসেস হলে গেস্ট ডাটা সিঙ্ক করো
       login: async (email, password) => {
         set({ isLoading: true });
         try {
@@ -25,7 +24,6 @@ export const useAuthStore = create(
             isLoading: false,
           });
 
-          // 🔥 গেস্ট ডাটা সার্ভারে পাঠিয়ে সিঙ্ক করো
           await useProductStore.getState().syncGuestDataWithUser();
 
           return data;
@@ -35,11 +33,9 @@ export const useAuthStore = create(
         }
       },
 
-      // 🚀 ২. লগআউট করলে সব ডাটা ভ্যানিশ করো
       logout: () => {
         localStorage.removeItem("token");
 
-        // 🔥 প্রোডাক্ট স্টোর (Cart/Wishlist) একদম রিসেট
         useProductStore.getState().resetStore();
 
         set({
@@ -50,7 +46,6 @@ export const useAuthStore = create(
         });
       },
 
-      // 🚀 ৩. সেশন চেক করার সময় সার্ভার থেকে লেটেস্ট কার্ট নিয়ে এসো
       checkSession: async () => {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -67,7 +62,6 @@ export const useAuthStore = create(
             isLoading: false,
           });
 
-          // 🔥 সেশন ভ্যালিড থাকলে সার্ভারের সাথে সিঙ্ক করে নাও
           await useProductStore.getState().syncWithServer();
         } catch (error) {
           console.error("Session expired or invalid");

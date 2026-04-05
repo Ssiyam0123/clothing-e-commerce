@@ -11,7 +11,7 @@ const storageType = (process.env.STORAGE_TYPE || 'cloudinary').toLowerCase().tri
 
 // --- CLOUDINARY CONFIGURATION ---
 if (storageType === 'cloudinary') {
-    // ডিবাগিংয়ের জন্য চেক: যদি ভেরিয়েবল না থাকে তবে আগেই ওয়ার্নিং দেবে
+
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
         console.error("❌ Cloudinary Error: Credentials missing in .env file!");
     }

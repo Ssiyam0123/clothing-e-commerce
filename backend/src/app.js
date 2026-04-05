@@ -36,7 +36,6 @@ app.set("trust proxy", 1);
 
 app.use(
   cors({
-    // 🚀 প্রো-টিপ: ডোমেইনের শেষে কখনো "/" দেবেন না
     origin: [
       "http://localhost:3000",
       "https://clothing-e-commerce-web.vercel.app" 
@@ -54,7 +53,7 @@ app.use(
   })
 );
 
-// Parsers (session removed – JWT only)
+// Parsers
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());

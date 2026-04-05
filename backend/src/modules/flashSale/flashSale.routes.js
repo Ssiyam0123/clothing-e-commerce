@@ -7,6 +7,7 @@ import {
   updateFlashSale,
   deleteFlashSale,
   getFlashSaleProducts,
+  getFlashSaleBySlug,
 } from './flashSale.controller.js';
 import { protect, admin } from '../../middleware/auth.js';
 
@@ -22,5 +23,5 @@ router.post('/', createFlashSale);
 router.get('/', getAllFlashSales);
 router.put('/:id', updateFlashSale);
 router.delete('/:id', deleteFlashSale);
-
+router.get('/details/:slug', getFlashSaleBySlug);
 export default router;

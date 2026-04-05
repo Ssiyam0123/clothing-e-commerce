@@ -1,0 +1,106 @@
+'use client';
+
+import { useParams } from 'next/navigation';
+import { useSingleFlashSale } from '@/hooks/useFlashSale';
+import { useAppStore } from '@/store/appStore';
+import FlashSaleBanner from '@/components/store/FlashSaleBanner';
+import FlashSaleProductCard from '@/components/store/FlashSaleProductCard';
+import Loader from '@/components/common/Loader';
+import { motion } from 'framer-motion';
+import { Zap, Clock, ChevronLeft } from 'lucide-react';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+
+// ⏱️ Countdown Timer Sub-component
+const Countdown = ({ targetDate }) => {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const distance = new Date(targetDate).getTime() - new Date().getTime();
+      if (distance < 0) return clearInterval(interval);
+      
+      setTimeLeft({
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        mins: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+        secs: Math.floor((distance % (1000 * 60)) / 1000),
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [targetDate]);
+
+  return (
+    <div className="flex gap-4">
+      {Object.entries(timeLeft).map(([label, val], i) => (
+        <div key={i} className="flex flex-col items-center bg-zinc-900 text-white p-4 rounded-3xl min-w-[80px] border border-white/5 shadow-2xl">
+          <span className="text-3xl font-black">{val < 10 ? `0${val}` : val}</span>
+          <span className="text-[8px] uppercase tracking-widest font-bold opacity-40">{label}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default function FlashSaleDetailPage() {
+  const { slug } = useParams();
+  const { lang } = useAppStore();
+  const { data: sale, isLoading, error } = useSingleFlashSale(slug);
+
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-page"><Loader /></div>;
+  if (error || !sale) return <div className="min-h-screen flex items-center justify-center uppercase font-black opacity-20">Sequence Not Found</div>;
+
+  const isLive = new Date(sale.startDate) <= new Date();
+
+  return (
+    <main className="min-h-screen bg-white dark:bg-[#050505] pb-40">
+      {/* 🧭 Navigation */}
+      <div className="max-w-7xl mx-auto px-6 py-10">
+        <Link href="/flash-sale" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity">
+          <ChevronLeft size={14} /> Back to Hub
+        </Link>
+      </div>
+
+      {/* 🖼️ Hero Banner Section */}
+      <div className="max-w-7xl mx-auto px-6 mb-20">
+        <FlashSaleBanner flashSale={sale} />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-10">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-rose-600">
+              {isLive ? <Zap size={20} fill="currentColor" /> : <Clock size={20} />}
+              <span className="text-xs font-black uppercase tracking-[0.3em]">
+                {isLive ? 'Deployment Live' : 'Pending Deployment'}
+              </span>
+            </div>
+            <h1 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-none dark:text-white">
+              {sale.name}
+            </h1>
+            <p className="max-w-2xl text-zinc-500 font-medium leading-relaxed">
+              {sale.description || "Limited access sequence. Exclusive artifacts available for a restricted duration."}
+            </p>
+          </div>
+
+          {/* Show countdown only if it's not live yet */}
+          {!isLive && <Countdown targetDate={sale.startDate} />}
+        </div>
+
+        {/* 📦 Product Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+          {sale.products?.map((product, idx) => (
+            <motion.div
+              key={product._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+            >
+              <FlashSaleProductCard product={product} />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </main>
+  );
+}

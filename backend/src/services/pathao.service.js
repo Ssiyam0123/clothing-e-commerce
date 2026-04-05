@@ -2,17 +2,14 @@ import axios from 'axios';
 import redisClient from '../config/redis.js';
 
 class PathaoService {
-    // 🛡️ ক্যাশ রেডি কি না চেক করা
     get isCacheReady() {
         return redisClient && redisClient.status === 'ready';
     }
 
-    // 🔗 URL স্যানিটাইজেশন
     formatURL(url) {
         return (url || 'https://courier-api-sandbox.pathao.com').replace(/\/$/, '');
     }
 
-    // 🔑 এক্সেস টোকেন জেনারেট করা (Dynamic & Cached)
     async getToken(creds) {
         const cacheKey = `pathao:token:${creds.clientId}`;
         
@@ -45,7 +42,6 @@ class PathaoService {
         }
     }
 
-    // 🔍 অ্যাড্রেস স্ট্রিং থেকে অটোমেটিক আইডি খুঁজে বের করা
     async autoResolveAddress(addressString, creds) {
         const token = await this.getToken(creds);
         const url = this.formatURL(creds.baseURL);
@@ -59,7 +55,6 @@ class PathaoService {
             const suggestions = response.data.data;
 
             if (suggestions && suggestions.length > 0) {
-                // সবথেকে কাছের ম্যাচটা রিটার্ন করছি
                 const bestMatch = suggestions[0];
                 return {
                     city_id: bestMatch.city_id,
@@ -75,7 +70,6 @@ class PathaoService {
         }
     }
 
-    // 🚛 কনসাইনমেন্ট ক্রিয়েট করা
     async createOrder(payload, creds) {
         const token = await this.getToken(creds);
         const url = this.formatURL(creds.baseURL);

@@ -93,14 +93,62 @@ export const deleteFlashSale = asyncHandler(async (req, res) => {
 });
 
 // Get all active flash sales (public)
+// export const getActiveFlashSales = asyncHandler(async (req, res) => {
+//   const now = new Date();
+//   const sales = await FlashSale.find({ 
+//     isActive: true, 
+//     endDate: { $gte: now } 
+//   }).sort('startDate');
+//   res.json(sales);
+// });
+
+
+
+
+
+
+
+// 🚀 updated getActiveFlashSales: সব একটিভ এবং আপকামিং সেল ডিটেইলসহ পাঠাবে
 export const getActiveFlashSales = asyncHandler(async (req, res) => {
   const now = new Date();
+  
+  // শুধু সেই সেলগুলো নিবে যেগুলোর এন্ড ডেট পার হয়নি
   const sales = await FlashSale.find({ 
     isActive: true, 
     endDate: { $gte: now } 
-  }).sort('startDate');
-  res.json(sales);
+  })
+  .sort('startDate')
+  .populate(populatedProductsConfig);
+
+  // প্রতিটি সেলের প্রোডাক্টের জন্য ডিসকাউন্ট ক্যালকুলেশন
+  const salesWithCalculatedPrices = sales.map(sale => {
+    const saleObj = sale.toObject();
+    
+    saleObj.products = saleObj.products.map(product => {
+      const basePrice = product.price;
+      const flashDiscount = sale.discount;
+      
+      return {
+        ...product,
+        originalPrice: basePrice,
+        discountedPrice: basePrice - (basePrice * flashDiscount / 100),
+        discountPercentage: flashDiscount,
+        flashSaleEnds: sale.endDate,
+        // স্ট্যাটাস লজিক: এখন চলছে নাকি সামনে আসবে
+        isLive: new Date(sale.startDate) <= now
+      };
+    });
+    
+    return saleObj;
+  });
+
+  res.json(salesWithCalculatedPrices);
 });
+
+
+
+
+
 
 export const getFlashSaleProducts = asyncHandler(async (req, res) => {
   const now = new Date();
@@ -152,4 +200,36 @@ export const getFlashSaleById = asyncHandler(async (req, res) => {
   saleObj.products = productsWithDiscount; 
   
   res.json(saleObj);
+});
+
+
+
+
+
+export const getFlashSaleBySlug = asyncHandler(async (req, res) => {
+  const { slug } = req.params;
+
+  const sale = await FlashSale.findOne({ slug, isActive: true })
+    .populate({
+      path: 'products',
+      populate: { path: 'sizes.size', select: 'name' }
+    });
+
+  if (!sale) return res.status(404).json({ message: 'Sequence not found in archives.' });
+
+  const productsWithDiscount = sale.products.map(p => {
+    const productObj = p.toObject();
+    const basePrice = productObj.price;
+    return {
+      ...productObj,
+      originalPrice: basePrice,
+      discountedPrice: basePrice - (basePrice * sale.discount / 100),
+      discountPercentage: sale.discount
+    };
+  });
+
+  const response = sale.toObject();
+  response.products = productsWithDiscount;
+
+  res.json(response);
 });

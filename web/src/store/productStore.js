@@ -4,7 +4,7 @@ import api from "@/lib/api";
 
 const initialState = {
   cart: {
-    itemsMap: {}, // key format: productId_sizeId
+    itemsMap: {},
     totalItems: 0,
     totalPrice: 0,
   },
@@ -23,7 +23,6 @@ export const useProductStore = create(
       (set, get) => ({
         ...initialState,
 
-        // 🛰️ ১. সার্ভারের সাথে ডাটা সিঙ্ক
         syncWithServer: async () => {
           try {
             const [cartRes, wishRes] = await Promise.all([
@@ -37,14 +36,33 @@ export const useProductStore = create(
 
             cartRes.data.items?.forEach((item) => {
               const key = getKey(getSafeId(item.product), getSafeId(item.size));
-              itemsMap[key] = item;
-              totalItems += item.quantity;
-              totalPrice += item.discountedPrice * item.quantity;
+
+              const productPrice = Number(item.product?.price || 0);
+              const productDiscount = Number(item.product?.discount || 0);
+
+              const safeDiscountedPrice =
+                Number(item.discountedPrice) ||
+                productPrice - (productPrice * productDiscount) / 100;
+
+              itemsMap[key] = {
+                ...item,
+                discountedPrice: safeDiscountedPrice,
+                price: productPrice,
+              };
+
+              totalItems += Number(item.quantity || 0);
+              totalPrice += safeDiscountedPrice * Number(item.quantity || 0);
             });
 
             set({
-              cart: { itemsMap, totalItems, totalPrice },
-              wishlistSet: new Set(wishRes.data.products?.map((p) => getSafeId(p))),
+              cart: {
+                itemsMap,
+                totalItems,
+                totalPrice: Number(totalPrice.toFixed(2)),
+              },
+              wishlistSet: new Set(
+                wishRes.data.products?.map((p) => getSafeId(p)),
+              ),
               wishlistItems: wishRes.data.products || [],
             });
           } catch (err) {
@@ -52,7 +70,6 @@ export const useProductStore = create(
           }
         },
 
-        // 🚛 ২. গেস্ট ডাটা মাইগ্রেশন
         syncGuestDataWithUser: async () => {
           const { cart, wishlistItems } = get();
           const cartItems = Object.values(cart.itemsMap).map((i) => ({
@@ -63,9 +80,14 @@ export const useProductStore = create(
 
           try {
             const promises = [];
-            if (cartItems.length > 0) promises.push(api.post("/cart/bulk-add", { items: cartItems }));
+            if (cartItems.length > 0)
+              promises.push(api.post("/cart/bulk-add", { items: cartItems }));
             if (wishlistItems.length > 0) {
-              promises.push(api.post("/wishlist/bulk-add", { productIds: wishlistItems.map((p) => getSafeId(p)) }));
+              promises.push(
+                api.post("/wishlist/bulk-add", {
+                  productIds: wishlistItems.map((p) => getSafeId(p)),
+                }),
+              );
             }
             if (promises.length > 0) await Promise.all(promises);
             await get().syncWithServer();
@@ -75,21 +97,32 @@ export const useProductStore = create(
           }
         },
 
-        // 🛒 ৩. Add to Cart
         addToCart: (product, sizeId, quantity = 1, isAuth = false) => {
           const key = getKey(product._id, sizeId);
           const prevCartState = { ...get().cart };
 
           set((state) => {
             const itemsMap = { ...state.cart.itemsMap };
-            const discPrice = product.price - (product.price * (product.discount || 0)) / 100;
+            const discPrice =
+              product.price - (product.price * (product.discount || 0)) / 100;
 
             if (itemsMap[key]) {
-              itemsMap[key] = { ...itemsMap[key], quantity: itemsMap[key].quantity + quantity };
-            } else {
-              const sizeObj = product.sizes?.find((s) => getSafeId(s.size) === String(sizeId))?.size || { _id: sizeId, name: "Standard" };
               itemsMap[key] = {
-                product: { _id: product._id, name: product.name, images: product.images, price: product.price, discount: product.discount },
+                ...itemsMap[key],
+                quantity: itemsMap[key].quantity + quantity,
+              };
+            } else {
+              const sizeObj = product.sizes?.find(
+                (s) => getSafeId(s.size) === String(sizeId),
+              )?.size || { _id: sizeId, name: "Standard" };
+              itemsMap[key] = {
+                product: {
+                  _id: product._id,
+                  name: product.name,
+                  images: product.images,
+                  price: product.price,
+                  discount: product.discount,
+                },
                 size: sizeObj,
                 quantity,
                 discountedPrice: discPrice,
@@ -106,11 +139,12 @@ export const useProductStore = create(
           });
 
           if (isAuth) {
-            api.post("/cart/add", { productId: product._id, sizeId, quantity }).catch(() => set({ cart: prevCartState }));
+            api
+              .post("/cart/add", { productId: product._id, sizeId, quantity })
+              .catch(() => set({ cart: prevCartState }));
           }
         },
 
-        // 🔄 ৪. Update Quantity
         updateCartItem: (productId, sizeId, qty, isAuth = false) => {
           const key = getKey(productId, sizeId);
           const prevCartState = { ...get().cart };
@@ -133,11 +167,12 @@ export const useProductStore = create(
           });
 
           if (isAuth) {
-            api.put("/cart/update", { productId, sizeId, quantity: qty }).catch(() => set({ cart: prevCartState }));
+            api
+              .put("/cart/update", { productId, sizeId, quantity: qty })
+              .catch(() => set({ cart: prevCartState }));
           }
         },
 
-        // 🗑️ ৫. Remove Item
         removeFromCart: (productId, sizeId, isAuth = false) => {
           const key = getKey(productId, sizeId);
           const prevCartState = { ...get().cart };
@@ -152,17 +187,19 @@ export const useProductStore = create(
               cart: {
                 itemsMap,
                 totalItems: state.cart.totalItems - item.quantity,
-                totalPrice: state.cart.totalPrice - item.discountedPrice * item.quantity,
+                totalPrice:
+                  state.cart.totalPrice - item.discountedPrice * item.quantity,
               },
             };
           });
 
           if (isAuth) {
-            api.delete(`/cart/remove/${productId}/${sizeId}`).catch(() => set({ cart: prevCartState }));
+            api
+              .delete(`/cart/remove/${productId}/${sizeId}`)
+              .catch(() => set({ cart: prevCartState }));
           }
         },
 
-        // ❤️ ৬. Wishlist Logic
         toggleWishlist: (product, isAuth = false) => {
           const id = getSafeId(product);
           const prevSet = new Set(get().wishlistSet);
@@ -183,15 +220,21 @@ export const useProductStore = create(
 
           if (isAuth) {
             const isRemoving = prevSet.has(id);
-            const req = isRemoving ? api.delete(`/wishlist/remove/${id}`) : api.post("/wishlist/add", { productId: id });
-            req.catch(() => set({ wishlistSet: prevSet, wishlistItems: prevItems }));
+            const req = isRemoving
+              ? api.delete(`/wishlist/remove/${id}`)
+              : api.post("/wishlist/add", { productId: id });
+            req.catch(() =>
+              set({ wishlistSet: prevSet, wishlistItems: prevItems }),
+            );
           }
         },
 
-        // ⚡ ৭. Buy Now Protocol
         initiateBuyNow: (product, sizeId, quantity = 1) => {
-          const discPrice = product.price - (product.price * (product.discount || 0)) / 100;
-          const foundSize = product.sizes?.find((s) => getSafeId(s.size) === String(sizeId));
+          const discPrice =
+            product.price - (product.price * (product.discount || 0)) / 100;
+          const foundSize = product.sizes?.find(
+            (s) => getSafeId(s.size) === String(sizeId),
+          );
 
           set({
             buyNowItem: {
@@ -204,13 +247,10 @@ export const useProductStore = create(
           });
         },
 
-        // 🧹 ৮. SMART RESET (মেইন ফিক্স এখানে)
-        clearCart: (type = 'all') => {
-          if (type === 'direct') {
-            // যদি শুধু ডিরেক্ট বাই হয়, তবে কার্ট মুছবে না
+        clearCart: (type = "all") => {
+          if (type === "direct") {
             set({ buyNowItem: null });
           } else {
-            // যদি কার্ট থেকে কেনা হয়, তবে কার্ট মুছবে এবং বাই নাও মুছবে
             set({ cart: initialState.cart, buyNowItem: null });
           }
         },
@@ -227,13 +267,17 @@ export const useProductStore = create(
             const str = localStorage.getItem(name);
             if (!str) return null;
             const data = JSON.parse(str);
-            if (data.state?.wishlistSet) data.state.wishlistSet = new Set(data.state.wishlistSet);
+            if (data.state?.wishlistSet)
+              data.state.wishlistSet = new Set(data.state.wishlistSet);
             return data;
           },
           setItem: (name, value) => {
             const dataToStore = {
               ...value,
-              state: { ...value.state, wishlistSet: Array.from(value.state.wishlistSet || []) },
+              state: {
+                ...value.state,
+                wishlistSet: Array.from(value.state.wishlistSet || []),
+              },
             };
             localStorage.setItem(name, JSON.stringify(dataToStore));
           },
