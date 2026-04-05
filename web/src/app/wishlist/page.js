@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { getImageUrl } from '@/utils/imageUtils';
 import Loader from '@/components/common/Loader';
-import { useProductCondition } from '@/store/productStore';
+import { useProductStore } from '@/store/productStore';
 import { swalToast, swalError } from '@/utils/swal';
 import { useAppStore } from '@/store/appStore';
 import { useTrackingStore } from '@/store/trackingStore';
@@ -33,9 +33,9 @@ export default function WishlistPage() {
   const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY['en'], [lang]);
 
   const trackAddToCart = useTrackingStore((state) => state.trackAddToCart);
-  const wishlistItems = useProductCondition((state) => state.wishlistItems);
-  const toggleWishlist = useProductCondition((state) => state.toggleWishlist);
-  const addToCart = useProductCondition((state) => state.addToCart);
+  const wishlistItems = useProductStore((state) => state.wishlistItems);
+  const toggleWishlist = useProductStore((state) => state.toggleWishlist);
+  const addToCart = useProductStore((state) => state.addToCart);
 
   const handleMoveToCart = (product) => {
     const availableSizes = product.sizes?.filter(s => s.stock > 0);

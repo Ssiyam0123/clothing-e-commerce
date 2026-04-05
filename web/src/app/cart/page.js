@@ -20,7 +20,7 @@ import { useTrackingStore } from '@/store/trackingStore';
 import { getImageUrl } from '@/utils/imageUtils';
 import { swalError, swalToast, swalConfirm } from '@/utils/swal';
 import Loader from '@/components/common/Loader';
-import { useProductCondition } from '@/store/productStore';
+import { useProductStore } from '@/store/productStore';
 
 const DICTIONARY = {
   en: {
@@ -49,7 +49,7 @@ function UnifiedSettlementContent() {
   // 🛰️ Stores
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStore();
   const { lang } = useAppStore();
-  const { cart, buyNowItem, updateCartItem, removeFromCart, clearCart } = useProductCondition();
+  const { cart, buyNowItem, updateCartItem, removeFromCart, clearCart } = useProductStore();
   const { settings, isLoading: settingsLoading } = useSettings();
   const { initOrder } = useOrders();
   const { validateCoupon } = useCoupons();

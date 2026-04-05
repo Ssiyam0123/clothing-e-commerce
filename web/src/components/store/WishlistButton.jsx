@@ -1,7 +1,7 @@
 "use client";
 
 import React, { memo, useCallback } from "react";
-import { useProductCondition } from "@/store/productStore";
+import { useProductStore } from "@/store/productStore";
 import { swalToast } from "@/utils/swal";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
@@ -12,13 +12,13 @@ const WishlistButton = memo(({ product, lang }) => {
   
   // 🚀 INDUSTRY STANDARD: এই সিলেক্টরটি নিশ্চিত করে যে অন্য প্রোডাক্টের জন্য 
   // এই বাটন রি-রেন্ডার হবে না।
-  const inWishlist = useProductCondition(
+  const inWishlist = useProductStore(
     useCallback((state) => 
       state.wishlistItems.some((p) => String(p._id) === String(product?._id)), 
     [product?._id])
   );
   
-  const toggleWishlist = useProductCondition((state) => state.toggleWishlist);
+  const toggleWishlist = useProductStore((state) => state.toggleWishlist);
 
   const handleToggle = (e) => {
     e.preventDefault();

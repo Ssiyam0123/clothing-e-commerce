@@ -18,7 +18,7 @@ import StarRating from '@/components/store/StarRating';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Zap, Truck, RefreshCcw, ChevronLeft, ShieldCheck, Minus, Plus, Heart } from 'lucide-react';
 import { swalError, swalToast } from '@/utils/swal';
-import { useProductCondition } from '@/store/productStore';
+import { useProductStore } from '@/store/productStore';
 
 const DICTIONARY = {
   en: { add: 'Secure to Bag', buy: 'Instant Checkout', selectSize: 'Architecture', price: 'Investment', about: 'Narrative', related: 'The Sequence' },
@@ -31,7 +31,7 @@ export default function ProductDetailsPage() {
   const { isAuthenticated } = useAuthStore();
   const { lang, isMounted } = useAppStore();
   
-  const { addToCart, initiateBuyNow, toggleWishlist, wishlistItems } = useProductCondition();
+  const { addToCart, initiateBuyNow, toggleWishlist, wishlistItems } = useProductStore();
   const trackViewContent = useTrackingStore((state) => state.trackViewContent);
   const trackAddToCart = useTrackingStore((state) => state.trackAddToCart);
 

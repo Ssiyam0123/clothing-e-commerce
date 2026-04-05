@@ -9,11 +9,10 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 
-// 🚀 FIX: slides = [] ডিফল্ট হিসেবে সেট করা হয়েছে যাতে undefined এরর না আসে
+
 export default function HeroSection({ slides = [], ui = {}, lang = 'en' }) {
   const isBn = lang === 'bn';
 
-  // 🛡️ Guard Clause: যদি স্লাইডস এখনও না আসে (Loading state)
   if (!slides || slides.length === 0) {
     return (
       <section className="relative h-[75vh] min-h-[500px] md:h-[85vh] md:min-h-[700px] bg-[#0a0a0a] flex items-center justify-center overflow-hidden">
@@ -40,7 +39,7 @@ export default function HeroSection({ slides = [], ui = {}, lang = 'en' }) {
         effect="fade"
         autoplay={{ delay: 5000, disableOnInteraction: false }}
         pagination={{ clickable: true, dynamicBullets: true }}
-        loop={slides.length > 1} // 🚀 শুধু ১টার বেশি স্লাইড থাকলে লুপ হবে
+        loop={slides.length > 1} 
         className="h-full w-full"
       >
         {slides.map((slide) => (

@@ -27,7 +27,7 @@ export default function FilterBar({
   const debouncedInput = useDebounce(inputValue, debounceMs);
   const onSearchChangeRef = useRef(onSearchChange);
   
-  // 🚀 FIX: Track URL search state silently without triggering renders
+
   const currentSearchRef = useRef(search || '');
 
   useEffect(() => {
@@ -41,7 +41,6 @@ export default function FilterBar({
     }
   }, [search, isFocused, inputValue]);
 
-  // 🚀 FIX: Decoupled Live Search Effect
   useEffect(() => {
     if (liveSearch && onSearchChangeRef.current) {
       if (debouncedInput !== currentSearchRef.current) {
@@ -50,7 +49,6 @@ export default function FilterBar({
     }
   }, [debouncedInput, liveSearch]); 
 
-  // Suggestions Logic
   useEffect(() => {
     if (inputValue.trim().length > 1 && isFocused) {
       const fetchSuggestions = async () => {
@@ -88,7 +86,6 @@ export default function FilterBar({
     }
   };
 
-  // 🚀 FIX: Clean Clear Function
   const handleClearSearch = (e) => {
     e.preventDefault(); 
     setInputValue('');
@@ -98,7 +95,7 @@ export default function FilterBar({
   return (
     <div className="bg-white/80 dark:bg-[#111]/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.02)] border border-zinc-100 dark:border-zinc-800/80 p-2 flex flex-col md:flex-row gap-4 items-center justify-between relative z-50 transition-all w-full">
       
-      {/* 🔍 Premium Search Input */}
+      {/* Search Input */}
       <div className="w-full md:w-1/2 relative group" ref={wrapperRef}>
         <span className="absolute left-6 top-1/2 -translate-y-1/2 text-lg text-zinc-400 transition-transform group-focus-within:scale-110 group-focus-within:text-zinc-900 dark:group-focus-within:text-white z-10">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>

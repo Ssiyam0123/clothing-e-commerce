@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist, devtools, createJSONStorage } from "zustand/middleware";
+import { persist, devtools } from "zustand/middleware";
 import api from "@/lib/api";
 
 const initialState = {
@@ -13,18 +13,17 @@ const initialState = {
   buyNowItem: null,
 };
 
-// 🛰️ Helper Functions
 const getKey = (pId, sId) => `${String(pId)}_${String(sId)}`;
 const getSafeId = (obj) =>
   obj && typeof obj === "object" ? String(obj._id || obj.id) : String(obj);
 
-export const useProductCondition = create(
+export const useProductStore = create(
   devtools(
     persist(
       (set, get) => ({
         ...initialState,
 
-        // 🔄 ১. সার্ভার থেকে ডাটা সিঙ্ক করা (লগইন বা সেশন রিফ্রেশে কল হবে)
+        // 🛰️ ১. সার্ভারের সাথে ডাটা সিঙ্ক
         syncWithServer: async () => {
           try {
             const [cartRes, wishRes] = await Promise.all([
@@ -45,9 +44,7 @@ export const useProductCondition = create(
 
             set({
               cart: { itemsMap, totalItems, totalPrice },
-              wishlistSet: new Set(
-                wishRes.data.products?.map((p) => getSafeId(p)),
-              ),
+              wishlistSet: new Set(wishRes.data.products?.map((p) => getSafeId(p))),
               wishlistItems: wishRes.data.products || [],
             });
           } catch (err) {
@@ -55,10 +52,9 @@ export const useProductCondition = create(
           }
         },
 
-        // 🚛 ২. গেস্ট ডাটা এবং ইউজার একাউন্ট মার্জ করা (Bulk Sync)
+        // 🚛 ২. গেস্ট ডাটা মাইগ্রেশন
         syncGuestDataWithUser: async () => {
           const { cart, wishlistItems } = get();
-
           const cartItems = Object.values(cart.itemsMap).map((i) => ({
             productId: getSafeId(i.product),
             sizeId: getSafeId(i.size),
@@ -67,61 +63,39 @@ export const useProductCondition = create(
 
           try {
             const promises = [];
-            if (cartItems.length > 0) {
-              promises.push(api.post("/cart/bulk-add", { items: cartItems }));
-            }
+            if (cartItems.length > 0) promises.push(api.post("/cart/bulk-add", { items: cartItems }));
             if (wishlistItems.length > 0) {
-              promises.push(
-                api.post("/wishlist/bulk-add", {
-                  productIds: wishlistItems.map((p) => getSafeId(p)),
-                }),
-              );
+              promises.push(api.post("/wishlist/bulk-add", { productIds: wishlistItems.map((p) => getSafeId(p)) }));
             }
-
             if (promises.length > 0) await Promise.all(promises);
-
-            // সিঙ্ক সফল হলে লোকাল ডাটা রিসেট করে সার্ভার থেকে ফ্রেশ ডাটা নাও
             await get().syncWithServer();
           } catch (err) {
-            console.error("Critical: Data Migration Failed", err);
+            console.error("Migration Failed", err);
             await get().syncWithServer();
           }
         },
 
-        // 🛒 ৩. Add to Cart (O(1) lookup + Incremental Totals)
+        // 🛒 ৩. Add to Cart
         addToCart: (product, sizeId, quantity = 1, isAuth = false) => {
           const key = getKey(product._id, sizeId);
           const prevCartState = { ...get().cart };
 
           set((state) => {
             const itemsMap = { ...state.cart.itemsMap };
-            const discPrice =
-              product.price - (product.price * (product.discount || 0)) / 100;
+            const discPrice = product.price - (product.price * (product.discount || 0)) / 100;
 
             if (itemsMap[key]) {
-              itemsMap[key] = {
-                ...itemsMap[key],
-                quantity: itemsMap[key].quantity + quantity,
-              };
+              itemsMap[key] = { ...itemsMap[key], quantity: itemsMap[key].quantity + quantity };
             } else {
-              const sizeObj = product.sizes?.find(
-                (s) => getSafeId(s.size) === String(sizeId),
-              )?.size || { _id: sizeId, name: "Standard" };
+              const sizeObj = product.sizes?.find((s) => getSafeId(s.size) === String(sizeId))?.size || { _id: sizeId, name: "Standard" };
               itemsMap[key] = {
-                product: {
-                  _id: product._id,
-                  name: product.name,
-                  images: product.images,
-                  price: product.price,
-                  discount: product.discount,
-                },
+                product: { _id: product._id, name: product.name, images: product.images, price: product.price, discount: product.discount },
                 size: sizeObj,
                 quantity,
                 discountedPrice: discPrice,
                 originalPrice: product.price,
               };
             }
-
             return {
               cart: {
                 itemsMap,
@@ -132,9 +106,7 @@ export const useProductCondition = create(
           });
 
           if (isAuth) {
-            api
-              .post("/cart/add", { productId: product._id, sizeId, quantity })
-              .catch(() => set({ cart: prevCartState }));
+            api.post("/cart/add", { productId: product._id, sizeId, quantity }).catch(() => set({ cart: prevCartState }));
           }
         },
 
@@ -161,9 +133,7 @@ export const useProductCondition = create(
           });
 
           if (isAuth) {
-            api
-              .put("/cart/update", { productId, sizeId, quantity: qty })
-              .catch(() => set({ cart: prevCartState }));
+            api.put("/cart/update", { productId, sizeId, quantity: qty }).catch(() => set({ cart: prevCartState }));
           }
         },
 
@@ -182,16 +152,13 @@ export const useProductCondition = create(
               cart: {
                 itemsMap,
                 totalItems: state.cart.totalItems - item.quantity,
-                totalPrice:
-                  state.cart.totalPrice - item.discountedPrice * item.quantity,
+                totalPrice: state.cart.totalPrice - item.discountedPrice * item.quantity,
               },
             };
           });
 
           if (isAuth) {
-            api
-              .delete(`/cart/remove/${productId}/${sizeId}`)
-              .catch(() => set({ cart: prevCartState }));
+            api.delete(`/cart/remove/${productId}/${sizeId}`).catch(() => set({ cart: prevCartState }));
           }
         },
 
@@ -204,7 +171,6 @@ export const useProductCondition = create(
           set((state) => {
             const newSet = new Set(state.wishlistSet);
             let newItems;
-
             if (newSet.has(id)) {
               newSet.delete(id);
               newItems = state.wishlistItems.filter((p) => getSafeId(p) !== id);
@@ -217,29 +183,20 @@ export const useProductCondition = create(
 
           if (isAuth) {
             const isRemoving = prevSet.has(id);
-            const req = isRemoving
-              ? api.delete(`/wishlist/remove/${id}`)
-              : api.post("/wishlist/add", { productId: id });
-            req.catch(() =>
-              set({ wishlistSet: prevSet, wishlistItems: prevItems }),
-            );
+            const req = isRemoving ? api.delete(`/wishlist/remove/${id}`) : api.post("/wishlist/add", { productId: id });
+            req.catch(() => set({ wishlistSet: prevSet, wishlistItems: prevItems }));
           }
         },
 
         // ⚡ ৭. Buy Now Protocol
         initiateBuyNow: (product, sizeId, quantity = 1) => {
-          const discPrice =
-            product.price - (product.price * (product.discount || 0)) / 100;
-          const foundSize = product.sizes?.find(
-            (s) => getSafeId(s.size) === String(sizeId),
-          );
+          const discPrice = product.price - (product.price * (product.discount || 0)) / 100;
+          const foundSize = product.sizes?.find((s) => getSafeId(s.size) === String(sizeId));
 
           set({
             buyNowItem: {
               product,
-              size: foundSize?.size?.name
-                ? foundSize.size
-                : { _id: sizeId, name: "Selected" },
+              size: foundSize?.size || { _id: sizeId, name: "Selected" },
               quantity,
               discountedPrice: discPrice,
               originalPrice: product.price,
@@ -247,8 +204,17 @@ export const useProductCondition = create(
           });
         },
 
-        // 🧹 ৮. Reset & Cleanup
-        clearCart: () => set({ cart: initialState.cart, buyNowItem: null }),
+        // 🧹 ৮. SMART RESET (মেইন ফিক্স এখানে)
+        clearCart: (type = 'all') => {
+          if (type === 'direct') {
+            // যদি শুধু ডিরেক্ট বাই হয়, তবে কার্ট মুছবে না
+            set({ buyNowItem: null });
+          } else {
+            // যদি কার্ট থেকে কেনা হয়, তবে কার্ট মুছবে এবং বাই নাও মুছবে
+            set({ cart: initialState.cart, buyNowItem: null });
+          }
+        },
+
         resetStore: () => {
           localStorage.removeItem("vanguard-condition-vault");
           set(initialState);
@@ -261,18 +227,13 @@ export const useProductCondition = create(
             const str = localStorage.getItem(name);
             if (!str) return null;
             const data = JSON.parse(str);
-            if (data.state?.wishlistSet) {
-              data.state.wishlistSet = new Set(data.state.wishlistSet);
-            }
+            if (data.state?.wishlistSet) data.state.wishlistSet = new Set(data.state.wishlistSet);
             return data;
           },
           setItem: (name, value) => {
             const dataToStore = {
               ...value,
-              state: {
-                ...value.state,
-                wishlistSet: Array.from(value.state.wishlistSet || []),
-              },
+              state: { ...value.state, wishlistSet: Array.from(value.state.wishlistSet || []) },
             };
             localStorage.setItem(name, JSON.stringify(dataToStore));
           },

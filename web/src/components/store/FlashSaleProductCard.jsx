@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { getImageUrl } from '@/utils/imageUtils';
-import { useProductCondition } from '@/store/productStore';
+import { useProductStore } from '@/store/productStore';
 import { useAppStore } from '@/store/appStore';
 import { motion } from 'framer-motion';
 import StarRating from './StarRating';
@@ -18,8 +18,8 @@ export default function FlashSaleProductCard({ product }) {
   const { lang } = useAppStore();
   const isBn = lang === 'bn';
 
-  const toggleWishlist = useProductCondition((state) => state.toggleWishlist);
-  const inWishlist = useProductCondition((state) =>
+  const toggleWishlist = useProductStore((state) => state.toggleWishlist);
+  const inWishlist = useProductStore((state) =>
     state.wishlistItems.some((p) => String(p._id) === String(product?._id))
   );
 

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import api from "@/lib/api";
-import { useProductCondition } from "./productStore";
+import { useProductStore } from "./productStore";
 
 export const useAuthStore = create(
   persist(
@@ -26,7 +26,7 @@ export const useAuthStore = create(
           });
 
           // 🔥 গেস্ট ডাটা সার্ভারে পাঠিয়ে সিঙ্ক করো
-          await useProductCondition.getState().syncGuestDataWithUser();
+          await useProductStore.getState().syncGuestDataWithUser();
 
           return data;
         } catch (error) {
@@ -40,7 +40,7 @@ export const useAuthStore = create(
         localStorage.removeItem("token");
 
         // 🔥 প্রোডাক্ট স্টোর (Cart/Wishlist) একদম রিসেট
-        useProductCondition.getState().resetStore();
+        useProductStore.getState().resetStore();
 
         set({
           user: null,
@@ -68,7 +68,7 @@ export const useAuthStore = create(
           });
 
           // 🔥 সেশন ভ্যালিড থাকলে সার্ভারের সাথে সিঙ্ক করে নাও
-          await useProductCondition.getState().syncWithServer();
+          await useProductStore.getState().syncWithServer();
         } catch (error) {
           console.error("Session expired or invalid");
           get().logout();

@@ -7,15 +7,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Heart, ShoppingBag, Menu, X, Sun, Moon, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
 
 // Hooks & Stores
-import { useAuthStore } from '@/store/authStore'; // 🚀 নতুন স্টোর ইম্পোর্ট
+import { useAuthStore } from '@/store/authStore';
 import { useAppStore } from '@/store/appStore';
-import { useProductCondition } from '@/store/productStore';
+import { useProductStore } from '@/store/productStore';
 import { getImageUrl } from '@/utils/imageUtils';
 
 const NAV_LINKS = [
   { id: 'home', href: '/', en: 'Home', bn: 'হোম' },
   { id: 'shop', href: '/products', en: 'Collection', bn: 'কালেকশন' },
   { id: 'sale', href: '/flash-sale', en: 'Flash Sale', bn: 'ফ্ল্যাশ ডিল' },
+  { id: 'blogs', href: '/blog', en: 'blog', bn: 'ফ্ল্যাশ ডিল' },
 ];
 
 export default function Navbar() {
@@ -27,8 +28,8 @@ export default function Navbar() {
   const { theme, toggleTheme, lang, setLang } = useAppStore();
   
   // Zustand Selectors for Performance
-  const cartTotalItems = useProductCondition((state) => state.cart.totalItems);
-  const wishlistCount = useProductCondition((state) => state.wishlistItems.length);
+  const cartTotalItems = useProductStore((state) => state.cart.totalItems);
+  const wishlistCount = useProductStore((state) => state.wishlistItems.length);
   
   // Local UI State
   const [isScrolled, setIsScrolled] = useState(false);

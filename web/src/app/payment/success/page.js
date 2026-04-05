@@ -7,7 +7,7 @@ import { getImageUrl } from "@/utils/imageUtils";
 import { motion } from "framer-motion";
 import { CheckCircle2, Package, Truck, ArrowRight, ShoppingBag, ShieldCheck } from "lucide-react";
 import Loader from "@/components/common/Loader";
-import { useProductCondition } from "@/store/productStore";
+import { useProductStore } from "@/store/productStore";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -15,14 +15,17 @@ function SuccessContent() {
   const orderId = searchParams.get("orderId");
   
   const { orderDetails: order, orderDetailsLoading: isLoading } = useOrders({}, orderId);
-  const { clearCart } = useProductCondition();
+  const { clearCart } = useProductStore();
 
-  // 🛰️ Protocol: Clear vault once settlement is confirmed
-  useEffect(() => {
-    if (order && !isLoading) {
-      clearCart();
+useEffect(() => {
+  if (order && !isLoading) {
+    if (order.isDirectBuy) {
+      clearCart('direct'); 
+    } else {
+      clearCart('all'); 
     }
-  }, [order, isLoading, clearCart]);
+  }
+}, [order, isLoading, clearCart]);
 
   if (isLoading) {
     return (

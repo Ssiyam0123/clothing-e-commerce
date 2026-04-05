@@ -23,6 +23,8 @@ import trackingRoutes from "./modules/tracking/tracking.routes.js";
 import settingsRoutes from "./modules/settings/settings.routes.js";
 import apiKeysRoutes from "./modules/apiKeys/apiKey.routes.js";
 import authRoutes from "./modules/auth/auth.routes.js";
+import blogRoutes from "./modules/blog/blog.route.js";
+import blogImageRoutes from './modules/blog/blog-image.route.js';
 
 // 🛡️ Middleware Imports
 import { errorHandler } from "./middleware/errorHandler.js";
@@ -89,6 +91,8 @@ app.use("/api/track", trackingRoutes);
 app.use("/api/api-keys", apiKeysRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/blogs",blogRoutes)
+app.use('/api', blogImageRoutes);
 
 app.use(handleFileError);
 app.use(errorHandler);

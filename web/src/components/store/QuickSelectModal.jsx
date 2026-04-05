@@ -2,7 +2,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Minus, Plus, ShoppingCart, Zap, PackageCheck, AlertCircle } from "lucide-react";
-import { useProductCondition } from "@/store/productStore";
+import { useProductStore } from "@/store/productStore";
 import { swalToast } from "@/utils/swal";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
@@ -14,8 +14,8 @@ export default function QuickSelectModal({ isOpen, onClose, product, lang }) {
   const [quantity, setQuantity] = useState(1);
 
   // 🛰️ Global Stores - Using selectors for better stability
-  const addToCart = useProductCondition((state) => state.addToCart);
-  const initiateBuyNow = useProductCondition((state) => state.initiateBuyNow);
+  const addToCart = useProductStore((state) => state.addToCart);
+  const initiateBuyNow = useProductStore((state) => state.initiateBuyNow);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const isBn = lang === "bn";

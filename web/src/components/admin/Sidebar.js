@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { 
   LayoutDashboard, ShoppingBag, Shirt, FolderTree, 
-  Zap, palette, Ticket, Users, User, Settings, X 
+  Zap, palette, Ticket, Users, User, Settings, X, 
+  Bold
 } from "lucide-react"; // 🚀 Lucide icons for premium feel
 
 const navItems = [
@@ -17,6 +18,7 @@ const navItems = [
   { name: "Campaigns", href: "/admin/banner-campaigns", icon: "🎨" },
   { name: "Coupons", href: "/admin/coupons", icon: <Ticket size={18}/> },
   { name: "Users", href: "/admin/users", icon: <Users size={18}/> },
+  { name: "Blog", href: "/admin/blog", icon: <Bold size={18}/> },
   { name: "My Profile", href: "/profile", icon: <User size={18}/> },
   { name: "Setting", href: "/admin/settings", icon: <Settings size={18}/> },
 ];
