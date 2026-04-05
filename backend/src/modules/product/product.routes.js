@@ -5,6 +5,7 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
+  getProductBySlug,
 } from './product.controller.js';
 import { requireAuth, admin } from '../../middleware/auth.js';
 import upload from '../../middleware/upload.js';
@@ -19,5 +20,10 @@ router.route('/:id')
   .get(getProductById)
   .put(requireAuth, admin, upload.array('images', 5), updateProduct)
   .delete(requireAuth, admin, deleteProduct);
+
+
+  router.get('/details/:slug', getProductBySlug);
+
+
 
 export default router;

@@ -27,6 +27,7 @@ const DICTIONARY = {
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
+  const { slug } = useParams();
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
   const { lang, isMounted } = useAppStore();
@@ -46,8 +47,9 @@ export default function ProductDetailsPage() {
   // 📥 Data Fetching
   const { data: product, isLoading, error, refetch: refetchProduct } = useQuery({
     queryKey: ['product', id],
-    queryFn: async () => (await api.get(`/products/${id}`)).data,
+    queryFn: async () => (await api.get(`/products/${slug}`)).data,
   });
+
 
   const { data: relatedData } = useQuery({
     queryKey: ['products-related', product?.category?._id],

@@ -164,7 +164,6 @@ export const getProducts = asyncHandler(async (req, res) => {
         {
             $group: {
                 _id: '$_id',
-                // $$ROOT দিয়ে পুরো অবজেক্ট রাখা হচ্ছে যাতে কোনো ফিল্ড মিস না হয়
                 productData: { $first: '$$ROOT' },
                 sizes: { $push: '$sizes' }
             }
@@ -274,4 +273,23 @@ export const deleteProduct = asyncHandler(async (req, res) => {
     }
     await product.deleteOne();
     res.json({ message: 'Product and associated assets purged.' });
+});
+
+
+
+
+export const getProductBySlug = asyncHandler(async (req, res) => {
+    const { slug } = req.params;
+
+    const product = await Product.findOne({ slug, isActive: true })
+        .populate('category', 'name slug')
+        .populate('subcategory', 'name slug')
+        .populate('sizes.size', 'name')
+        .lean();
+
+    if (!product) {
+        return res.status(404).json({ message: 'Artifact not found in archives' });
+    }
+
+    res.json(product);
 });

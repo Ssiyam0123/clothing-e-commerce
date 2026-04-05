@@ -6,9 +6,8 @@ import { getImageUrl } from '@/utils/imageUtils';
 import { useProductStore } from '@/store/productStore';
 import { useAppStore } from '@/store/appStore';
 import { motion } from 'framer-motion';
-import StarRating from './StarRating';
 import { Heart, Zap, ShoppingBag, Star } from 'lucide-react';
-import { swalToast, swalError } from '@/utils/swal';
+import { swalError } from '@/utils/swal';
 import QuickSelectModal from './QuickSelectModal';
 import { useAuthStore } from '@/store/authStore';
 
@@ -19,9 +18,10 @@ export default function FlashSaleProductCard({ product }) {
   const isBn = lang === 'bn';
 
   const toggleWishlist = useProductStore((state) => state.toggleWishlist);
-  const inWishlist = useProductStore((state) =>
-    state.wishlistItems.some((p) => String(p._id) === String(product?._id))
-  );
+  const wishlistItems = useProductStore((state) => state.wishlistItems);
+  
+  // 🕵️ Wishlist Comparison Logic
+  const inWishlist = wishlistItems?.some((p) => String(p._id || p.id) === String(product?._id));
 
   if (!product) return null;
 
@@ -42,7 +42,10 @@ export default function FlashSaleProductCard({ product }) {
       
       {/* --- Image Section --- */}
       <div className="relative aspect-[4/5] overflow-hidden bg-zinc-50 dark:bg-zinc-900">
-        <Link href={`/products/${product._id}`} className="absolute inset-0 z-10" />
+        
+        {/* 🚀 SEO FIX: Changed from product._id to product.slug */}
+        <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10" />
+        
         <motion.img
           src={getImageUrl(product.images?.[0])}
           alt={product.name}
@@ -50,7 +53,7 @@ export default function FlashSaleProductCard({ product }) {
         />
         
         {/* ⚡ Flash Sale Zap Badge */}
-        <div className="absolute top-0 left-0 z-20 bg-rose-600 text-white px-3 py-1.5 rounded-br-2xl flex items-center gap-1 shadow-lg">
+        <div className="absolute top-0 left-0 z-20 bg-rose-600 text-white px-3 py-1.5 rounded-br-2xl flex items-center gap-1 shadow-lg border-r border-b border-white/10">
           <Zap size={12} fill="white" className="animate-pulse" />
           <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest">
             {product.discount}% OFF
@@ -107,7 +110,7 @@ export default function FlashSaleProductCard({ product }) {
 
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="flex-1 bg-black dark:bg-white text-white dark:text-black font-black h-11 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white transition-all active:scale-[0.98] shadow-lg"
+            className="flex-1 bg-black dark:bg-white text-white dark:text-black font-black h-11 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white transition-all active:scale-[0.98] shadow-lg border border-transparent dark:border-white/10"
           >
             <Zap size={14} fill="currentColor" className="hidden xs:block" />
             <span className="text-[9px] md:text-[10px] uppercase tracking-widest px-1">
@@ -117,11 +120,11 @@ export default function FlashSaleProductCard({ product }) {
         </div>
       </div>
 
-      {/*  Stock Progress Bar (At the very bottom) */}
+      {/* Stock Progress Bar */}
       <div className="h-1.5 w-full bg-zinc-100 dark:bg-rose-950/20">
         <motion.div 
           initial={{ width: 0 }}
-          whileInView={{ width: '82%' }} // এখানে তোর স্টক পারসেন্টেজ লজিক বসাতে পারিস
+          whileInView={{ width: '82%' }}
           transition={{ duration: 1.5, ease: "circOut" }}
           className="h-full bg-gradient-to-r from-rose-400 to-rose-600 rounded-r-full shadow-[0_0_10px_rgba(225,29,72,0.4)]" 
         />

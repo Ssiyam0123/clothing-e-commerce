@@ -23,7 +23,7 @@ export default function ProductCard({ product, lang = 'en' }) {
       
       {/* --- Image Section (Aspect 4:5 for Premium Fashion Look) --- */}
       <div className="relative aspect-[4/5] overflow-hidden bg-zinc-50 dark:bg-zinc-900">
-        <Link href={`/products/${product._id}`} className="absolute inset-0 z-10" />
+        <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10" />
         <OptimizedImage
           src={product.images?.[0]}
           alt={product.name}

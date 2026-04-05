@@ -56,7 +56,7 @@ export default function AdminBlogDashboard() {
             />
           </div>
           <Link 
-            href="/admin/blogs/create" 
+            href="/admin/blog/create" 
             className="bg-black dark:bg-white text-white dark:text-black px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-3 shadow-xl hover:bg-rose-600 hover:text-white transition-all active:scale-95"
           >
             <Plus size={16} /> New Sequence
@@ -123,7 +123,7 @@ export default function AdminBlogDashboard() {
                   <Eye size={20} />
                 </Link>
                 <Link 
-                  href={`/admin/blogs/${post._id}`}
+                  href={`/admin/blog/${post._id}`}
                   className="p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all"
                 >
                   <Edit3 size={20} />
