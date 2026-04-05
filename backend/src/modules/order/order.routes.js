@@ -33,8 +33,10 @@ router.get("/bkash/success/:orderId", bkashSuccess);
 router.get("/", requireAuth, admin, getOrders);
 
 // 🛡️ Admin: Dynamic routes for specific order (must come after all static routes)
-router.get("/:id", requireAuth, admin, validateObjectId, getOrderById);
+
 router.post("/:id/pathao-sync", requireAuth, admin, validateObjectId, syncOrderToPathao);
+
+router.get('/:id', optionalAuth, getOrderById);
 
 
 export default router;
