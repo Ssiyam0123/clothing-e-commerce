@@ -6,6 +6,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, EffectFade, A11y } from 'swiper/modules';
 import { getImageUrl } from '@/utils/imageUtils';
 
+// Import Swiper styles (they are loaded statically, but we'll add a preload hint)
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
@@ -24,19 +25,10 @@ export default function HeroSection({ slides = [], ui = {}, lang = 'en' }) {
           <h2 className="text-zinc-800 font-black text-5xl md:text-8xl tracking-tighter italic opacity-20">
             VANGUARD
           </h2>
-          <div className="mt-4 flex justify-center gap-2">
-            <div
-              className="w-2 h-2 rounded-full bg-zinc-800 animate-bounce"
-              style={{ animationDelay: '0ms' }}
-            />
-            <div
-              className="w-2 h-2 rounded-full bg-zinc-800 animate-bounce"
-              style={{ animationDelay: '150ms' }}
-            />
-            <div
-              className="w-2 h-2 rounded-full bg-zinc-800 animate-bounce"
-              style={{ animationDelay: '300ms' }}
-            />
+          <div className="mt-4 flex justify-center gap-2" aria-hidden="true">
+            <div className="w-2 h-2 rounded-full bg-zinc-800 animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 rounded-full bg-zinc-800 animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 rounded-full bg-zinc-800 animate-bounce" style={{ animationDelay: '300ms' }} />
           </div>
         </div>
       </section>
@@ -67,16 +59,14 @@ export default function HeroSection({ slides = [], ui = {}, lang = 'en' }) {
         {slides.map((slide, idx) => (
           <SwiperSlide key={slide._id || idx}>
             <div className="relative h-full w-full group">
-              {/* Optimized Next.js Image with priority for first slide */}
               <Image
-                src={getImageUrl(slide.image, 1920, 85)} // width=1920, quality=85
+                src={getImageUrl(slide.image, 1920, 85)}
                 alt={slide.title || 'Campaign banner'}
                 fill
-                priority={idx === 0} // only first slide is critical
+                priority={idx === 0}
                 sizes="100vw"
                 className="object-cover object-center transition-transform duration-[15s] ease-out group-hover:scale-105"
               />
-              {/* Cinematic Overlay – increased opacity for better contrast */}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent h-full" />
               
               <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-16 lg:px-24 pb-20 md:pb-28 z-10">
@@ -113,50 +103,40 @@ export default function HeroSection({ slides = [], ui = {}, lang = 'en' }) {
 
       <style jsx>{`
         @keyframes slide-in-from-bottom-8 {
-          from {
-            transform: translateY(2rem);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
+          from { transform: translateY(2rem); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
         }
-        .animate-in {
-          animation-fill-mode: forwards;
-        }
-        .slide-in-from-bottom-8 {
-          animation-name: slide-in-from-bottom-8;
-        }
-        .fade-in {
-          animation-name: fade-in;
-        }
+        .animate-in { animation-fill-mode: forwards; }
+        .slide-in-from-bottom-8 { animation-name: slide-in-from-bottom-8; }
+        .fade-in { animation-name: fade-in; }
         @keyframes fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
-        .delay-100 {
-          animation-delay: 100ms;
-        }
-        .delay-200 {
-          animation-delay: 200ms;
-        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
 
+        /* Improved touch targets for pagination bullets */
         :global(.swiper-pagination-bullet) {
           background-color: #ffffff !important;
           opacity: 0.3;
           width: 12px;
           height: 12px;
-          transition: all 0.3s ease;
+          transition: transform 0.3s ease, opacity 0.3s ease;
+          transform: scale(1);
         }
         :global(.swiper-pagination-bullet-active) {
           opacity: 1;
           width: 30px;
           border-radius: 6px;
+        }
+        :global(.swiper-pagination-bullet)::before {
+          content: '';
+          position: absolute;
+          top: -8px;
+          left: -8px;
+          right: -8px;
+          bottom: -8px;
         }
       `}</style>
     </section>

@@ -8,28 +8,34 @@ export default function OptimizedImage({
   src, 
   alt, 
   className = '', 
-  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
-  priority = false 
+  sizes = '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw',
+  priority = false,
+  width = 600,
+  quality = 80
 }) {
   const [hasError, setHasError] = useState(false);
 
   if (!src || hasError) {
     return (
-      <div className={`w-full h-full bg-zinc-100 dark:bg-zinc-900 flex flex-col items-center justify-center ${className}`}>
+      <div className={`w-full h-full bg-zinc-100 dark:bg-zinc-900 flex flex-col items-center justify-center ${className}`} aria-hidden="true">
         <span className="text-4xl grayscale opacity-20">👕</span>
       </div>
     );
   }
 
+  // Pass width and quality to getImageUrl
+  const optimizedSrc = getImageUrl(src, width, quality);
+
   return (
     <Image
-      src={getImageUrl(src)}
+      src={optimizedSrc}
       alt={alt || 'Image'}
       fill
       priority={priority}
+      loading={priority ? 'eager' : 'lazy'}
       sizes={sizes}
       className={`object-cover transition-opacity duration-500 ${className}`}
-      onError={() => setHasError(true)} 
+      onError={() => setHasError(true)}
     />
   );
 }

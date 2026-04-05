@@ -23,7 +23,7 @@ const ProductCard = memo(({ product, lang = 'en' }) => {
   return (
     <div className="group relative flex flex-col h-full bg-white dark:bg-[#0a0a0a] rounded-2xl md:rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
       
-      {/* Image Section - Maintain aspect ratio */}
+      {/* Image Section */}
       <div className="relative aspect-[4/5] overflow-hidden bg-zinc-100 dark:bg-zinc-900">
         <Link 
           href={`/products/${product.slug}`} 
@@ -37,16 +37,16 @@ const ProductCard = memo(({ product, lang = 'en' }) => {
           loading="lazy"
         />
         
-        {/* Rating Overlay - compact */}
-        <div className="absolute bottom-2 left-2 z-20 flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-black/50 backdrop-blur-sm">
-          <Star size={8} className="fill-amber-400 text-amber-400" />
-          <span className="text-[8px] font-bold text-white">{product.averageRating || '4.8'}</span>
+        {/* Rating Overlay - accessible contrast */}
+        <div className="absolute bottom-2 left-2 z-20 flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-sm">
+          <Star size={8} className="fill-amber-400 text-amber-400" aria-hidden="true" />
+          <span className="text-[8px] font-bold text-white">{product.averageRating?.toFixed(1) || '4.8'}</span>
         </div>
 
-        {/* Wishlist Button - larger tap target */}
+        {/* Wishlist Button - larger touch target */}
         <button 
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWishlist(product, !!user); }}
-          className={`absolute top-2 right-2 z-20 p-2 rounded-full backdrop-blur-sm transition-all active:scale-90 ${
+          className={`absolute top-2 right-2 z-20 p-2.5 rounded-full backdrop-blur-sm transition-all active:scale-90 ${
             inWishlist 
               ? 'bg-rose-500 text-white shadow-md' 
               : 'bg-white/70 dark:bg-black/50 text-zinc-800 dark:text-zinc-200'
@@ -57,19 +57,19 @@ const ProductCard = memo(({ product, lang = 'en' }) => {
         </button>
       </div>
 
-      {/* Content Section - optimized spacing for mobile */}
+      {/* Content Section */}
       <div className="p-3 md:p-5 flex flex-col flex-1">
-        {/* Category Badge */}
-        <p className="text-[9px] md:text-[10px] font-black text-rose-600 uppercase tracking-wider mb-1">
+        {/* Category Badge - improved contrast */}
+        <p className="text-[9px] md:text-[10px] font-black text-rose-700 dark:text-rose-400 uppercase tracking-wider mb-1">
           {product.category?.name || 'Artifact'}
         </p>
 
-        {/* Title - clamp to 2 lines on mobile? But we keep 1 for consistency */}
+        {/* Title */}
         <h3 className="font-black text-sm md:text-base tracking-tight uppercase dark:text-white line-clamp-1 mb-1">
           {product.name}
         </h3>
 
-        {/* Pricing - bold and clear */}
+        {/* Pricing */}
         <div className="flex items-baseline gap-2 mt-1 mb-3">
           <span className="text-base md:text-xl font-black dark:text-white">
             ৳{discountedPrice.toFixed(0)}
@@ -81,23 +81,22 @@ const ProductCard = memo(({ product, lang = 'en' }) => {
           )}
         </div>
 
-        {/* Action Buttons - bigger touch area on mobile */}
+        {/* Action Buttons */}
         <div className="mt-auto flex items-center gap-2">
-          {/* Cart Button - icon only but larger */}
           <button 
             onClick={() => setIsModalOpen(true)}
             className="w-10 h-10 md:w-12 md:h-12 bg-zinc-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center hover:bg-black hover:text-white transition-all active:scale-95"
             aria-label="Quick add to cart"
           >
-            <ShoppingBag size={16} className="md:w-5 md:h-5" />
+            <ShoppingBag size={16} className="md:w-5 md:h-5" aria-hidden="true" />
           </button>
 
-          {/* Buy Button - text and icon */}
           <button 
             onClick={() => setIsModalOpen(true)}
             className="flex-1 bg-black dark:bg-white text-white dark:text-black font-bold h-10 md:h-12 rounded-xl flex items-center justify-center gap-1.5 hover:bg-rose-600 hover:text-white transition-all active:scale-95 shadow-md"
+            aria-label={lang === 'bn' ? 'অর্ডার করুন' : 'Buy now'}
           >
-            <Zap size={12} className="fill-current hidden sm:block" />
+            <Zap size={12} className="fill-current hidden sm:block" aria-hidden="true" />
             <span className="text-[9px] md:text-[10px] font-black uppercase tracking-wide">
               {lang === 'bn' ? 'অর্ডার' : 'Buy Now'}
             </span>
@@ -105,7 +104,6 @@ const ProductCard = memo(({ product, lang = 'en' }) => {
         </div>
       </div>
 
-      {/* Quick Select Modal */}
       <QuickSelectModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
@@ -117,5 +115,4 @@ const ProductCard = memo(({ product, lang = 'en' }) => {
 });
 
 ProductCard.displayName = 'ProductCard';
-
 export default ProductCard;

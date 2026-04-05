@@ -26,11 +26,11 @@ export default function FlashSaleTeaser({
             <div className="flex justify-between w-full">
               {/* Live Badge */}
               <div className="flex items-center gap-2.5 bg-rose-600/10 dark:bg-rose-600/20 w-fit px-4 py-2 rounded-full border border-rose-600/10">
-                <span className="relative flex h-2 w-2">
+                <span className="relative flex h-2 w-2" aria-hidden="true">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
                 </span>
-                <p className="text-rose-600 dark:text-rose-400 font-black text-[10px] uppercase tracking-[0.4em]">
+                <p className="text-rose-700 dark:text-rose-400 font-black text-[10px] uppercase tracking-[0.4em]">
                   {isBn ? "লাইভ ড্রপ" : "Live Drop"}
                 </p>
               </div>
@@ -45,6 +45,7 @@ export default function FlashSaleTeaser({
                 <ArrowRight
                   size={16}
                   className="group-hover:translate-x-2 transition-transform"
+                  aria-hidden="true"
                 />
               </Link>
             </div>
@@ -56,7 +57,7 @@ export default function FlashSaleTeaser({
           </div>
         </div>
 
-        {/* Product Grid – no animations, static render */}
+        {/* Product Grid – static render for performance */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">
           {flashSaleProducts.products.slice(0, 4).map((p) => (
             <div key={p._id}>
