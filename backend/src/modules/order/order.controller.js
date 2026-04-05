@@ -16,7 +16,7 @@ import {
   initiateBkash,
   handleCODGateway,
 } from "./order.gateway.js";
-
+import bkashService from '../../services/bkash.service.js'; import pathaoService from '../../services/pathao.service.js';
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
 const finalizeOrderProcessing = async (order) => {
@@ -189,6 +189,73 @@ export const ipn = asyncHandler(async (req, res) => {
 });
 
 // --- Admin: Fetch All Orders (using User model, not raw db) ---
+// export const getOrders = asyncHandler(async (req, res) => {
+//   const { search, status, page = 1, limit = 10 } = req.query;
+//   const filter = {};
+
+//   if (status && status !== "all") {
+//     filter.orderStatus = status;
+//   }
+
+//   if (search && search.trim()) {
+//     const safeSearch = search.trim();
+//     if (mongoose.Types.ObjectId.isValid(safeSearch)) {
+//       filter._id = safeSearch;
+//     } else {
+//       filter.$or = [
+//         { "shippingAddress.phone": { $regex: safeSearch, $options: "i" } },
+//         { "shippingAddress.name": { $regex: safeSearch, $options: "i" } },
+//       ];
+//     }
+//   }
+
+//   const skip = (Math.max(1, Number(page)) - 1) * Number(limit);
+//   const itemsLimit = Number(limit);
+
+//   const ordersRaw = await Order.find(filter)
+//     .sort("-createdAt")
+//     .skip(skip)
+//     .limit(itemsLimit)
+//     .lean();
+
+//   const total = await Order.countDocuments(filter);
+
+//   // Collect unique user IDs from orders
+//   const userIds = [...new Set(ordersRaw.map((o) => o.user).filter(Boolean))];
+
+//   // Fetch users using Mongoose User model
+//   const users = await User.find({
+//     $or: [
+//       { _id: { $in: userIds.filter((id) => mongoose.Types.ObjectId.isValid(id)) } },
+//       { id: { $in: userIds } },
+//     ],
+//   }).select("name email avatar role");
+
+//   const userMap = users.reduce((acc, u) => {
+//     acc[String(u._id)] = u;
+//     if (u.id) acc[String(u.id)] = u;
+//     return acc;
+//   }, {});
+
+//   const enrichedOrders = ordersRaw.map((order) => ({
+//     ...order,
+//     user: userMap[String(order.user)] || { name: "Guest Identity", email: "N/A" },
+//   }));
+
+//   res.json({
+//     success: true,
+//     orders: enrichedOrders,
+//     total,
+//     page: Number(page),
+//     pages: Math.ceil(total / itemsLimit) || 1,
+//   });
+// });
+
+
+
+
+
+// --- Admin: Fetch All Orders (Updated to show Guest Name from Form) ---
 export const getOrders = asyncHandler(async (req, res) => {
   const { search, status, page = 1, limit = 10 } = req.query;
   const filter = {};
@@ -220,27 +287,38 @@ export const getOrders = asyncHandler(async (req, res) => {
 
   const total = await Order.countDocuments(filter);
 
-  // Collect unique user IDs from orders
+  // Collect unique user IDs
   const userIds = [...new Set(ordersRaw.map((o) => o.user).filter(Boolean))];
 
-  // Fetch users using Mongoose User model
+  // Fetch users
   const users = await User.find({
-    $or: [
-      { _id: { $in: userIds.filter((id) => mongoose.Types.ObjectId.isValid(id)) } },
-      { id: { $in: userIds } },
-    ],
+    _id: { $in: userIds }
   }).select("name email avatar role");
 
   const userMap = users.reduce((acc, u) => {
     acc[String(u._id)] = u;
-    if (u.id) acc[String(u.id)] = u;
     return acc;
   }, {});
 
-  const enrichedOrders = ordersRaw.map((order) => ({
-    ...order,
-    user: userMap[String(order.user)] || { name: "Guest Identity", email: "N/A" },
-  }));
+  const enrichedOrders = ordersRaw.map((order) => {
+    const registeredUser = userMap[String(order.user)];
+    
+    return {
+      ...order,
+      // 🕵️ সিনিয়র লজিক: যদি রেজিস্টার্ড ইউজার থাকে তবে তার ডাটা দাও, 
+      // নাহলে গেস্টের ক্ষেত্রে শিপিং ফর্মের নাম এবং ইমেইল ব্যবহার করো।
+      user: registeredUser ? {
+        name: registeredUser.name,
+        email: registeredUser.email,
+        avatar: registeredUser.avatar,
+        isRegistered: true
+      } : {
+        name: order.shippingAddress?.name || "Unknown Guest", // ফর্মের নাম
+        email: order.shippingAddress?.email || "N/A",      // ফর্মের ইমেইল
+        isRegistered: false
+      },
+    };
+  });
 
   res.json({
     success: true,
@@ -250,6 +328,14 @@ export const getOrders = asyncHandler(async (req, res) => {
     pages: Math.ceil(total / itemsLimit) || 1,
   });
 });
+
+
+
+
+
+
+
+
 
 // --- User: Get My Orders (handles guest via guest ID header) ---
 // export const getMyOrders = asyncHandler(async (req, res) => {
@@ -266,26 +352,21 @@ export const getOrders = asyncHandler(async (req, res) => {
 
 
 
-// --- User: Get My Orders (মেম্বার এবং গেস্ট উভয়ের জন্য ফিক্সড) ---
 export const getMyOrders = asyncHandler(async (req, res) => {
-  const userId = getUserIdFromReq(req); // এটা তোর ওই হেল্পার ফাংশন
+  const userId = getUserIdFromReq(req); 
 
   if (!userId) {
     return res.status(401).json({ message: "Identification required." });
   }
 
   let query;
-  // 🕵️ সিনিয়র লজিক: আইডি ভ্যালিড হলে ইউজার ফিল্ডে সার্চ করো, নাহলে অন্যভাবে (যেমন ফোন বা ইমেইল)
-  // তবে সেরা উপায় হলো অর্ডারে একটি guestId ফিল্ড রাখা। আপাতত তোর বর্তমান স্ট্রাকচারে ফিক্স করছি:
+
   if (mongoose.Types.ObjectId.isValid(userId)) {
     query = { user: userId };
   } else {
-    // যদি গেস্ট হয়, তবে আমরা অর্ডারগুলো খুঁজবো shippingAddress-এর ফোন দিয়ে 
-    // অথবা তুই যদি গেস্ট আইডি অর্ডারে সেভ করে থাকিস তবে সেটা দিয়ে।
-    // আপাতত ৫00 এরর বন্ধ করতে এখানে খালি অ্যারে পাঠানো নিরাপদ যদি গেস্ট ট্র্যাকিং না থাকে।
+   
     query = { "shippingAddress.phone": req.user?.phone || "" }; 
     
-    // নোট: যদি তুই চাস গেস্ট তার সব অর্ডার দেখুক, তবে অর্ডার স্কিমাতে guestId: String যোগ করতে হবে।
     if (!req.user?.phone && !mongoose.Types.ObjectId.isValid(userId)) {
         return res.json([]); 
     }
@@ -298,7 +379,6 @@ export const getMyOrders = asyncHandler(async (req, res) => {
 export const getOrderById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  // ৫00 এরর হ্যান্ডলিং
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "Invalid Order ID protocol." });
   }
@@ -310,17 +390,13 @@ export const getOrderById = asyncHandler(async (req, res) => {
 
   if (!order) return res.status(404).json({ message: "Protocol not found." });
 
-  // 🕵️ এক্সেস কন্ট্রোল লজিক (Critical Fix for Guest)
-  const currentUserId = getUserIdFromReq(req); // তোর ওই হেল্পার ফাংশন
+  const currentUserId = getUserIdFromReq(req); 
   const isAdmin = req.user?.role === "admin";
 
-  // লজিক: যদি মেম্বার হয় তবে ইউজার আইডি মিলতে হবে। 
-  // যদি গেস্ট হয়, তবে আমরা সাধারণত চেক করি তার সেশন আইডি বা ফোনের সাথে মিলে কি না।
   const isOwner = (order.user && order.user.toString() === currentUserId) || 
                   (order.isGuest && !order.user); 
 
-  // সিকিউরিটি নোট: প্রোডাকশনে গেস্টদের জন্য ইমেইল/ফোন ভেরিফিকেশন আরও ভালো।
-  // আপাতত তোর ৪০১ এরর ফিক্স করতে এই লজিক কাজ করবে।
+
   if (!isAdmin && !isOwner) {
     return res.status(401).json({ message: "Access Denied. Unauthorized Protocol." });
   }

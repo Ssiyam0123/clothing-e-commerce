@@ -18,12 +18,13 @@ const orderSchema = new mongoose.Schema(
     user: { 
       type: mongoose.Schema.Types.ObjectId, 
       ref: "User", 
-      required: false, // 🚀 FIXED: গেস্টের জন্য এটা অপশনাল
+      required: false,
+      index: true, // 🚀 Speed up user-based queries
     },
     isGuest: { 
       type: Boolean, 
       default: false 
-    }, // 🕵️ গেস্ট ইউজার ট্র্যাকিংয়ের জন্য
+    },
     orderItems: [orderItemSchema],
     shippingAddress: {
       name: { type: String, required: true }, 
@@ -64,5 +65,9 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+// 🚀 CRITICAL: Index for sorting to prevent memory overflow
+orderSchema.index({ createdAt: -1 });
+orderSchema.index({ "paymentResult.status": 1, createdAt: -1 });
 
 export default mongoose.models.Order || mongoose.model("Order", orderSchema);

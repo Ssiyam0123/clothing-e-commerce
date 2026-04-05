@@ -1,22 +1,27 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useOrders } from '@/hooks/useOrders';
 import { swalConfirm, swalToast, swalError } from '@/utils/swal';
 import Loader from '@/components/common/Loader';
 import { getImageUrl } from '@/utils/imageUtils';
+import { 
+  Zap, Package, Truck, CheckCircle2, 
+  XCircle, Clock, ShieldCheck, Mail, Phone, MapPin 
+} from 'lucide-react';
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
-  const router = useRouter();
-  
-  // orderId পাস করা হয়েছে যাতে নির্দিষ্ট অর্ডারের ডেটা আসে
   const { orderDetails: order, orderDetailsLoading, updateStatus, syncToPathao } = useOrders({}, id);
   const [syncing, setSyncing] = useState(false);
 
-  // অর্ডারের স্ট্যাটাস আপডেট করার হ্যান্ডলার
+  // 🕵️ Senior Logic: ইউজার রেজিস্টার্ড নাকি গেস্ট তা ডিটেক্ট করা
+  const customerName = useMemo(() => order?.user?.name || order?.shippingAddress?.name || 'Unknown Guest', [order]);
+  const customerEmail = useMemo(() => order?.user?.email || order?.shippingAddress?.email || 'N/A', [order]);
+  const isRegistered = !!order?.user;
+
   const handleStatusUpdate = async (newStatus) => {
     const confirmed = await swalConfirm('Update Status?', `Mark this order as ${newStatus}?`);
     if (confirmed) {
@@ -29,23 +34,22 @@ export default function OrderDetailsPage() {
     }
   };
 
-  // Pathao Courier এ সিঙ্ক করার হ্যান্ডলার
   const handlePathaoSync = async () => {
-    const confirmed = await swalConfirm('Sync to Pathao?', 'This will create a live consignment in Pathao Courier system.');
+    const confirmed = await swalConfirm('Sync to Pathao?', 'This will create a live consignment in Pathao.');
     if (confirmed) {
       try {
         setSyncing(true);
         await syncToPathao(order._id);
-        swalToast('Order successfully synced with Pathao!');
+        swalToast('Synced with Pathao!');
       } catch (err) {
-        swalError('Sync Failed', err.response?.data?.message || 'Check if Pathao IDs are missing in address.');
+        swalError('Sync Failed', err.response?.data?.message || 'Check Pathao IDs.');
       } finally {
         setSyncing(false);
       }
     }
   };
 
-  if (orderDetailsLoading) return <div className="p-20"><Loader /></div>;
+  if (orderDetailsLoading) return <div className="min-h-screen flex items-center justify-center"><Loader /></div>;
   if (!order) return <div className="p-20 text-center uppercase font-black text-zinc-400">Order not found</div>;
 
   const statusColors = {
@@ -57,147 +61,180 @@ export default function OrderDetailsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 pb-20 animate-in fade-in duration-700">
+    <div className="max-w-[1400px] mx-auto space-y-8 pb-32 px-4 sm:px-10 pt-10">
       
-      {/* --- HEADER SECTION --- */}
-      <div className="bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm">
-        <div>
-          <Link href="/admin/orders" className="text-[9px] font-black text-zinc-400 hover:text-zinc-900 dark:hover:text-white uppercase tracking-[0.3em] mb-2 block transition-colors">← Back to Archives</Link>
+      {/* 🧭 NAVIGATION & ACTIONS */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
+        <div className="space-y-2">
+          <Link href="/admin/orders" className="text-[10px] font-black text-zinc-400 hover:text-rose-600 uppercase tracking-[0.3em] flex items-center gap-2 transition-all">
+            <Package size={12} /> Order Archives
+          </Link>
           <div className="flex items-center gap-4">
-            <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase">Order #{order._id.slice(-8)}</h1>
-            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${statusColors[order.orderStatus] || 'bg-zinc-100'}`}>
+            <h1 className="text-3xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase italic">#{order._id.slice(-8)}</h1>
+            <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${statusColors[order.orderStatus]}`}>
               {order.orderStatus}
             </span>
           </div>
         </div>
         
-        <div className="flex flex-wrap justify-center gap-3">
-          {/* Status Switcher */}
+        <div className="flex flex-wrap gap-3">
           <select 
             value={order.orderStatus}
             onChange={(e) => handleStatusUpdate(e.target.value)}
-            disabled={order.orderStatus === 'Delivered' || order.orderStatus === 'Cancelled'}
-            className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-full px-6 py-3 text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer disabled:opacity-50"
+            disabled={['Delivered', 'Cancelled'].includes(order.orderStatus)}
+            className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl px-6 py-4 text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer hover:border-zinc-400 transition-all disabled:opacity-50"
           >
-            <option value="Pending">Pending</option>
-            <option value="Processing">Processing</option>
-            <option value="Shipped">Shipped</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
+            {['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'].map(s => (
+              <option key={s} value={s}>{s}</option>
+            ))}
           </select>
           
-          {/* Pathao Sync Button */}
           {order.pathaoConsignmentId ? (
-            <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 px-6 py-3 rounded-full flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-widest">Synced: {order.pathaoConsignmentId}</span>
+            <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 px-8 py-4 rounded-2xl flex items-center gap-3">
+              <Truck size={16} />
+              <span className="text-[10px] font-black uppercase tracking-widest">Pathao: {order.pathaoConsignmentId}</span>
             </div>
           ) : (
             <button 
               onClick={handlePathaoSync}
-              disabled={syncing || order.orderStatus === 'Cancelled' || order.orderStatus === 'Delivered'}
-              className="bg-zinc-900 dark:bg-white text-white dark:text-black px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all disabled:opacity-50 shadow-xl"
+              disabled={syncing || ['Cancelled', 'Delivered'].includes(order.orderStatus)}
+              className="bg-zinc-900 dark:bg-white text-white dark:text-black px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-rose-600 hover:text-white transition-all disabled:opacity-50 shadow-xl flex items-center gap-3"
             >
-              {syncing ? 'Connecting...' : '🚀 Sync to Pathao'}
+              {syncing ? <Loader size="small" /> : <><Zap size={16} fill="currentColor" /> Sync Pathao</>}
             </button>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* --- LEFT: Manifest & Financials --- */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Manifest Items */}
-          <div className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-10 shadow-sm">
-            <h3 className="text-xs font-black text-zinc-400 uppercase tracking-[0.3em] mb-8">Manifest Items</h3>
-            <div className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
+        {/* 📦 LEFT: Manifest (8 Cols) */}
+        <div className="lg:col-span-8 space-y-8">
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 shadow-sm">
+            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em] mb-10 border-b dark:border-zinc-800 pb-4">01. Artifact Manifest</h3>
+            
+            <div className="space-y-6">
               {order.orderItems.map((item, i) => (
-                <div key={i} className="py-6 flex items-center gap-6 group">
-                  <div className="h-24 w-20 bg-zinc-100 dark:bg-zinc-900 rounded-2xl overflow-hidden shrink-0 border border-zinc-200 dark:border-zinc-800">
-                    <img src={getImageUrl(item.image)} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt={item.name} />
+                <div key={i} className="flex flex-col sm:flex-row items-center gap-8 p-6 rounded-3xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-white/5 group">
+                  <div className="h-32 w-24 bg-zinc-200 dark:bg-zinc-800 rounded-2xl overflow-hidden shrink-0 border dark:border-white/5 shadow-inner">
+                    <img src={getImageUrl(item.image || item.product?.images?.[0])} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt={item.name} />
                   </div>
-                  <div className="flex-1">
-                    <p className="font-black text-zinc-900 dark:text-white uppercase tracking-tight text-lg">{item.name}</p>
-                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1">Unit Price: ৳{item.price}</p>
+                  <div className="flex-1 text-center sm:text-left space-y-2">
+                    <p className="font-black text-zinc-900 dark:text-white uppercase tracking-tight text-xl italic">{item.name}</p>
+                    <p className="text-[9px] font-black text-rose-600 uppercase tracking-widest">Price per unit: ৳{item.price}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-black text-zinc-400 uppercase">Qty</p>
-                    <p className="text-2xl font-black text-zinc-900 dark:text-white">{item.quantity}</p>
+                  <div className="flex items-center gap-10">
+                    <div className="text-center">
+                      <p className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Quantity</p>
+                      <p className="text-3xl font-black text-zinc-900 dark:text-white">×{item.quantity}</p>
+                    </div>
+                    <div className="text-right min-w-[100px]">
+                      <p className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Subtotal</p>
+                      <p className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter">৳{(item.price * item.quantity).toFixed(0)}</p>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
             
-            {/* Ledger */}
-            <div className="mt-10 pt-10 border-t border-zinc-100 dark:border-zinc-800 space-y-4">
-              <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-zinc-400">
-                <span>Subtotal</span>
-                <span className="text-zinc-900 dark:text-zinc-100">৳{order.itemsPrice?.toFixed(2)}</span>
+            {/* FINANCIAL SUMMARY */}
+            <div className="mt-12 pt-10 border-t border-zinc-100 dark:border-zinc-800 flex flex-col md:flex-row justify-between gap-10">
+              <div className="space-y-4 flex-1">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                  <span>Subtotal</span>
+                  <span className="text-zinc-900 dark:text-white">৳{order.itemsPrice?.toFixed(0)}</span>
+                </div>
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                  <span>Logistics Fee</span>
+                  <span className="text-zinc-900 dark:text-white">৳{order.shippingPrice?.toFixed(0)}</span>
+                </div>
+                {order.discountAmount > 0 && (
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-emerald-500">
+                    <span>Voucher Discount</span>
+                    <span>- ৳{order.discountAmount.toFixed(0)}</span>
+                  </div>
+                )}
               </div>
-              <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-zinc-400">
-                <span>Shipping Fee</span>
-                <span className="text-zinc-900 dark:text-zinc-100">৳{order.shippingPrice?.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between items-end pt-4 border-t border-zinc-50 dark:border-zinc-900">
-                 <div>
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Settlement</p>
-                    <p className="font-bold text-zinc-900 dark:text-white uppercase">{order.paymentMethod}</p>
-                 </div>
-                 <div className="text-right">
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Total Processed</p>
-                    <p className="text-5xl font-black text-zinc-900 dark:text-white tracking-tighter">৳{order.totalPrice.toFixed(2)}</p>
-                 </div>
+              <div className="md:text-right md:border-l dark:border-zinc-800 md:pl-12">
+                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-2">Total Settlement</p>
+                <p className="text-6xl md:text-7xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none italic">
+                  ৳{order.totalPrice.toFixed(0)}
+                </p>
+                <div className="flex items-center md:justify-end gap-2 mt-4 text-[10px] font-black uppercase text-zinc-400">
+                  <ShieldCheck size={14} className="text-emerald-500" />
+                  Secured by {order.paymentMethod}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* --- RIGHT: Customer & Logistics --- */}
-        <div className="space-y-8">
-          {/* Customer Profile */}
+        {/* 📋 RIGHT: Intelligence (4 Cols) */}
+        <div className="lg:col-span-4 space-y-8">
+          {/* CUSTOMER INTELLIGENCE */}
           <div className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 shadow-sm">
-            <h3 className="text-xs font-black text-zinc-400 uppercase tracking-[0.3em] mb-6">Customer Profile</h3>
-            <div className="flex items-center gap-4 mb-8">
-              <div className="h-14 w-14 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center font-black text-zinc-400 border border-zinc-200 dark:border-zinc-800 text-xl">
+            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em] mb-8">02. Identity Profile</h3>
+            <div className="flex items-center gap-5 mb-10">
+              <div className="h-20 w-20 rounded-[2rem] bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center font-black text-zinc-400 border border-zinc-200 dark:border-zinc-800 text-3xl shadow-inner overflow-hidden">
                 {order.user?.avatar ? (
-                  <img src={getImageUrl(order.user.avatar)} className="w-full h-full rounded-full object-cover grayscale" />
-                ) : order.user?.name?.charAt(0)}
+                  <img src={getImageUrl(order.user.avatar)} className="w-full h-full object-cover grayscale" />
+                ) : customerName.charAt(0)}
               </div>
               <div>
-                <p className="font-black text-zinc-900 dark:text-white uppercase tracking-tight">{order.user?.name || 'Guest'}</p>
-                <p className="text-[10px] font-bold text-zinc-500 break-all">{order.user?.email}</p>
+                <p className="font-black text-2xl text-zinc-900 dark:text-white uppercase tracking-tighter italic">{customerName}</p>
+                <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border ${isRegistered ? 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20' : 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20'}`}>
+                  {isRegistered ? 'Verified Member' : 'Guest Identity'}
+                </span>
               </div>
             </div>
             
-            <div className="space-y-6 pt-6 border-t border-zinc-50 dark:border-zinc-900">
-              <div>
-                <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1.5">Phone Contact</p>
-                <p className="text-sm font-bold text-zinc-900 dark:text-white">{order.shippingAddress.phone}</p>
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <Mail size={16} className="text-zinc-400 mt-1" />
+                <div>
+                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">Neural Address</p>
+                  <p className="text-xs font-bold text-zinc-900 dark:text-white break-all">{customerEmail}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1.5">Shipping Destination</p>
-                <p className="text-sm font-bold text-zinc-900 dark:text-white leading-relaxed uppercase">
-                  {order.shippingAddress.street},<br/>
-                  {order.shippingAddress.city}, {order.shippingAddress.country}
-                </p>
+              <div className="flex items-start gap-4">
+                <Phone size={16} className="text-zinc-400 mt-1" />
+                <div>
+                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">Contact Link</p>
+                  <p className="text-xs font-bold text-zinc-900 dark:text-white">{order.shippingAddress.phone}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <MapPin size={16} className="text-zinc-400 mt-1" />
+                <div>
+                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">Deployment Base</p>
+                  <p className="text-xs font-bold text-zinc-900 dark:text-white leading-relaxed uppercase">
+                    {order.shippingAddress.street},<br/>
+                    {order.shippingAddress.city}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Payment Metadata */}
-          <div className="bg-zinc-50 dark:bg-[#0d0d0d] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 shadow-inner">
-             <h3 className="text-xs font-black text-zinc-400 uppercase tracking-[0.3em] mb-6">Payment Metadata</h3>
+          {/* PAYMENT METADATA */}
+          <div className="bg-zinc-50 dark:bg-zinc-900/20 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 shadow-inner">
+             <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em] mb-6">03. Financial Metadata</h3>
              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                   <span className="text-[10px] font-black text-zinc-500 uppercase">Status</span>
-                   <span className={`text-[10px] font-black uppercase ${order.paymentResult?.status === 'Completed' ? 'text-emerald-500' : 'text-amber-500'}`}>
-                      {order.paymentResult?.status || 'Pending'}
-                   </span>
+                <div className="flex justify-between items-center py-3 border-b dark:border-zinc-800">
+                   <span className="text-[10px] font-black text-zinc-500 uppercase">Clearance Status</span>
+                   <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full animate-pulse ${order.paymentResult?.status === 'Completed' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                      <span className={`text-[10px] font-black uppercase ${order.paymentResult?.status === 'Completed' ? 'text-emerald-500' : 'text-amber-500'}`}>
+                         {order.paymentResult?.status || 'In Transit'}
+                      </span>
+                   </div>
                 </div>
                 {order.paymentResult?.transactionId && (
-                  <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800">
-                    <p className="text-[9px] font-black text-zinc-500 uppercase mb-1">Transaction ID</p>
-                    <p className="font-mono text-[10px] font-bold text-zinc-900 dark:text-white break-all">{order.paymentResult.transactionId}</p>
+                  <div className="pt-2">
+                    <p className="text-[9px] font-black text-zinc-500 uppercase mb-2">Sequence ID</p>
+                    <p className="font-mono text-[10px] font-bold text-zinc-900 dark:text-zinc-400 break-all bg-white dark:bg-black p-4 rounded-2xl border dark:border-white/5">
+                      {order.paymentResult.transactionId}
+                    </p>
                   </div>
                 )}
              </div>

@@ -15,7 +15,7 @@ export default function SubcategoryForm() {
   const { id } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const presetCategory = searchParams.get('category'); // 👈 get category from URL
+  const presetCategory = searchParams.get('category'); 
 
   const isEdit = id !== 'new';
 

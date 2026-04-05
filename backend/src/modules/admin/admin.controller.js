@@ -1,139 +1,112 @@
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import Order from '../order/order.model.js';
 import Product from '../product/product.model.js';
+import User from '../user/user.model.js';
 import mongoose from 'mongoose';
 
 export const getDashboardData = asyncHandler(async (req, res) => {
-    const db = mongoose.connection.db;
+    const { year, month } = req.query;
+    const targetYear = year ? parseInt(year) : new Date().getFullYear();
+    const targetMonth = month && month !== 'all' ? parseInt(month) : null;
+
+    let startDate, endDate, groupByFormat;
+
+    if (targetMonth) {
+        // 📅 যদি নির্দিষ্ট মাস সিলেক্ট করা থাকে (Show Daily)
+        startDate = new Date(targetYear, targetMonth - 1, 1);
+        endDate = new Date(targetYear, targetMonth, 0, 23, 59, 59, 999);
+        groupByFormat = "%Y-%m-%d"; // প্রতিদিনের ডাটা
+    } else {
+        // 📅 যদি শুধু বছর সিলেক্ট থাকে (Show Monthly)
+        startDate = new Date(targetYear, 0, 1);
+        endDate = new Date(targetYear, 11, 31, 23, 59, 59, 999);
+        groupByFormat = "%Y-%m"; // প্রতি মাসের ডাটা
+    }
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const [stats] = await Order.aggregate([
+    const statsResult = await Order.aggregate([
         {
             $facet: {
                 totalStats: [
-                    { $match: { 'paymentResult.status': 'Completed' } },
+                    { $match: { 'paymentResult.status': { $in: ['Completed', 'COD'] } } },
                     {
                         $group: {
                             _id: null,
-                            revenue: { $sum: '$totalPrice' },
+                            revenue: { $sum: { $toDouble: '$totalPrice' } },
                             count: { $sum: 1 },
-                            avgTicketSize: { $avg: '$totalPrice' }
+                            avgTicketSize: { $avg: { $toDouble: '$totalPrice' } }
                         }
                     }
                 ],
                 todayStats: [
-                    { $match: { createdAt: { $gte: today }, 'paymentResult.status': 'Completed' } },
-                    { $group: { _id: null, revenue: { $sum: '$totalPrice' }, count: { $sum: 1 } } }
+                    { $addFields: { convertedDate: { $toDate: "$createdAt" } } },
+                    { $match: { convertedDate: { $gte: today }, 'paymentResult.status': { $in: ['Completed', 'COD'] } } },
+                    { $group: { _id: null, revenue: { $sum: { $toDouble: '$totalPrice' } }, count: { $sum: 1 } } }
                 ],
                 monthlyTrend: [
-                    { $match: { 'paymentResult.status': 'Completed' } },
+                    { $addFields: { convertedDate: { $toDate: "$createdAt" } } },
+                    { 
+                        $match: { 
+                            convertedDate: { $gte: startDate, $lte: endDate },
+                            'paymentResult.status': { $in: ['Completed', 'COD'] } 
+                        } 
+                    },
                     {
                         $group: {
-                            _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
-                            revenue: { $sum: "$totalPrice" }
+                            _id: { $dateToString: { format: groupByFormat, date: "$convertedDate" } },
+                            revenue: { $sum: { $toDouble: "$totalPrice" } }
                         }
                     },
-                    { $sort: { "_id": 1 } },
-                    { $limit: 12 }
+                    { $sort: { "_id": 1 } }
                 ]
             }
         }
-    ]);
+    ], { allowDiskUse: true }); // 🚀 Memory limit fix
 
+    const stats = statsResult[0] || {};
 
+    // 📦 Inventory, Categories, User Stats (Keep existing logic)
     const inventoryStats = await Product.aggregate([
-        {
-            $project: {
-                name: 1,
-                totalStock: { $sum: "$sizes.stock" }
-            }
-        },
-        {
-            $group: {
-                _id: null,
-                totalProducts: { $sum: 1 },
-                outOfStockCount: {
-                    $sum: { $cond: [{ $eq: ["$totalStock", 0] }, 1, 0] }
-                },
-                lowStockCount: {
-                    $sum: { $cond: [{ $and: [{ $gt: ["$totalStock", 0] }, { $lt: ["$totalStock", 10] }] }, 1, 0] }
-                },
-                criticalItems: {
-                    $push: {
-                        $cond: [
-                            { $lt: ["$totalStock", 10] },
-                            { name: "$name", stock: "$totalStock", status: { $cond: [{ $eq: ["$totalStock", 0] }, "OUT", "LOW"] } },
-                            "$$REMOVE"
-                        ]
-                    }
-                }
-            }
-        }
+        { $project: { name: 1, totalStock: { $sum: "$sizes.stock" } } },
+        { $group: { _id: null, totalProducts: { $sum: 1 }, outOfStockCount: { $sum: { $cond: [{ $eq: ["$totalStock", 0] }, 1, 0] } }, lowStockCount: { $sum: { $cond: [{ $and: [{ $gt: ["$totalStock", 0] }, { $lt: ["$totalStock", 10] }] }, 1, 0] } }, criticalItems: { $push: { $cond: [{ $lt: ["$totalStock", 10] }, { name: "$name", stock: "$totalStock", status: { $cond: [{ $eq: ["$totalStock", 0] }, "OUT", "LOW"] } }, "$$REMOVE"] } } } }
     ]);
 
-    // 3. Category Distribution
     const categoryStats = await Product.aggregate([
         { $group: { _id: "$category", count: { $sum: 1 } } },
         { $lookup: { from: 'categories', localField: '_id', foreignField: '_id', as: 'catInfo' } },
-        { $unwind: "$catInfo" },
-        { $project: { name: "$catInfo.name", count: 1 } }
+        { $unwind: { path: "$catInfo", preserveNullAndEmptyArrays: true } },
+        { $project: { name: { $ifNull: ["$catInfo.name", "Uncategorized"] }, count: 1 } }
     ]);
-
-    // 4. Logistics Funnel
-    const logisticsStats = await Order.aggregate([
-        { $group: { _id: "$orderStatus", count: { $sum: 1 } } }
-    ]);
-
-    // 5. Customer Insights (Better Auth Optimized)
-    const customerStats = {
-        total: await db.collection('users').countDocuments({ role: 'customer' }),
-        newThisMonth: await db.collection('users').countDocuments({
-            role: 'customer',
-            createdAt: { $gte: new Date(today.getFullYear(), today.getMonth(), 1) }
-        })
-    };
-
-    // 6. Recent Orders (Bulk User Mapping - NO LOOP AWAIT)
 
     const recentOrdersRaw = await Order.find({}).sort('-createdAt').limit(5).lean();
-    const userIds = recentOrdersRaw.map(o => o.user);
-    
-    const users = await db.collection('users').find({
-        $or: [
-            { _id: { $in: userIds } },
-            { id: { $in: userIds } }
-        ]
-    }).toArray();
-
-    const userMap = users.reduce((acc, u) => {
-        acc[u.id || u._id.toString()] = { name: u.name, email: u.email };
-        return acc;
-    }, {});
+    const userIds = recentOrdersRaw.map(o => o.user).filter(uid => uid != null); 
+    const users = await User.find({ _id: { $in: userIds } }).select('name email avatar').lean();
+    const userMap = users.reduce((acc, u) => { acc[String(u._id)] = u; return acc; }, {});
 
     const enrichedOrders = recentOrdersRaw.map(order => ({
         ...order,
-        user: userMap[order.user.toString()] || { name: 'Guest User', email: 'N/A' }
+        user: order.user ? userMap[String(order.user)] : { name: order.shippingAddress?.name || 'Guest User' }
     }));
 
-    // Response
     res.json({
         revenue: {
-            total: stats.totalStats[0]?.revenue || 0,
-            avgOrder: stats.totalStats[0]?.avgTicketSize || 0,
-            today: stats.todayStats[0]?.revenue || 0,
-            todayCount: stats.todayStats[0]?.count || 0,
-            trend: stats.monthlyTrend
+            total: stats.totalStats?.[0]?.revenue || 0,
+            avgOrder: stats.totalStats?.[0]?.avgTicketSize || 0,
+            today: stats.todayStats?.[0]?.revenue || 0,
+            trend: stats.monthlyTrend || []
         },
         inventory: {
             totalProducts: inventoryStats[0]?.totalProducts || 0,
-            lowStock: inventoryStats[0]?.lowStockCount || 0,
             outOfStock: inventoryStats[0]?.outOfStockCount || 0,
-            criticalItems: inventoryStats[0]?.criticalItems.slice(0, 5) || []
+            criticalItems: inventoryStats[0]?.criticalItems?.slice(0, 5) || []
         },
-        logistics: logisticsStats,
         categories: categoryStats,
-        customers: customerStats,
+        customers: {
+            total: await User.countDocuments({ role: 'customer' }),
+            newThisMonth: await User.countDocuments({ role: 'customer', createdAt: { $gte: new Date(today.getFullYear(), today.getMonth(), 1) } })
+        },
         recentOrders: enrichedOrders
     });
 });

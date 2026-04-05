@@ -7,7 +7,6 @@ const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
 
 export const initiateSSLCommerz = async (order, creds) => {
-    // 🚀 ১. সব ভেরিয়েবল আগে ডিফাইন করে নিতে হবে
     const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
     const store_id = String(creds.storeId || "").trim();
     const store_passwd = String(creds.storePassword || "").trim();
@@ -15,7 +14,6 @@ export const initiateSSLCommerz = async (order, creds) => {
 
     const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live);
     
-    // 🚀 ২. এবার পেলোড তৈরি (ভেরিয়েবল গুলো এখন অ্যাক্সেসযোগ্য)
     const payload = {
         total_amount: order.totalPrice,
         currency: "BDT",
@@ -25,7 +23,6 @@ export const initiateSSLCommerz = async (order, creds) => {
         cancel_url: `${backendUrl}/api/orders/ssl/cancel/${order.paymentResult.transactionId}`,
         ipn_url: `${backendUrl}/api/orders/ssl/ipn`,
         
-        // 👤 Customer Information
         cus_name: order.shippingAddress.name || "Customer",
         cus_email: order.shippingAddress.email || "customer@vanguard.os",
         cus_add1: order.shippingAddress.street || "Dhaka",

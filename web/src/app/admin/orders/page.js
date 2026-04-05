@@ -11,22 +11,18 @@ import Loader from '@/components/common/Loader';
 import Link from 'next/link';
 
 function AdminOrdersContent() {
-  // ১. ফিল্টার স্টেট (Backend এর status, search, page সব হ্যান্ডেল করবে)
   const { search, setSearch, sort, setSort, page, setPage, queryParams } = useFilters({ 
     initialLimit: 10,
     initialSort: '-createdAt' 
   });
   
-  // স্ট্যাটাস ফিল্টারের জন্য আলাদা স্টেট (Backend supports: Pending, Processing, Shipped, Delivered, Cancelled)
   const [status, setStatus] = useState('all');
 
-  // ২. ফাইনাল কুয়েরি প্যারামস (Status সহ)
   const finalQueryParams = useMemo(() => ({
     ...queryParams,
     status: status !== 'all' ? status : undefined
   }), [queryParams, status]);
 
-  // ৩. ডাটা ফেচিং
   const { allOrdersData, allOrdersLoading, isAllFetching } = useOrders(finalQueryParams);
 
   const handleSearch = useCallback((val) => {
@@ -36,7 +32,7 @@ function AdminOrdersContent() {
 
   const handleStatusChange = (newStatus) => {
     setStatus(newStatus);
-    setPage(1); // ফিল্টার চেঞ্জ করলে ১ নম্বর পেজে ব্যাক করবে
+    setPage(1);
   };
 
   const columns = [
@@ -57,9 +53,22 @@ function AdminOrdersContent() {
         </div>
       ) 
     },
+    // 🚀 UPDATED: Date with Time Visualization
     { 
-      label: 'Date', 
-      render: (item) => <span className="text-[11px] font-bold text-zinc-500 uppercase">{new Date(item.createdAt).toLocaleDateString()}</span>
+      label: 'Date & Time', 
+      render: (item) => {
+        const dateObj = new Date(item.createdAt);
+        return (
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[11px] font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tighter leading-none">
+              {dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+            </span>
+            <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.1em]">
+              {dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+            </span>
+          </div>
+        );
+      }
     },
     { 
       label: 'Total', 
@@ -94,7 +103,6 @@ function AdminOrdersContent() {
 
   return (
     <div className="space-y-8 pb-20 max-w-[1600px] mx-auto px-4">
-      {/* 1. Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
         <div>
           <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase mb-2">Orders Archive</h1>
@@ -108,7 +116,6 @@ function AdminOrdersContent() {
         </div>
       </div>
 
-      {/* 2. Status Tabs Filter */}
       <div className="flex flex-wrap gap-2 pb-2 overflow-x-auto no-scrollbar">
         {['all', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'].map((s) => (
           <button
@@ -125,7 +132,6 @@ function AdminOrdersContent() {
         ))}
       </div>
 
-      {/* 3. Search & Sort Bar */}
       <FilterBar 
         search={search} 
         onSearchSubmit={handleSearch} 
@@ -141,7 +147,6 @@ function AdminOrdersContent() {
         searchPlaceholder="Order ID, Customer Name or Phone..." 
       />
 
-      {/* 4. Table & Pagination Section */}
       <div className="relative">
         {allOrdersLoading ? (
           <TableSkeleton rowCount={10} colCount={6} />
@@ -149,7 +154,6 @@ function AdminOrdersContent() {
           <div className={`transition-opacity duration-300 ${isAllFetching ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
             <DataTable columns={columns} data={allOrdersData?.orders || []} />
             
-            {/* Reusable Pagination */}
             {allOrdersData?.pages > 1 && (
               <div className="mt-12 flex justify-center">
                 <Pagination 
