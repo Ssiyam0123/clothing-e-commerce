@@ -50,23 +50,23 @@ export default function Footer({ lang = 'en', settings: initialSettings }) {
             alt={siteName} 
             width={160}
             height={40}
-            className="h-10 w-auto object-contain opacity-40 hover:opacity-100 transition-opacity mb-8" 
+            className="h-10 w-auto object-contain transition-opacity mb-8" 
           />
         ) : (
-          <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter opacity-20 mb-8" aria-hidden="true">{siteName}</h2>
+          <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-zinc-900 dark:text-white mb-8" aria-hidden="true">{siteName}</h2>
         )}
-        <p className={`max-w-md mx-auto leading-relaxed text-zinc-500 dark:text-zinc-400 ${lang === 'en' ? 'text-[10px] font-black uppercase tracking-[0.5em]' : 'text-sm font-semibold'}`}>
+        <p className={`max-w-md mx-auto leading-relaxed text-zinc-600 dark:text-zinc-300 ${lang === 'en' ? 'text-[10px] font-black uppercase tracking-[0.5em]' : 'text-sm font-semibold'}`}>
           {ui.footer}
         </p>
         
         {contact.phone && (
-          <p className="mt-4 text-[9px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+          <p className="mt-4 text-[9px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-300">
             {contact.phone} | {contact.email}
           </p>
         )}
         
         {contact.address && (
-          <p className="mt-2 text-[8px] font-bold uppercase tracking-widest text-zinc-400/50">
+          <p className="mt-2 text-[8px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
             {contact.address}
           </p>
         )}

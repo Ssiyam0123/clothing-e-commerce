@@ -1,9 +1,19 @@
+import { CartItemSkeleton, CartSummarySkeleton } from '@/components/common/Skeletons';
+
 export default function CartLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-page">
-      <div className="text-center space-y-4">
-        <div className="w-16 h-16 border-4 border-zinc-200 dark:border-zinc-800 border-t-rose-600 rounded-full animate-spin mx-auto" />
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Reviewing Bag</p>
+    <div className="min-h-screen pt-32 pb-20">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="h-16 w-64 bg-zinc-200 dark:bg-zinc-800 rounded-2xl mb-16 animate-pulse" />
+        
+        <div className="grid lg:grid-cols-12 gap-16">
+          <div className="lg:col-span-8 space-y-12">
+            {[1, 2, 3].map(i => <CartItemSkeleton key={i} />)}
+          </div>
+          <div className="lg:col-span-4">
+            <CartSummarySkeleton />
+          </div>
+        </div>
       </div>
     </div>
   );

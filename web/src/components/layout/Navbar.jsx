@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Heart, ShoppingBag, Menu, X, Sun, Moon, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
+import { Search, Heart, ShoppingBag, Menu, X, Sun, Moon, User, LogOut, LayoutDashboard, ChevronDown, MessageSquare } from 'lucide-react';
 
 // Hooks & Stores
 import { useAuthStore } from '@/store/authStore';
@@ -39,7 +39,7 @@ export default function Navbar({ settings: initialSettings }) {
 
   // Stores
   const { user, logout, isAuthenticated, isLoading } = useAuthStore();
-  const { theme, toggleTheme, lang, setLang } = useAppStore();
+  const { theme, toggleTheme, lang, setLang, setChatOpen } = useAppStore();
 
   const cartTotalItems = useProductStore((state) => state.cart.totalItems);
   const wishlistCount = useProductStore((state) => state.wishlistItems.length);
@@ -290,6 +290,17 @@ export default function Navbar({ settings: initialSettings }) {
                         )}
 
                         <button
+                          onClick={() => {
+                            setIsProfileDropdownOpen(false);
+                            setChatOpen(true);
+                          }}
+                          className="w-full flex items-center gap-3 px-5 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-2xl transition-all"
+                          role="menuitem"
+                        >
+                          <MessageSquare size={14} aria-hidden="true" /> Tactical Support
+                        </button>
+
+                        <button
                           onClick={handleLogout}
                           className="w-full flex items-center gap-3 px-5 py-4 text-[10px] font-black uppercase tracking-widest text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-2xl transition-all border-t border-zinc-100 dark:border-zinc-800 mt-2"
                           role="menuitem"
@@ -414,6 +425,15 @@ export default function Navbar({ settings: initialSettings }) {
                     PROFILE
                   </Link>
                 )}
+                <button
+                  onClick={() => {
+                    setIsSidebarOpen(false);
+                    setChatOpen(true);
+                  }}
+                  className="block text-5xl font-black uppercase tracking-tighter italic text-rose-600/40 hover:text-rose-600 transition-colors text-left"
+                >
+                  SUPPORT
+                </button>
               </nav>
 
               <div className="pt-10 border-t border-zinc-100 dark:border-white/5 space-y-6">

@@ -47,7 +47,7 @@ export default function Newsletter({ ui, lang = 'en' }) {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="text-zinc-500 mb-12 text-lg font-light tracking-wide"
+          className="text-zinc-400 mb-12 text-lg font-light tracking-wide"
         >
           {ui.newsletterSub || 'Subscribe for early access and exclusive drops.'}
         </motion.p>

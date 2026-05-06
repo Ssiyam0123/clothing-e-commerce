@@ -38,9 +38,9 @@ export default function UspSection({ ui }) {
                   {item.icon}
                 </span>
               </div>
-              <h3 className="text-sm font-black uppercase tracking-widest text-zinc-900 dark:text-zinc-100 mb-2 bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text text-transparent">
+              <h2 className="text-sm font-black uppercase tracking-widest text-zinc-900 dark:text-zinc-100 mb-2 bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text text-transparent">
                 {item.title}
-              </h3>
+              </h2>
               <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">
                 {item.desc}
               </p>

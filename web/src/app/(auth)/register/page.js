@@ -31,14 +31,25 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      await register(name, email, password);
-      swalToast(
-        "Registration Successful!",
-        "Please check your email to verify your account."
-      );
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 3000);
+      const data = await register(name, email, password);
+      
+      if (data.token) {
+        swalToast(
+          "Welcome to the Syndicate!",
+          "Account created and verified. Auto-logging you in..."
+        );
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
+      } else {
+        swalToast(
+          "Registration Successful!",
+          "Please check your email to verify your account."
+        );
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
+      }
     } catch (err) {
       swalError("Registration Failed", err.response?.data?.message || "Something went wrong");
     } finally {

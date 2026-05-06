@@ -55,14 +55,21 @@ export const register = async (req, res) => {
       }
     }
 
-    // If email was sent successfully, user remains unverified.
-    // If email failed and SMTP is configured, we still return success but user must verify later.
-    // Frontend will show appropriate message.
+    // If SMTP is not configured or email fails, we can optionally auto-login the user
+    const token = generateToken(user._id);
 
     res.status(201).json({
       message: emailSent
         ? "Registration successful! Please check your email to verify your account."
-        : "Registration successful! You can now log in. (Email verification skipped – SMTP not configured)",
+        : "Registration successful! (Email verification skipped)",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role,
+      },
     });
   } catch (error) {
     console.error("Registration error:", error);

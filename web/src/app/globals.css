@@ -255,3 +255,27 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* 🏎️ ACCESSIBILITY: Swiper Pagination Touch Targets */
+.swiper-pagination-bullet {
+  width: 12px !important;
+  height: 12px !important;
+  margin: 0 8px !important;
+  position: relative;
+}
+
+.swiper-pagination-bullet::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px; /* WCAG touch target size */
+  height: 44px;
+}
+
+.swiper-pagination-bullet-active {
+  background: var(--accent-secondary) !important;
+  width: 32px !important;
+  border-radius: 6px !important;
+}

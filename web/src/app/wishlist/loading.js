@@ -1,9 +1,14 @@
+import { GridSkeleton } from '@/components/common/Skeletons';
+
 export default function WishlistLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-page">
-      <div className="text-center space-y-4">
-        <div className="w-16 h-16 border-4 border-zinc-200 dark:border-zinc-800 border-t-rose-600 rounded-full animate-spin mx-auto" />
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Loading Artifacts</p>
+    <div className="min-h-screen pt-32 pb-20">
+      <div className="container mx-auto px-6">
+        <div className="mb-16">
+          <div className="h-12 w-64 bg-zinc-200 dark:bg-zinc-800 rounded-full mb-4 animate-pulse" />
+          <div className="h-4 w-48 bg-zinc-200 dark:bg-zinc-800 rounded-full animate-pulse" />
+        </div>
+        <GridSkeleton count={8} />
       </div>
     </div>
   );
