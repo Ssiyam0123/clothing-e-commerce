@@ -20,7 +20,8 @@ export default function Footer({ lang }) {
         <div className="mt-14 flex justify-center gap-10 text-[9px] font-black uppercase tracking-widest opacity-60">
            <Link href="#" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Privacy</Link>
            <Link href="#" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Terms</Link>
-           <Link href="#" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Instagram</Link>
+           <Link href="https://instagram.com/vanguard" rel="me" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Instagram</Link>
+           <Link href="https://g.page/vanguard/review" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Reviews</Link>
         </div>
       </div>
     </footer>

@@ -1,114 +1,128 @@
-'use client';
+import { notFound } from 'next/navigation';
+import BlogDetailsClient from './BlogDetailsClient';
 
-import { useParams } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useBlogs } from '@/hooks/useBlogs';
-import Loader from '@/components/common/Loader';
-import { getImageUrl } from '@/utils/imageUtils';
-import { Calendar, User, Clock, ArrowLeft, Share2 } from 'lucide-react';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://clothing-e-commerce-web.vercel.app';
 
-export default function SingleBlogPage() {
-  const { slug } = useParams();
-  const { blog, blogLoading } = useBlogs(slug);
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  try {
+    const res = await fetch(`${API_URL}/blogs/${slug}`, {
+      next: { revalidate: 3600 }
+    });
+    if (!res.ok) throw new Error('Blog not found');
+    const blog = await res.json();
+    
+    const imageUrl = blog.featuredImage?.startsWith('http') ? blog.featuredImage : `${SITE_URL}${blog.featuredImage}`;
 
-  if (blogLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#050505]">
-        <Loader />
-      </div>
-    );
+    return {
+      title: `${blog.title} | Vanguard Journal`,
+      description: blog.excerpt?.slice(0, 160) || blog.title,
+      openGraph: {
+        title: blog.title,
+        description: blog.excerpt?.slice(0, 160),
+        images: [{ url: imageUrl, width: 1200, height: 630, alt: blog.title }],
+        type: 'article',
+        publishedTime: blog.createdAt,
+        authors: [blog.author?.name || 'Vanguard Team'],
+        tags: [blog.category],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: blog.title,
+        description: blog.excerpt?.slice(0, 160),
+        images: [imageUrl],
+        'twitter:label2': 'Reading Time',
+        'twitter:data2': blog.readingTime,
+      },
+      alternates: {
+        canonical: `${SITE_URL}/blog/${slug}`,
+      },
+    };
+  } catch (error) {
+    console.error('Metadata fetch failed:', error);
+    return {
+      title: 'Blog Not Found | Vanguard',
+    };
+  }
+}
+
+export default async function BlogPage({ params }) {
+  const { slug } = await params;
+  let blog = null;
+
+  try {
+    const res = await fetch(`${API_URL}/blogs/${slug}`, {
+      next: { revalidate: 60 }
+    });
+    if (!res.ok) {
+      if (res.status === 404) notFound();
+      throw new Error(`HTTP ${res.status}`);
+    }
+    blog = await res.json();
+  } catch (err) {
+    console.error('Blog fetch error:', err);
+    notFound();
   }
 
-  if (!blog) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-[#050505] px-6 text-center">
-        <h1 className="text-6xl font-black text-zinc-900 dark:text-white mb-4">404</h1>
-        <p className="text-zinc-500 mb-8">The narrative you're looking for doesn't exist.</p>
-        <Link
-          href="/blog"
-          className="bg-black dark:bg-white text-white dark:text-black px-8 py-4 rounded-full font-black text-sm uppercase tracking-wider hover:scale-105 transition-all"
-        >
-          Back to Journal
-        </Link>
-      </div>
-    );
-  }
+  const blogSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: blog.title,
+    image: blog.featuredImage?.startsWith('http') ? blog.featuredImage : `${SITE_URL}${blog.featuredImage}`,
+    datePublished: blog.createdAt,
+    dateModified: blog.updatedAt || blog.createdAt,
+    author: {
+      '@type': 'Person',
+      name: blog.author?.name || 'Vanguard Team',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Vanguard',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${SITE_URL}/logo.png`,
+      },
+    },
+    description: blog.excerpt,
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: `${SITE_URL}/blog`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: blog.title,
+        item: `${SITE_URL}/blog/${slug}`,
+      },
+    ],
+  };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#050505] transition-colors duration-700">
-      {/* Hero Section */}
-      <div className="relative w-full h-[60vh] md:h-[70vh] bg-zinc-900 overflow-hidden">
-        <Image
-          src={getImageUrl(blog.featuredImage, 1920, 85)}
-          alt={blog.title}
-          fill
-          priority
-          className="object-cover opacity-70"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 text-white">
-          <div className="max-w-4xl mx-auto">
-            <span className="inline-block px-4 py-1.5 bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-6">
-              {blog.category}
-            </span>
-            <h1 className="text-4xl md:text-7xl font-black uppercase tracking-tighter leading-tight mb-6">
-              {blog.title}
-            </h1>
-            <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-300">
-              <div className="flex items-center gap-2">
-                <User size={16} aria-hidden="true" />
-                <span>{blog.author?.name || 'Vanguard'}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar size={16} aria-hidden="true" />
-                <span>{new Date(blog.createdAt).toLocaleDateString()}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock size={16} aria-hidden="true" />
-                <span>{blog.readingTime}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Content Section */}
-      <article className="max-w-4xl mx-auto px-6 py-16 md:py-24">
-        <div
-          className="prose prose-lg dark:prose-invert prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-a:text-rose-600 prose-strong:text-rose-600 max-w-none"
-          dangerouslySetInnerHTML={{ __html: blog.content }}
-        />
-
-        {/* Share & Back */}
-        <div className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-wrap justify-between items-center gap-4">
-          <Link
-            href="/blog"
-            className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400 hover:text-rose-600 transition-colors"
-            aria-label="Back to blog listing"
-          >
-            <ArrowLeft size={18} aria-hidden="true" /> Back to Journal
-          </Link>
-          <button
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: blog.title,
-                  url: window.location.href,
-                });
-              } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert('Link copied to clipboard!');
-              }
-            }}
-            className="flex items-center gap-2 bg-zinc-100 dark:bg-zinc-900 px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all"
-            aria-label="Share this article"
-          >
-            <Share2 size={14} aria-hidden="true" /> Share Article
-          </button>
-        </div>
-      </article>
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <BlogDetailsClient blog={blog} />
+    </>
   );
 }

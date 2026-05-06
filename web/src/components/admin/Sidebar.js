@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { 
   LayoutDashboard, ShoppingBag, Shirt, FolderTree, 
   Zap, palette, Ticket, Users, User, Settings, X, 
-  Bold
+  Bold, MessageCircle
 } from "lucide-react"; // 🚀 Lucide icons for premium feel
 
 const navItems = [
@@ -14,6 +14,7 @@ const navItems = [
   { name: "Orders", href: "/admin/orders", icon: <ShoppingBag size={18}/> },
   { name: "Products", href: "/admin/products", icon: <Shirt size={18}/> },
   { name: "Categories", href: "/admin/categories", icon: <FolderTree size={18}/> },
+  { name: "Live Chat", href: "/admin/chat", icon: <MessageCircle size={18}/> },
   { name: "Flash Drops", href: "/admin/flash-sales", icon: <Zap size={18}/> },
   { name: "Campaigns", href: "/admin/banner-campaigns", icon: "🎨" },
   { name: "Coupons", href: "/admin/coupons", icon: <Ticket size={18}/> },

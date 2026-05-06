@@ -1,109 +1,59 @@
-'use client';
+import BlogMagazineClient from './BlogMagazineClient';
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { useQuery } from '@tanstack/react-query';
-import api from '@/lib/api';
-import { getImageUrl } from '@/utils/imageUtils';
-import Loader from '@/components/common/Loader';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://clothing-e-commerce-web.vercel.app';
 
-export default function BlogMagazinePage() {
-  const { data: posts, isLoading } = useQuery({
-    queryKey: ['blogs'],
-    queryFn: async () => (await api.get('/blogs')).data
-  });
+export const metadata = {
+  title: 'Vanguard Journal | Streetwear Narrative',
+  description: 'Explore the tactical aesthetic and fabric narratives at the Vanguard Journal. Latest trends in sustainable streetwear.',
+  alternates: {
+    canonical: `${SITE_URL}/blog`,
+  },
+};
 
-  if (isLoading) return <Loader />;
+export default async function BlogPage() {
+  let posts = [];
+  try {
+    const res = await fetch(`${API_URL}/blogs`, {
+      next: { revalidate: 3600 }
+    });
+    if (res.ok) {
+      posts = await res.json();
+    }
+  } catch (error) {
+    console.error('Failed to fetch blogs:', error);
+  }
 
-  const featured = posts?.[0];
-  const remaining = posts?.slice(1);
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is Vanguard?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Vanguard is a premium streetwear brand focused on sustainable fabrics, ethical production, and bold urban silhouettes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How often do you release new journals?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'We release new fabric narratives and tactical aesthetic journals weekly.',
+        },
+      },
+    ],
+  };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#050505] pt-32 pb-20 px-6">
-      <div className="max-w-[1400px] mx-auto">
-        
-        {/* Header Section */}
-        <header className="mb-20 text-center">
-          <h1 className="text-7xl md:text-9xl font-black uppercase italic tracking-tighter dark:text-white leading-none">
-            Foundry<br/><span className="text-rose-600">Journal</span>
-          </h1>
-          <p className="mt-6 text-[10px] font-black uppercase tracking-[0.6em] text-zinc-400">
-            Tactical Aesthetic & Fabric Narrative
-          </p>
-        </header>
-
-        {/* Magazine Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          
-          {/* Main Feature */}
-          {featured && (
-            <div className="lg:col-span-8 group cursor-pointer">
-              <Link href={`/blog/${featured.slug}`} aria-label={`Read full article: ${featured.title}`}>
-                <div className="relative aspect-[16/9] overflow-hidden rounded-[3rem] bg-zinc-100 dark:bg-zinc-900">
-                  <Image
-                    src={getImageUrl(featured.featuredImage, 1200, 85)}
-                    alt={featured.title}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 66vw"
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-                    priority
-                  />
-                  <div className="absolute top-8 left-8 bg-white dark:bg-black px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest">
-                    {featured.category}
-                  </div>
-                </div>
-                <div className="mt-8 space-y-4">
-                  <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter dark:text-white group-hover:text-rose-600 transition-colors">
-                    {featured.title}
-                  </h2>
-                  <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                    <span>{featured.author?.name}</span>
-                    <div className="w-1 h-1 bg-zinc-300 rounded-full" aria-hidden="true" />
-                    <span>{featured.readingTime}</span>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          )}
-
-          {/* Sidebar – Latest Sequence */}
-          <div className="lg:col-span-4 space-y-12">
-            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-zinc-400 border-b dark:border-zinc-800 pb-4">
-              Latest Sequence
-            </h3>
-            {remaining?.map((post) => (
-              <Link
-                href={`/blog/${post.slug}`}
-                key={post._id}
-                className="flex gap-6 group"
-                aria-label={`Read article: ${post.title}`}
-              >
-                <div className="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0 bg-zinc-100">
-                  <Image
-                    src={getImageUrl(post.featuredImage, 150, 75)}
-                    alt={post.title}
-                    fill
-                    sizes="96px"
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <span className="text-[8px] font-black text-rose-600 uppercase tracking-widest">
-                    {post.category}
-                  </span>
-                  <h4 className="text-sm font-black uppercase leading-tight dark:text-white group-hover:underline">
-                    {post.title}
-                  </h4>
-                  <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
-                    {post.readingTime}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <BlogMagazineClient posts={posts} />
+    </>
   );
 }

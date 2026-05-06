@@ -2,21 +2,84 @@ import { Suspense } from 'react';
 import ProductsClient from '@/components/products/ProductsClient';
 import { FilterSkeleton, GridSkeleton } from '@/components/common/Skeletons';
 
-export const metadata = {
-  title: 'The Collection | Vanguard',
-  description: 'Browse our complete collection of premium streetwear.',
-};
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://clothing-e-commerce-web.vercel.app';
+
+export async function generateMetadata({ searchParams }) {
+  const { category, subcategory, search } = await searchParams;
+  
+  let title = 'The Collection | Vanguard';
+  let description = 'Browse our complete collection of premium streetwear. Sustainable fabrics, bold silhouettes.';
+
+  if (category) {
+    try {
+      const res = await fetch(`${API_URL}/categories`);
+      if (res.ok) {
+        const categories = await res.json();
+        const cat = categories.find(c => c.slug === category);
+        if (cat) {
+          title = `${cat.name} | Vanguard Collection`;
+          description = `Explore our ${cat.name} collection. Premium urban apparel designed for the modern trendsetter.`;
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch category for metadata');
+    }
+  } else if (search) {
+    title = `Search results for "${search}" | Vanguard`;
+  }
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [`${SITE_URL}/og-image.jpg`],
+    },
+    alternates: {
+      canonical: `${SITE_URL}/products`,
+    },
+  };
+}
 
 const ProductsPageSkeleton = () => (
   <div className="space-y-12"><FilterSkeleton /><GridSkeleton count={12} /></div>
 );
 
-export default function ProductsPage() {
+export default async function ProductsPage({ searchParams }) {
+  const params = await searchParams;
+  
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Collection',
+        item: `${SITE_URL}/products`,
+      },
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-page pt-24 pb-20 transition-colors duration-700">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <div className="container mx-auto px-4 md:px-6">
         <div className="mb-16 text-center">
-          <h1 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter text-primary leading-none">The Collection</h1>
+          <h1 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter text-primary leading-none">
+            {params.search ? `Search: ${params.search}` : 'The Collection'}
+          </h1>
           <p className="mt-6 text-[10px] font-black uppercase tracking-[0.4em] text-muted">Curated Vanguard Artifacts</p>
         </div>
         <Suspense fallback={<ProductsPageSkeleton />}>

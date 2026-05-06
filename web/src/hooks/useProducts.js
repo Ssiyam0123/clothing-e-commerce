@@ -4,19 +4,19 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 import api from '@/lib/api';
 
-export const useProducts = () => {
+export const useProducts = (initialFilters = {}) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   // Read filter values from URL
   const filters = useMemo(() => ({
-    search: searchParams.get('search') || '',
-    sort: searchParams.get('sort') || '',
-    category: searchParams.get('category') || 'all',
-    page: Number(searchParams.get('page')) || 1,
-    limit: 30,
-  }), [searchParams]);
+    search: searchParams.get('search') || initialFilters.search || '',
+    sort: searchParams.get('sort') || initialFilters.sort || '',
+    category: searchParams.get('category') || initialFilters.category || 'all',
+    page: Number(searchParams.get('page')) || initialFilters.page || 1,
+    limit: initialFilters.limit || 30,
+  }), [searchParams, initialFilters]);
 
   // Helper to update URL and refetch
   const updateFilters = useCallback((newFilters) => {

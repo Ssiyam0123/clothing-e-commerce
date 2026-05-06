@@ -101,44 +101,7 @@ export default function HeroSection({ slides = [], ui = {}, lang = 'en' }) {
         ))}
       </Swiper>
 
-      <style jsx>{`
-        @keyframes slide-in-from-bottom-8 {
-          from { transform: translateY(2rem); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-        .animate-in { animation-fill-mode: forwards; }
-        .slide-in-from-bottom-8 { animation-name: slide-in-from-bottom-8; }
-        .fade-in { animation-name: fade-in; }
-        @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
 
-        /* Improved touch targets for pagination bullets */
-        :global(.swiper-pagination-bullet) {
-          background-color: #ffffff !important;
-          opacity: 0.3;
-          width: 12px;
-          height: 12px;
-          transition: transform 0.3s ease, opacity 0.3s ease;
-          transform: scale(1);
-        }
-        :global(.swiper-pagination-bullet-active) {
-          opacity: 1;
-          width: 30px;
-          border-radius: 6px;
-        }
-        :global(.swiper-pagination-bullet)::before {
-          content: '';
-          position: absolute;
-          top: -8px;
-          left: -8px;
-          right: -8px;
-          bottom: -8px;
-        }
-      `}</style>
     </section>
   );
 }

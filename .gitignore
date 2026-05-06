@@ -32,4 +32,7 @@ web/extract.js
 
 
 **/combined_codebase.txt
+**/backend_codebase.txt
+**/web_codebase.txt
 **/extract.js
+backend/create-admin.js

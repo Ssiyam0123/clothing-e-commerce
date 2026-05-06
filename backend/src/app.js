@@ -25,7 +25,7 @@ import apiKeysRoutes from "./modules/apiKeys/apiKey.routes.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import blogRoutes from "./modules/blog/blog.route.js";
 import blogImageRoutes from './modules/blog/blog-image.route.js';
-
+import chatRoutes from "./modules/chat/chat.routes.js";
 // 🛡️ Middleware Imports
 import { errorHandler } from "./middleware/errorHandler.js";
 import { handleFileError } from "./middleware/cleanup.js";
@@ -92,6 +92,7 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/blogs",blogRoutes)
 app.use('/api', blogImageRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.use(handleFileError);
 app.use(errorHandler);

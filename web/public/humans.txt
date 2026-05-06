@@ -1,0 +1,11 @@
+/* TEAM */
+  Chef: Vanguard Team
+  Contact: hello [at] vanguard.com
+  Twitter: @vanguard
+  From: Dhaka, Bangladesh
+
+/* SITE */
+  Last update: 2026/05/06
+  Language: English / Bengali
+  Doctype: HTML5
+  IDE: VS Code, Gemini, Next.js, Express, MongoDB

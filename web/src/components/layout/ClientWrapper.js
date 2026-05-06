@@ -1,24 +1,25 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation"; // 🚀 পাথ চেক করার জন্য
-import { useAppStore } from "@/store/appStore";
-import { useAuthStore } from "@/store/authStore"; 
-import Navbar from "./Navbar";
-import Footer from "./Footer";
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useAppStore } from '@/store/appStore';
+import { useAuthStore } from '@/store/authStore';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
+import SupportChat from '@/components/chat/SupportChat';
 
 export default function ClientWrapper({ children }) {
   const [mounted, setMounted] = useState(false);
-  const pathname = usePathname(); 
-  const { initApp } = useAppStore();
-  const { checkSession, isLoading } = useAuthStore(); 
+  const pathname = usePathname();
+  const { initApp, lang } = useAppStore();
+  const { checkSession, isLoading } = useAuthStore();
 
   const isAdminPage = pathname.startsWith('/admin');
 
   useEffect(() => {
     setMounted(true);
     initApp();
-    checkSession(); 
+    checkSession();
   }, [initApp, checkSession]);
 
   if (!mounted || isLoading) {
@@ -34,12 +35,11 @@ export default function ClientWrapper({ children }) {
   return (
     <>
       {!isAdminPage && <Navbar />}
-      
-      <main className={`min-h-screen overflow-x-hidden ${!isAdminPage ? 'pt-24' : ''}`}>
+      <main className={!isAdminPage ? 'min-h-screen' : ''}>
         {children}
       </main>
-      
-      {!isAdminPage && <Footer />}
+      {!isAdminPage && <Footer lang={lang} />}
+      {!isAdminPage && <SupportChat />}
     </>
   );
 }

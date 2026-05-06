@@ -1,106 +1,127 @@
-'use client';
+import { notFound } from 'next/navigation';
+import FlashSaleDetailsClient from './FlashSaleDetailsClient';
 
-import { useParams } from 'next/navigation';
-import { useSingleFlashSale } from '@/hooks/useFlashSale';
-import { useAppStore } from '@/store/appStore';
-import FlashSaleBanner from '@/components/store/FlashSaleBanner';
-import FlashSaleProductCard from '@/components/store/FlashSaleProductCard';
-import Loader from '@/components/common/Loader';
-import { motion } from 'framer-motion';
-import { Zap, Clock, ChevronLeft } from 'lucide-react';
-import Link from 'next/link';
-import { useState, useEffect } from 'react';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://clothing-e-commerce-web.vercel.app';
 
-// ⏱️ Countdown Timer Sub-component
-const Countdown = ({ targetDate }) => {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  try {
+    const res = await fetch(`${API_URL}/flash-sales/details/${slug}`, {
+      next: { revalidate: 3600 }
+    });
+    if (!res.ok) throw new Error('Flash sale not found');
+    const sale = await res.json();
+    
+    const imageUrl = sale.banner?.startsWith('http') ? sale.banner : `${SITE_URL}${sale.banner}`;
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const distance = new Date(targetDate).getTime() - new Date().getTime();
-      if (distance < 0) return clearInterval(interval);
-      
-      setTimeLeft({
-        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        mins: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-        secs: Math.floor((distance % (1000 * 60)) / 1000),
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [targetDate]);
+    return {
+      title: `${sale.name} | Flash Sale | Vanguard`,
+      description: sale.description || `Exclusive flash sale event: ${sale.name}. Limited time offers.`,
+      openGraph: {
+        title: sale.name,
+        description: sale.description,
+        images: [{ url: imageUrl, width: 1200, height: 630, alt: sale.name }],
+        type: 'website',
+        url: `${SITE_URL}/flash-sale/${slug}`,
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: sale.name,
+        description: sale.description,
+        images: [imageUrl],
+      },
+      alternates: {
+        canonical: `${SITE_URL}/flash-sale/${slug}`,
+      },
+    };
+  } catch (error) {
+    console.error('Metadata fetch failed:', error);
+    return {
+      title: 'Flash Sale | Vanguard',
+    };
+  }
+}
+
+export default async function FlashSalePage({ params }) {
+  const { slug } = await params;
+  let sale = null;
+
+  try {
+    const res = await fetch(`${API_URL}/flash-sales/details/${slug}`, {
+      next: { revalidate: 60 }
+    });
+    if (!res.ok) {
+      if (res.status === 404) notFound();
+      throw new Error(`HTTP ${res.status}`);
+    }
+    sale = await res.json();
+  } catch (err) {
+    console.error('Flash sale fetch error:', err);
+    notFound();
+  }
+
+  const saleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'SaleEvent',
+    name: sale.name,
+    description: sale.description,
+    startDate: sale.startDate,
+    endDate: sale.endDate,
+    location: {
+      '@type': 'VirtualLocation',
+      url: `${SITE_URL}/flash-sale/${slug}`,
+    },
+    image: sale.banner?.startsWith('http') ? sale.banner : `${SITE_URL}${sale.banner}`,
+    offers: sale.products?.map(p => ({
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Product',
+        name: p.name,
+        image: p.images?.[0]?.startsWith('http') ? p.images[0] : `${SITE_URL}${p.images[0]}`,
+      },
+      priceCurrency: 'BDT',
+      price: p.price - (p.price * sale.discount) / 100,
+      availability: 'https://schema.org/InStock',
+    })),
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Flash Sale',
+        item: `${SITE_URL}/flash-sale`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: sale.name,
+        item: `${SITE_URL}/flash-sale/${slug}`,
+      },
+    ],
+  };
 
   return (
-    <div className="flex gap-4">
-      {Object.entries(timeLeft).map(([label, val], i) => (
-        <div key={i} className="flex flex-col items-center bg-zinc-900 text-white p-4 rounded-3xl min-w-[80px] border border-white/5 shadow-2xl">
-          <span className="text-3xl font-black">{val < 10 ? `0${val}` : val}</span>
-          <span className="text-[8px] uppercase tracking-widest font-bold opacity-40">{label}</span>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-export default function FlashSaleDetailPage() {
-  const { slug } = useParams();
-  const { lang } = useAppStore();
-  const { data: sale, isLoading, error } = useSingleFlashSale(slug);
-
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-page"><Loader /></div>;
-  if (error || !sale) return <div className="min-h-screen flex items-center justify-center uppercase font-black opacity-20">Sequence Not Found</div>;
-
-  const isLive = new Date(sale.startDate) <= new Date();
-
-  return (
-    <main className="min-h-screen bg-white dark:bg-[#050505] pb-40">
-      {/* 🧭 Navigation */}
-      <div className="max-w-7xl mx-auto px-6 py-10">
-        <Link href="/flash-sale" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity">
-          <ChevronLeft size={14} /> Back to Hub
-        </Link>
-      </div>
-
-      {/* 🖼️ Hero Banner Section */}
-      <div className="max-w-7xl mx-auto px-6 mb-20">
-        <FlashSaleBanner flashSale={sale} />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-10">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-rose-600">
-              {isLive ? <Zap size={20} fill="currentColor" /> : <Clock size={20} />}
-              <span className="text-xs font-black uppercase tracking-[0.3em]">
-                {isLive ? 'Deployment Live' : 'Pending Deployment'}
-              </span>
-            </div>
-            <h1 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-none dark:text-white">
-              {sale.name}
-            </h1>
-            <p className="max-w-2xl text-zinc-500 font-medium leading-relaxed">
-              {sale.description || "Limited access sequence. Exclusive artifacts available for a restricted duration."}
-            </p>
-          </div>
-
-          {/* Show countdown only if it's not live yet */}
-          {!isLive && <Countdown targetDate={sale.startDate} />}
-        </div>
-
-        {/* 📦 Product Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-          {sale.products?.map((product, idx) => (
-            <motion.div
-              key={product._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-            >
-              <FlashSaleProductCard product={product} />
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </main>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(saleSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <FlashSaleDetailsClient sale={sale} />
+    </>
   );
 }

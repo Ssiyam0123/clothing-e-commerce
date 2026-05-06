@@ -74,7 +74,7 @@ export default function FlashSaleClient() {
   if (isLoading) return <div className="p-12"><GridSkeleton count={8} /></div>;
 
   return (
-    <div className="pb-32 font-sans pt-12 space-y-28">
+    <div className="pb-32 font-sans pt-25 space-y-28">
       
       {/* 🔥 ACTIVE DROPS SECTION */}
       {activeSales.map((sale) => (

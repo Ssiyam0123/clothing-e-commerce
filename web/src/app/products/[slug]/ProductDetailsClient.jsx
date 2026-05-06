@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect, useMemo } from 'react';
-import { ShoppingBag, Truck, ShieldCheck, Minus, Plus, Heart } from 'lucide-react';
+import { ShoppingBag, Truck, ShieldCheck, Minus, Plus, Heart, Share2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 import api from '@/lib/api';
@@ -194,6 +194,24 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                 >
                   <Heart size={24} fill={inWishlist ? "currentColor" : "none"} />
                 </button>
+                <button 
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({
+                        title: product.name,
+                        text: product.description,
+                        url: window.location.href,
+                      });
+                    } else {
+                      navigator.clipboard.writeText(window.location.href);
+                      swalToast("Link Copied", "success");
+                    }
+                  }}
+                  className="p-3 rounded-full text-zinc-300 dark:text-zinc-700 hover:text-rose-500 transition-all"
+                  aria-label="Share product"
+                >
+                  <Share2 size={24} />
+                </button>
               </div>
 
               <div className="space-y-6">
@@ -203,6 +221,26 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                 <p className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium max-w-lg">
                   {product.description}
                 </p>
+
+                {/* AEO / FAQ Section */}
+                <div className="mt-10 space-y-6 border-t border-zinc-100 dark:border-zinc-800 pt-8">
+                  <div itemScope itemType="https://schema.org/Question">
+                    <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-widest text-zinc-900 dark:text-white mb-2">Is this fabric sustainable?</h3>
+                    <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                      <p itemProp="text" className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        Yes, every Vanguard artifact is crafted from ethically sourced, sustainable materials designed for longevity and minimal environmental impact.
+                      </p>
+                    </div>
+                  </div>
+                  <div itemScope itemType="https://schema.org/Question">
+                    <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-widest text-zinc-900 dark:text-white mb-2">What is the return policy?</h3>
+                    <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                      <p itemProp="text" className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        We offer a 30-day return policy on all unworn items in their original packaging. Your satisfaction is our primary protocol.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </section>
 
