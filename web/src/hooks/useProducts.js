@@ -4,7 +4,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 import api from '@/lib/api';
 
-export const useProducts = (initialFilters = {}) => {
+export const useProducts = (initialFilters = {}, initialData = undefined) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -16,6 +16,7 @@ export const useProducts = (initialFilters = {}) => {
     category: searchParams.get('category') || initialFilters.category || 'all',
     page: Number(searchParams.get('page')) || initialFilters.page || 1,
     limit: initialFilters.limit || 30,
+    isFeatured: initialFilters.isFeatured || false,
   }), [searchParams, initialFilters]);
 
   // Helper to update URL and refetch
@@ -52,6 +53,7 @@ export const useProducts = (initialFilters = {}) => {
     search: filters.search,
     sort: filters.sort,
     ...(filters.category !== 'all' && { category: filters.category }),
+    ...(filters.isFeatured && { isFeatured: 'true' }),
   }), [filters]);
 
   // TanStack Query
@@ -61,6 +63,7 @@ export const useProducts = (initialFilters = {}) => {
       const response = await api.get('/products', { params: apiParams });
       return response.data;
     },
+    initialData: initialData,
     placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,

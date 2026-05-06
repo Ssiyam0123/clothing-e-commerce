@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import ProductCard from '@/components/common/ProductCard';
 import { Plus } from 'lucide-react';

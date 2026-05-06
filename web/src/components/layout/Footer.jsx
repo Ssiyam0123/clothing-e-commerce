@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 
 const DICTIONARY = {
@@ -7,8 +5,7 @@ const DICTIONARY = {
   bn: { footer: 'প্রতিষ্ঠিত ২০২৬। সচেতনদের জন্য তৈরি।' }
 };
 
-import { useSettings } from '@/hooks/useSettings';
-import { Globe, Camera, Send, MessageCircle, Video, Music, User, Hash, Share2 } from 'lucide-react';
+import { Globe, Camera, Send, MessageCircle, Video, Music, User, Hash, Share2, Disc, Layout, Ghost } from 'lucide-react';
 import { getImageUrl } from '@/utils/imageUtils';
 
 const SOCIAL_ICONS = {
@@ -22,11 +19,14 @@ const SOCIAL_ICONS = {
   linkedin: User,
   pinterest: Hash,
   threads: Hash,
-  telegram: Send
+  telegram: Send,
+  discord: Disc,
+  reddit: Layout,
+  snapchat: Ghost
 };
 
-export default function Footer({ lang }) {
-  const { settings } = useSettings();
+export default function Footer({ lang = 'en', settings: initialSettings }) {
+  const settings = initialSettings;
   const branding = settings?.branding || {};
   const siteName = branding.siteName || 'VANGUARD';
   const footerLogo = branding.footerLogo;

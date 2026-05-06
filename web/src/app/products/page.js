@@ -47,8 +47,37 @@ const ProductsPageSkeleton = () => (
   <div className="space-y-12"><FilterSkeleton /><GridSkeleton count={12} /></div>
 );
 
+async function getInitialProducts(searchParams) {
+  const params = new URLSearchParams(searchParams);
+  // Default values to match hook's initial state
+  if (!params.has('page')) params.set('page', '1');
+  if (!params.has('limit')) params.set('limit', '30');
+  if (!params.has('category')) params.set('category', 'all');
+
+  const apiParams = new URLSearchParams();
+  if (params.get('page')) apiParams.set('page', params.get('page'));
+  if (params.get('limit')) apiParams.set('limit', params.get('limit'));
+  if (params.get('search')) apiParams.set('search', params.get('search'));
+  if (params.get('sort')) apiParams.set('sort', params.get('sort'));
+  if (params.get('category') && params.get('category') !== 'all') {
+    apiParams.set('category', params.get('category'));
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/products?${apiParams.toString()}`, {
+      next: { revalidate: 60 } // Revalidate every minute
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    console.error('Initial products fetch failed:', e);
+    return null;
+  }
+}
+
 export default async function ProductsPage({ searchParams }) {
   const params = await searchParams;
+  const initialData = await getInitialProducts(params);
   
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
@@ -83,7 +112,7 @@ export default async function ProductsPage({ searchParams }) {
           <p className="mt-6 text-[10px] font-black uppercase tracking-[0.4em] text-muted">Curated Vanguard Artifacts</p>
         </div>
         <Suspense fallback={<ProductsPageSkeleton />}>
-          <ProductsClient />
+          <ProductsClient initialData={initialData} />
         </Suspense>
       </div>
     </main>

@@ -5,10 +5,13 @@ import { ProductCardSkeleton } from '@/components/common/Skeletons';
 import Pagination from '@/components/common/Pagination';
 import ProductCard from '../common/ProductCard';
 
-export default function ProductList() {
-  const { products, pagination, isLoading, isFetching, setPage } = useProducts();
+export default function ProductList({ initialData }) {
+  const { products, pagination, isLoading, isFetching, setPage } = useProducts({}, initialData);
 
-  if (isLoading) {
+  // If we have initialData, we are not loading even if the hook hasn't run yet
+  const showLoading = isLoading && !initialData;
+
+  if (showLoading) {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
         {Array.from({ length: 12 }).map((_, i) => (

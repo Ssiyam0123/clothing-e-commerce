@@ -1,5 +1,4 @@
 import QueryProvider from "@/components/providers/QueryProvider";
-import ClientWrapper from "@/components/layout/ClientWrapper";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -39,6 +38,7 @@ export async function generateMetadata() {
     publisher: siteName,
     icons: {
       icon: favicon,
+      shortcut: favicon,
       apple: favicon,
     },
     formatDetection: {
@@ -105,6 +105,11 @@ export const viewport = {
   themeColor: "#ffffff",
 };
 
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
+import ClientInitialization from '@/components/layout/ClientInitialization';
+import SupportChat from '@/components/chat/SupportChat';
+
 export default async function RootLayout({ children }) {
   const settings = await getSettings();
   const headerList = await headers();
@@ -150,17 +155,23 @@ export default async function RootLayout({ children }) {
       </head>
       <body suppressHydrationWarning>
         <QueryProvider>
-          <ClientWrapper>
-             {isMaintenance ? (
-               <div className="min-h-screen bg-black flex flex-col items-center justify-center text-center p-6">
-                 <h1 className="text-6xl font-black text-white uppercase italic tracking-tighter mb-4">Under Maintenance</h1>
-                 <p className="text-zinc-500 uppercase tracking-[0.3em] text-[10px]">We are upgrading the protocol. Check back soon.</p>
-                 <div className="mt-10 w-20 h-[2px] bg-rose-600 animate-pulse" />
-               </div>
-             ) : (
-               children
-             )}
-          </ClientWrapper>
+          <ClientInitialization />
+          {isMaintenance ? (
+            <div className="min-h-screen bg-black flex flex-col items-center justify-center text-center p-6">
+              <h1 className="text-6xl font-black text-white uppercase italic tracking-tighter mb-4">Under Maintenance</h1>
+              <p className="text-zinc-500 uppercase tracking-[0.3em] text-[10px]">We are upgrading the protocol. Check back soon.</p>
+              <div className="mt-10 w-20 h-[2px] bg-rose-600 animate-pulse" />
+            </div>
+          ) : (
+            <>
+              {!isAdminRoute && <Navbar settings={settings} />}
+              <main className={!isAdminRoute ? 'min-h-screen' : ''}>
+                {children}
+              </main>
+              {!isAdminRoute && <Footer settings={settings} />}
+              {!isAdminRoute && <SupportChat />}
+            </>
+          )}
         </QueryProvider>
       </body>
     </html>

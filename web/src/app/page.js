@@ -1,234 +1,121 @@
-"use client";
-
-import { useMemo, lazy, Suspense } from "react";
-import { useAppStore } from "@/store/appStore";
+import { Suspense } from "react";
+import { cookies, headers } from "next/headers";
 import { DICTIONARY } from "@/app/homeDictionary";
-import { useProducts } from "@/hooks/useProducts";
-import { useCategories } from "@/hooks/useCategories";
-import { useFlashSales } from "@/hooks/useFlashSale";
-import { useActiveBannerCampaign } from "@/hooks/useActiveBannerCampaign";
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-
-// Lazy load heavy components that are below the fold
-const HeroSection = lazy(() => import("@/components/home/HeroSection"));
-const UspSection = lazy(() => import("@/components/home/UspSection"));
-const FlashSaleTeaser = lazy(() => import("@/components/home/FlashSaleTeaser"));
-const CategoryGrid = lazy(() => import("@/components/home/CategoryGrid"));
-const ProductSection = lazy(() => import("@/components/home/ProductSection"));
-const Newsletter = lazy(() => import("@/components/home/Newsletter"));
-
-// ✅ FIXED IMPORT – use the correct alias path
+import HeroSectionServer from "@/components/home/HeroSectionServer";
+import UspSection from "@/components/home/UspSection";
+import FlashSaleTeaserServer from "@/components/home/FlashSaleTeaserServer";
+import CategoryGrid from "@/components/home/CategoryGrid";
+import ProductSection from "@/components/home/ProductSection";
+import Newsletter from "@/components/home/Newsletter";
 import { GridSkeleton, HeroSkeleton } from "@/components/common/Skeletons";
 
-const sectionVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 80, damping: 20, delay: 0.1 },
-  },
-};
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.2, delayChildren: 0.1 },
-  },
-};
+async function getHomeData() {
+  try {
+    const [productsRes, categoriesRes, flashSalesRes, bannerRes] = await Promise.all([
+      fetch(`${API_URL}/products?limit=24`, { next: { revalidate: 3600 } }),
+      fetch(`${API_URL}/categories`, { next: { revalidate: 86400 } }),
+      fetch(`${API_URL}/flash-sales/active`, { next: { revalidate: 60 } }),
+      fetch(`${API_URL}/banner-campaigns/active`, { next: { revalidate: 3600 } })
+    ]);
 
-const SectionHeader = ({ title, subtitle }) => (
-  <div className="flex flex-col mb-16 gap-3">
-    <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white">
-      {title}
-    </h2>
-    <div className="h-1.5 w-20 bg-rose-600 rounded-full" />
-    {subtitle && (
-      <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.3em] pt-1">
-        {subtitle}
-      </p>
-    )}
-  </div>
-);
-
-export default function HomeClient() {
-  const { lang, isMounted } = useAppStore();
-  const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY.en, [lang]);
-
-  const { products, isLoading: productsLoading } = useProducts({ limit: 8 });
-  const { categories, isLoading: categoriesLoading } = useCategories();
-  const { flashSaleProducts, isLoading: flashSaleLoading } = useFlashSales();
-  const { activeCampaign, isLoading: bannerLoading } =
-    useActiveBannerCampaign();
-
-  const featuredProducts = useMemo(
-    () => products?.filter((p) => p.isFeatured) || [],
-    [products],
-  );
-  const newArrivals = useMemo(() => products || [], [products]);
-
-  if (!isMounted) {
-    return (
-      <div className="w-full bg-white dark:bg-[#050505]">
-        <HeroSkeleton />
-        <div className="py-20 px-4">
-          <GridSkeleton count={4} />
-        </div>
-      </div>
-    );
+    return {
+      products: productsRes.ok ? (await productsRes.json()).products : [],
+      categories: categoriesRes.ok ? await categoriesRes.json() : [],
+      flashSales: flashSalesRes.ok ? await flashSalesRes.json() : null,
+      activeCampaign: bannerRes.ok ? await bannerRes.json() : null,
+    };
+  } catch (e) {
+    console.error("Home data fetch failed:", e);
+    return { products: [], categories: [], flashSales: null, activeCampaign: null };
   }
+}
+
+export default async function HomePage() {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("lang")?.value || "en";
+  const ui = DICTIONARY[lang] || DICTIONARY.en;
+  
+  const data = await getHomeData();
+  
+  const featuredProducts = data.products.filter(p => p.isFeatured).slice(0, 4);
+  const newArrivals = data.products.slice(0, 8);
+  const saleProducts = data.products.filter(p => p.discount > 0).slice(0, 4);
 
   return (
-    <motion.main
-      initial="hidden"
-      animate="visible"
-      variants={staggerContainer}
-      className="w-full bg-white dark:bg-[#050505] transition-colors duration-700"
-    >
-      {/* 1. Hero Section – critical, loaded with priority */}
+    <main className="w-full bg-white dark:bg-[#050505] transition-colors duration-700">
+      {/* 1. Hero Section */}
       <Suspense fallback={<HeroSkeleton />}>
-        {bannerLoading ? (
-          <HeroSkeleton />
-        ) : (
-          <motion.div variants={sectionVariants}>
-            <HeroSection
-              slides={
-                activeCampaign?.slides?.sort((a, b) => a.order - b.order) || []
-              }
-              ui={ui}
-              lang={lang}
-            />
-          </motion.div>
-        )}
+        <HeroSectionServer campaign={data.activeCampaign} lang={lang} ui={ui} />
       </Suspense>
 
-      {/* 2. USP Section – lazy loaded */}
-      <Suspense fallback={<div className="h-32" />}>
-        <motion.div
-          variants={sectionVariants}
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-        >
-          <UspSection ui={ui} />
-        </motion.div>
-      </Suspense>
+      {/* 2. USP Section */}
+      <UspSection ui={ui} />
 
       <div className="space-y-28 md:space-y-36 pb-36 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto">
-        {/* 3. Flash Sale Teaser */}
-        <Suspense fallback={<GridSkeleton count={4} />}>
-          {flashSaleLoading ? (
-            <GridSkeleton count={4} />
-          ) : (
-            flashSaleProducts?.flashSale && (
-              <motion.div
-                variants={sectionVariants}
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-              >
-                <FlashSaleTeaser
-                  activeSale={flashSaleProducts.flashSale}
-                  flashSaleProducts={flashSaleProducts}
-                  ui={ui}
-                  lang={lang}
-                />
-              </motion.div>
-            )
-          )}
-        </Suspense>
+        {/* 3. Flash Sale */}
+        {data.flashSales?.flashSale && (
+          <Suspense fallback={<GridSkeleton count={4} />}>
+            <FlashSaleTeaserServer 
+              activeSale={data.flashSales.flashSale} 
+              products={data.flashSales} 
+              lang={lang}
+              ui={ui}
+            />
+          </Suspense>
+        )}
 
         {/* 4. Category Grid */}
-        <Suspense fallback={<GridSkeleton count={4} />}>
-          <motion.div
-            variants={sectionVariants}
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            <CategoryGrid
-              categories={categories}
-              ui={ui}
-              isLoading={categoriesLoading}
-            />
-          </motion.div>
-        </Suspense>
+        <CategoryGrid categories={data.categories} ui={ui} />
 
         {/* 5. Featured Artifacts */}
-        <Suspense fallback={<GridSkeleton count={4} />}>
-          <motion.section
-            variants={sectionVariants}
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            className="space-y-16"
-          >
-            <div className="flex justify-between">
-              <SectionHeader
-                title={ui.featTitle}
-                subtitle="Masterpieces Crafted within the Foundry Walls"
-              />
-              <div className="flex flex-col md:flex-row gap-6">
-                <Link
-                  href="/products"
-                  className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-rose-600 transition-all"
-                  aria-label="Explore all products"
-                >
-                  {lang === "bn" ? "সব দেখুন" : "Explore All"}
-                  <ArrowRight
-                    size={14}
-                    className="group-hover:translate-x-2 transition-transform"
-                  />
-                </Link>
-              </div>
-            </div>
-
-            {productsLoading ? (
-              <GridSkeleton count={4} />
-            ) : (
-              <div className="">
-                <ProductSection
-                  products={featuredProducts}
-                  lang={lang}
-                  ui={ui}
-                />
-              </div>
-            )}
-          </motion.section>
-        </Suspense>
+        <section className="space-y-16">
+          <div className="flex flex-col mb-16 gap-3">
+            <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white">
+              {ui.featTitle}
+            </h2>
+            <div className="h-1.5 w-20 bg-rose-600 rounded-full" />
+            <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.3em] pt-1">
+              {ui.featSub}
+            </p>
+          </div>
+          <ProductSection products={featuredProducts} lang={lang} />
+        </section>
 
         {/* 6. New Arrivals */}
-        <Suspense fallback={<GridSkeleton count={4} />}>
-          <motion.section
-            variants={sectionVariants}
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            className="space-y-16"
-          >
-            <SectionHeader title={ui.newTitle} subtitle="Fresh from the Foundry" />
+        <section className="space-y-16">
+          <div className="flex flex-col mb-16 gap-3">
+            <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white">
+              {ui.newTitle}
+            </h2>
+            <div className="h-1.5 w-20 bg-rose-600 rounded-full" />
+            <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.3em] pt-1">
+              {ui.newSub}
+            </p>
+          </div>
+          <ProductSection products={newArrivals} showLoadMore={true} lang={lang} ui={ui} />
+        </section>
 
-            {productsLoading ? (
-              <GridSkeleton count={4} />
-            ) : (
-              <ProductSection
-                products={newArrivals}
-                lang={lang}
-                showLoadMore={true}
-                ui={ui}
-              />
-            )}
-          </motion.section>
-        </Suspense>
+        {/* 7. Sale Section */}
+        {saleProducts.length > 0 && (
+          <section className="space-y-16">
+            <div className="flex flex-col mb-16 gap-3">
+              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white">
+                {ui.saleTitle}
+              </h2>
+              <div className="h-1.5 w-20 bg-rose-600 rounded-full" />
+              <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.3em] pt-1">
+                {ui.saleSub}
+              </p>
+            </div>
+            <ProductSection products={saleProducts} lang={lang} isDarkBg={true} />
+          </section>
+        )}
 
-        {/* 7. Newsletter – loaded lazily */}
-        <Suspense fallback={<div className="h-64" />}>
-          <motion.div
-            variants={sectionVariants}
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <Newsletter ui={ui} lang={lang} />
-          </motion.div>
-        </Suspense>
+        {/* 8. Newsletter */}
+        <Newsletter ui={ui} lang={lang} />
       </div>
-    </motion.main>
+    </main>
   );
 }

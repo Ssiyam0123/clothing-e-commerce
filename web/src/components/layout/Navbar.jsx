@@ -20,12 +20,14 @@ const DEFAULT_NAV = [
   { id: 'blogs', href: '/blog', en: 'Blog', bn: 'ব্লগ' },
 ];
 
-export default function Navbar() {
+export default function Navbar({ settings: initialSettings }) {
   const router = useRouter();
   const pathname = usePathname();
 
   // Settings
-  const { settings } = useSettings();
+  const { settings: hookSettings } = useSettings();
+  const settings = initialSettings || hookSettings;
+  
   const branding = settings?.branding || {};
   const siteName = branding.siteName || 'VANGUARD';
   const headerLogo = branding.headerLogo;

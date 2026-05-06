@@ -80,6 +80,7 @@ export const getProducts = asyncHandler(async (req, res) => {
         limit = 12,
         isActive,
         stockStatus,
+        isFeatured,
     } = req.query;
 
     const matchStage = {};
@@ -91,6 +92,10 @@ export const getProducts = asyncHandler(async (req, res) => {
         matchStage.isActive = false;
     } else {
         matchStage.isActive = true;
+    }
+
+    if (isFeatured === 'true') {
+        matchStage.isFeatured = true;
     }
 
     if (category && category !== 'all') {

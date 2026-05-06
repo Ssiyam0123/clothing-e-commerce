@@ -1,8 +1,21 @@
 import { notFound } from 'next/navigation';
-import ProductDetailsClient from './ProductDetailsClient';
+import dynamic from 'next/dynamic';
+import { Share2 } from 'lucide-react';
+import StarRating from '@/components/store/StarRating';
+import ProductImageGallery from '@/components/products/ProductImageGallery';
+import WishlistButtonClient from '@/components/products/WishlistButtonClient';
+import ProductActionsClient from '@/components/products/ProductActionsClient';
+import RelatedProducts from '@/components/products/RelatedProducts';
+import ReviewSectionWrapper from '@/components/products/ReviewSectionWrapper';
+import Loader from '@/components/common/Loader';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://clothing-e-commerce-web.vercel.app';
+
+const DICTIONARY = {
+  en: { about: 'Narrative', related: 'The Sequence' },
+  bn: { about: 'বিবরণ', related: 'অনুরূপ পণ্য' }
+};
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -28,7 +41,6 @@ export async function generateMetadata({ params }) {
         type: 'website',
         siteName: 'Vanguard',
         url: `${SITE_URL}/products/${slug}`,
-        // Custom Product OG tags
         'og:price:amount': discountedPrice.toString(),
         'og:price:currency': 'BDT',
         'og:availability': isAvailable ? 'instock' : 'oos',
@@ -38,28 +50,10 @@ export async function generateMetadata({ params }) {
         title: product.name,
         description: product.description?.slice(0, 160),
         images: [imageUrl],
-        'twitter:label1': 'Price',
-        'twitter:data1': `৳${discountedPrice.toFixed(0)}`,
-        'twitter:label2': 'Availability',
-        'twitter:data2': isAvailable ? 'In Stock' : 'Out of Stock',
-      },
-      other: {
-        'product:brand': 'Vanguard',
-        'product:category': product.category?.name || 'Streetwear',
-        'product:price:amount': discountedPrice.toString(),
-        'product:price:currency': 'BDT',
-        'product:availability': isAvailable ? 'instock' : 'oos',
-      },
-      alternates: {
-        canonical: `${SITE_URL}/products/${slug}`,
       },
     };
   } catch (error) {
-    console.error('Metadata fetch failed:', error);
-    return {
-      title: 'Product Not Found | Vanguard',
-      description: 'The requested product could not be found.',
-    };
+    return { title: 'Product Not Found | Vanguard' };
   }
 }
 
@@ -77,13 +71,14 @@ export default async function ProductPage({ params }) {
     }
     product = await res.json();
   } catch (err) {
-    console.error('Product fetch error:', err);
     notFound();
   }
 
   const discountedPrice = product.price - (product.price * (product.discount || 0)) / 100;
   const isAvailable = product.sizes?.some(s => s.stock > 0);
-  
+  const lang = 'en'; // Ideally this comes from a layout or cookie, keeping 'en' as default
+  const ui = DICTIONARY[lang];
+
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -92,59 +87,103 @@ export default async function ProductPage({ params }) {
     image: product.images?.map(img => img.startsWith('http') ? img : `${SITE_URL}${img}`),
     sku: product.sku || product._id,
     brand: { '@type': 'Brand', name: 'Vanguard' },
-    category: product.category?.name,
     offers: {
       '@type': 'Offer',
       url: `${SITE_URL}/products/${slug}`,
       priceCurrency: 'BDT',
       price: discountedPrice,
-      priceValidUntil: '2027-01-01',
       availability: isAvailable ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      seller: { '@type': 'Organization', name: 'Vanguard' },
     },
-    aggregateRating: product.totalReviews > 0 ? {
-      '@type': 'AggregateRating',
-      ratingValue: product.averageRating || 5,
-      reviewCount: product.totalReviews || 1,
-    } : undefined,
-  };
-
-  const breadcrumbSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: SITE_URL,
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: product.category?.name || 'Collection',
-        item: `${SITE_URL}/products?category=${product.category?._id}`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: product.name,
-        item: `${SITE_URL}/products/${slug}`,
-      },
-    ],
   };
 
   return (
-    <>
+    <main className="min-h-screen bg-[#fcfcfc] dark:bg-[#050505] transition-colors duration-700">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <ProductDetailsClient product={product} />
-    </>
+      
+      <div className="max-w-[1700px] mx-auto pt-20 lg:pt-32 px-4 lg:px-12">
+        <div className="grid lg:grid-cols-12 gap-0 lg:gap-16 xl:gap-24">
+          
+          {/* LEFT: Media Section (Client Island) */}
+          <div className="lg:col-span-7">
+            <ProductImageGallery 
+              images={product.images} 
+              name={product.name} 
+              discount={product.discount} 
+            />
+          </div>
+
+          {/* RIGHT: Information Engine (Static Shell + Small Client Islands) */}
+          <div className="lg:col-span-5 py-10 lg:py-4">
+            <section className="space-y-6 mb-12">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-rose-600">
+                    {product.category?.name}
+                  </span>
+                  <div className="h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                  <div className="flex items-center gap-1.5 opacity-60">
+                    <StarRating rating={product.averageRating || 5} size="small" />
+                    <span className="text-[9px] font-black dark:text-white">{product.totalReviews || 0}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <WishlistButtonClient product={product} />
+                  <button className="p-3 rounded-full text-zinc-300 dark:text-zinc-700 hover:text-rose-500 transition-all">
+                    <Share2 size={24} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <h1 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.85] text-zinc-900 dark:text-white">
+                  {product.name}
+                </h1>
+                <p className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium max-w-lg">
+                  {product.description}
+                </p>
+
+                {/* AEO / FAQ Section (Static SSR) */}
+                <div className="mt-10 space-y-6 border-t border-zinc-100 dark:border-zinc-800 pt-8">
+                  <div itemScope itemType="https://schema.org/Question">
+                    <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-widest text-zinc-900 dark:text-white mb-2">Is this fabric sustainable?</h3>
+                    <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                      <p itemProp="text" className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        Yes, every Vanguard artifact is crafted from ethically sourced, sustainable materials designed for longevity and minimal environmental impact.
+                      </p>
+                    </div>
+                  </div>
+                  <div itemScope itemType="https://schema.org/Question">
+                    <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-widest text-zinc-900 dark:text-white mb-2">What is the return policy?</h3>
+                    <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                      <p itemProp="text" className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        We offer a 30-day return policy on all unworn items. Your satisfaction is our primary protocol.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Actions (Client Island) */}
+            <ProductActionsClient product={product} />
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-[1400px] mx-auto px-6 mt-40 pb-56 lg:pb-32 space-y-48">
+        {/* Reviews (Client Island - Lazy) */}
+        <ReviewSectionWrapper productId={product._id} />
+        
+        {/* Related Products (Server Component) */}
+        <RelatedProducts 
+          categoryId={product.category?._id} 
+          currentProductId={product._id} 
+          title={ui.related} 
+        />
+      </div>
+    </main>
   );
 }

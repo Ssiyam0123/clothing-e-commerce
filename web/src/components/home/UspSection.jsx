@@ -1,5 +1,3 @@
-'use client';
-
 // Skeleton version of the USP item
 const UspSkeleton = () => (
   <div className="flex flex-col items-center text-center animate-pulse" aria-label="Loading USP">

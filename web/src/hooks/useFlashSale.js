@@ -15,6 +15,7 @@ export const useFlashSales = (fetchAll = false) => {
     queryKey: ["flash-sales-active"],
     queryFn: async () => (await api.get("/flash-sales/active")).data,
     staleTime: 1000 * 60 * 5,
+    refetchInterval: 10000, // Background refresh every 10 seconds for real-time stock/timer
   });
 
   const { data: flashSaleProducts, isLoading: productsLoading } = useQuery({
@@ -92,6 +93,7 @@ export const useSingleFlashSale = (slug) => {
     queryKey: ["flash-sale", slug],
     queryFn: async () => (await api.get(`/flash-sales/details/${slug}`)).data,
     enabled: !!slug,
-    staleTime: 1000 * 60 * 10, 
+    staleTime: 1000 * 60 * 10,
+    refetchInterval: 10000, 
   });
 };
