@@ -9,7 +9,7 @@ import { Heart, ShoppingBag, Zap, Star } from 'lucide-react';
 import QuickSelectModal from '../store/QuickSelectModal';
 import { useAuthStore } from '@/store/authStore';
 
-const ProductCard = memo(({ product, lang = 'en' }) => {
+const ProductCard = memo(({ product, lang = 'en', index = 0 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuthStore();
   
@@ -37,7 +37,9 @@ const ProductCard = memo(({ product, lang = 'en' }) => {
           src={product.images?.[0]}
           alt={product.name}
           className="transition-transform duration-500 group-hover:scale-105 object-cover w-full h-full"
-          loading="lazy"
+          loading={index < 4 ? "eager" : "lazy"}
+          priority={index < 4}
+          fetchPriority={index === 0 ? "high" : "auto"}
         />
         
         {/* Rating Overlay - accessible contrast */}

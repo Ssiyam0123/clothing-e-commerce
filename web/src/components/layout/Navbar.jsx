@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Heart, ShoppingBag, Menu, X, Sun, Moon, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
@@ -84,7 +85,10 @@ export default function Navbar({ settings: initialSettings }) {
     router.push('/');
   };
 
+  const isAdminRoute = pathname.startsWith('/admin');
   const isAdmin = user?.role === 'admin';
+
+  if (isAdminRoute) return null;
 
   return (
     <>
@@ -100,13 +104,20 @@ export default function Navbar({ settings: initialSettings }) {
           {/* Logo */}
           <PrefetchLink href="/" queryKey={['home-data']} className="flex items-center gap-2 group shrink-0" aria-label={`${siteName} home`}>
             {headerLogo ? (
-              <img src={getImageUrl(headerLogo)} alt={siteName} className="h-10 w-auto object-contain" />
+              <Image 
+                src={getImageUrl(headerLogo, 200, 80)} 
+                alt={siteName} 
+                width={160}
+                height={40}
+                priority
+                className="h-10 w-auto object-contain" 
+              />
             ) : (
               <div className="w-10 h-10 bg-black dark:bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-500">
                 <span className="text-white dark:text-black font-black italic text-sm">{siteName.charAt(0)}</span>
               </div>
             )}
-            <span className="text-xl font-black tracking-tighter uppercase dark:text-white hidden md:block">
+            <span className="text-xl font-black tracking-tighter uppercase dark:text-white hidden md:block" aria-hidden="true">
               {siteName}
             </span>
           </PrefetchLink>

@@ -1,4 +1,7 @@
+'use client';
 import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 const DICTIONARY = {
   en: { footer: 'Established 2026. Crafted for trendsetters.' },
@@ -26,6 +29,9 @@ const SOCIAL_ICONS = {
 };
 
 export default function Footer({ lang = 'en', settings: initialSettings }) {
+  const pathname = usePathname();
+  if (pathname.startsWith('/admin')) return null;
+
   const settings = initialSettings;
   const branding = settings?.branding || {};
   const siteName = branding.siteName || 'VANGUARD';
@@ -39,27 +45,33 @@ export default function Footer({ lang = 'en', settings: initialSettings }) {
     <footer className="py-24 border-t transition-colors duration-700 bg-zinc-50 dark:bg-[#050505] border-zinc-200 dark:border-zinc-900 text-zinc-500 dark:text-zinc-600">
       <div className="max-w-7xl mx-auto px-6 text-center flex flex-col items-center">
         {footerLogo ? (
-          <img src={getImageUrl(footerLogo)} alt={siteName} className="h-12 w-auto object-contain opacity-20 hover:opacity-50 transition-opacity mb-8" />
+          <Image 
+            src={getImageUrl(footerLogo, 200, 80)} 
+            alt={siteName} 
+            width={160}
+            height={40}
+            className="h-10 w-auto object-contain opacity-40 hover:opacity-100 transition-opacity mb-8" 
+          />
         ) : (
-          <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter opacity-20 mb-8">{siteName}</h2>
+          <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter opacity-20 mb-8" aria-hidden="true">{siteName}</h2>
         )}
-        <p className={`max-w-md mx-auto leading-relaxed ${lang === 'en' ? 'text-[10px] font-black uppercase tracking-[0.5em]' : 'text-sm font-semibold'}`}>
+        <p className={`max-w-md mx-auto leading-relaxed text-zinc-500 dark:text-zinc-400 ${lang === 'en' ? 'text-[10px] font-black uppercase tracking-[0.5em]' : 'text-sm font-semibold'}`}>
           {ui.footer}
         </p>
         
         {contact.phone && (
-          <p className="mt-4 text-[9px] font-black uppercase tracking-widest opacity-40">
+          <p className="mt-4 text-[9px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
             {contact.phone} | {contact.email}
           </p>
         )}
         
         {contact.address && (
-          <p className="mt-2 text-[8px] font-bold uppercase tracking-widest opacity-30">
+          <p className="mt-2 text-[8px] font-bold uppercase tracking-widest text-zinc-400/50">
             {contact.address}
           </p>
         )}
 
-        <div className="mt-14 flex flex-wrap justify-center gap-x-12 gap-y-6 text-[9px] font-black uppercase tracking-[0.2em] opacity-60">
+        <div className="mt-14 flex flex-wrap justify-center gap-x-12 gap-y-6 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
            {socialLinks.length > 0 ? (
              socialLinks.map((link, idx) => {
                const Icon = SOCIAL_ICONS[link.platform.toLowerCase()] || Share2;
@@ -70,6 +82,7 @@ export default function Footer({ lang = 'en', settings: initialSettings }) {
                    target="_blank" 
                    rel="noopener noreferrer" 
                    className="hover:text-rose-600 dark:hover:text-rose-500 transition-all flex items-center gap-2 group"
+                   aria-label={`Follow us on ${link.platform}`}
                  >
                    <Icon size={12} className="group-hover:scale-125 transition-transform" /> 
                    <span>{link.platform}</span>
@@ -78,8 +91,8 @@ export default function Footer({ lang = 'en', settings: initialSettings }) {
              })
            ) : (
              <div className="flex gap-10">
-               <Link href="#" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Privacy Policy</Link>
-               <Link href="#" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Terms of Service</Link>
+               <Link href="#" className="hover:text-zinc-900 dark:hover:text-white transition-colors" aria-label="Privacy Policy">Privacy Policy</Link>
+               <Link href="#" className="hover:text-zinc-900 dark:hover:text-white transition-colors" aria-label="Terms of Service">Terms of Service</Link>
              </div>
            )}
         </div>

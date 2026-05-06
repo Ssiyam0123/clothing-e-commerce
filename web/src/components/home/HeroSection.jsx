@@ -67,6 +67,7 @@ export default function HeroSection({ slides = [], ui = {}, lang = 'en' }) {
                 alt={slide.title || 'Campaign banner'}
                 fill
                 priority={idx === 0}
+                fetchPriority={idx === 0 ? "high" : "auto"}
                 sizes="100vw"
                 className="object-cover object-center transition-transform duration-[15s] ease-out group-hover:scale-105"
               />

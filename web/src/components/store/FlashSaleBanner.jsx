@@ -84,8 +84,8 @@ export default function FlashSaleBanner({ flashSale, onExpire }) {
         </div>
       )}
 
-      <div className="relative z-10 p-10 md:p-16 lg:p-20 flex flex-col md:flex-row items-center justify-between gap-12">
-        <div className="text-center md:text-left max-w-xl">
+      <div className="relative z-10 p-6 md:p-16 lg:p-20 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-12">
+        <div className="text-center md:text-left max-w-xl w-full">
           {/* Status badge – static, no animation */}
           <div className="inline-flex items-center gap-2 bg-rose-50 dark:bg-rose-600/10 border border-rose-200 dark:border-rose-500/20 px-4 py-1.5 rounded-full mb-6 shadow-sm">
             <span className={`w-1.5 h-1.5 rounded-full ${status === 'active' ? 'bg-rose-500 animate-pulse' : 'bg-amber-500'} shadow-[0_0_8px_rgba(244,63,94,0.8)]`}></span>
@@ -94,11 +94,11 @@ export default function FlashSaleBanner({ flashSale, onExpire }) {
             </span>
           </div>
           
-          <h2 className={`text-5xl md:text-7xl font-black text-zinc-900 dark:text-white uppercase leading-none mb-6 drop-shadow-sm ${isBn ? 'font-sans tracking-tight' : 'tracking-tighter'}`}>
+          <h2 className={`text-3xl sm:text-4xl md:text-7xl font-black text-zinc-900 dark:text-white uppercase leading-tight mb-6 drop-shadow-sm ${isBn ? 'font-sans tracking-tight' : 'tracking-tighter'}`}>
             {flashSale.name}
           </h2>
           
-          <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg font-medium tracking-wide mb-10 leading-relaxed max-w-md mx-auto md:mx-0">
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm md:text-lg font-medium tracking-wide mb-8 md:mb-10 leading-relaxed max-w-md mx-auto md:mx-0">
             {flashSale.description || ui.defaultDesc}
           </p>
 
@@ -114,7 +114,7 @@ export default function FlashSaleBanner({ flashSale, onExpire }) {
         </div>
 
         {/* Countdown or ended message */}
-        <div className="bg-white/40 dark:bg-white/5 backdrop-blur-2xl border border-zinc-200/50 dark:border-white/10 p-8 md:p-12 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl flex flex-col items-center min-w-[300px] shrink-0">
+        <div className="w-full md:w-auto bg-white/40 dark:bg-white/5 backdrop-blur-2xl border border-zinc-200/50 dark:border-white/10 p-6 md:p-12 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl flex flex-col items-center shrink-0">
           {targetDate && (
             <CountdownTimer 
               targetDate={targetDate} 

@@ -36,12 +36,12 @@ export default function CountdownTimer({ targetDate, onExpire, label }) {
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-      className="flex flex-col items-center bg-white/10 dark:bg-black/80 backdrop-blur-xl border border-zinc-200 dark:border-white/10 px-4 py-3 rounded-2xl min-w-[70px] shadow-2xl"
+      className="flex flex-col items-center bg-white/10 dark:bg-black/80 backdrop-blur-xl border border-zinc-200 dark:border-white/10 px-3 md:px-4 py-2 md:py-3 rounded-xl md:rounded-2xl min-w-[60px] md:min-w-[70px] shadow-2xl"
     >
-      <span className="text-3xl font-black text-zinc-900 dark:text-white leading-none">
+      <span className="text-xl md:text-3xl font-black text-zinc-900 dark:text-white leading-none">
         {String(val).padStart(2, '0')}
       </span>
-      <span className="text-[9px] font-black uppercase text-zinc-500 tracking-[0.2em] mt-2">
+      <span className="text-[7px] md:text-[9px] font-black uppercase text-zinc-500 tracking-[0.2em] mt-1 md:mt-2">
         {label}
       </span>
     </motion.div>

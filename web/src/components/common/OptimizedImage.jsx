@@ -10,6 +10,7 @@ export default function OptimizedImage({
   className = '', 
   sizes = '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw',
   priority = false,
+  fetchPriority = 'auto',
   width = 600,
   quality = 80
 }) {
@@ -32,6 +33,7 @@ export default function OptimizedImage({
       alt={alt || 'Image'}
       fill
       priority={priority}
+      fetchPriority={fetchPriority}
       loading={priority ? 'eager' : 'lazy'}
       sizes={sizes}
       className={`object-cover transition-opacity duration-500 ${className}`}

@@ -74,19 +74,19 @@ export default function FlashSaleClient() {
   if (isLoading) return <div className="p-12"><GridSkeleton count={8} /></div>;
 
   return (
-    <div className="pb-32 font-sans pt-25 space-y-28">
+    <div className="pb-32 font-sans pt-24 md:pt-32 space-y-16 md:space-y-28">
       
       {/* 🔥 ACTIVE DROPS SECTION */}
       {activeSales.map((sale) => (
-        <section key={sale._id} className="max-w-7xl mx-auto px-6">
+        <section key={sale._id} className="max-w-7xl mx-auto px-4 md:px-6">
           <FlashSaleBanner flashSale={sale} />
-          <div className="flex justify-between items-end mt-12 mb-10 border-b dark:border-white/5 pb-8">
-            <h2 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">{sale.name}</h2>
-            <Link href={`/flash-sale/${sale.slug}`} className="bg-zinc-900 dark:bg-white text-white dark:text-black px-10 py-5 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-rose-600 transition-all">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mt-8 md:mt-12 mb-8 md:mb-10 border-b dark:border-white/5 pb-8">
+            <h2 className="text-3xl sm:text-4xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">{sale.name}</h2>
+            <Link href={`/flash-sale/${sale.slug}`} className="w-full md:w-auto bg-zinc-900 dark:bg-white text-white dark:text-black px-10 py-5 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-rose-600 transition-all text-center">
               {ui.viewDetails}
             </Link>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {sale.products?.slice(0, 4).map(p => <FlashSaleProductCard key={p._id} product={p} />)}
           </div>
         </section>
@@ -115,15 +115,17 @@ export default function FlashSaleClient() {
                     <img src={sale.bannerImage || '/api/placeholder/800/400'} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[3s]" alt="" />
                   </div>
 
-                  <div className="absolute inset-0 p-12 flex flex-col justify-end bg-gradient-to-t from-black via-black/40 to-transparent">
+                  <div className="absolute inset-0 p-6 md:p-12 flex flex-col justify-end bg-gradient-to-t from-black via-black/40 to-transparent">
                     <div className="space-y-4">
-                      <p className="text-rose-600 text-[10px] font-black uppercase tracking-[0.4em]">Encrypted sequence</p>
-                      <h4 className="text-4xl md:text-5xl font-black text-white uppercase italic leading-none group-hover:translate-x-2 transition-transform duration-500">{sale.name}</h4>
+                      <p className="text-rose-600 text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em]">Encrypted sequence</p>
+                      <h4 className="text-3xl md:text-5xl font-black text-white uppercase italic leading-none group-hover:translate-x-2 transition-transform duration-500">{sale.name}</h4>
                       
                       {/* 🚀 REAL-TIME COUNTDOWN COMPONENT */}
-                      <CountdownTimer targetDate={sale.startDate} lang={lang} />
+                      <div className="scale-75 md:scale-100 origin-left">
+                        <CountdownTimer targetDate={sale.startDate} lang={lang} />
+                      </div>
 
-                      <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest pt-4">
+                      <p className="text-zinc-500 text-[8px] md:text-[10px] font-bold uppercase tracking-widest pt-2 md:pt-4">
                         Drops on: {new Date(sale.startDate).toLocaleDateString(lang === 'bn' ? 'bn-BD' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </p>
                     </div>

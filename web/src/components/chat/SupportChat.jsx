@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { useChat } from '@/hooks/useChat';
 import { useAuthStore } from '@/store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,12 +10,15 @@ import Link from 'next/link';
 export default function SupportChat() {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuthStore();
+  const pathname = usePathname();
+  
   const { messages, isConnected, sendMessage } = useChat(isOpen && !!user);
   const [input, setInput] = useState('');
   const scrollRef = useRef();
 
   useEffect(() => { scrollRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
+  if (pathname.startsWith('/admin')) return null;
   if (user?.role === 'admin') return null;
 
   return (
@@ -107,7 +111,11 @@ export default function SupportChat() {
           </motion.div>
         )}
       </AnimatePresence>
-      <button onClick={() => setIsOpen(!isOpen)} className="h-16 w-16 bg-black dark:bg-white text-white dark:text-black rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all">
+      <button 
+        onClick={() => setIsOpen(!isOpen)} 
+        className="h-16 w-16 bg-black dark:bg-white text-white dark:text-black rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all"
+        aria-label={isOpen ? "Close support chat" : "Open support chat"}
+      >
         {isOpen ? <X size={24}/> : <MessageSquare size={24}/>}
       </button>
     </div>

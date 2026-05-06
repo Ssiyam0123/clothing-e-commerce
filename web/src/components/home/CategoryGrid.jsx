@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode } from 'swiper/modules';
+import { getImageUrl } from '@/utils/imageUtils';
 
 // Swiper Styles
 import 'swiper/css';
@@ -60,7 +61,7 @@ export default function CategoryGrid({ categories, ui }) {
                   {/* Image with CSS hover scale */}
                   <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-110">
                     <Image
-                      src={cat.image || '/placeholder-cat.jpg'}
+                      src={getImageUrl(cat.image || '/placeholder-cat.jpg', 600, 80)}
                       alt={cat.name}
                       fill
                       sizes="(max-width: 768px) 50vw, 25vw"

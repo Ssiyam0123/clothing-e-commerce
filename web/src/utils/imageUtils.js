@@ -1,32 +1,44 @@
 export const getImageUrl = (path, width = 800, quality = 80) => {
-  if (!path || typeof path !== 'string') {
-    return '/images/placeholder.png';
-  }
+  if (!path) return '/images/placeholder.png';
+  if (path.startsWith('http') && !path.includes('cloudinary.com')) return path;
+  if (path.startsWith('blob:') || path.startsWith('data:')) return path;
+  
+  // If it's a Cloudinary URL, extract public ID
+  let publicId = path;
+  let cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
-  // External URLs (already absolute) or blob/data URIs – return as is
-  if (path.startsWith('http') || path.startsWith('blob:') || path.startsWith('data:')) {
-    return path;
-  }
-
-  // Cloudinary URL – add transformation parameters if not already present
   if (path.includes('cloudinary.com')) {
-    // If the URL already has transformations, return it unchanged
-    if (path.includes('/upload/') && !path.includes('/upload/w_')) {
-      const [base, rest] = path.split('/upload/');
-      return `${base}/upload/w_${width},q_${quality},f_auto/${rest}`;
+    const urlParts = path.split('/');
+    const cloudNameIndex = urlParts.indexOf('res.cloudinary.com') + 1;
+    if (cloudNameIndex > 0 && urlParts[cloudNameIndex]) {
+      cloudName = urlParts[cloudNameIndex];
     }
-    return path; // already has transformations or no upload segment
-  }
 
-  // Local development / uploaded files
-  const imageBaseUrl = process.env.NEXT_PUBLIC_IMAGE_URL || 'http://localhost:5000';
-  const normalizedPath = path.replace(/^\/+/, '');
-  
-  if (normalizedPath.startsWith('uploads/')) {
-    return `${imageBaseUrl}/${normalizedPath}`;
+    const parts = path.split('/upload/');
+    if (parts[1]) {
+      const pathParts = parts[1].split('/');
+      if (pathParts[0].includes('_')) {
+        publicId = pathParts.slice(1).join('/');
+      } else {
+        publicId = parts[1];
+      }
+    }
+  } else {
+    const normalizedPath = path.replace(/^\/+/, '');
+    if (normalizedPath.startsWith('uploads/')) {
+      const imageBaseUrl = process.env.NEXT_PUBLIC_IMAGE_URL || 'http://localhost:5000';
+      return `${imageBaseUrl}/${normalizedPath}`;
+    }
+    if (path.startsWith('/')) return path;
   }
   
-  return `${imageBaseUrl}/uploads/${normalizedPath}`;
+  if (!cloudName) return path;
+  
+  // Cloudinary optimizations: f_auto (WebP/AVIF), q_auto (smart quality), c_limit (fit within width)
+  const params = ['f_auto', 'q_auto', 'c_limit', `w_${width}`];
+  if (quality && quality !== 80) params.push(`q_${quality}`);
+  
+  return `https://res.cloudinary.com/${cloudName}/image/upload/${params.join(',')}/${publicId}`;
 };
 
 export const getApiUrl = () => process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
