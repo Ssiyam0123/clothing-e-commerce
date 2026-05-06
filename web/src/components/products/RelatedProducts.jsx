@@ -25,12 +25,12 @@ export default async function RelatedProducts({ categoryId, currentProductId, ti
   return (
     <div className="space-y-16">
       <div className="text-center">
-        <h2 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter dark:text-white leading-none">
+        <h2 className="text-[14vw] md:text-8xl font-black uppercase italic tracking-tighter dark:text-white leading-[0.8]">
           {title}
         </h2>
-        <div className="mt-8 h-1 w-24 bg-rose-600 mx-auto rounded-full" />
+        <div className="mt-8 h-px w-full max-w-[100px] bg-rose-600 mx-auto" />
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-10">
         {filteredProducts.map(p => (
           <ProductCard key={p._id} product={p} />
         ))}

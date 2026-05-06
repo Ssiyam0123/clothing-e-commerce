@@ -61,7 +61,7 @@ export default function ProductList({ initialData }) {
 
   return (
     <div className={`transition-opacity duration-300 ${isFetching && !isFetchingNextPage ? 'opacity-40' : 'opacity-100'}`}>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-16">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8 mb-16">
         {uniqueProducts.map((p) => (
           <ProductCard key={p._id} product={p} />
         ))}

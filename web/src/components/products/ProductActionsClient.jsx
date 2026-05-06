@@ -62,12 +62,12 @@ export default function ProductActionsClient({ product }) {
   return (
     <>
       {/* Pricing Section */}
-      <section className="bg-white dark:bg-white/5 p-10 rounded-[3rem] shadow-xl border border-white dark:border-white/5 mb-12">
+      <section className="bg-white dark:bg-white/5 p-6 md:p-10 rounded-[2.5rem] lg:rounded-[3rem] shadow-xl border border-white dark:border-white/5 mb-12">
         <p className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-4">{ui.price}</p>
-        <div className="flex items-baseline gap-6">
-          <span className="text-6xl font-black tracking-tighter dark:text-white">৳{discountedPrice.toFixed(0)}</span>
+        <div className="flex items-baseline gap-4 md:gap-6">
+          <span className="text-5xl md:text-6xl font-black tracking-tighter dark:text-white">৳{discountedPrice.toFixed(0)}</span>
           {product.discount > 0 && (
-            <span className="text-2xl font-bold text-zinc-300 dark:text-zinc-700 line-through tracking-tighter italic opacity-50">৳{product.price}</span>
+            <span className="text-xl md:text-2xl font-bold text-zinc-300 dark:text-zinc-700 line-through tracking-tighter italic opacity-50">৳{product.price}</span>
           )}
         </div>
       </section>
@@ -75,13 +75,13 @@ export default function ProductActionsClient({ product }) {
       {/* Size Framework */}
       <section className="space-y-6 mb-12">
         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 ml-1">{ui.selectSize}</h3>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {product.sizes?.map((s) => (
             <button 
               key={s.size._id} 
               disabled={s.stock <= 0}
               onClick={() => setSelectedSize(s.size._id)}
-              className={`py-5 rounded-[1.5rem] font-black text-xs uppercase transition-all duration-500 ${
+              className={`py-4 md:py-5 rounded-2xl md:rounded-[1.5rem] font-black text-xs uppercase transition-all duration-500 ${
                 selectedSize === s.size._id 
                   ? 'bg-zinc-900 dark:bg-white text-white dark:text-black shadow-2xl scale-105' 
                   : 'bg-white dark:bg-white/5 text-zinc-400 dark:text-zinc-600 hover:bg-zinc-100 disabled:opacity-20'
@@ -146,21 +146,22 @@ export default function ProductActionsClient({ product }) {
         </div>
       </section>
 
-      {/* MOBILE ACTION BAR (also inside this client island for simplicity) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[130] bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-2xl p-5 pb-10 flex items-center gap-4 shadow-2xl border-t dark:border-white/5">
-        <div className="flex-1">
+      {/* MOBILE ACTION BAR */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[130] bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-2xl p-4 pb-8 flex items-center gap-3 shadow-2xl border-t dark:border-white/5">
+        <div className="flex-1 min-w-0">
           <p className="text-xl font-black dark:text-white tracking-tighter leading-none">৳{discountedPrice.toFixed(0)}</p>
-          <p className="text-[8px] text-zinc-500 uppercase font-black mt-1 truncate max-w-[120px]">{product.name}</p>
+          <p className="text-[9px] text-zinc-500 uppercase font-black mt-1 truncate">{product.name}</p>
         </div>
         <button 
           onClick={handleBagAction} 
-          className="w-14 h-14 bg-zinc-100 dark:bg-white/10 dark:text-white rounded-2xl flex items-center justify-center active:scale-90 transition-transform"
+          className="aspect-square h-12 md:h-14 bg-zinc-100 dark:bg-white/10 dark:text-white rounded-xl md:rounded-2xl flex items-center justify-center active:scale-90 transition-transform"
+          aria-label="Add to bag"
         >
-          <ShoppingBag size={22}/>
+          <ShoppingBag size={20}/>
         </button>
         <button 
           onClick={handleInstantBuy} 
-          className="flex-[2] bg-zinc-900 dark:bg-white text-white dark:text-black h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition-transform"
+          className="flex-[2] bg-zinc-900 dark:bg-white text-white dark:text-black h-12 md:h-14 rounded-xl md:rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition-transform"
         >
           {lang === 'bn' ? 'অর্ডার' : 'Checkout'}
         </button>

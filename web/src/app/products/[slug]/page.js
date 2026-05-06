@@ -103,8 +103,8 @@ export default async function ProductPage({ params }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
       
-      <div className="max-w-[1700px] mx-auto pt-20 lg:pt-32 px-4 lg:px-12">
-        <div className="grid lg:grid-cols-12 gap-0 lg:gap-16 xl:gap-24">
+      <div className="max-w-[1700px] mx-auto pt-24 lg:pt-32 px-4 lg:px-12">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 xl:gap-24">
           
           {/* LEFT: Media Section (Client Island) */}
           <div className="lg:col-span-7">
@@ -116,7 +116,7 @@ export default async function ProductPage({ params }) {
           </div>
 
           {/* RIGHT: Information Engine (Static Shell + Small Client Islands) */}
-          <div className="lg:col-span-5 py-10 lg:py-4">
+          <div className="lg:col-span-5 py-6 lg:py-4">
             <section className="space-y-6 mb-12">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -138,10 +138,10 @@ export default async function ProductPage({ params }) {
               </div>
 
               <div className="space-y-6">
-                <h1 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.85] text-zinc-900 dark:text-white">
+                <h1 className="text-[12vw] md:text-7xl lg:text-8xl font-black tracking-tighter uppercase italic leading-[0.85] text-zinc-900 dark:text-white">
                   {product.name}
                 </h1>
-                <p className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium max-w-lg">
+                <p className="text-sm md:text-base text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
                   {product.description}
                 </p>
 
@@ -173,7 +173,7 @@ export default async function ProductPage({ params }) {
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-6 mt-40 pb-56 lg:pb-32 space-y-48">
+      <div className="max-w-[1400px] mx-auto px-4 md:px-6 mt-24 lg:mt-40 pb-56 lg:pb-32 space-y-24 lg:space-y-48">
         {/* Reviews (Client Island - Lazy) */}
         <ReviewSectionWrapper productId={product._id} />
         
