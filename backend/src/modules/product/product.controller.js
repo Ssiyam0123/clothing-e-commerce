@@ -81,6 +81,7 @@ export const getProducts = asyncHandler(async (req, res) => {
         isActive,
         stockStatus,
         isFeatured,
+        fields,
     } = req.query;
 
     const matchStage = {};
@@ -204,6 +205,15 @@ export const getProducts = asyncHandler(async (req, res) => {
 
     // Final Sort (Grouping মাঝে মাঝে সর্ট নষ্ট করে দেয়)
     pipeline.push({ $sort: sortObj });
+
+    // 7. Field Selection
+    if (fields) {
+        const projection = fields.split(',').reduce((acc, f) => {
+            acc[f.trim()] = 1;
+            return acc;
+        }, {});
+        pipeline.push({ $project: projection });
+    }
 
     const products = await Product.aggregate(pipeline);
 

@@ -12,6 +12,7 @@ import { useAppStore } from '@/store/appStore';
 import { useProductStore } from '@/store/productStore';
 import { getImageUrl } from '@/utils/imageUtils';
 import { useSettings } from '@/hooks/useSettings';
+import PrefetchLink from '@/components/common/PrefetchLink';
 
 const DEFAULT_NAV = [
   { id: 'home', href: '/', en: 'Home', bn: 'হোম' },
@@ -97,7 +98,7 @@ export default function Navbar({ settings: initialSettings }) {
       >
         <div className="max-w-[1800px] mx-auto px-4 md:px-10 flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group shrink-0" aria-label={`${siteName} home`}>
+          <PrefetchLink href="/" queryKey={['home-data']} className="flex items-center gap-2 group shrink-0" aria-label={`${siteName} home`}>
             {headerLogo ? (
               <img src={getImageUrl(headerLogo)} alt={siteName} className="h-10 w-auto object-contain" />
             ) : (
@@ -108,16 +109,27 @@ export default function Navbar({ settings: initialSettings }) {
             <span className="text-xl font-black tracking-tighter uppercase dark:text-white hidden md:block">
               {siteName}
             </span>
-          </Link>
+          </PrefetchLink>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-10">
             {navLinks.map((link, idx) => {
               const isActive = pathname === link.href;
               return (
-                <Link
+                <PrefetchLink
                   key={link.id || idx}
                   href={link.href}
+                  queryKey={
+                    link.href === '/products' 
+                      ? ['products', { page: 1, limit: 12 }] 
+                      : link.href === '/flash-sale' 
+                        ? ['flash-sales-active'] 
+                        : link.href === '/blog'
+                          ? ['blogs']
+                          : link.href === '/'
+                            ? ['home-data']
+                            : null
+                  }
                   className={`relative text-[10px] font-black uppercase tracking-[0.3em] transition-all hover:tracking-[0.4em] ${
                     isActive ? 'text-rose-600' : 'text-zinc-500 hover:text-black dark:hover:text-white'
                   }`}
@@ -129,7 +141,7 @@ export default function Navbar({ settings: initialSettings }) {
                       className="absolute -bottom-2 left-0 right-0 h-[2px] bg-rose-600 rounded-full"
                     />
                   )}
-                </Link>
+                </PrefetchLink>
               );
             })}
           </div>
@@ -146,8 +158,9 @@ export default function Navbar({ settings: initialSettings }) {
             </button>
 
             {/* Wishlist */}
-            <Link
+            <PrefetchLink
               href="/wishlist"
+              queryKey={['wishlist']}
               className="relative p-2.5 text-zinc-500 hover:text-rose-500 transition-colors"
               aria-label="Wishlist"
             >
@@ -162,11 +175,12 @@ export default function Navbar({ settings: initialSettings }) {
                   aria-hidden="true"
                 />
               )}
-            </Link>
+            </PrefetchLink>
 
             {/* Cart */}
-            <Link
+            <PrefetchLink
               href="/cart"
+              queryKey={['cart']}
               className="relative p-2.5 text-zinc-500 hover:text-black dark:hover:text-white transition-colors"
               aria-label="Shopping cart"
             >
@@ -176,7 +190,7 @@ export default function Navbar({ settings: initialSettings }) {
                   {cartTotalItems}
                 </span>
               )}
-            </Link>
+            </PrefetchLink>
 
             <div className="h-6 w-px bg-zinc-200 dark:bg-zinc-800 mx-2 hidden sm:block" aria-hidden="true" />
 
@@ -245,13 +259,14 @@ export default function Navbar({ settings: initialSettings }) {
                           </p>
                         </div>
 
-                        <Link
+                        <PrefetchLink
                           href="/profile"
+                          queryKey={['profile']}
                           className="flex items-center gap-3 px-5 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-2xl transition-all"
                           role="menuitem"
                         >
                           <User size={14} aria-hidden="true" /> Identity Details
-                        </Link>
+                        </PrefetchLink>
 
                         {isAdmin && (
                           <Link

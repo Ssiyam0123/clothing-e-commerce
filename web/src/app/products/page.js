@@ -51,7 +51,7 @@ async function getInitialProducts(searchParams) {
   const params = new URLSearchParams(searchParams);
   // Default values to match hook's initial state
   if (!params.has('page')) params.set('page', '1');
-  if (!params.has('limit')) params.set('limit', '30');
+  if (!params.has('limit')) params.set('limit', '12');
   if (!params.has('category')) params.set('category', 'all');
 
   const apiParams = new URLSearchParams();
@@ -62,6 +62,9 @@ async function getInitialProducts(searchParams) {
   if (params.get('category') && params.get('category') !== 'all') {
     apiParams.set('category', params.get('category'));
   }
+  
+  // Optimize data transfer
+  apiParams.set('fields', 'name,slug,price,discount,images,category,averageRating');
 
   try {
     const res = await fetch(`${API_URL}/products?${apiParams.toString()}`, {

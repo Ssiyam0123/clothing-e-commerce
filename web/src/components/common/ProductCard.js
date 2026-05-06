@@ -4,6 +4,7 @@ import { useState, memo } from 'react';
 import Link from 'next/link';
 import { useProductStore } from '@/store/productStore';
 import OptimizedImage from '@/components/common/OptimizedImage'; 
+import PrefetchLink from '@/components/common/PrefetchLink';
 import { Heart, ShoppingBag, Zap, Star } from 'lucide-react';
 import QuickSelectModal from '../store/QuickSelectModal';
 import { useAuthStore } from '@/store/authStore';
@@ -25,8 +26,10 @@ const ProductCard = memo(({ product, lang = 'en' }) => {
       
       {/* Image Section */}
       <div className="relative aspect-[4/5] overflow-hidden bg-zinc-100 dark:bg-zinc-900">
-        <Link 
+        <PrefetchLink 
           href={`/products/${product.slug}`} 
+          queryKey={['product', product.slug]}
+          queryFn={() => fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/products/details/${product.slug}`).then(res => res.json())}
           className="absolute inset-0 z-10"
           aria-label={`View details of ${product.name}`}
         />

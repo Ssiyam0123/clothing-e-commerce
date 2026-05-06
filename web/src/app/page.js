@@ -53,7 +53,7 @@ export default async function HomePage() {
       {/* 2. USP Section */}
       <UspSection ui={ui} />
 
-      <div className="space-y-28 md:space-y-36 pb-36 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto">
+      <div className="space-y-28 md:space-y-36 pb-36 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto mt-20">
         {/* 3. Flash Sale */}
         {data.flashSales?.flashSale && (
           <Suspense fallback={<GridSkeleton count={4} />}>

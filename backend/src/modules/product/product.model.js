@@ -100,6 +100,7 @@ productSchema.index({
 productSchema.index({ category: 1, price: -1 });
 productSchema.index({ category: 1, createdAt: -1 });
 productSchema.index({ subcategory: 1, price: -1 });
+productSchema.index({ isActive: 1, createdAt: -1 });
 productSchema.index({ isFeatured: 1, featuredOrder: 1 });
 
 // Cascade delete: Remove product from all carts and wishlists when deleted

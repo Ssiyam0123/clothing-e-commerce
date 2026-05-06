@@ -46,13 +46,19 @@ export const createPost = asyncHandler(async (req, res) => {
 
 // 📰 Get All Posts (public)
 export const getPosts = asyncHandler(async (req, res) => {
-  const { category, status = 'PUBLISHED' } = req.query;
+  const { category, status = 'PUBLISHED', fields } = req.query;
   const query = { status };
   if (category) query.category = category;
 
-  const posts = await Blog.find(query)
+  let postsQuery = Blog.find(query)
     .populate('author', 'name avatar')
     .sort('-createdAt');
+
+  if (fields) {
+    postsQuery = postsQuery.select(fields.split(',').join(' '));
+  }
+  
+  const posts = await postsQuery;
     
   res.json(posts);
 });

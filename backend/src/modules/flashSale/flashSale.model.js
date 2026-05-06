@@ -62,5 +62,6 @@ flashSaleSchema.pre("save", async function () {
 });
 
 flashSaleSchema.index({ startDate: 1, endDate: 1, isActive: 1 });
+flashSaleSchema.index({ isActive: 1, endDate: 1 });
 
-export default mongoose.model("FlashSale", flashSaleSchema);
+export default mongoose.models.FlashSale || mongoose.model("FlashSale", flashSaleSchema);
