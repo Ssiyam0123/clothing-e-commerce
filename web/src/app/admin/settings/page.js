@@ -4,13 +4,19 @@ import { useState, useEffect } from "react";
 import { useSettings } from "@/hooks/useSettings";
 import { useApiKeys } from "@/hooks/useApiKeys";
 import { motion, AnimatePresence } from "framer-motion";
-import { Save, Globe, ShieldCheck, Share2, HardDrive, Eye, EyeOff, Plus, Trash2, Power } from "lucide-react";
+import { Save, Globe, ShieldCheck, Share2, HardDrive, Eye, EyeOff, Plus, Trash2, Power, Menu, Mail } from "lucide-react";
+import { getImageUrl } from "@/utils/imageUtils";
+
+// shadcn/ui components
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 const TABS = [
   { id: 'branding', label: 'Branding', icon: Globe },
   { id: 'socials', label: 'Social Links', icon: Share2 },
-  { id: 'api', label: 'API Vault', icon: ShieldCheck },
-  { id: 'system', label: 'System', icon: HardDrive },
+  { id: 'contact', label: 'Contact', icon: Mail },
 ];
 
 export default function SettingsPage() {
@@ -23,9 +29,16 @@ export default function SettingsPage() {
   const [formData, setFormData] = useState({
     branding: {},
     socialLinks: [],
+    navigation: [],
+    contact: {},
     config: {},
     paymentOptions: { cod: true, online: true, bkash: true }
   });
+  
+  // Files for upload
+  const [files, setFiles] = useState({ headerLogo: null, footerLogo: null, favicon: null });
+  const [previews, setPreviews] = useState({ headerLogo: null, footerLogo: null, favicon: null });
+
   const [keyData, setKeyData] = useState({
     sslCommerz: { storeId: '', storePassword: '', isLive: false, isActive: true },
     bkash: { appKey: '', appSecret: '', userName: '', password: '', baseURL: 'https://tokenized.sandbox.bka.sh/v1.2.0-beta', isLive: false, isActive: true },
@@ -38,6 +51,8 @@ export default function SettingsPage() {
       setFormData({
         branding: settings.branding || {},
         socialLinks: settings.socialLinks || [],
+        navigation: settings.navigation || [],
+        contact: settings.contact || {},
         config: settings.config || {},
         paymentOptions: settings.paymentOptions || { cod: true, online: true, bkash: true }
       });
@@ -55,7 +70,32 @@ export default function SettingsPage() {
     }
   }, [apiKeys]);
 
-  // --- Social Links Logic ---
+  const handleFileChange = (field, file) => {
+    if (file) {
+      setFiles(prev => ({ ...prev, [field]: file }));
+      setPreviews(prev => ({ ...prev, [field]: URL.createObjectURL(file) }));
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    const data = new FormData();
+    data.append('branding', JSON.stringify(formData.branding));
+    data.append('navigation', JSON.stringify(formData.navigation));
+    data.append('socialLinks', JSON.stringify(formData.socialLinks));
+    data.append('contact', JSON.stringify(formData.contact));
+    data.append('config', JSON.stringify(formData.config));
+    data.append('paymentOptions', JSON.stringify(formData.paymentOptions));
+
+    if (files.headerLogo) data.append('headerLogo', files.headerLogo);
+    if (files.footerLogo) data.append('footerLogo', files.footerLogo);
+    if (files.favicon) data.append('favicon', files.favicon);
+
+    await updateSettings(data);
+    // Clear local files and previews after successful update
+    setFiles({ headerLogo: null, footerLogo: null, favicon: null });
+    setPreviews({ headerLogo: null, footerLogo: null, favicon: null });
+  };
+
   const addSocial = () => {
     const newSocial = { platform: "New Platform", url: "", icon: "Facebook", isActive: true };
     setFormData({ ...formData, socialLinks: [...(formData.socialLinks || []), newSocial] });
@@ -70,20 +110,6 @@ export default function SettingsPage() {
     setFormData({ ...formData, socialLinks: updated });
   };
 
-  // --- API Vault Logic ---
-  const toggleService = (service) => {
-    const updatedKeys = { ...keyData };
-    updatedKeys[service].isActive = !updatedKeys[service].isActive;
-    setKeyData(updatedKeys);
-  };
-
-  const handleSaveSettings = async () => {
-    await updateSettings(formData);
-  };
-  const handleSaveKeys = async () => {
-    await updateApiKeys(keyData);
-  };
-
   return (
     <div className="min-h-screen bg-[#fcfcfc] dark:bg-[#080808] p-6 lg:p-12 transition-colors duration-500">
       <div className="max-w-6xl mx-auto">
@@ -92,14 +118,14 @@ export default function SettingsPage() {
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase dark:text-white">Protocol</h1>
             <p className="text-[10px] uppercase tracking-[0.5em] text-zinc-500 mt-2 font-bold">Central System Management</p>
           </div>
-          <button 
-            onClick={activeTab === 'api' ? handleSaveKeys : handleSaveSettings}
-            disabled={isUpdating || isSyncing}
-            className="flex items-center gap-3 bg-zinc-900 dark:bg-white text-white dark:text-black px-10 py-5 rounded-full font-black uppercase text-[10px] tracking-widest hover:scale-105 active:scale-95 transition-all shadow-2xl disabled:opacity-50"
+          <Button 
+            onClick={handleSaveSettings}
+            disabled={isUpdating}
+            className="rounded-full px-10 py-7 font-black uppercase text-[10px] tracking-widest shadow-2xl transition-all"
           >
-            <Save size={14} />
-            {isUpdating || isSyncing ? 'Synchronizing...' : 'Commit Changes'}
-          </button>
+            <Save size={14} className="mr-2" />
+            {isUpdating ? 'Synchronizing...' : 'Commit Changes'}
+          </Button>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -131,125 +157,39 @@ export default function SettingsPage() {
                     <InputField label="Site Primary Name" value={formData.branding?.siteName} onChange={(v) => setFormData({...formData, branding: {...formData.branding, siteName: v}})} />
                     <InputField label="Site Meta Title" value={formData.branding?.siteTitle} onChange={(v) => setFormData({...formData, branding: {...formData.branding, siteTitle: v}})} />
                   </div>
+                  <InputField label="Site Description / Meta description" value={formData.branding?.description} onChange={(v) => setFormData({...formData, branding: {...formData.branding, description: v}})} />
+                  
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-10 pt-10 border-t dark:border-white/5">
-                    <ImageUploadField label="Header Logo" value={formData.branding?.headerLogo} />
-                    <ImageUploadField label="Footer Logo" value={formData.branding?.footerLogo} />
-                    <ImageUploadField label="Favicon" value={formData.branding?.favicon} />
+                    <ImageUploadField 
+                      label="Header Logo" 
+                      value={formData.branding?.headerLogo} 
+                      preview={previews.headerLogo}
+                      onChange={(f) => handleFileChange('headerLogo', f)} 
+                    />
+                    <ImageUploadField 
+                      label="Footer Logo" 
+                      value={formData.branding?.footerLogo} 
+                      preview={previews.footerLogo}
+                      onChange={(f) => handleFileChange('footerLogo', f)} 
+                    />
+                    <ImageUploadField 
+                      label="Favicon" 
+                      value={formData.branding?.favicon} 
+                      preview={previews.favicon}
+                      onChange={(f) => handleFileChange('favicon', f)} 
+                    />
                   </div>
                 </motion.div>
               )}
 
-              {/* SOCIAL LINKS */}
-              {activeTab === 'socials' && (
-                <motion.div key="socials" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Social Connections</h2>
-                    <button onClick={addSocial} className="flex items-center gap-2 bg-indigo-500 text-white px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all">
-                      <Plus size={12} /> Add New
-                    </button>
-                  </div>
-                  <div className="space-y-4">
-                    {formData.socialLinks?.map((social, index) => (
-                      <div key={index} className="flex flex-col md:flex-row items-center gap-6 p-6 bg-zinc-50 dark:bg-black/20 rounded-[2rem] border border-zinc-100 dark:border-white/5">
-                        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-                          <InputField label="Platform" value={social.platform} onChange={(v) => updateSocial(index, 'platform', v)} />
-                          <InputField label="URL" value={social.url} onChange={(v) => updateSocial(index, 'url', v)} />
-                          <InputField label="Icon Name" value={social.icon} onChange={(v) => updateSocial(index, 'icon', v)} />
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <ToggleButton isActive={social.isActive} onClick={() => updateSocial(index, 'isActive', !social.isActive)} />
-                          <button onClick={() => removeSocial(index)} className="p-3 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-full transition-all">
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* API VAULT – with complete Pathao and bKash fields */}
-              {activeTab === 'api' && (
-                <motion.div key="api" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="space-y-16">
-                  <div className="flex justify-between items-center bg-zinc-900 text-white p-6 rounded-3xl">
-                    <div className="flex items-center gap-4">
-                      <ShieldCheck className="text-emerald-400" />
-                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest">Secret Vault Mode</p>
-                        <p className="text-[8px] text-zinc-500 uppercase tracking-tighter">Manage API Keys and Service Toggles</p>
-                      </div>
-                    </div>
-                    <button onClick={() => setShowSecrets(!showSecrets)} className="p-2 hover:bg-white/10 rounded-full transition-all">
-                      {showSecrets ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-
-                  {/* SSLCommerz */}
-                  <ServiceSection title="SSLCommerz Protocol" isActive={keyData.sslCommerz?.isActive} onToggle={() => toggleService('sslCommerz')}>
-                    <InputField label="Store ID" type={showSecrets ? 'text' : 'password'} value={keyData.sslCommerz?.storeId} onChange={(v) => setKeyData({...keyData, sslCommerz: {...keyData.sslCommerz, storeId: v}})} />
-                    <InputField label="Store Password" type={showSecrets ? 'text' : 'password'} value={keyData.sslCommerz?.storePassword} onChange={(v) => setKeyData({...keyData, sslCommerz: {...keyData.sslCommerz, storePassword: v}})} />
-                    <ToggleField label="Live Mode" value={keyData.sslCommerz?.isLive} onChange={(v) => setKeyData({...keyData, sslCommerz: {...keyData.sslCommerz, isLive: v}})} />
-                  </ServiceSection>
-
-                  {/* bKash – with baseURL field */}
-                  <ServiceSection title="bKash API" isActive={keyData.bkash?.isActive} onToggle={() => toggleService('bkash')}>
-                    <InputField label="App Key" type={showSecrets ? 'text' : 'password'} value={keyData.bkash?.appKey} onChange={(v) => setKeyData({...keyData, bkash: {...keyData.bkash, appKey: v}})} />
-                    <InputField label="App Secret" type={showSecrets ? 'text' : 'password'} value={keyData.bkash?.appSecret} onChange={(v) => setKeyData({...keyData, bkash: {...keyData.bkash, appSecret: v}})} />
-                    <InputField label="Username" type={showSecrets ? 'text' : 'password'} value={keyData.bkash?.userName} onChange={(v) => setKeyData({...keyData, bkash: {...keyData.bkash, userName: v}})} />
-                    <InputField label="Password" type={showSecrets ? 'text' : 'password'} value={keyData.bkash?.password} onChange={(v) => setKeyData({...keyData, bkash: {...keyData.bkash, password: v}})} />
-                    <InputField label="Base URL" value={keyData.bkash?.baseURL} onChange={(v) => setKeyData({...keyData, bkash: {...keyData.bkash, baseURL: v}})} />
-                    <ToggleField label="Live Mode" value={keyData.bkash?.isLive} onChange={(v) => setKeyData({...keyData, bkash: {...keyData.bkash, isLive: v}})} />
-                  </ServiceSection>
-
-                  {/* Pathao – with all required fields (clientId, clientSecret, userName, password, storeId, baseURL) */}
-                  <ServiceSection title="Pathao Courier" isActive={keyData.pathao?.isActive} onToggle={() => toggleService('pathao')}>
-                    <InputField label="Client ID" type={showSecrets ? 'text' : 'password'} value={keyData.pathao?.clientId} onChange={(v) => setKeyData({...keyData, pathao: {...keyData.pathao, clientId: v}})} />
-                    <InputField label="Client Secret" type={showSecrets ? 'text' : 'password'} value={keyData.pathao?.clientSecret} onChange={(v) => setKeyData({...keyData, pathao: {...keyData.pathao, clientSecret: v}})} />
-                    <InputField label="Username (API User)" type={showSecrets ? 'text' : 'password'} value={keyData.pathao?.userName} onChange={(v) => setKeyData({...keyData, pathao: {...keyData.pathao, userName: v}})} />
-                    <InputField label="Password (API Pass)" type={showSecrets ? 'text' : 'password'} value={keyData.pathao?.password} onChange={(v) => setKeyData({...keyData, pathao: {...keyData.pathao, password: v}})} />
-                    <InputField label="Store ID" value={keyData.pathao?.storeId} onChange={(v) => setKeyData({...keyData, pathao: {...keyData.pathao, storeId: v}})} />
-                    <InputField label="Base URL" value={keyData.pathao?.baseURL} onChange={(v) => setKeyData({...keyData, pathao: {...keyData.pathao, baseURL: v}})} />
-                  </ServiceSection>
-
-                  {/* Meta Pixel */}
-                  <ServiceSection title="Meta Pixel Tracking" isActive={keyData.meta?.isActive} onToggle={() => toggleService('meta')}>
-                    <InputField label="Pixel ID" value={keyData.meta?.pixelId} onChange={(v) => setKeyData({...keyData, meta: {...keyData.meta, pixelId: v}})} />
-                    <InputField label="Access Token" type={showSecrets ? 'text' : 'password'} value={keyData.meta?.accessToken} onChange={(v) => setKeyData({...keyData, meta: {...keyData.meta, accessToken: v}})} />
-                    <InputField label="Test Event Code" value={keyData.meta?.testEventCode} onChange={(v) => setKeyData({...keyData, meta: {...keyData.meta, testEventCode: v}})} />
-                  </ServiceSection>
-                </motion.div>
-              )}
-
-              {/* SYSTEM – with payment options */}
-              {activeTab === 'system' && (
-                <motion.div key="system" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="space-y-10">
-                  <div className="space-y-4">
-                    <label className="text-[10px] font-black uppercase text-zinc-400">Image Processing Storage</label>
-                    <select 
-                      value={formData.config?.storageMethod}
-                      onChange={(e) => setFormData({...formData, config: {...formData.config, storageMethod: e.target.value}})}
-                      className="w-full bg-zinc-50 dark:bg-black/40 border border-zinc-100 dark:border-white/5 p-5 rounded-[1.5rem] outline-none font-bold uppercase text-[11px] tracking-widest dark:text-white appearance-none"
-                    >
-                      <option value="cloudinary">Cloudinary Integration</option>
-                      <option value="server">Local High-Speed Storage</option>
-                    </select>
-                  </div>
-                  <div className="flex items-center justify-between p-8 rounded-[2.5rem] border-2 border-dashed border-zinc-100 dark:border-white/5">
-                    <div>
-                      <p className="text-[11px] font-black uppercase dark:text-white">Protocol: Maintenance Mode</p>
-                      <p className="text-[9px] text-zinc-500 uppercase mt-1 tracking-widest">Global storefront access restriction</p>
-                    </div>
-                    <ToggleButton isActive={formData.config?.maintenanceMode} onClick={() => setFormData({...formData, config: {...formData.config, maintenanceMode: !formData.config?.maintenanceMode}})} />
-                  </div>
-
-                  {/* Payment Options */}
-                  <div className="space-y-6">
-                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400">Payment Methods</h3>
-                    <div className="space-y-4">
-                      <ToggleRow label="Cash on Delivery (COD)" description="Allow customers to pay when they receive the order" isActive={formData.paymentOptions?.cod} onToggle={() => setFormData({...formData, paymentOptions: {...formData.paymentOptions, cod: !formData.paymentOptions?.cod}})} />
-                      <ToggleRow label="Online Payment (SSLCommerz)" description="Credit cards, internet banking, mobile banking" isActive={formData.paymentOptions?.online} onToggle={() => setFormData({...formData, paymentOptions: {...formData.paymentOptions, online: !formData.paymentOptions?.online}})} />
-                      <ToggleRow label="bKash (Direct)" description="Pay using bKash mobile banking" isActive={formData.paymentOptions?.bkash} onToggle={() => setFormData({...formData, paymentOptions: {...formData.paymentOptions, bkash: !formData.paymentOptions?.bkash}})} />
-                    </div>
+              {/* CONTACT */}
+              {activeTab === 'contact' && (
+                <motion.div key="contact" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="space-y-12">
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <InputField label="Phone Number" value={formData.contact?.phone} onChange={(v) => setFormData({...formData, contact: {...formData.contact, phone: v}})} />
+                    <InputField label="Email Address" value={formData.contact?.email} onChange={(v) => setFormData({...formData, contact: {...formData.contact, email: v}})} />
+                    <InputField label="WhatsApp Number" value={formData.contact?.whatsapp} onChange={(v) => setFormData({...formData, contact: {...formData.contact, whatsapp: v}})} />
+                    <InputField label="Physical Address" value={formData.contact?.address} onChange={(v) => setFormData({...formData, contact: {...formData.contact, address: v}})} />
                   </div>
                 </motion.div>
               )}
@@ -261,16 +201,16 @@ export default function SettingsPage() {
   );
 }
 
-// --- Helper Components (unchanged) ---
+// --- Helper Components ---
 function InputField({ label, value, onChange, type = "text" }) {
   return (
     <div className="space-y-2 w-full">
-      <label className="text-[9px] font-black uppercase text-zinc-400 ml-1 tracking-widest">{label}</label>
-      <input 
+      <Label className="text-[9px] font-black uppercase text-zinc-400 ml-1 tracking-widest">{label}</Label>
+      <Input 
         type={type}
         value={value || ""} 
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-transparent border-b-2 border-zinc-100 dark:border-white/5 py-3 focus:border-zinc-900 dark:focus:border-white outline-none font-bold text-xs transition-all dark:text-white"
+        className="bg-transparent border-t-0 border-x-0 border-b-2 border-zinc-100 dark:border-white/5 rounded-none px-0 py-3 focus:border-zinc-900 dark:focus:border-white focus-visible:ring-0 font-bold text-xs transition-all dark:text-white h-auto"
       />
     </div>
   );
@@ -329,20 +269,23 @@ function ToggleRow({ label, description, isActive, onToggle }) {
   );
 }
 
-function ImageUploadField({ label, value }) {
+function ImageUploadField({ label, value, preview, onChange }) {
   return (
     <div className="space-y-4">
-      <label className="text-[9px] font-black uppercase text-zinc-400">{label}</label>
-      <div className="aspect-square bg-zinc-50 dark:bg-black/40 rounded-[2rem] border border-dashed border-zinc-200 dark:border-white/10 flex flex-col items-center justify-center overflow-hidden relative group cursor-pointer">
-        {value ? (
-          <img src={value} className="w-full h-full object-contain p-4 transition-transform group-hover:scale-110" alt="preview" />
+      <Label className="text-[9px] font-black uppercase text-zinc-400">{label}</Label>
+      <div className="aspect-square bg-zinc-50 dark:bg-black/40 rounded-[2rem] border border-dashed border-zinc-200 dark:border-white/10 flex flex-col items-center justify-center overflow-hidden relative group">
+        {(preview || value) ? (
+          <img src={preview || getImageUrl(value)} className="w-full h-full object-contain p-4 transition-transform group-hover:scale-110" alt="preview" />
         ) : (
           <span className="text-[8px] font-black uppercase text-zinc-400">Empty Asset</span>
         )}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-          <span className="text-[8px] font-black uppercase text-white tracking-widest font-bold">Replace Asset</span>
-        </div>
       </div>
+      <Input 
+        type="file"
+        accept="image/*"
+        onChange={(e) => onChange(e.target.files[0])}
+        className="text-[10px] bg-zinc-50 dark:bg-black/20 border-zinc-100 dark:border-white/5 rounded-xl h-auto"
+      />
     </div>
   );
 }

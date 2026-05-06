@@ -11,12 +11,15 @@ export const useSettings = () => {
       const { data } = await api.get('/settings');
       return data;
     },
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const updateSettings = useMutation({
     mutationFn: async (updatedData) => {
-      const { data } = await api.put('/settings', updatedData);
+      const isFormData = updatedData instanceof FormData;
+      const { data } = await api.put('/settings', updatedData, {
+        headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {},
+      });
       return data;
     },
     onSuccess: () => {

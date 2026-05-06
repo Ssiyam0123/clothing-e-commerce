@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, EffectFade, A11y } from 'swiper/modules';
 import { getImageUrl } from '@/utils/imageUtils';
+import { useSettings } from '@/hooks/useSettings';
 
 // Import Swiper styles (they are loaded statically, but we'll add a preload hint)
 import 'swiper/css';
@@ -13,6 +14,8 @@ import 'swiper/css/effect-fade';
 
 export default function HeroSection({ slides = [], ui = {}, lang = 'en' }) {
   const isBn = lang === 'bn';
+  const { settings } = useSettings();
+  const siteName = settings?.branding?.siteName || 'VANGUARD';
 
   if (!slides || slides.length === 0) {
     return (
@@ -22,8 +25,8 @@ export default function HeroSection({ slides = [], ui = {}, lang = 'en' }) {
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black via-zinc-900 to-black animate-pulse" />
         <div className="relative z-10 text-center">
-          <h2 className="text-zinc-800 font-black text-5xl md:text-8xl tracking-tighter italic opacity-20">
-            VANGUARD
+          <h2 className="text-zinc-800 font-black text-5xl md:text-8xl tracking-tighter italic opacity-20 uppercase">
+            {siteName}
           </h2>
           <div className="mt-4 flex justify-center gap-2" aria-hidden="true">
             <div className="w-2 h-2 rounded-full bg-zinc-800 animate-bounce" style={{ animationDelay: '0ms' }} />

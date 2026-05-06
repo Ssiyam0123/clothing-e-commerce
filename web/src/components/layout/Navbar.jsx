@@ -11,8 +11,9 @@ import { useAuthStore } from '@/store/authStore';
 import { useAppStore } from '@/store/appStore';
 import { useProductStore } from '@/store/productStore';
 import { getImageUrl } from '@/utils/imageUtils';
+import { useSettings } from '@/hooks/useSettings';
 
-const NAV_LINKS = [
+const DEFAULT_NAV = [
   { id: 'home', href: '/', en: 'Home', bn: 'হোম' },
   { id: 'shop', href: '/products', en: 'Collection', bn: 'কালেকশন' },
   { id: 'sale', href: '/flash-sale', en: 'Flash Sale', bn: 'ফ্ল্যাশ ডিল' },
@@ -22,6 +23,15 @@ const NAV_LINKS = [
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
+
+  // Settings
+  const { settings } = useSettings();
+  const branding = settings?.branding || {};
+  const siteName = branding.siteName || 'VANGUARD';
+  const headerLogo = branding.headerLogo;
+  const navLinks = settings?.navigation?.length > 0 
+    ? settings.navigation.filter(l => l.isActive).map(l => ({ ...l, en: l.label, bn: l.label }))
+    : DEFAULT_NAV;
 
   // Stores
   const { user, logout, isAuthenticated, isLoading } = useAuthStore();
@@ -85,28 +95,32 @@ export default function Navbar() {
       >
         <div className="max-w-[1800px] mx-auto px-4 md:px-10 flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group shrink-0" aria-label="Vanguard home">
-            <div className="w-10 h-10 bg-black dark:bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-500">
-              <span className="text-white dark:text-black font-black italic text-sm">V</span>
-            </div>
+          <Link href="/" className="flex items-center gap-2 group shrink-0" aria-label={`${siteName} home`}>
+            {headerLogo ? (
+              <img src={getImageUrl(headerLogo)} alt={siteName} className="h-10 w-auto object-contain" />
+            ) : (
+              <div className="w-10 h-10 bg-black dark:bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-500">
+                <span className="text-white dark:text-black font-black italic text-sm">{siteName.charAt(0)}</span>
+              </div>
+            )}
             <span className="text-xl font-black tracking-tighter uppercase dark:text-white hidden md:block">
-              VANGUARD
+              {siteName}
             </span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-10">
-            {NAV_LINKS.map((link) => {
+            {navLinks.map((link, idx) => {
               const isActive = pathname === link.href;
               return (
                 <Link
-                  key={link.id}
+                  key={link.id || idx}
                   href={link.href}
                   className={`relative text-[10px] font-black uppercase tracking-[0.3em] transition-all hover:tracking-[0.4em] ${
                     isActive ? 'text-rose-600' : 'text-zinc-500 hover:text-black dark:hover:text-white'
                   }`}
                 >
-                  {link[lang]}
+                  {link[lang] || link.label}
                   {isActive && (
                     <motion.div
                       layoutId="navUnderline"
@@ -349,9 +363,9 @@ export default function Navbar() {
               </div>
 
               <nav className="space-y-8 flex-1" aria-label="Mobile navigation">
-                {NAV_LINKS.map((link) => (
+                {navLinks.map((link, idx) => (
                   <Link
-                    key={link.id}
+                    key={link.id || idx}
                     href={link.href}
                     onClick={() => setIsSidebarOpen(false)}
                     className={`block text-5xl font-black uppercase tracking-tighter italic transition-all ${
