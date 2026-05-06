@@ -71,7 +71,6 @@ export default function FlashSaleClient() {
     return { activeSales: active, upcomingSales: upcoming };
   }, [allActiveSales, now]);
 
-  if (isLoading) return <div className="p-12"><GridSkeleton count={8} /></div>;
 
   return (
     <div className="pb-32 font-sans pt-24 md:pt-32 space-y-16 md:space-y-28">

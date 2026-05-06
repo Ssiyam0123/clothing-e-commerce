@@ -60,7 +60,7 @@ export default function Footer({ lang = 'en', settings: initialSettings }) {
         </p>
         
         {contact.phone && (
-          <p className="mt-4 text-[9px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-300">
+          <p className="mt-4 text-[9px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
             {contact.phone} | {contact.email}
           </p>
         )}
@@ -97,7 +97,7 @@ export default function Footer({ lang = 'en', settings: initialSettings }) {
            )}
         </div>
         
-        <p className="mt-10 text-[8px] font-black uppercase tracking-[0.3em] opacity-30">
+        <p className="mt-10 text-[8px] font-black uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
           © {new Date().getFullYear()} {siteName}. All Rights Reserved.
         </p>
       </div>

@@ -258,24 +258,29 @@ body {
 
 /* 🏎️ ACCESSIBILITY: Swiper Pagination Touch Targets */
 .swiper-pagination-bullet {
-  width: 12px !important;
-  height: 12px !important;
-  margin: 0 8px !important;
+  width: 10px !important;
+  height: 10px !important;
+  margin: 0 12px !important;
+  background: #a1a1aa !important;
+  opacity: 0.5 !important;
+  transition: all 0.2s;
   position: relative;
 }
 
-.swiper-pagination-bullet::before {
+.swiper-pagination-bullet::after {
   content: '';
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 44px; /* WCAG touch target size */
+  width: 44px;
   height: 44px;
+  background: transparent;
+  cursor: pointer;
 }
 
 .swiper-pagination-bullet-active {
-  background: var(--accent-secondary) !important;
-  width: 32px !important;
-  border-radius: 6px !important;
+  opacity: 1 !important;
+  transform: scale(1.2);
+  background: #18181b !important;
 }
