@@ -12,7 +12,11 @@ const server = http.createServer(app);
 //  Socket.io Setup
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://clothing-e-commerce-web.vercel.app"],
+    origin: [
+      "http://localhost:3000",
+      "https://clothing-e-commerce-web.vercel.app",
+      process.env.FRONTEND_URL
+    ].filter(Boolean),
     credentials: true
   }
 });
