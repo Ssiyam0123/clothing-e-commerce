@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { swalSuccess, swalError } from '@/utils/swal';
+import { revalidateSettings } from '@/app/actions/revalidate';
 
 export const useSettings = () => {
   const queryClient = useQueryClient();
@@ -24,6 +25,7 @@ export const useSettings = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['site-settings'] });
+      revalidateSettings();
       swalSuccess("Success", "Site protocol updated effectively.");
     },
     onError: (err) => {

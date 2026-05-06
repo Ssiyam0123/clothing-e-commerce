@@ -14,10 +14,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 async function getHomeData() {
   try {
     const [productsRes, categoriesRes, flashSalesRes, bannerRes] = await Promise.all([
-      fetch(`${API_URL}/products?limit=24`, { next: { revalidate: 3600 } }),
-      fetch(`${API_URL}/categories`, { next: { revalidate: 86400 } }),
-      fetch(`${API_URL}/flash-sales/active`, { next: { revalidate: 60 } }),
-      fetch(`${API_URL}/banner-campaigns/active`, { next: { revalidate: 3600 } })
+      fetch(`${API_URL}/products?limit=24`, { next: { revalidate: 60, tags: ['products', 'home-data'] } }),
+      fetch(`${API_URL}/categories`, { next: { revalidate: 3600, tags: ['categories', 'home-data'] } }),
+      fetch(`${API_URL}/flash-sales/active`, { next: { revalidate: 30, tags: ['flash-sale', 'home-data'] } }),
+      fetch(`${API_URL}/banner-campaigns/active`, { next: { revalidate: 60, tags: ['banners', 'home-data'] } })
     ]);
 
     return {

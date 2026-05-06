@@ -7,7 +7,10 @@ export async function getSettings() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
   try {
     const res = await fetch(`${apiUrl}/settings`, { 
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      next: { 
+        revalidate: 60,
+        tags: ['settings']
+      }, 
     });
     
     if (!res.ok) {
