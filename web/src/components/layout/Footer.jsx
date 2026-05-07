@@ -55,11 +55,17 @@ export default function Footer() {
               "We architect artifacts for the modern vanguard. Sustainable fibers meet high-performance silhouettes."
             </p>
             <div className="flex items-center gap-6">
-              {[Globe, Send, Share2, Activity].map((Icon, i) => (
+              {[
+                { Icon: Globe, label: "Global Network" },
+                { Icon: Send, label: "Direct Transmission" },
+                { Icon: Share2, label: "Share Protocol" },
+                { Icon: Activity, label: "System Status" }
+              ].map(({ Icon, label }, i) => (
                 <Link 
                   key={i} 
                   href="#" 
-                  className="w-12 h-12 rounded-2xl glass flex items-center justify-center text-muted-foreground hover:text-accent-secondary hover:scale-110 hover:rotate-6 transition-all duration-500 shadow-sm border-border/10"
+                  className="w-12 h-12 rounded-2xl glass flex items-center justify-center text-foreground hover:text-accent-secondary hover:scale-110 hover:rotate-6 transition-all duration-500 shadow-sm border-border/10"
+                  aria-label={label}
                 >
                   <Icon size={20} />
                 </Link>
@@ -74,19 +80,21 @@ export default function Footer() {
                 <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-accent-secondary">
                   {section.title}
                 </h4>
-                <ul className="space-y-5">
-                  {section.links.map((link) => (
-                    <li key={link.label}>
-                      <Link 
-                        href={link.href}
-                        className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all flex items-center gap-2 group"
-                      >
-                        <span className="h-px w-0 bg-accent-secondary group-hover:w-4 transition-all duration-500" />
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+                <nav aria-label={`${section.title} navigation`}>
+                  <ul className="space-y-5">
+                    {section.links.map((link) => (
+                      <li key={link.label}>
+                        <Link 
+                          href={link.href}
+                          className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all flex items-center gap-2 group"
+                        >
+                          <span className="h-px w-0 bg-accent-secondary group-hover:w-4 transition-all duration-500" />
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
               </div>
             ))}
           </div>
@@ -105,15 +113,22 @@ export default function Footer() {
                   <Input 
                     placeholder="CODENAME@VAN-GUARD.COM" 
                     className="h-16 lg:h-24 rounded-full sm:rounded-full bg-background/50 border-none px-10 lg:px-12 font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-2xl focus-visible:ring-2 focus-visible:ring-accent-secondary/30 transition-all placeholder:text-muted-foreground/30 w-full pr-[180px]"
+                    aria-label="Newsletter email address"
                   />
                   <div className="hidden sm:block absolute right-3 lg:right-4 top-1/2 -translate-y-1/2">
-                    <Button className="h-10 lg:h-16 rounded-full bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-8 lg:px-12 shadow-xl">
+                    <Button 
+                      className="h-10 lg:h-16 rounded-full bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-8 lg:px-12 shadow-xl"
+                      aria-label="Subscribe to newsletter"
+                    >
                       <Mail size={16} className="mr-3 lg:w-5 lg:h-5" />
                       <span className="font-black uppercase text-[10px] tracking-widest">Transmit</span>
                     </Button>
                   </div>
                   {/* Mobile Only Button */}
-                  <Button className="sm:hidden mt-4 h-16 rounded-full bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-8 shadow-xl w-full">
+                  <Button 
+                    className="sm:hidden mt-4 h-16 rounded-full bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-8 shadow-xl w-full"
+                    aria-label="Subscribe to newsletter"
+                  >
                      <Mail size={18} className="mr-3" />
                      <span className="font-black uppercase text-[10px] tracking-widest">Transmit</span>
                   </Button>

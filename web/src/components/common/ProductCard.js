@@ -119,6 +119,7 @@ export default function ProductCard({ product, className }) {
                 variant="outline"
                 size="sm"
                 className="h-8 px-2 sm:px-3 text-[10px] font-bold uppercase tracking-tight gap-1 rounded-md border-foreground/10 hover:bg-foreground hover:text-background"
+                aria-label={`Buy ${product.name} now`}
               >
                 <Zap size={12} className="fill-current" />
                 <span className="hidden xs:inline">Buy</span>
@@ -127,6 +128,7 @@ export default function ProductCard({ product, className }) {
                 onClick={(e) => triggerModal(e, "cart")}
                 size="sm"
                 className="h-8 px-2 sm:px-3 text-[10px] font-bold uppercase tracking-tight gap-1 rounded-md"
+                aria-label={`Add ${product.name} to cart`}
               >
                 <ShoppingCart size={12} />
                 <span className="hidden xs:inline text-[9px]">Add</span>

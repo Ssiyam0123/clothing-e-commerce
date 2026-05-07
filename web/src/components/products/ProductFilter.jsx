@@ -115,20 +115,20 @@ export default function ProductFilter({ initialCategories }) {
 function CategoryButton({ isSelected, onClick, label, icon, image }) {
   return (
     <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ scale: 1.05, y: -2 }}
+      whileTap={{ scale: 0.95 }}
       onClick={onClick}
       className={cn(
-        "relative flex items-center gap-5 p-2 pr-10 rounded-[2rem] border transition-all duration-500 group overflow-hidden",
+        "relative flex items-center gap-5 p-2.5 pr-12 rounded-[2.5rem] border transition-all duration-500 group overflow-hidden shadow-sm",
         isSelected
-          ? "bg-foreground border-foreground shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] z-10"
-          : "bg-background border-border/40 hover:border-accent-secondary/50 hover:shadow-xl hover:shadow-accent-secondary/5"
+          ? "bg-foreground border-foreground shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)] z-10"
+          : "bg-card/40 backdrop-blur-md border-border/80 hover:border-accent-secondary hover:bg-card/80 hover:shadow-xl hover:shadow-accent-secondary/10"
       )}
     >
       {/* Visual Identity */}
       <div className={cn(
         "w-12 h-12 rounded-full overflow-hidden flex items-center justify-center transition-all duration-700 shadow-inner",
-        isSelected ? "bg-background/10" : "bg-accent/30"
+        isSelected ? "bg-background/20 ring-2 ring-background/10" : "bg-accent/40 ring-1 ring-border/5"
       )}>
         {image ? (
           <Image
@@ -138,13 +138,13 @@ function CategoryButton({ isSelected, onClick, label, icon, image }) {
             height={48}
             className={cn(
               "w-full h-full object-cover transition-all duration-700",
-              isSelected ? "scale-110 grayscale-0" : "grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
+              isSelected ? "scale-110 grayscale-0" : "grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-125"
             )}
           />
         ) : (
           <div className={cn(
-            "transition-colors",
-            isSelected ? "text-background" : "text-muted-foreground group-hover:text-accent-secondary"
+            "transition-all duration-500",
+            isSelected ? "text-background scale-110" : "text-muted-foreground group-hover:text-accent-secondary group-hover:scale-110"
           )}>
             {icon || <Sparkles size={18} />}
           </div>
@@ -152,10 +152,10 @@ function CategoryButton({ isSelected, onClick, label, icon, image }) {
       </div>
 
       {/* Label Matrix */}
-      <div className="flex flex-col items-start gap-0.5">
+      <div className="flex flex-col items-start gap-1">
         <span className={cn(
-          "text-[10px] font-black uppercase tracking-[0.25em] transition-colors",
-          isSelected ? "text-background" : "text-muted-foreground group-hover:text-foreground"
+          "text-[11px] font-black uppercase tracking-[0.3em] transition-all duration-500",
+          isSelected ? "text-background" : "text-foreground/80 group-hover:text-foreground"
         )}>
           {label}
         </span>
@@ -165,7 +165,7 @@ function CategoryButton({ isSelected, onClick, label, icon, image }) {
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: "100%", opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
-              className="h-0.5 bg-accent-secondary rounded-full mt-1"
+              className="h-0.5 bg-accent-secondary rounded-full"
             />
           )}
         </AnimatePresence>
@@ -173,10 +173,10 @@ function CategoryButton({ isSelected, onClick, label, icon, image }) {
 
       {/* Interactive Decoration */}
       <div className={cn(
-        "absolute top-0 right-0 h-full w-2 flex items-center justify-center transition-all",
-        isSelected ? "bg-accent-secondary opacity-100" : "bg-accent/10 opacity-0 group-hover:opacity-100"
+        "absolute top-0 right-0 h-full w-3 flex items-center justify-center transition-all duration-500",
+        isSelected ? "bg-accent-secondary opacity-100" : "bg-accent/20 opacity-0 group-hover:opacity-100"
       )}>
-         <ChevronRight size={8} className={isSelected ? "text-white" : "text-muted-foreground"} />
+         <ChevronRight size={10} className={isSelected ? "text-white" : "text-accent-secondary"} />
       </div>
     </motion.button>
   );

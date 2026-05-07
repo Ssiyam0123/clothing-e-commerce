@@ -244,7 +244,7 @@ export default async function ProductPage({ params }) {
         {/* Related Products */}
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <RelatedProducts
-            categoryId={product.category?._id}
+            categorySlug={product.category?.slug}
             currentProductId={product._id}
             title={ui.related}
           />

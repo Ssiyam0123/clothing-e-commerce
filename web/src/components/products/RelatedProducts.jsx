@@ -3,10 +3,10 @@ import { cn } from "@/lib/utils";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-async function getRelatedProducts(categoryId) {
+async function getRelatedProducts(categorySlug) {
   try {
     const res = await fetch(
-      `${API_URL}/products?category=${categoryId}&limit=5`,
+      `${API_URL}/products?category=${categorySlug}&limit=8`,
       {
         next: { revalidate: 3600 },
       },
@@ -21,11 +21,11 @@ async function getRelatedProducts(categoryId) {
 }
 
 export default async function RelatedProducts({
-  categoryId,
+  categorySlug,
   currentProductId,
   title,
 }) {
-  const products = await getRelatedProducts(categoryId);
+  const products = await getRelatedProducts(categorySlug);
   const filteredProducts = products
     .filter((p) => p._id !== currentProductId)
     .slice(0, 4);

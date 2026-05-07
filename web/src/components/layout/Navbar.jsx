@@ -43,11 +43,13 @@ export default function Navbar() {
   const { cart, wishlistItems } = useProductStore();
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const cartCount = cart?.totalItems || 0;
   const wishlistCount = wishlistItems?.length || 0;
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -101,20 +103,25 @@ export default function Navbar() {
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="w-10 h-10 rounded-full hover:bg-accent/30"
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
           >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            {mounted ? (
+              theme === "dark" ? <Sun size={18} /> : <Moon size={18} />
+            ) : (
+              <div className="w-[18px] h-[18px]" /> // Placeholder to prevent layout shift
+            )}
           </Button>
 
           {/* Search Trigger */}
-          <Link href="/products?search=open">
-             <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30">
+          <Link href="/products?search=open" aria-label="Search products">
+             <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30" aria-hidden="true">
                <Search size={18} />
              </Button>
           </Link>
 
           {/* Wishlist */}
-          <Link href="/wishlist" className="relative">
-            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30">
+          <Link href="/wishlist" className="relative" aria-label={`View wishlist, ${wishlistCount} items`}>
+            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30" aria-hidden="true">
               <Heart size={18} />
             </Button>
             {wishlistCount > 0 && (
@@ -125,8 +132,8 @@ export default function Navbar() {
           </Link>
 
           {/* Cart */}
-          <Link href="/cart" className="relative">
-            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30">
+          <Link href="/cart" className="relative" aria-label={`View shopping cart, ${cartCount} items`}>
+            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30" aria-hidden="true">
               <ShoppingBag size={18} />
             </Button>
             {cartCount > 0 && (
@@ -193,12 +200,16 @@ export default function Navbar() {
           {/* MOBILE MENU */}
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
-              <button className="lg:hidden w-10 h-10 rounded-full hover:bg-accent/30 flex items-center justify-center transition-all active:scale-90 border border-border/10">
+              <button 
+                className="lg:hidden w-10 h-10 rounded-full hover:bg-accent/30 flex items-center justify-center transition-all active:scale-90 border border-border/10"
+                aria-label="Open navigation menu"
+              >
                 <Menu size={20} />
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full sm:max-w-md bg-background/95 backdrop-blur-3xl border-l border-border/10 p-0 flex flex-col [&>button]:hidden">
               <SheetHeader className="text-left p-8 border-b border-border/5">
+                 <SheetTitle className="text-lg font-black uppercase tracking-widest italic">Vanguard Menu</SheetTitle>
               </SheetHeader>
               
               <ScrollArea className="flex-1 p-8">
