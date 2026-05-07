@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
-export default function CountdownTimer({ targetDate, onExpire, label }) {
+export default function CountdownTimer({ targetDate, onExpire, label, className }) {
   const [timeLeft, setTimeLeft] = useState(null);
 
   useEffect(() => {
@@ -33,29 +34,32 @@ export default function CountdownTimer({ targetDate, onExpire, label }) {
 
   const Unit = ({ val, label }) => (
     <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
+      initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 200, damping: 20 }}
-      className="flex flex-col items-center bg-surface backdrop-blur-xl border border-light px-3 md:px-4 py-2 md:py-3 rounded-xl md:rounded-2xl min-w-[60px] md:min-w-[70px] shadow-2xl"
+      className="flex flex-col items-center justify-center bg-accent/20 backdrop-blur-3xl border border-border/10 px-2 sm:px-4 py-2 sm:py-3 rounded-2xl min-w-[55px] sm:min-w-[75px] shadow-2xl ring-1 ring-white/5"
     >
-      <span className="text-xl md:text-3xl font-black text-primary leading-none">
+      <span className="text-xl sm:text-3xl font-black text-foreground tracking-tighter tabular-nums leading-none">
         {String(val).padStart(2, "0")}
       </span>
-      <span className="text-[7px] md:text-[9px] font-black uppercase text-secondary tracking-[0.2em] mt-1 md:mt-2">
+      <span className="text-[7px] sm:text-[9px] font-black uppercase text-muted-foreground tracking-[0.3em] mt-1 sm:mt-1.5">
         {label}
       </span>
     </motion.div>
   );
 
   return (
-    <div className="flex flex-col items-center">
+    <div className={cn("flex flex-col items-center gap-4 sm:gap-6", className)}>
       {label && (
-        <p className="text-[10px] font-black text-secondary uppercase tracking-[0.4em] mb-4">
-          {label}
-        </p>
+        <div className="flex items-center gap-3">
+          <div className="h-px w-6 sm:w-10 bg-border/20" />
+          <p className="text-[9px] sm:text-[11px] font-black text-accent-secondary uppercase tracking-[0.4em] whitespace-nowrap">
+            {label}
+          </p>
+          <div className="h-px w-6 sm:w-10 bg-border/20" />
+        </div>
       )}
-      <div className="flex gap-2">
-        <AnimatePresence>
+      <div className="flex gap-2 sm:gap-4">
+        <AnimatePresence mode="popLayout">
           {timeLeft.days > 0 && (
             <Unit key="days" val={timeLeft.days} label="Days" />
           )}

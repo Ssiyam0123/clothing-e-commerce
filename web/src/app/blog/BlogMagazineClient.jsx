@@ -3,59 +3,81 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getImageUrl } from "@/utils/imageUtils";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { ArrowUpRight, Clock, User } from "lucide-react";
 
 export default function BlogMagazineClient({ posts }) {
   const featured = posts?.[0];
   const remaining = posts?.slice(1);
 
   return (
-    <div className="min-h-screen bg-surface dark:bg-[#050505] pt-32 pb-20 px-6">
+    <div className="min-h-screen bg-background pt-20 sm:pt-32 pb-24 sm:pb-32 px-4 sm:px-6">
       <div className="max-w-[1400px] mx-auto">
-        {/* Header Section */}
-        <header className="mb-20 text-center">
-          <h1 className="text-7xl md:text-9xl font-black uppercase italic tracking-tighter  leading-none">
-            Foundry
+        {/* 📰 Journal Header */}
+        <header className="mb-16 sm:mb-24 text-center space-y-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-3 px-4 py-1 rounded-full border border-border/10 bg-accent/30 backdrop-blur-md"
+          >
+            <div className="w-1.5 h-1.5 rounded-full bg-accent-secondary animate-pulse" />
+            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground">Protocol_Foundry</span>
+          </motion.div>
+          <h1 className="text-5xl sm:text-8xl md:text-9xl font-black uppercase italic tracking-tighter leading-none text-gradient">
+            Vanguard
             <br />
-            <span className="text-rose-600">Journal</span>
+            <span className="text-foreground">Journal</span>
           </h1>
-          <p className="mt-6 text-[10px] font-black uppercase tracking-[0.6em] text-muted">
-            Tactical Aesthetic & Fabric Narrative
+          <p className="max-w-md mx-auto text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.4em] text-muted-foreground/60 leading-relaxed">
+            Architecting Tactical Aesthetics & Digital Narratives
           </p>
         </header>
 
-        {/* Magazine Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        {/* 📚 Magazine Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
           {/* Main Feature */}
           {featured && (
-            <div className="lg:col-span-8 group cursor-pointer">
+            <div className="lg:col-span-8 group">
               <Link
                 href={`/blog/${featured.slug}`}
-                aria-label={`Read full article: ${featured.title}`}
+                className="block space-y-8"
               >
-                <div className="relative aspect-[16/9] overflow-hidden rounded-[3rem] bg-elevated dark:bg-accent-primary">
+                <div className="relative aspect-[16/10] sm:aspect-[16/9] overflow-hidden rounded-[2.5rem] sm:rounded-[4rem] bg-accent/20 shadow-2xl">
                   <Image
                     src={getImageUrl(featured.featuredImage, 1200, 85)}
                     alt={featured.title}
                     fill
                     sizes="(max-width: 1024px) 100vw, 66vw"
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-[1.5s] ease-out group-hover:scale-105"
                     priority
                   />
-                  <div className="absolute top-8 left-8 bg-surface px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest">
-                    {featured.category}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
+                  <div className="absolute top-6 left-6 sm:top-10 sm:left-10">
+                    <Badge className="bg-white text-black border-none px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-2xl">
+                      {featured.category}
+                    </Badge>
+                  </div>
+                  <div className="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 flex items-center justify-center text-white scale-0 group-hover:scale-100 transition-transform duration-500">
+                    <ArrowUpRight size={24} />
                   </div>
                 </div>
-                <div className="mt-8 space-y-4">
-                  <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter  group-hover:text-rose-600 transition-colors">
+                
+                <div className="space-y-6">
+                  <h2 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase italic tracking-tighter leading-[0.9] group-hover:text-accent-secondary transition-colors duration-500">
                     {featured.title}
                   </h2>
-                  <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest text-muted">
-                    <span>{featured.author?.name}</span>
-                    <div
-                      className="w-1 h-1 bg-zinc-300 rounded-full"
-                      aria-hidden="true"
-                    />
-                    <span>{featured.readingTime}</span>
+                  <div className="flex flex-wrap items-center gap-6 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                       <User size={12} className="text-accent-secondary" />
+                       <span>{featured.author?.name}</span>
+                    </div>
+                    <div className="w-1 h-1 bg-border rounded-full" />
+                    <div className="flex items-center gap-2">
+                       <Clock size={12} className="text-accent-secondary" />
+                       <span>{featured.readingTime}</span>
+                    </div>
                   </div>
                 </div>
               </Link>
@@ -64,39 +86,45 @@ export default function BlogMagazineClient({ posts }) {
 
           {/* Sidebar – Latest Sequence */}
           <div className="lg:col-span-4 space-y-12">
-            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-muted border-b dark:border-light pb-4">
-              Latest Sequence
-            </h3>
-            {remaining?.map((post) => (
-              <Link
-                href={`/blog/${post.slug}`}
-                key={post._id}
-                className="flex gap-6 group"
-                aria-label={`Read article: ${post.title}`}
-              >
-                <div className="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0 bg-elevated">
-                  <Image
-                    src={getImageUrl(post.featuredImage, 150, 75)}
-                    alt={post.title}
-                    fill
-                    sizes="96px"
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <span className="text-[8px] font-black text-rose-600 uppercase tracking-widest">
-                    {post.category}
-                  </span>
-                  <h4 className="text-sm font-black uppercase leading-tight  group-hover:underline">
-                    {post.title}
-                  </h4>
-                  <p className="text-[9px] font-bold text-muted uppercase tracking-widest">
-                    {post.readingTime}
-                  </p>
-                </div>
-              </Link>
-            ))}
+            <div className="flex items-center gap-4">
+               <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground whitespace-nowrap">
+                 Latest_Sequences
+               </h3>
+               <div className="h-px flex-1 bg-border/20" />
+            </div>
+
+            <div className="grid grid-cols-1 gap-10">
+              {remaining?.map((post) => (
+                <Link
+                  href={`/blog/${post.slug}`}
+                  key={post._id}
+                  className="flex gap-6 group items-center"
+                >
+                  <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-3xl overflow-hidden shrink-0 bg-accent/20 shadow-xl">
+                    <Image
+                      src={getImageUrl(post.featuredImage, 300, 75)}
+                      alt={post.title}
+                      fill
+                      sizes="(max-width: 640px) 96px, 128px"
+                      className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <Badge variant="outline" className="text-[8px] font-black text-accent-secondary uppercase tracking-widest border-accent-secondary/30 bg-accent-secondary/5 rounded-full">
+                      {post.category}
+                    </Badge>
+                    <h4 className="text-sm sm:text-base font-black uppercase leading-tight tracking-tight group-hover:text-accent-secondary transition-colors">
+                      {post.title}
+                    </h4>
+                    <div className="flex items-center gap-3 text-[8px] font-bold text-muted-foreground uppercase tracking-widest">
+                      <Clock size={10} />
+                      <span>{post.readingTime}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>

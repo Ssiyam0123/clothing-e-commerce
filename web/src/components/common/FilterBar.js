@@ -206,7 +206,7 @@ export default function FilterBar({
           </span>
         )}
         <Select value={sort || "all"} onValueChange={onSortChange}>
-          <SelectTrigger className="w-full md:min-w-[200px] md:max-w-[300px] h-16 bg-accent/30 border-none rounded-full px-8 font-black text-[10px] uppercase tracking-widest hover:bg-accent/50 transition-all shadow-sm focus:ring-2 focus:ring-accent-secondary/20">
+          <SelectTrigger className="w-full md:min-w-[200px] md:max-w-[300px] h-20 bg-accent/30 border-none rounded-full px-8 font-black text-[10px] uppercase tracking-widest hover:bg-accent/50 transition-all shadow-sm focus:ring-2 focus:ring-accent-secondary/20">
             <SelectValue placeholder="SORT SEQUENCE" />
           </SelectTrigger>
           <SelectContent className="bg-background/95 backdrop-blur-3xl border-none shadow-2xl rounded-[2rem] p-2">

@@ -8,7 +8,9 @@ import Sidebar from "@/components/admin/Sidebar";
 import Loader from "@/components/common/Loader";
 import { useAppStore } from "@/store/appStore";
 import { useAuthStore } from "@/store/authStore";
-import { Menu, Globe, Sun, Moon, LogOut } from "lucide-react";
+import { Menu, Globe, Sun, Moon, LogOut, ChevronRight } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 export default function AdminLayout({ children }) {
   const { user, isLoading: authLoading, logout } = useAuthStore();
@@ -22,15 +24,6 @@ export default function AdminLayout({ children }) {
       router.replace("/");
     }
   }, [user, authLoading, router]);
-
-  // 🔒 Lock Body Scroll when Sidebar is open on Mobile
-  useEffect(() => {
-    if (isSidebarOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-  }, [isSidebarOpen]);
 
   const handleLogout = () => {
     logout();
@@ -49,25 +42,30 @@ export default function AdminLayout({ children }) {
 
   return (
     <div className="flex h-screen bg-white dark:bg-[#050505] transition-colors duration-700">
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      {/* 🖥️ Desktop Sidebar */}
+      <Sidebar className="hidden lg:flex w-72" />
 
       <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* 🛰️ Top Header Bar */}
         <header className="bg-white/70 dark:bg-[#080808]/70 backdrop-blur-2xl border-b border-zinc-100 dark:border-zinc-900 z-40 transition-all">
           <div className="flex justify-between items-center px-4 md:px-10 py-4 md:py-6">
             <div className="flex items-center gap-5">
-              {/* 🍔 Mobile Hamburger */}
-              <button
-                className="lg:hidden p-3 text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-900 rounded-2xl active:scale-90 transition-all"
-                onClick={() => setIsSidebarOpen(true)}
-              >
-                <Menu size={20} />
-              </button>
+              {/* 🍔 Mobile Hamburger (Sheet) */}
+              <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+                <SheetTrigger asChild>
+                  <button className="lg:hidden p-3 text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-900 rounded-2xl active:scale-90 transition-all">
+                    <Menu size={20} />
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 w-72 bg-background border-r border-border/10 [&>button]:hidden">
+                  <Sidebar className="border-none" onItemClick={() => setIsSidebarOpen(false)} />
+                </SheetContent>
+              </Sheet>
 
               <div className="hidden sm:flex items-center gap-3 bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
-                  Live Terminal
+                  Terminal_Active
                 </span>
               </div>
             </div>
@@ -77,10 +75,10 @@ export default function AdminLayout({ children }) {
               <div className="flex items-center gap-4 md:gap-6 border-r border-zinc-200 dark:border-zinc-800 pr-4 md:pr-8">
                 <Link
                   href="/"
-                  className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
+                  className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white transition-colors group"
                 >
-                  <Globe size={14} className="opacity-50" />
-                  <span className="hidden md:inline">Portal</span>
+                  <Globe size={14} className="opacity-50 group-hover:text-accent-secondary" />
+                  <span className="hidden md:inline">Live Portal</span>
                 </Link>
 
                 <button
@@ -93,34 +91,36 @@ export default function AdminLayout({ children }) {
 
               {/* Identity Hub */}
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-2xl overflow-hidden bg-zinc-900 dark:bg-white border border-zinc-200 dark:border-zinc-800 shadow-xl">
-                  {user?.avatar ? (
-                    <img
-                      src={getImageUrl(user.avatar)}
-                      alt={user.name}
-                      className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-xs font-black text-white dark:text-black">
-                        {user?.name?.charAt(0)}
-                      </span>
-                    </div>
-                  )}
+                <div className="h-10 w-10 rounded-2xl overflow-hidden bg-zinc-900 dark:bg-white border border-zinc-200 dark:border-zinc-800 shadow-xl p-[2px]">
+                   <div className="w-full h-full rounded-[0.9rem] overflow-hidden">
+                      {user?.avatar ? (
+                        <img
+                          src={getImageUrl(user.avatar)}
+                          alt={user.name}
+                          className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-zinc-800 dark:bg-zinc-200">
+                          <span className="text-xs font-black text-white dark:text-black">
+                            {user?.name?.charAt(0)}
+                          </span>
+                        </div>
+                      )}
+                   </div>
                 </div>
                 <div className="hidden lg:block">
                   <p className="text-[10px] font-black text-zinc-900 dark:text-white uppercase tracking-wider">
                     {user?.name}
                   </p>
                   <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">
-                    Administrator
+                    Authorized_Admin
                   </p>
                 </div>
               </div>
 
               <button
                 onClick={handleLogout}
-                className="ml-2 md:ml-4 text-zinc-400 hover:text-rose-500 transition-colors"
+                className="ml-2 md:ml-4 text-zinc-300 hover:text-rose-500 transition-all hover:rotate-12"
                 title="Disconnect Session"
               >
                 <LogOut size={18} />
@@ -139,3 +139,4 @@ export default function AdminLayout({ children }) {
     </div>
   );
 }
+

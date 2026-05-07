@@ -127,24 +127,13 @@ export default async function ProductsPage({ searchParams }) {
   };
 
   return (
-    <main className="min-h-screen bg-page pt-24 pb-20 transition-colors duration-700">
+    <main className="min-h-screen bg-page pt-10  transition-colors duration-700">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <div className="container mx-auto px-4 md:px-6">
-        <div className="mb-20 text-center space-y-4 animate-in fade-in slide-in-from-top-4 duration-1000">
-          <h1 className="text-6xl md:text-9xl font-black uppercase italic tracking-tighter text-gradient leading-none">
-            {params.search ? `Search: ${params.search}` : "The Collection"}
-          </h1>
-          <div className="flex items-center justify-center gap-4">
-             <div className="h-px w-12 bg-border-medium/30" />
-             <p className="text-[10px] font-black uppercase tracking-[0.5em] text-accent-secondary">
-               Curated Vanguard Artifacts
-             </p>
-             <div className="h-px w-12 bg-border-medium/30" />
-          </div>
-        </div>
+        
         <Suspense fallback={<ProductsPageSkeleton />}>
           <ProductsClient initialData={initialData} initialCategories={categories} />
         </Suspense>

@@ -9,8 +9,12 @@ import { useProductStore } from "@/store/productStore";
 import { swalToast, swalError } from "@/utils/swal";
 import { useAppStore } from "@/store/appStore";
 import { useTrackingStore } from "@/store/trackingStore";
-import { ShoppingBag, X, ArrowRight, Info } from "lucide-react";
+import { ShoppingBag, X, ArrowRight, Info, Zap, Heart } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 const DICTIONARY = {
   en: {
@@ -72,34 +76,32 @@ export default function WishlistPage() {
 
   if (!isMounted || authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center dark:bg-[#050505]">
-        <Loader />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-6">
+           <Heart className="text-accent-secondary animate-pulse" size={48} />
+           <p className="text-[10px] font-black uppercase tracking-[0.5em] animate-pulse">Syncing Vault...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-surface dark:bg-[#050505] py-12 lg:py-24 relative overflow-hidden">
+    <div className="min-h-screen bg-background pt-20 sm:pt-32 pb-24 sm:pb-32 relative overflow-hidden">
+      {/* 🔮 Background Aura */}
       <div
-        className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent-secondary/5 blur-[120px] -z-10"
+        className="absolute top-0 right-0 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-accent-secondary/5 blur-[100px] sm:blur-[150px] -z-10"
         aria-hidden="true"
       />
 
-      <div className="max-w-[1700px] mx-auto px-4 md:px-10">
-        {/* Header Section */}
-        <header className="mb-16 border-b border-light pb-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <h1 className="text-5xl md:text-9xl font-black tracking-tighter uppercase italic  leading-[0.8]">
-                The{" "}
-                <span
-                  className="text-transparent stroke-black dark:stroke-white"
-                  style={{ WebkitTextStroke: "1.5px currentColor" }}
-                >
-                  Vault
-                </span>
+      <div className="max-w-[1700px] mx-auto px-4 sm:px-10">
+        {/* 🏛️ Header Section */}
+        <header className="mb-12 sm:mb-20 border-b border-border/10 pb-8 sm:pb-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="space-y-4 sm:space-y-6">
+              <h1 className="text-5xl sm:text-7xl lg:text-9xl font-black tracking-tighter uppercase italic leading-[0.8] text-gradient">
+                The Vault
               </h1>
-              <p className="mt-6 text-muted uppercase text-[10px] font-black tracking-[0.5em]">
+              <p className="text-muted-foreground uppercase text-[9px] sm:text-[10px] font-black tracking-[0.4em] sm:tracking-[0.5em]">
                 {ui.sub}
               </p>
             </div>
@@ -108,11 +110,11 @@ export default function WishlistPage() {
             {!isAuthenticated && wishlistItems.length > 0 && (
               <Link
                 href="/login?redirect=/wishlist"
-                className="flex items-center gap-3 bg-surface-alt px-6 py-4 rounded-2xl border border-light hover:border-rose-500/30 transition-all"
+                className="group flex items-center gap-4 bg-accent/20 backdrop-blur-xl px-6 py-4 rounded-2xl border border-border/10 hover:border-accent-secondary/30 transition-all shadow-xl"
                 aria-label="Log in to sync your wishlist"
               >
-                <Info size={16} className="text-rose-500" aria-hidden="true" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-secondary">
+                <Info size={18} className="text-accent-secondary group-hover:scale-110 transition-transform" aria-hidden="true" />
+                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-foreground/80">
                   {ui.syncTip}
                 </span>
               </Link>
@@ -120,83 +122,92 @@ export default function WishlistPage() {
           </div>
         </header>
 
-        {/* Wishlist Items */}
-        {!wishlistItems.length ? (
-          <div className="py-40 text-center">
-            <h2 className="text-2xl font-black uppercase text-muted dark:text-primary tracking-widest mb-8">
-              {ui.empty}
-            </h2>
-            <Link
-              href="/products"
-              className="group flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest "
-              aria-label={ui.browse}
+        {/* 💎 Wishlist Grid */}
+        <AnimatePresence mode="popLayout">
+          {!wishlistItems.length ? (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="py-40 text-center space-y-12"
             >
-              {ui.browse}{" "}
-              <ArrowRight
-                size={14}
-                className="group-hover:translate-x-2 transition-transform"
-                aria-hidden="true"
-              />
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">
-            {wishlistItems.map((product) => (
-              <div
-                key={product._id}
-                className="group relative bg-surface-alt rounded-[2.5rem] border border-light overflow-hidden"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden">
-                  <Image
-                    src={getImageUrl(product.images?.[0], 400, 80)}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                    className="object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
-                    loading="lazy"
-                  />
-                  <button
-                    onClick={() => handleRemove(product)}
-                    className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-surface backdrop-blur-md flex items-center justify-center text-muted hover:text-rose-600 transition-colors"
-                    aria-label={ui.remove}
-                  >
-                    <X size={18} aria-hidden="true" />
-                  </button>
-                </div>
-
-                <div className="p-6 space-y-4">
-                  <div className="min-h-[60px]">
-                    <h3 className="text-lg font-black uppercase tracking-tight  line-clamp-1">
-                      {product.name}
-                    </h3>
-                    <p className="text-[9px] font-bold text-muted uppercase tracking-widest">
-                      {product.category?.name}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-black  tracking-tighter">
-                      ৳
-                      {(
-                        product.price -
-                        (product.price * (product.discount || 0)) / 100
-                      ).toFixed(0)}
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={() => handleMoveToCart(product)}
-                    className="w-full flex items-center justify-center gap-2 bg-accent-primary text-primary  py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-accent-secondary hover:text-primary transition-all duration-300"
-                    aria-label={ui.add}
-                  >
-                    <ShoppingBag size={14} aria-hidden="true" />
-                    {ui.add}
-                  </button>
-                </div>
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] sm:rounded-[3rem] glass flex items-center justify-center mx-auto opacity-20">
+                 <ShoppingBag size={48} className="sm:w-16 sm:h-16" />
               </div>
-            ))}
-          </div>
-        )}
+              <h2 className="text-4xl sm:text-6xl md:text-8xl font-black uppercase italic tracking-tighter text-muted-foreground/20 leading-none">
+                {ui.empty}
+              </h2>
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-full px-12 h-14 font-black uppercase tracking-[0.3em] text-[10px] border-border/20 hover:bg-accent-secondary hover:text-white transition-all shadow-2xl"
+              >
+                <Link href="/products">
+                  {ui.browse}
+                </Link>
+              </Button>
+            </motion.div>
+          ) : (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-10">
+              {wishlistItems.map((product) => (
+                <motion.div
+                  layout
+                  key={product._id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="group relative bg-accent/10 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] border border-border/10 overflow-hidden hover:border-accent-secondary/30 transition-all duration-700 shadow-2xl hover:shadow-accent-secondary/10"
+                >
+                  <div className="relative aspect-[3/4] overflow-hidden">
+                    <Image
+                      src={getImageUrl(product.images?.[0], 400, 80)}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      className="object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    
+                    <Button
+                      size="icon"
+                      onClick={() => handleRemove(product)}
+                      className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 w-10 h-10 rounded-full bg-background/80 backdrop-blur-md text-foreground hover:text-destructive hover:bg-background transition-all shadow-xl"
+                      aria-label={ui.remove}
+                    >
+                      <X size={18} aria-hidden="true" />
+                    </Button>
+                  </div>
+
+                  <div className="p-4 sm:p-8 space-y-4 sm:space-y-6">
+                    <div className="space-y-1 sm:space-y-2">
+                      <p className="text-[8px] sm:text-[9px] font-black text-accent-secondary uppercase tracking-widest">
+                        {product.category?.name || "Premium Drop"}
+                      </p>
+                      <h3 className="text-base sm:text-xl font-black uppercase tracking-tighter italic leading-none line-clamp-1">
+                        {product.name}
+                      </h3>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl sm:text-3xl font-black tracking-tighter">
+                        ৳{(product.price - (product.price * (product.discount || 0)) / 100).toFixed(0)}
+                      </span>
+                    </div>
+
+                    <Button
+                      onClick={() => handleMoveToCart(product)}
+                      className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-foreground text-background font-black uppercase tracking-widest text-[9px] sm:text-[10px] hover:bg-accent-secondary hover:text-white transition-all duration-500 group/btn"
+                      aria-label={ui.add}
+                    >
+                      <ShoppingBag size={14} className="mr-2 group-hover/btn:scale-110 transition-transform" aria-hidden="true" />
+                      {ui.add}
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

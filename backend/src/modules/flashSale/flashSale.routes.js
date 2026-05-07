@@ -15,13 +15,12 @@ const router = express.Router();
 
 router.get('/active', getActiveFlashSales);
 router.get('/products', getFlashSaleProducts);
+router.get('/details/:slug', getFlashSaleBySlug);
 router.get('/:id', getFlashSaleById); 
-
 
 router.use(protect, admin);
 router.post('/', createFlashSale);
 router.get('/', getAllFlashSales);
 router.put('/:id', updateFlashSale);
 router.delete('/:id', deleteFlashSale);
-router.get('/details/:slug', getFlashSaleBySlug);
 export default router;

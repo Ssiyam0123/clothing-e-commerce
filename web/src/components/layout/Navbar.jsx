@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, ShoppingBag, User, Menu, X, Sun, Moon, Sparkles, Heart } from "lucide-react";
+import { Search, ShoppingBag, User, Menu, X, Sun, Moon, Sparkles, Heart, ChevronRight, Shield } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { useProductStore } from "@/store/productStore";
@@ -16,6 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +42,7 @@ export default function Navbar() {
   const { theme, setTheme, lang } = useAppStore();
   const { cart, wishlistItems } = useProductStore();
   const [scrolled, setScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const cartCount = cart?.totalItems || 0;
   const wishlistCount = wishlistItems?.length || 0;
@@ -51,11 +53,13 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  if (pathname.startsWith("/admin")) return null;
+
   return (
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-[100] transition-all duration-700 px-6 lg:px-12 py-4",
-        scrolled ? "bg-background/80 backdrop-blur-2xl  border-border/10 py-3" : "bg-transparent"
+        scrolled ? "bg-background/95 backdrop-blur-3xl  border-border/10 py-3 shadow-xl shadow-black/5" : "bg-transparent"
       )}
     >
       <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
@@ -187,44 +191,79 @@ export default function Navbar() {
           )}
 
           {/* MOBILE MENU */}
-          <Sheet>
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden w-10 h-10 rounded-full hover:bg-accent/30">
+              <button className="lg:hidden w-10 h-10 rounded-full hover:bg-accent/30 flex items-center justify-center transition-all active:scale-90 border border-border/10">
                 <Menu size={20} />
-              </Button>
+              </button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:max-w-md bg-background/95 backdrop-blur-3xl border-l border-border/10">
-              <SheetHeader className="text-left">
-                <SheetTitle className="text-4xl font-black uppercase italic tracking-tighter text-gradient mb-12">
-                  Nav_Sequence
-                </SheetTitle>
+            <SheetContent side="right" className="w-full sm:max-w-md bg-background/95 backdrop-blur-3xl border-l border-border/10 p-0 flex flex-col [&>button]:hidden">
+              <SheetHeader className="text-left p-8 border-b border-border/5">
               </SheetHeader>
-              <div className="flex flex-col gap-6">
-                {NAV_LINKS.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="text-4xl font-black uppercase tracking-tighter text-foreground hover:text-accent-secondary transition-colors italic"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-                
-                <div className="h-px w-full bg-border/10 my-6" />
-                
-                {!isAuthenticated ? (
-                  <Link href="/login">
-                    <Button className="w-full h-16 rounded-[2rem] bg-foreground text-background font-black uppercase tracking-widest text-[11px] shadow-2xl">
-                      Initialize Login
-                    </Button>
-                  </Link>
-                ) : (
-                   <Link href="/profile">
-                    <Button className="w-full h-16 rounded-[2rem] bg-accent-secondary text-white font-black uppercase tracking-widest text-[11px] shadow-2xl">
-                      Enter Dashboard
-                    </Button>
-                  </Link>
-                )}
+              
+              <ScrollArea className="flex-1 p-8">
+                <div className="flex flex-col gap-8">
+                  <div className="space-y-4">
+                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-6">Directory</p>
+                    {NAV_LINKS.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="text-4xl font-black uppercase tracking-tighter text-foreground hover:text-accent-secondary transition-colors italic block"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                  
+                  <div className="h-px w-full bg-border/5" />
+                  
+                  {isAuthenticated ? (
+                    <div className="space-y-6">
+                      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-6">Account Control</p>
+                      <div className="grid grid-cols-1 gap-4">
+                        <Link href="/profile?tab=profile" onClick={() => setIsMenuOpen(false)} className="text-xl font-bold uppercase tracking-tight flex items-center justify-between group">
+                          Identity Control
+                          <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                        <Link href="/profile?tab=orders" onClick={() => setIsMenuOpen(false)} className="text-xl font-bold uppercase tracking-tight flex items-center justify-between group">
+                          Archive Log
+                          <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                        {user?.role === 'admin' && (
+                          <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="text-xl font-bold uppercase tracking-tight flex items-center justify-between text-accent-secondary group">
+                            System Admin
+                            <Shield size={18} />
+                          </Link>
+                        )}
+                      </div>
+                      
+                      <Button 
+                        variant="ghost" 
+                        onClick={() => { logout(); setIsMenuOpen(false); }}
+                        className="w-full h-14 rounded-2xl border border-rose-500/20 text-rose-500 font-black uppercase tracking-widest text-[10px] hover:bg-rose-500 hover:text-white transition-all mt-8"
+                      >
+                        Terminate Session
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-8">
+                       <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-6">Authorization</p>
+                       <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                        <Button className="w-full h-16 rounded-[2rem] bg-foreground text-background font-black uppercase tracking-widest text-[11px] shadow-2xl hover:bg-accent-secondary hover:text-white transition-all">
+                          Initialize Login
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+              
+              <div className="p-8 border-t border-border/5 bg-accent/5">
+                 <p className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground text-center">
+                   Vanguard Core Protocol v4.0.1
+                 </p>
               </div>
             </SheetContent>
           </Sheet>

@@ -8,9 +8,9 @@ import SupportChat from "@/components/chat/SupportChat";
 export const StandardLayout = ({ children, settings }) => (
   <div className="identity-standard bg-background text-foreground transition-colors duration-500">
     <Navbar settings={settings} />
-    <div className="min-h-screen">
+    <main className="min-h-screen pt-16 md:pt-20">
       {children}
-    </div>
+    </main>
     <Footer settings={settings} />
     <SupportChat />
   </div>

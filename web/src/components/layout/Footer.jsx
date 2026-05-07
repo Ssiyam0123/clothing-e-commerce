@@ -93,22 +93,24 @@ export default function Footer() {
         </div>
 
         {/* Newsletter Terminal */}
-        <div className="mt-32 p-12 lg:p-20 rounded-[4rem] glass border-accent-secondary/10 relative overflow-hidden group">
+        <div className="mt-32 p-8 sm:p-12 lg:p-20 rounded-[3rem] sm:rounded-[4rem] glass border-accent-secondary/10 relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-br from-accent-secondary/5 to-transparent" />
           <div className="relative flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24">
              <div className="space-y-4 text-center lg:text-left">
-                <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter italic leading-none">Join the Sequence</h3>
+                <h3 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter italic leading-none">Join the Sequence</h3>
                 <p className="text-muted-foreground font-medium uppercase tracking-[0.2em] text-[10px]">Exclusive access to artifact drops and field reports.</p>
              </div>
              <div className="flex-1 w-full max-w-md relative group/input">
-                <Input 
-                  placeholder="CODENAME@VAN-GUARD.COM" 
-                  className="h-16 lg:h-20 rounded-full bg-background/50 border-none px-10 font-black text-xs uppercase tracking-widest shadow-2xl focus-visible:ring-2 focus-visible:ring-accent-secondary/30 transition-all placeholder:text-muted-foreground/30"
-                />
-                <Button className="absolute right-2 top-2 lg:top-3 h-12 lg:h-14 rounded-full bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-8 shadow-xl">
-                   <Mail size={18} className="mr-3" />
-                   <span className="font-black uppercase text-[10px] tracking-widest">Transmit</span>
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 relative">
+                  <Input 
+                    placeholder="CODENAME@VAN-GUARD.COM" 
+                    className="h-16 lg:h-20 rounded-full sm:rounded-full bg-background/50 border-none px-10 font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-2xl focus-visible:ring-2 focus-visible:ring-accent-secondary/30 transition-all placeholder:text-muted-foreground/30 w-full"
+                  />
+                  <Button className="h-16 sm:h-12 lg:h-14 rounded-full sm:absolute sm:right-2 sm:top-2 lg:top-3 bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-8 shadow-xl w-full sm:w-auto">
+                     <Mail size={18} className="mr-3" />
+                     <span className="font-black uppercase text-[10px] tracking-widest">Transmit</span>
+                  </Button>
+                </div>
              </div>
           </div>
         </div>
