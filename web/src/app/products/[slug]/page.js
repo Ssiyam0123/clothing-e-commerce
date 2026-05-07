@@ -133,6 +133,7 @@ export default async function ProductPage({ params }) {
               images={product.images}
               name={product.name}
               discount={product.discount}
+              isFeatured={product.isFeatured}
             />
           </div>
 
@@ -144,6 +145,11 @@ export default async function ProductPage({ params }) {
                   <Badge className="bg-accent-secondary text-white border-none px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg">
                     {product.category?.name || "Premium Artifact"}
                   </Badge>
+                  {product.isFeatured && (
+                    <Badge className="bg-amber-500 text-black border-none px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg">
+                      Featured Artifact
+                    </Badge>
+                  )}
                   <div className="flex items-center gap-2 glass px-3 py-1 rounded-xl">
                     <StarRating rating={product.averageRating || 5} size="small" />
                     <span className="text-[9px] font-black text-foreground">

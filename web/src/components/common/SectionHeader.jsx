@@ -18,7 +18,7 @@ export default function SectionHeader({ title, subtitle, align = "center", class
           {title}
         </h2>
         {subtitle && (
-          <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-muted-foreground/60 max-w-2xl mx-auto italic">
+          <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-muted-foreground max-w-2xl mx-auto italic">
             // {subtitle}
           </p>
         )}

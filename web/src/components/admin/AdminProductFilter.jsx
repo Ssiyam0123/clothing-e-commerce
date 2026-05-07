@@ -41,7 +41,7 @@ export default function AdminProductFilter() {
         sort={filters.sort}
         onSortChange={setSort}
         sortOptions={[
-          { value: "", label: "🌟 Default" },
+          { value: "all", label: "🌟 Default" },
           { value: "-createdAt", label: "✨ Newest" },
           { value: "price", label: "💵 Low Price" },
           { value: "-price", label: "💎 High Price" },

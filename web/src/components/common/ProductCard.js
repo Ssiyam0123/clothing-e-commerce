@@ -52,12 +52,17 @@ export default function ProductCard({ product, className }) {
           {/* Badges */}
           <div className="absolute top-2 left-2 z-20 flex flex-col gap-1">
             {hasDiscount && (
-              <Badge className="bg-red-500 text-white border-none px-2 py-0.5 text-[10px] font-semibold rounded-sm shadow-sm">
+              <Badge className="bg-red-600 text-white border-none px-2 py-0.5 text-[10px] font-semibold rounded-sm shadow-sm">
                 -{product.discount}%
               </Badge>
             )}
+            {product.isFeatured && (
+              <Badge className="bg-amber-500 text-black border-none px-2 py-0.5 text-[10px] font-semibold rounded-sm shadow-sm">
+                Featured
+              </Badge>
+            )}
             {product.isNew && (
-              <Badge className="bg-emerald-500 text-white border-none px-2 py-0.5 text-[10px] font-semibold rounded-sm shadow-sm">
+              <Badge className="bg-emerald-700 text-white border-none px-2 py-0.5 text-[10px] font-semibold rounded-sm shadow-sm">
                 New
               </Badge>
             )}

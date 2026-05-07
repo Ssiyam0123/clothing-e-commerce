@@ -66,7 +66,7 @@ export default function Navbar() {
     >
       <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center gap-3 group" aria-label="Vanguard Home">
           <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background group-hover:rotate-[15deg] transition-transform duration-500 shadow-xl shadow-foreground/5">
              <Sparkles size={20} className="group-hover:scale-125 transition-transform" />
           </div>
@@ -103,7 +103,7 @@ export default function Navbar() {
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="w-10 h-10 rounded-full hover:bg-accent/30"
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            aria-label={mounted ? `Switch to ${theme === "dark" ? "light" : "dark"} mode` : "Switch theme"}
           >
             {mounted ? (
               theme === "dark" ? <Sun size={18} /> : <Moon size={18} />
@@ -114,14 +114,14 @@ export default function Navbar() {
 
           {/* Search Trigger */}
           <Link href="/products?search=open" aria-label="Search products">
-             <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30" aria-hidden="true">
+             <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30">
                <Search size={18} />
              </Button>
           </Link>
 
           {/* Wishlist */}
           <Link href="/wishlist" className="relative" aria-label={`View wishlist, ${wishlistCount} items`}>
-            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30" aria-hidden="true">
+            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30">
               <Heart size={18} />
             </Button>
             {wishlistCount > 0 && (
@@ -133,7 +133,7 @@ export default function Navbar() {
 
           {/* Cart */}
           <Link href="/cart" className="relative" aria-label={`View shopping cart, ${cartCount} items`}>
-            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30" aria-hidden="true">
+            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30">
               <ShoppingBag size={18} />
             </Button>
             {cartCount > 0 && (

@@ -68,7 +68,7 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en" }) {
               <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-16 lg:px-24 pb-20 md:pb-28 z-10">
                 <div className="max-w-4xl space-y-6">
                   <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    <Badge variant="outline" className="border-accent-secondary text-accent-secondary rounded-full px-4 py-1 text-[10px] uppercase font-black tracking-widest bg-black/20 backdrop-blur-md">
+                    <Badge className="bg-accent-secondary text-white border-none rounded-full px-4 py-1 text-[10px] uppercase font-black tracking-widest shadow-xl">
                       {isBn ? "নতুন কালেকশন" : "New Collection"}
                     </Badge>
                   </div>
