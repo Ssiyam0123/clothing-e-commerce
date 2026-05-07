@@ -96,17 +96,24 @@ export default function Footer() {
         <div className="mt-32 p-8 sm:p-12 lg:p-20 rounded-[3rem] sm:rounded-[4rem] glass border-accent-secondary/10 relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-br from-accent-secondary/5 to-transparent" />
           <div className="relative flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24">
-             <div className="space-y-4 text-center lg:text-left">
+             <div className="space-y-4 text-center lg:text-left shrink-0">
                 <h3 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter italic leading-none">Join the Sequence</h3>
                 <p className="text-muted-foreground font-medium uppercase tracking-[0.2em] text-[10px]">Exclusive access to artifact drops and field reports.</p>
              </div>
-             <div className="flex-1 w-full max-w-md relative group/input">
-                <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 relative">
+             <div className="flex-1 w-full max-w-xl relative group/input">
+                <div className="flex flex-col sm:flex-row items-center relative">
                   <Input 
                     placeholder="CODENAME@VAN-GUARD.COM" 
-                    className="h-16 lg:h-20 rounded-full sm:rounded-full bg-background/50 border-none px-10 font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-2xl focus-visible:ring-2 focus-visible:ring-accent-secondary/30 transition-all placeholder:text-muted-foreground/30 w-full"
+                    className="h-16 lg:h-24 rounded-full sm:rounded-full bg-background/50 border-none px-10 lg:px-12 font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-2xl focus-visible:ring-2 focus-visible:ring-accent-secondary/30 transition-all placeholder:text-muted-foreground/30 w-full pr-[180px]"
                   />
-                  <Button className="h-16 sm:h-12 lg:h-14 rounded-full sm:absolute sm:right-2 sm:top-2 lg:top-3 bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-8 shadow-xl w-full sm:w-auto">
+                  <div className="hidden sm:block absolute right-3 lg:right-4 top-1/2 -translate-y-1/2">
+                    <Button className="h-10 lg:h-16 rounded-full bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-8 lg:px-12 shadow-xl">
+                      <Mail size={16} className="mr-3 lg:w-5 lg:h-5" />
+                      <span className="font-black uppercase text-[10px] tracking-widest">Transmit</span>
+                    </Button>
+                  </div>
+                  {/* Mobile Only Button */}
+                  <Button className="sm:hidden mt-4 h-16 rounded-full bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-8 shadow-xl w-full">
                      <Mail size={18} className="mr-3" />
                      <span className="font-black uppercase text-[10px] tracking-widest">Transmit</span>
                   </Button>

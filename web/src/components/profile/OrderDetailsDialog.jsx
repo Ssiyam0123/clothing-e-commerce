@@ -110,7 +110,7 @@ export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui }) 
                               </div>
                            </div>
                            <div className="text-right">
-                              <p className="text-sm font-black text-primary">${item.price.toFixed(2)}</p>
+                              <p className="text-sm font-black text-primary">৳{(item.price || 0).toFixed(0)}</p>
                            </div>
                         </div>
                      ))}
@@ -118,25 +118,25 @@ export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui }) 
                </div>
 
                {/* Financial Breakdown */}
-               <div className="p-8 rounded-[2rem] bg-foreground text-background space-y-4">
-                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-60">
-                     <span>Subtotal</span>
-                     <span>${order.itemsPrice.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-60">
-                     <span>Logistics Fee</span>
-                     <span>${order.shippingPrice.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-60">
-                     <span>Taxation</span>
-                     <span>${order.taxPrice.toFixed(2)}</span>
-                  </div>
-                  <div className="h-px bg-background/20 my-2" />
-                  <div className="flex justify-between items-end">
-                     <span className="text-xs font-black uppercase tracking-[0.3em]">Total Value</span>
-                     <span className="text-3xl font-black tracking-tighter text-accent-secondary">${order.totalPrice.toFixed(2)}</span>
-                  </div>
-               </div>
+                <div className="p-8 rounded-[2rem] bg-foreground text-background space-y-4">
+                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-60">
+                      <span>Subtotal</span>
+                      <span>৳{(order.itemsPrice || 0).toFixed(0)}</span>
+                   </div>
+                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-60">
+                      <span>Logistics Fee</span>
+                      <span>৳{(order.shippingPrice || 0).toFixed(0)}</span>
+                   </div>
+                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-60">
+                      <span>Taxation</span>
+                      <span>৳{(order.taxPrice || 0).toFixed(0)}</span>
+                   </div>
+                   <div className="h-px bg-background/20 my-2" />
+                   <div className="flex justify-between items-end">
+                      <span className="text-xs font-black uppercase tracking-[0.3em]">Total Value</span>
+                      <span className="text-3xl font-black tracking-tighter text-accent-secondary">৳{(order.totalPrice || 0).toFixed(0)}</span>
+                   </div>
+                </div>
             </div>
           ) : (
             <p className="text-center text-muted-foreground py-20">Sequence data not found.</p>

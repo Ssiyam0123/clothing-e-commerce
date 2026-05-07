@@ -332,126 +332,8 @@ export default function SettingsPage() {
                   exit={{ opacity: 0, x: -10 }}
                   className="space-y-16"
                 >
-                  {/* Identity Theme Selection */}
-                  <section className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h2 className="text-sm font-black uppercase tracking-widest dark:text-white">
-                          Identity Protocol
-                        </h2>
-                        <p className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">
-                          Select the visual DNA of your storefront
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {IDENTITY_THEME_OPTIONS.map((option) => (
-                        <button
-                          key={option.value}
-                          onClick={() => setFormData({
-                            ...formData,
-                            branding: { ...formData.branding, activeTheme: option.value }
-                          })}
-                          className={`flex flex-col items-start p-6 rounded-2xl border-2 transition-all text-left ${
-                            formData.branding?.activeTheme === option.value
-                              ? "border-zinc-900 dark:border-white bg-zinc-900 dark:bg-white text-white dark:text-black shadow-xl"
-                              : "border-zinc-100 dark:border-white/5 hover:border-zinc-300 dark:hover:border-white/20"
-                          }`}
-                        >
-                          <span className="text-[10px] font-black uppercase tracking-widest">
-                            {option.label.split(' (')[0]}
-                          </span>
-                          <span className={`text-[8px] mt-1 ${
-                            formData.branding?.activeTheme === option.value ? "opacity-70" : "text-zinc-500"
-                          }`}>
-                            {option.label.split(' (')[1].replace(')', '')}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </section>
-
-                  {/* Color Mode Selection */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-16 pt-16 border-t dark:border-white/5">
-                    <section className="space-y-6">
-                      <div>
-                        <h2 className="text-sm font-black uppercase tracking-widest dark:text-white">
-                          Atmosphere
-                        </h2>
-                        <p className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">
-                          Default color environment for new visitors
-                        </p>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        {COLOR_MODE_OPTIONS.map((option) => (
-                          <button
-                            key={option.value}
-                            onClick={() => setFormData({
-                              ...formData,
-                              branding: { ...formData.branding, defaultTheme: option.value }
-                            })}
-                            className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border transition-all ${
-                              formData.branding?.defaultTheme === option.value
-                                ? "border-zinc-900 dark:border-white bg-zinc-50 dark:bg-white/5"
-                                : "border-zinc-100 dark:border-white/5 hover:bg-zinc-50 dark:hover:bg-white/5"
-                            }`}
-                          >
-                            <span className="text-[9px] font-black uppercase tracking-widest dark:text-white">
-                              {option.label}
-                            </span>
-                            <div className={`w-2 h-2 rounded-full ${
-                              formData.branding?.defaultTheme === option.value 
-                                ? "bg-zinc-900 dark:bg-white animate-pulse" 
-                                : "bg-zinc-200 dark:bg-zinc-800"
-                            }`} />
-                          </button>
-                        ))}
-                      </div>
-                    </section>
-
-                    {/* Language Selection */}
-                    <section className="space-y-6">
-                      <div>
-                        <h2 className="text-sm font-black uppercase tracking-widest dark:text-white">
-                          Localization
-                        </h2>
-                        <p className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">
-                          System default regional interface
-                        </p>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        {LANGUAGE_OPTIONS.map((option) => (
-                          <button
-                            key={option.value}
-                            onClick={() => setFormData({
-                              ...formData,
-                              branding: { ...formData.branding, defaultLanguage: option.value }
-                            })}
-                            className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border transition-all ${
-                              formData.branding?.defaultLanguage === option.value
-                                ? "border-zinc-900 dark:border-white bg-zinc-50 dark:bg-white/5"
-                                : "border-zinc-100 dark:border-white/5 hover:bg-zinc-50 dark:hover:bg-white/5"
-                            }`}
-                          >
-                            <span className="text-[9px] font-black uppercase tracking-widest dark:text-white">
-                              {option.label}
-                            </span>
-                            <div className={`w-2 h-2 rounded-full ${
-                              formData.branding?.defaultLanguage === option.value 
-                                ? "bg-zinc-900 dark:bg-white animate-pulse" 
-                                : "bg-zinc-200 dark:bg-zinc-800"
-                            }`} />
-                          </button>
-                        ))}
-                      </div>
-                    </section>
-                  </div>
-
                   {/* Primary Color Selection */}
-                  <section className="pt-16 border-t dark:border-white/5 space-y-8">
+                  <section className="space-y-8">
                     <div>
                       <h2 className="text-sm font-black uppercase tracking-widest dark:text-white">
                         Chromatic Brand Identity
@@ -468,6 +350,11 @@ export default function SettingsPage() {
                         { name: "Blue", color: "bg-blue-600" },
                         { name: "Green", color: "bg-emerald-500" },
                         { name: "Orange", color: "bg-orange-500" },
+                        { name: "Amethyst", color: "bg-purple-500" },
+                        { name: "Citrine", color: "bg-yellow-500" },
+                        { name: "Ruby", color: "bg-red-600" },
+                        { name: "Teal", color: "bg-teal-500" },
+                        { name: "Brown", color: "bg-amber-800" },
                       ].map((item) => (
                         <button
                           key={item.name}

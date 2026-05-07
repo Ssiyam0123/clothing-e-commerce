@@ -10,7 +10,7 @@ const pageSettingSchema = new mongoose.Schema({
         activeTheme: { type: String, default: "executive", enum: ["executive", "streetwear", "earth", "luxury", "cyber"] },
         // ✅ New fields for centralized control
         defaultTheme: { type: String, default: "dark", enum: ["light", "dark", "system"] }, 
-        defaultThemeColor: { type: String, default: "Zinc", enum: ["Zinc", "Rose", "Blue", "Green", "Orange"] },
+        defaultThemeColor: { type: String, default: "Zinc", enum: ["Zinc", "Rose", "Blue", "Green", "Orange", "Amethyst", "Citrine", "Ruby", "Teal", "Brown"] },
         defaultLanguage: { type: String, default: "en", enum: ["en", "bn"] }
     },
     socialLinks: [{

@@ -70,24 +70,24 @@ export default function ProductCard({ product, className }) {
         </div>
 
         {/* Product Info Section */}
-        <div className="p-3 sm:p-4 flex flex-col gap-2">
+        <div className="p-3 sm:p-4 flex flex-col flex-1">
           {/* Category */}
           {product.category?.name && (
-            <span className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider truncate">
+            <span className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider truncate mb-1">
               {product.category.name}
             </span>
           )}
 
           {/* Name */}
-          <Link href={`/products/${product.slug}`}>
-            <h3 className="font-medium text-sm sm:text-base line-clamp-2 hover:text-primary transition-colors">
+          <Link href={`/products/${product.slug}`} className="mb-2">
+            <h3 className="font-medium text-sm sm:text-base line-clamp-2 hover:text-primary transition-colors min-h-[2.5rem] sm:min-h-[3rem]">
               {product.name}
             </h3>
           </Link>
 
           {/* Rating */}
-          {product.averageRating > 0 && (
-            <div className="flex items-center gap-1">
+          {product.averageRating > 0 ? (
+            <div className="flex items-center gap-1 mb-4">
               <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
               <span className="text-xs font-medium">
                 {product.averageRating.toFixed(1)}
@@ -96,13 +96,15 @@ export default function ProductCard({ product, className }) {
                 ({product.reviewCount || 0})
               </span>
             </div>
+          ) : (
+            <div className="h-4 mb-4" /> // Spacing for consistency
           )}
 
-          {/* Price & Actions Row */}
-          <div className="flex items-center justify-between gap-2 mt-1">
+          {/* Price & Actions Row - Always sticks to bottom */}
+          <div className="mt-auto flex items-center justify-between gap-2">
             <div className="flex items-baseline gap-1.5 flex-wrap">
               <span className="text-lg sm:text-xl font-bold tracking-tight">
-                ৳{discountedPrice.toFixed(0)}
+                ৳{(discountedPrice || 0).toFixed(0)}
               </span>
               {hasDiscount && (
                 <span className="text-xs sm:text-sm text-muted-foreground line-through">

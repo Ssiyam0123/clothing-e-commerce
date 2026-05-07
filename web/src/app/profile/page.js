@@ -160,24 +160,31 @@ function ProfileContent() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen pt-32 pb-24">
-      <div className="max-w-6xl mx-auto px-6">
+    <div className="min-h-screen pt-24 sm:pt-32 pb-24 sm:pb-32 bg-background relative overflow-hidden">
+      {/* 🔮 Background Aura */}
+      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-accent/10 to-transparent -z-10" />
+      
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-10">
         <ProfileHeader user={user} ui={ui} />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-accent/5 p-1 rounded-full mb-16 h-auto border border-border/20">
-            <TabsTrigger value="orders" className="rounded-full px-8 py-3 text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
-              Archive Log
-            </TabsTrigger>
-            <TabsTrigger value="profile" className="rounded-full px-8 py-3 text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
-              Identity details
-            </TabsTrigger>
-            <TabsTrigger value="security" className="rounded-full px-8 py-3 text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
-              Security Protocol
-            </TabsTrigger>
-          </TabsList>
+          <div className="relative mb-12 sm:mb-20">
+             <TabsList className="w-full bg-accent/10 p-1.5 rounded-2xl sm:rounded-full h-auto border border-border/10 overflow-x-auto overflow-y-hidden no-scrollbar justify-start sm:justify-center flex-nowrap whitespace-nowrap">
+                <TabsTrigger value="orders" className="rounded-xl sm:rounded-full px-6 sm:px-10 py-3 sm:py-4 text-[9px] sm:text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-foreground data-[state=active]:text-background transition-all shrink-0">
+                  Archive Log
+                </TabsTrigger>
+                <TabsTrigger value="profile" className="rounded-xl sm:rounded-full px-6 sm:px-10 py-3 sm:py-4 text-[9px] sm:text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-foreground data-[state=active]:text-background transition-all shrink-0">
+                  Identity details
+                </TabsTrigger>
+                <TabsTrigger value="security" className="rounded-xl sm:rounded-full px-6 sm:px-10 py-3 sm:py-4 text-[9px] sm:text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-foreground data-[state=active]:text-background transition-all shrink-0">
+                  Security Protocol
+                </TabsTrigger>
+             </TabsList>
+             {/* Mobile Scroll Indicator Fade */}
+             <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none sm:hidden" />
+          </div>
 
-          <TabsContent value="orders" className="mt-0 focus-visible:outline-none">
+          <TabsContent value="orders" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-700">
             <ProfileOrders 
               orders={myOrders} 
               ui={ui} 
@@ -186,8 +193,8 @@ function ProfileContent() {
             />
           </TabsContent>
 
-          <TabsContent value="profile" className="mt-0 focus-visible:outline-none">
-            <div className="bg-background border border-border/30 rounded-[3rem] p-8 md:p-16 shadow-2xl shadow-primary/5">
+          <TabsContent value="profile" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="bg-card/50 backdrop-blur-xl border border-border/10 rounded-[2rem] sm:rounded-[4rem] p-6 sm:p-12 md:p-20 shadow-2xl">
               <ProfileIdentity 
                 user={user} 
                 ui={ui} 
@@ -197,8 +204,8 @@ function ProfileContent() {
             </div>
           </TabsContent>
 
-          <TabsContent value="security" className="mt-0 focus-visible:outline-none">
-            <div className="bg-background border border-border/30 rounded-[3rem] p-8 md:p-16 shadow-2xl shadow-primary/5">
+          <TabsContent value="security" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="bg-card/50 backdrop-blur-xl border border-border/10 rounded-[2rem] sm:rounded-[4rem] p-6 sm:p-12 md:p-20 shadow-2xl">
               <ProfileSecurity 
                 ui={ui} 
                 onUpdate={handleUpdateSecurity} 

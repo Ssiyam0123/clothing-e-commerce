@@ -106,7 +106,7 @@ export default function ProfileOrders({ orders, ui, loading, onOpenDetails }) {
                               <span className="w-1 h-1 rounded-full bg-border" />
                               <span>Qty: {product.quantity}</span>
                            </div>
-                           <p className="text-xs font-black text-primary">${product.price.toFixed(2)}</p>
+                           <p className="text-xs font-black text-primary">৳{(product.price || 0).toFixed(0)}</p>
                         </div>
                      </div>
                    ))}
@@ -126,7 +126,7 @@ export default function ProfileOrders({ orders, ui, loading, onOpenDetails }) {
                          <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                            <Tag size={10} /> Total Value
                          </p>
-                         <p className="text-lg font-black tracking-tighter text-accent-secondary">${order.totalPrice.toFixed(2)}</p>
+                         <p className="text-lg font-black tracking-tighter text-accent-secondary">৳{(order.totalPrice || 0).toFixed(0)}</p>
                       </div>
                    </div>
 
