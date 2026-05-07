@@ -35,7 +35,7 @@ export default function ProductFilter({ initialCategories }) {
   const handleCategoryUpdate = useCallback(
     (slug, name) => {
       setCategory(slug);
-      if (slug !== "all") {
+      if (slug !== "all" && slug !== "isFeatured") {
         trackSearch(null, name);
       }
     },
@@ -79,7 +79,7 @@ export default function ProductFilter({ initialCategories }) {
               onClick={() => handleCategoryUpdate('all', 'All')}
               className="text-[9px] font-black uppercase tracking-widest text-accent-secondary hover:underline underline-offset-4 transition-all"
              >
-               Clear Protocol
+                Clear Protocol
              </button>
            )}
         </div>
@@ -89,9 +89,17 @@ export default function ProductFilter({ initialCategories }) {
             {/* ♾️ Universal Node */}
             <CategoryButton
               isSelected={filters.category === "all"}
-              onClick={() => handleCategoryUpdate("all", "All Categories")}
+              onClick={() => handleCategoryUpdate("all", "All Collections")}
               label="All Collections"
               icon={<LayoutGrid size={18} />}
+            />
+
+            {/* ✨ Featured Node */}
+            <CategoryButton
+              isSelected={filters.category === "isFeatured"}
+              onClick={() => handleCategoryUpdate("isFeatured", "Featured")}
+              label="Featured"
+              icon={<Sparkles size={18} className="text-amber-400" />}
             />
 
             {/* 📦 Collection Nodes */}

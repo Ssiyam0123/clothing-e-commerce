@@ -18,7 +18,6 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
         searchParams.get("category") || initialFilters.category || "all",
       page: Number(searchParams.get("page")) || initialFilters.page || 1,
       limit: initialFilters.limit || 30,
-      isFeatured: initialFilters.isFeatured || false,
     }),
     [searchParams, initialFilters],
   );
@@ -29,8 +28,8 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
       const params = new URLSearchParams(searchParams.toString());
 
       Object.entries(newFilters).forEach(([key, value]) => {
-        if (value && value !== "all") {
-          params.set(key, value);
+        if (value !== undefined && value !== null && value !== "" && value !== "all") {
+          params.set(key, value.toString());
         } else {
           params.delete(key);
         }
@@ -75,7 +74,7 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
       search: filters.search,
       sort: filters.sort,
       ...(filters.category !== "all" && { category: filters.category }),
-      ...(filters.isFeatured && { isFeatured: "true" }),
+      ...(filters.category === "isFeatured" && { isFeatured: "true" }),
     }),
     [filters],
   );

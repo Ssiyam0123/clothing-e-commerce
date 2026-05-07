@@ -95,11 +95,11 @@ export const getProducts = asyncHandler(async (req, res) => {
         matchStage.isActive = true;
     }
 
-    if (isFeatured === 'true') {
+    if (category === 'isFeatured' || isFeatured === 'true') {
         matchStage.isFeatured = true;
     }
 
-    if (category && category !== 'all') {
+    if (category && category !== 'all' && category !== 'isFeatured') {
         const catDoc = await Category.findOne({ slug: category }).select('_id');
         if (catDoc) matchStage.category = catDoc._id;
         else return res.json({ success: true, total: 0, pages: 0, products: [] });

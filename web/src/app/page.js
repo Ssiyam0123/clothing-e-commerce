@@ -98,9 +98,17 @@ export default async function HomePage() {
           <CategoryGrid categories={data.categories} />
         </section>
 
-        {/* 4. Featured Artifacts */}
+        {/* 4. Featured Product Section */}
         <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-          <SectionHeader title={ui.featTitle} subtitle={ui.featSub} className="mb-16 md:mb-24" />
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 md:mb-24">
+            <SectionHeader title={ui.featTitle} subtitle={ui.featSub} className="mb-0" />
+            <Link
+              href="/products?category=isFeatured"
+              className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-elevated px-8 py-4 rounded-full border border-light hover:bg-accent-secondary hover:text-white transition-all duration-500"
+            >
+              View More
+            </Link>
+          </div>
           <ProductSection products={featuredProducts} lang={lang} />
         </section>
 
