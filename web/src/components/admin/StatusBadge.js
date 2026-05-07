@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 export default function StatusBadge({ value }) {
   if (!value) return null;
@@ -28,15 +28,18 @@ export default function StatusBadge({ value }) {
     "out of stock": "bg-red-100 text-red-800 border-red-300",
     "low stock": "bg-orange-100 text-orange-800 border-orange-300",
     "in stock": "bg-green-100 text-green-800 border-green-300",
-    "synced": "bg-indigo-100 text-indigo-800 border-indigo-200",
+    synced: "bg-indigo-100 text-indigo-800 border-indigo-200",
   };
 
   // ভ্যালু অনুযায়ী স্টাইল সিলেক্ট করা
   const normalizedValue = value.toLowerCase();
-  const badgeStyle = statusConfig[normalizedValue] || "bg-gray-50 text-gray-500 border-gray-200";
+  const badgeStyle =
+    statusConfig[normalizedValue] || "bg-gray-50 text-gray-500 border-gray-200";
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-300 ${badgeStyle}`}>
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-300 ${badgeStyle}`}
+    >
       <span className="mr-1.5 h-1 w-1 rounded-full bg-current animate-pulse"></span>
       {value}
     </span>

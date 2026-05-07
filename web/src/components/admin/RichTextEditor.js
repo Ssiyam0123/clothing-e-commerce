@@ -1,10 +1,10 @@
 // src/components/admin/RichTextEditor.js
-'use client';
-import React, { useEffect, useRef } from 'react';
-import Quill from 'quill';
-import 'quill/dist/quill.snow.css';
-import api from '@/lib/api';
-import { getImageUrl } from '@/utils/imageUtils';
+"use client";
+import React, { useEffect, useRef } from "react";
+import Quill from "quill";
+import "quill/dist/quill.snow.css";
+import api from "@/lib/api";
+import { getImageUrl } from "@/utils/imageUtils";
 
 export default function RichTextEditor({ value, onChange }) {
   const editorRef = useRef(null);
@@ -13,21 +13,21 @@ export default function RichTextEditor({ value, onChange }) {
   useEffect(() => {
     if (editorRef.current && !quillRef.current) {
       const quill = new Quill(editorRef.current, {
-        theme: 'snow',
+        theme: "snow",
         modules: {
           toolbar: {
             container: [
               [{ header: [1, 2, 3, false] }],
-              ['bold', 'italic', 'underline', 'strike'],
-              [{ list: 'ordered' }, { list: 'bullet' }],
-              ['link', 'image', 'blockquote', 'code-block'],
-              ['clean'],
+              ["bold", "italic", "underline", "strike"],
+              [{ list: "ordered" }, { list: "bullet" }],
+              ["link", "image", "blockquote", "code-block"],
+              ["clean"],
             ],
             handlers: {
               image: function () {
-                const input = document.createElement('input');
-                input.setAttribute('type', 'file');
-                input.setAttribute('accept', 'image/*');
+                const input = document.createElement("input");
+                input.setAttribute("type", "file");
+                input.setAttribute("accept", "image/*");
                 input.click();
 
                 input.onchange = async () => {
@@ -35,17 +35,21 @@ export default function RichTextEditor({ value, onChange }) {
                   if (!file) return;
 
                   const formData = new FormData();
-                  formData.append('image', file);
+                  formData.append("image", file);
 
                   try {
-                    const { data } = await api.post('/upload/blog-image', formData, {
-                      headers: { 'Content-Type': 'multipart/form-data' },
-                    });
+                    const { data } = await api.post(
+                      "/upload/blog-image",
+                      formData,
+                      {
+                        headers: { "Content-Type": "multipart/form-data" },
+                      },
+                    );
                     const range = quill.getSelection(true);
-                    quill.insertEmbed(range.index, 'image', data.url);
+                    quill.insertEmbed(range.index, "image", data.url);
                   } catch (err) {
-                    console.error('Image upload failed:', err);
-                    alert('Failed to upload image');
+                    console.error("Image upload failed:", err);
+                    alert("Failed to upload image");
                   }
                 };
               },
@@ -56,7 +60,7 @@ export default function RichTextEditor({ value, onChange }) {
 
       if (value) quill.root.innerHTML = value;
 
-      quill.on('text-change', () => {
+      quill.on("text-change", () => {
         onChange(quill.root.innerHTML);
       });
 
@@ -66,13 +70,13 @@ export default function RichTextEditor({ value, onChange }) {
 
   useEffect(() => {
     if (quillRef.current && value !== quillRef.current.root.innerHTML) {
-      quillRef.current.root.innerHTML = value || '';
+      quillRef.current.root.innerHTML = value || "";
     }
   }, [value]);
 
   return (
     <div className="quill-modern-wrapper">
-      <div ref={editorRef} style={{ minHeight: '450px' }} />
+      <div ref={editorRef} style={{ minHeight: "450px" }} />
       <style jsx global>{`
         .ql-container.ql-snow {
           border: none !important;

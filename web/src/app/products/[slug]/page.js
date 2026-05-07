@@ -1,59 +1,76 @@
-import { notFound } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import { Share2 } from 'lucide-react';
-import StarRating from '@/components/store/StarRating';
-import ProductImageGallery from '@/components/products/ProductImageGallery';
-import WishlistButtonClient from '@/components/products/WishlistButtonClient';
-import ProductActionsClient from '@/components/products/ProductActionsClient';
-import RelatedProducts from '@/components/products/RelatedProducts';
-import ReviewSectionWrapper from '@/components/products/ReviewSectionWrapper';
-import Loader from '@/components/common/Loader';
+import { notFound } from "next/navigation";
+import { Share2, Star, ShieldCheck, Truck, RotateCcw } from "lucide-react";
+import StarRating from "@/components/store/StarRating";
+import ProductImageGallery from "@/components/products/ProductImageGallery";
+import WishlistButtonClient from "@/components/products/WishlistButtonClient";
+import ProductActionsClient from "@/components/products/ProductActionsClient";
+import RelatedProducts from "@/components/products/RelatedProducts";
+import ReviewSectionWrapper from "@/components/products/ReviewSectionWrapper";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://clothing-e-commerce-web.vercel.app';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://clothing-e-commerce-web.vercel.app";
 
 const DICTIONARY = {
-  en: { about: 'Narrative', related: 'The Sequence' },
-  bn: { about: 'বিবরণ', related: 'অনুরূপ পণ্য' }
+  en: { about: "Narrative", related: "The Sequence" },
+  bn: { about: "বিবরণ", related: "অনুরূপ পণ্য" },
 };
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   try {
     const res = await fetch(`${API_URL}/products/details/${slug}`, {
-      next: { revalidate: 3600 }
+      next: { revalidate: 3600 },
     });
-    if (!res.ok) throw new Error('Product not found');
+    if (!res.ok) throw new Error("Product not found");
     const product = await res.json();
-    
-    const discountedPrice = product.price - (product.price * (product.discount || 0)) / 100;
-    const isAvailable = product.sizes?.some(s => s.stock > 0);
-    const imageUrl = product.images?.[0] ? (product.images[0].startsWith('http') ? product.images[0] : `${SITE_URL}${product.images[0]}`) : `${SITE_URL}/og-image.jpg`;
+
+    const discountedPrice =
+      product.price - (product.price * (product.discount || 0)) / 100;
+    const isAvailable = product.sizes?.some((s) => s.stock > 0);
+    const imageUrl = product.images?.[0]
+      ? product.images[0].startsWith("http")
+        ? product.images[0]
+        : `${SITE_URL}${product.images[0]}`
+      : `${SITE_URL}/og-image.jpg`;
 
     return {
       title: `${product.name} | Vanguard Collection`,
-      description: product.description?.slice(0, 160) || `Shop ${product.name} – premium streetwear from Vanguard.`,
-      keywords: [product.name, product.category?.name, "streetwear", "Vanguard"],
+      description:
+        product.description?.slice(0, 160) ||
+        `Shop ${product.name} – premium streetwear from Vanguard.`,
+      keywords: [
+        product.name,
+        product.category?.name,
+        "streetwear",
+        "Vanguard",
+      ],
       openGraph: {
         title: product.name,
         description: product.description?.slice(0, 160),
-        images: [{ url: imageUrl, width: 1200, height: 630, alt: product.name }],
-        type: 'website',
-        siteName: 'Vanguard',
+        images: [
+          { url: imageUrl, width: 1200, height: 630, alt: product.name },
+        ],
+        type: "website",
+        siteName: "Vanguard",
         url: `${SITE_URL}/products/${slug}`,
-        'og:price:amount': discountedPrice.toString(),
-        'og:price:currency': 'BDT',
-        'og:availability': isAvailable ? 'instock' : 'oos',
+        "og:price:amount": discountedPrice.toString(),
+        "og:price:currency": "BDT",
+        "og:availability": isAvailable ? "instock" : "oos",
       },
       twitter: {
-        card: 'summary_large_image',
+        card: "summary_large_image",
         title: product.name,
         description: product.description?.slice(0, 160),
         images: [imageUrl],
       },
     };
   } catch (error) {
-    return { title: 'Product Not Found | Vanguard' };
+    return { title: "Product Not Found | Vanguard" };
   }
 }
 
@@ -63,7 +80,7 @@ export default async function ProductPage({ params }) {
 
   try {
     const res = await fetch(`${API_URL}/products/details/${slug}`, {
-      next: { revalidate: 60 }
+      next: { revalidate: 60 },
     });
     if (!res.ok) {
       if (res.status === 404) notFound();
@@ -74,92 +91,137 @@ export default async function ProductPage({ params }) {
     notFound();
   }
 
-  const discountedPrice = product.price - (product.price * (product.discount || 0)) / 100;
-  const isAvailable = product.sizes?.some(s => s.stock > 0);
-  const lang = 'en'; // Ideally this comes from a layout or cookie, keeping 'en' as default
+  const discountedPrice =
+    product.price - (product.price * (product.discount || 0)) / 100;
+  const isAvailable = product.sizes?.some((s) => s.stock > 0);
+  const lang = "en"; 
   const ui = DICTIONARY[lang];
 
   const productSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
+    "@context": "https://schema.org",
+    "@type": "Product",
     name: product.name,
     description: product.description,
-    image: product.images?.map(img => img.startsWith('http') ? img : `${SITE_URL}${img}`),
+    image: product.images?.map((img) =>
+      img.startsWith("http") ? img : `${SITE_URL}${img}`,
+    ),
     sku: product.sku || product._id,
-    brand: { '@type': 'Brand', name: 'Vanguard' },
+    brand: { "@type": "Brand", name: "Vanguard" },
     offers: {
-      '@type': 'Offer',
+      "@type": "Offer",
       url: `${SITE_URL}/products/${slug}`,
-      priceCurrency: 'BDT',
+      priceCurrency: "BDT",
       price: discountedPrice,
-      availability: isAvailable ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      availability: isAvailable
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
     },
   };
 
   return (
-    <main className="min-h-screen bg-[#fcfcfc] dark:bg-[#050505] transition-colors duration-700">
+    <main className="min-h-screen bg-background text-foreground transition-colors duration-700">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
-      
-      <div className="max-w-[1700px] mx-auto pt-24 lg:pt-32 px-4 lg:px-12">
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 xl:gap-24">
-          
-          {/* LEFT: Media Section (Client Island) */}
-          <div className="lg:col-span-7">
-            <ProductImageGallery 
-              images={product.images} 
-              name={product.name} 
-              discount={product.discount} 
+
+      <div className="max-w-[1800px] mx-auto pt-24 lg:pt-32 px-6 lg:px-12">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-20 xl:gap-32">
+          {/* LEFT: Media Section */}
+          <div className="lg:col-span-7 animate-in fade-in slide-in-from-left-4 duration-1000">
+            <ProductImageGallery
+              images={product.images}
+              name={product.name}
+              discount={product.discount}
             />
           </div>
 
-          {/* RIGHT: Information Engine (Static Shell + Small Client Islands) */}
-          <div className="lg:col-span-5 py-6 lg:py-4">
-            <section className="space-y-6 mb-12">
+          {/* RIGHT: Information Engine */}
+          <div className="lg:col-span-5 py-6 lg:py-4 flex flex-col gap-10 animate-in fade-in slide-in-from-right-4 duration-1000">
+            <section className="space-y-10">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-rose-600">
-                    {product.category?.name}
-                  </span>
-                  <div className="h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                  <div className="flex items-center gap-1.5 opacity-60">
+                <div className="flex items-center gap-4">
+                  <Badge className="bg-accent-secondary text-white border-none px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
+                    {product.category?.name || "Premium Artifact"}
+                  </Badge>
+                  <div className="flex items-center gap-2 glass px-3 py-1.5 rounded-xl">
                     <StarRating rating={product.averageRating || 5} size="small" />
-                    <span className="text-[9px] font-black dark:text-white">{product.totalReviews || 0}</span>
+                    <span className="text-[10px] font-black text-foreground">
+                      {product.totalReviews || 0} REVIEWS
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <WishlistButtonClient product={product} />
-                  <button className="p-3 rounded-full text-zinc-300 dark:text-zinc-700 hover:text-rose-500 transition-all">
-                    <Share2 size={24} />
-                  </button>
+                  <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full glass hover:bg-accent-secondary hover:text-white transition-all">
+                    <Share2 size={20} />
+                  </Button>
                 </div>
               </div>
 
-              <div className="space-y-6">
-                <h1 className="text-[12vw] md:text-7xl lg:text-8xl font-black tracking-tighter uppercase italic leading-[0.85] text-zinc-900 dark:text-white">
-                  {product.name}
-                </h1>
-                <p className="text-sm md:text-base text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter uppercase italic leading-[0.85] text-gradient">
+                    {product.name}
+                  </h1>
+                  <div className="flex items-baseline gap-4">
+                    <span className="text-4xl md:text-5xl font-black tracking-tighter">
+                      ৳{discountedPrice.toFixed(0)}
+                    </span>
+                    {product.discount > 0 && (
+                      <span className="text-xl font-bold text-muted-foreground/40 line-through tracking-tight">
+                        ৳{product.price.toFixed(0)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium max-w-xl">
                   {product.description}
                 </p>
 
-                {/* AEO / FAQ Section (Static SSR) */}
-                <div className="mt-10 space-y-6 border-t border-zinc-100 dark:border-zinc-800 pt-8">
-                  <div itemScope itemType="https://schema.org/Question">
-                    <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-widest text-zinc-900 dark:text-white mb-2">Is this fabric sustainable?</h3>
+                {/* Core USP Items */}
+                <div className="grid grid-cols-3 gap-4 pt-8">
+                   <div className="flex flex-col items-center gap-4 text-center group/usp p-4 rounded-[2rem] hover:bg-accent/20 transition-all duration-500">
+                     <div className="w-14 h-14 rounded-2xl glass flex items-center justify-center text-accent-secondary group-hover/usp:scale-110 group-hover/usp:rotate-6 transition-all duration-500 shadow-lg">
+                        <ShieldCheck size={24} />
+                     </div>
+                     <div className="space-y-1">
+                        <span className="block text-[10px] font-black uppercase tracking-widest text-foreground">Certified</span>
+                        <span className="block text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Quality Lock</span>
+                     </div>
+                   </div>
+                   <div className="flex flex-col items-center gap-4 text-center group/usp p-4 rounded-[2rem] hover:bg-accent/20 transition-all duration-500">
+                     <div className="w-14 h-14 rounded-2xl glass flex items-center justify-center text-accent-secondary group-hover/usp:scale-110 group-hover/usp:-rotate-6 transition-all duration-500 shadow-lg">
+                        <Truck size={24} />
+                     </div>
+                     <div className="space-y-1">
+                        <span className="block text-[10px] font-black uppercase tracking-widest text-foreground">Express</span>
+                        <span className="block text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Global Transit</span>
+                     </div>
+                   </div>
+                   <div className="flex flex-col items-center gap-4 text-center group/usp p-4 rounded-[2rem] hover:bg-accent/20 transition-all duration-500">
+                     <div className="w-14 h-14 rounded-2xl glass flex items-center justify-center text-accent-secondary group-hover/usp:scale-110 group-hover/usp:rotate-12 transition-all duration-500 shadow-lg">
+                        <RotateCcw size={24} />
+                     </div>
+                     <div className="space-y-1">
+                        <span className="block text-[10px] font-black uppercase tracking-widest text-foreground">Recovery</span>
+                        <span className="block text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Secure Returns</span>
+                     </div>
+                   </div>
+                </div>
+
+                <Separator className="bg-border/30" />
+
+                {/* AEO / FAQ Section */}
+                <div className="space-y-8">
+                  <div itemScope itemType="https://schema.org/Question" className="space-y-2">
+                    <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-[0.4em] text-accent-secondary">
+                      Composition Protocol
+                    </h3>
                     <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                      <p itemProp="text" className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                        Yes, every Vanguard artifact is crafted from ethically sourced, sustainable materials designed for longevity and minimal environmental impact.
-                      </p>
-                    </div>
-                  </div>
-                  <div itemScope itemType="https://schema.org/Question">
-                    <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-widest text-zinc-900 dark:text-white mb-2">What is the return policy?</h3>
-                    <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                      <p itemProp="text" className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                        We offer a 30-day return policy on all unworn items. Your satisfaction is our primary protocol.
+                      <p itemProp="text" className="text-sm text-muted-foreground leading-relaxed font-medium">
+                        Every Vanguard artifact is architected from premium, sustainable fibers designed for high-performance durability and an avant-garde silhouette.
                       </p>
                     </div>
                   </div>
@@ -173,17 +235,21 @@ export default async function ProductPage({ params }) {
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-4 md:px-6 mt-24 lg:mt-40 pb-56 lg:pb-32 space-y-24 lg:space-y-48">
-        {/* Reviews (Client Island - Lazy) */}
-        <ReviewSectionWrapper productId={product._id} />
-        
-        {/* Related Products (Server Component) */}
-        <RelatedProducts 
-          categoryId={product.category?._id} 
-          currentProductId={product._id} 
-          title={ui.related} 
-        />
+      <div className="max-w-[1800px] mx-auto px-6 lg:px-12 mt-32 lg:mt-56 pb-48 space-y-32 lg:space-y-64">
+        {/* Reviews */}
+        <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
+           <ReviewSectionWrapper productId={product._id} />
+        </div>
+
+        {/* Related Products */}
+        <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
+          <RelatedProducts
+            categoryId={product.category?._id}
+            currentProductId={product._id}
+            title={ui.related}
+          />
+        </div>
       </div>
     </main>
   );
-}
+}

@@ -1,25 +1,32 @@
-'use client';
+"use client";
 
-import { useAppStore } from '@/store/appStore';
-import FlashSaleBanner from '@/components/store/FlashSaleBanner';
-import FlashSaleProductCard from '@/components/store/FlashSaleProductCard';
-import { motion } from 'framer-motion';
-import { Zap, Clock, ChevronLeft } from 'lucide-react';
-import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useAppStore } from "@/store/appStore";
+import FlashSaleBanner from "@/components/store/FlashSaleBanner";
+import ProductCard from "@/components/common/ProductCard";
+import { motion } from "framer-motion";
+import { Zap, Clock, ChevronLeft } from "lucide-react";
+import Link from "next/link";
+import { useState, useEffect } from "react";
 
 // ⏱️ Countdown Timer Sub-component
 const Countdown = ({ targetDate }) => {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    mins: 0,
+    secs: 0,
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
       const distance = new Date(targetDate).getTime() - new Date().getTime();
       if (distance < 0) return clearInterval(interval);
-      
+
       setTimeLeft({
         days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        hours: Math.floor(
+          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        ),
         mins: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
         secs: Math.floor((distance % (1000 * 60)) / 1000),
       });
@@ -30,9 +37,16 @@ const Countdown = ({ targetDate }) => {
   return (
     <div className="flex gap-4">
       {Object.entries(timeLeft).map(([label, val], i) => (
-        <div key={i} className="flex flex-col items-center bg-zinc-900 text-white p-4 rounded-3xl min-w-[80px] border border-white/5 shadow-2xl">
-          <span className="text-3xl font-black">{val < 10 ? `0${val}` : val}</span>
-          <span className="text-[8px] uppercase tracking-widest font-bold opacity-40">{label}</span>
+        <div
+          key={i}
+          className="flex flex-col items-center bg-accent-primary text-primary p-4 rounded-3xl min-w-[80px] border border-white/5 shadow-2xl"
+        >
+          <span className="text-3xl font-black">
+            {val < 10 ? `0${val}` : val}
+          </span>
+          <span className="text-[8px] uppercase tracking-widest font-bold opacity-40">
+            {label}
+          </span>
         </div>
       ))}
     </div>
@@ -43,10 +57,13 @@ export default function FlashSaleDetailsClient({ sale }) {
   const isLive = new Date(sale.startDate) <= new Date();
 
   return (
-    <main className="min-h-screen bg-white dark:bg-[#050505] pb-40">
+    <main className="min-h-screen bg-surface dark:bg-[#050505] pb-40">
       {/* 🧭 Navigation */}
       <div className="max-w-7xl mx-auto px-6 py-10">
-        <Link href="/flash-sale" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity">
+        <Link
+          href="/flash-sale"
+          className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity"
+        >
           <ChevronLeft size={14} /> Back to Hub
         </Link>
       </div>
@@ -60,16 +77,21 @@ export default function FlashSaleDetailsClient({ sale }) {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-10">
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-rose-600">
-              {isLive ? <Zap size={20} fill="currentColor" /> : <Clock size={20} />}
+              {isLive ? (
+                <Zap size={20} fill="currentColor" />
+              ) : (
+                <Clock size={20} />
+              )}
               <span className="text-xs font-black uppercase tracking-[0.3em]">
-                {isLive ? 'Deployment Live' : 'Pending Deployment'}
+                {isLive ? "Deployment Live" : "Pending Deployment"}
               </span>
             </div>
-            <h1 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-none dark:text-white">
+            <h1 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-none ">
               {sale.name}
             </h1>
-            <p className="max-w-2xl text-zinc-500 font-medium leading-relaxed">
-              {sale.description || "Limited access sequence. Exclusive artifacts available for a restricted duration."}
+            <p className="max-w-2xl text-secondary font-medium leading-relaxed">
+              {sale.description ||
+                "Limited access sequence. Exclusive artifacts available for a restricted duration."}
             </p>
           </div>
 
@@ -86,7 +108,7 @@ export default function FlashSaleDetailsClient({ sale }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
             >
-              <FlashSaleProductCard product={product} />
+              <ProductCard product={product} isFlashSale={true} />
             </motion.div>
           ))}
         </div>

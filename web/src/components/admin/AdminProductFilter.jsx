@@ -1,11 +1,11 @@
 // src/components/admin/AdminProductFilter.jsx
-'use client';
+"use client";
 
-import { useRef, useState } from 'react';
-import { useAdminProducts } from '@/hooks/useAdminProducts';
-import { useCategories } from '@/hooks/useCategories';
-import { getImageUrl } from '@/utils/imageUtils';
-import FilterBar from '@/components/common/FilterBar';
+import { useRef, useState } from "react";
+import { useAdminProducts } from "@/hooks/useAdminProducts";
+import { useCategories } from "@/hooks/useCategories";
+import { getImageUrl } from "@/utils/imageUtils";
+import FilterBar from "@/components/common/FilterBar";
 
 export default function AdminProductFilter() {
   const { filters, setSearch, setSort, setCategory } = useAdminProducts();
@@ -58,32 +58,32 @@ export default function AdminProductFilter() {
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
         className={`mt-6 flex overflow-x-auto w-full no-scrollbar gap-4 pb-4 px-1 snap-x snap-mandatory scroll-smooth touch-pan-x transition-all ${
-          isDragging ? 'cursor-grabbing scale-[0.99] opacity-90' : 'cursor-grab'
+          isDragging ? "cursor-grabbing scale-[0.99] opacity-90" : "cursor-grab"
         }`}
       >
         {/* All Categories button */}
         <button
-          onClick={() => setCategory('all')}
+          onClick={() => setCategory("all")}
           className={`flex items-center gap-3 pr-6 pl-2 py-2 rounded-full border transition-all duration-300 shrink-0 snap-start group ${
-            filters.category === 'all'
-              ? 'bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white shadow-xl'
-              : 'bg-white dark:bg-[#111] border-zinc-200 dark:border-zinc-800 hover:border-zinc-400'
+            filters.category === "all"
+              ? "bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white shadow-xl"
+              : "bg-white dark:bg-[#111] border-zinc-200 dark:border-zinc-800 hover:border-zinc-400"
           }`}
         >
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${
-              filters.category === 'all'
-                ? 'bg-zinc-800 dark:bg-zinc-100'
-                : 'bg-zinc-100 dark:bg-[#0a0a0a] grayscale'
+              filters.category === "all"
+                ? "bg-zinc-800 dark:bg-zinc-100"
+                : "bg-zinc-100 dark:bg-[#0a0a0a] grayscale"
             }`}
           >
             ♾️
           </div>
           <span
             className={`text-[10px] font-black uppercase tracking-widest ${
-              filters.category === 'all'
-                ? 'text-white dark:text-black'
-                : 'text-zinc-600 dark:text-zinc-400'
+              filters.category === "all"
+                ? "text-white dark:text-black"
+                : "text-zinc-600 dark:text-zinc-400"
             }`}
           >
             All Categories
@@ -99,8 +99,8 @@ export default function AdminProductFilter() {
               onClick={() => setCategory(cat.slug)}
               className={`flex items-center gap-3 pr-6 pl-2 py-2 rounded-full border transition-all duration-300 shrink-0 snap-start group ${
                 isSelected
-                  ? 'bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white shadow-xl'
-                  : 'bg-white dark:bg-[#111] border-zinc-200 dark:border-zinc-800 hover:border-zinc-400'
+                  ? "bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white shadow-xl"
+                  : "bg-white dark:bg-[#111] border-zinc-200 dark:border-zinc-800 hover:border-zinc-400"
               }`}
             >
               <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-700/50">
@@ -108,13 +108,17 @@ export default function AdminProductFilter() {
                   src={getImageUrl(cat.image)}
                   alt={cat.name}
                   className={`w-full h-full object-cover transition-all duration-500 ${
-                    isSelected ? 'grayscale-0 scale-110' : 'grayscale group-hover:grayscale-0'
+                    isSelected
+                      ? "grayscale-0 scale-110"
+                      : "grayscale group-hover:grayscale-0"
                   }`}
                 />
               </div>
               <span
                 className={`text-[10px] font-black uppercase tracking-widest ${
-                  isSelected ? 'text-white dark:text-black' : 'text-zinc-600 dark:text-zinc-400'
+                  isSelected
+                    ? "text-white dark:text-black"
+                    : "text-zinc-600 dark:text-zinc-400"
                 }`}
               >
                 {cat.name}

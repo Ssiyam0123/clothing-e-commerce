@@ -1,28 +1,32 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useSizes } from '@/hooks/useSizes';
-import { useCategories } from '@/hooks/useCategories';
-import DataTable from '@/components/admin/DataTable';
-import ActionButtons from '@/components/admin/ActionButtons';
-import Loader from '@/components/common/Loader';
+import { useState } from "react";
+import Link from "next/link";
+import { useSizes } from "@/hooks/useSizes";
+import { useCategories } from "@/hooks/useCategories";
+import DataTable from "@/components/admin/DataTable";
+import ActionButtons from "@/components/admin/ActionButtons";
+import Loader from "@/components/common/Loader";
 
 export default function Sizes() {
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("");
   const { categories, isLoading: categoriesLoading } = useCategories();
   const { sizes, isLoading, deleteSize } = useSizes(selectedCategory);
 
   const handleDelete = async (id) => {
-    if (confirm('Are you sure you want to delete this size?')) {
+    if (confirm("Are you sure you want to delete this size?")) {
       await deleteSize.mutateAsync(id);
     }
   };
 
   const columns = [
-    { label: 'Name', key: 'name' },
-    { label: 'Description', key: 'description' },
-    { label: 'Category', key: 'category', render: (item) => item.category?.name },
+    { label: "Name", key: "name" },
+    { label: "Description", key: "description" },
+    {
+      label: "Category",
+      key: "category",
+      render: (item) => item.category?.name,
+    },
   ];
 
   if (isLoading || categoriesLoading) return <Loader />;
@@ -51,7 +55,9 @@ export default function Sizes() {
         >
           <option value="">All Categories</option>
           {categories?.map((cat) => (
-            <option key={cat._id} value={cat._id}>{cat.name}</option>
+            <option key={cat._id} value={cat._id}>
+              {cat.name}
+            </option>
           ))}
         </select>
       </div>

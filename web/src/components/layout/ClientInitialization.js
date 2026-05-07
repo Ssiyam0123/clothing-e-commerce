@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useAppStore } from '@/store/appStore';
-import { useAuthStore } from '@/store/authStore';
+import { useEffect } from "react";
+import { useAppStore } from "@/store/appStore";
+import { useAuthStore } from "@/store/authStore";
 
 export default function ClientInitialization() {
   const initApp = useAppStore((state) => state.initApp);

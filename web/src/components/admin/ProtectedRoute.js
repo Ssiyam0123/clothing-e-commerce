@@ -1,9 +1,9 @@
-'use client';
-import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import Loader from '../common/Loader';
-import { motion } from 'framer-motion';
-import { useAuthStore } from '@/store/authStore';
+"use client";
+import { useRouter, usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import Loader from "../common/Loader";
+import { motion } from "framer-motion";
+import { useAuthStore } from "@/store/authStore";
 
 export default function ProtectedRoute({ children, adminOnly = false }) {
   const { user, isAuthenticated, isLoading } = useAuthStore();
@@ -12,22 +12,26 @@ export default function ProtectedRoute({ children, adminOnly = false }) {
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (isLoading) return; 
+    if (isLoading) return;
 
     if (!isAuthenticated) {
       router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
-    } else if (adminOnly && user?.role !== 'admin') {
-      router.replace('/');
+    } else if (adminOnly && user?.role !== "admin") {
+      router.replace("/");
     } else {
-      setIsAuthorized(true); 
+      setIsAuthorized(true);
     }
   }, [isLoading, isAuthenticated, user, router, adminOnly, pathname]);
 
   if (isLoading || !isAuthorized) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-[#fcfcfc] dark:bg-[#050505] transition-colors duration-700">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-           <Loader />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Loader />
         </motion.div>
       </div>
     );

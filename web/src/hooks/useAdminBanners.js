@@ -1,23 +1,27 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/lib/api';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/api";
 
 export const useAdminBanners = () => {
   const queryClient = useQueryClient();
 
   // Fetch all banners (admin)
-  const { data: banners, isLoading, error } = useQuery({
-    queryKey: ['admin-banners'],
+  const {
+    data: banners,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["admin-banners"],
     queryFn: async () => {
-      const { data } = await api.get('/banners');
+      const { data } = await api.get("/banners");
       return data;
     },
   });
 
   // Create banner
   const createBanner = useMutation({
-    mutationFn: (newBanner) => api.post('/banners', newBanner),
+    mutationFn: (newBanner) => api.post("/banners", newBanner),
     onSuccess: () => {
-      queryClient.invalidateQueries(['admin-banners']);
+      queryClient.invalidateQueries(["admin-banners"]);
     },
   });
 
@@ -25,7 +29,7 @@ export const useAdminBanners = () => {
   const updateBanner = useMutation({
     mutationFn: ({ id, data }) => api.put(`/banners/${id}`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['admin-banners']);
+      queryClient.invalidateQueries(["admin-banners"]);
     },
   });
 
@@ -33,7 +37,7 @@ export const useAdminBanners = () => {
   const deleteBanner = useMutation({
     mutationFn: (id) => api.delete(`/banners/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries(['admin-banners']);
+      queryClient.invalidateQueries(["admin-banners"]);
     },
   });
 

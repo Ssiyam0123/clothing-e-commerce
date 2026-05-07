@@ -6,7 +6,12 @@ const pageSettingSchema = new mongoose.Schema({
         siteTitle: { type: String, default: "Premium Apparel" },
         headerLogo: { type: String }, 
         footerLogo: { type: String },
-        favicon: { type: String }
+        favicon: { type: String },
+        activeTheme: { type: String, default: "executive", enum: ["executive", "streetwear", "earth", "luxury", "cyber"] },
+        // ✅ New fields for centralized control
+        defaultTheme: { type: String, default: "dark", enum: ["light", "dark", "system"] }, 
+        defaultThemeColor: { type: String, default: "Zinc", enum: ["Zinc", "Rose", "Blue", "Green", "Orange"] },
+        defaultLanguage: { type: String, default: "en", enum: ["en", "bn"] }
     },
     socialLinks: [{
         platform: { type: String }, 

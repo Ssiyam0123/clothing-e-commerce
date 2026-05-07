@@ -30,6 +30,8 @@ import chatRoutes from "./modules/chat/chat.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { handleFileError } from "./middleware/cleanup.js";
 
+import contextMiddleware from "./middleware/context.js";
+
 const app = express();
 
 app.set("trust proxy", 1);
@@ -59,10 +61,15 @@ app.use(
       "x-guest-id",
       "x-requested-with",
       "Cookie",
+      "x-vanguard-theme",
+      "x-vanguard-lang",
+      "x-vanguard-mode"
     ],
     exposedHeaders: ["set-cookie"],
   })
 );
+
+app.use(contextMiddleware);
 
 // Parsers
 app.use(express.json({ limit: "50mb" }));

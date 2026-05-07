@@ -3,25 +3,43 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { 
-  LayoutDashboard, ShoppingBag, Shirt, FolderTree, 
-  Zap, palette, Ticket, Users, User, Settings, X, 
-  Bold, MessageCircle
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Shirt,
+  FolderTree,
+  Zap,
+  palette,
+  Ticket,
+  Users,
+  User,
+  Settings,
+  X,
+  Bold,
+  MessageCircle,
 } from "lucide-react"; // 🚀 Lucide icons for premium feel
 
 const navItems = [
-  { name: "Command Center", href: "/admin", icon: <LayoutDashboard size={18}/> },
-  { name: "Orders", href: "/admin/orders", icon: <ShoppingBag size={18}/> },
-  { name: "Products", href: "/admin/products", icon: <Shirt size={18}/> },
-  { name: "Categories", href: "/admin/categories", icon: <FolderTree size={18}/> },
-  { name: "Live Chat", href: "/admin/chat", icon: <MessageCircle size={18}/> },
-  { name: "Flash Drops", href: "/admin/flash-sales", icon: <Zap size={18}/> },
+  {
+    name: "Command Center",
+    href: "/admin",
+    icon: <LayoutDashboard size={18} />,
+  },
+  { name: "Orders", href: "/admin/orders", icon: <ShoppingBag size={18} /> },
+  { name: "Products", href: "/admin/products", icon: <Shirt size={18} /> },
+  {
+    name: "Categories",
+    href: "/admin/categories",
+    icon: <FolderTree size={18} />,
+  },
+  { name: "Live Chat", href: "/admin/chat", icon: <MessageCircle size={18} /> },
+  { name: "Flash Drops", href: "/admin/flash-sales", icon: <Zap size={18} /> },
   { name: "Campaigns", href: "/admin/banner-campaigns", icon: "🎨" },
-  { name: "Coupons", href: "/admin/coupons", icon: <Ticket size={18}/> },
-  { name: "Users", href: "/admin/users", icon: <Users size={18}/> },
-  { name: "Blog", href: "/admin/blog", icon: <Bold size={18}/> },
-  { name: "My Profile", href: "/profile", icon: <User size={18}/> },
-  { name: "Setting", href: "/admin/settings", icon: <Settings size={18}/> },
+  { name: "Coupons", href: "/admin/coupons", icon: <Ticket size={18} /> },
+  { name: "Users", href: "/admin/users", icon: <Users size={18} /> },
+  { name: "Blog", href: "/admin/blog", icon: <Bold size={18} /> },
+  { name: "My Profile", href: "/profile", icon: <User size={18} /> },
+  { name: "Setting", href: "/admin/settings", icon: <Settings size={18} /> },
 ];
 
 export default function Sidebar({ isOpen = false, onClose = () => {} }) {
@@ -59,7 +77,9 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
         <div className="p-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 bg-black dark:bg-white rounded-2xl flex items-center justify-center shadow-2xl shadow-black/20">
-              <span className="text-white dark:text-black font-black italic">V</span>
+              <span className="text-white dark:text-black font-black italic">
+                V
+              </span>
             </div>
             <div className="flex flex-col">
               <h2 className="text-sm font-black tracking-tighter uppercase text-zinc-900 dark:text-white leading-none">
@@ -70,7 +90,7 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
               </span>
             </div>
           </div>
-          
+
           {/* ✖️ Mobile Close Button */}
           <button
             onClick={onClose}
@@ -89,7 +109,8 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
             {navItems.map((item) => {
               const isActive =
                 pathname === item.href ||
-                (item.href !== "/admin" && pathname.startsWith(`${item.href}/`));
+                (item.href !== "/admin" &&
+                  pathname.startsWith(`${item.href}/`));
 
               return (
                 <li key={item.href}>
@@ -104,7 +125,9 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
                         : "text-zinc-500 dark:text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:text-zinc-900 dark:hover:text-white"
                     }`}
                   >
-                    <span className={`transition-transform duration-300 ${isActive ? "scale-110" : "opacity-70 group-hover:opacity-100"}`}>
+                    <span
+                      className={`transition-transform duration-300 ${isActive ? "scale-110" : "opacity-70 group-hover:opacity-100"}`}
+                    >
                       {item.icon}
                     </span>
                     <span>{item.name}</span>
@@ -118,9 +141,9 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
         {/* 🔐 Footer Session Info */}
         <div className="p-8 mt-auto">
           <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl p-4 border border-zinc-100 dark:border-zinc-800/50">
-             <p className="text-[8px] font-black text-zinc-400 uppercase tracking-[0.3em] text-center">
-               Vanguard Node v2.0.6
-             </p>
+            <p className="text-[8px] font-black text-zinc-400 uppercase tracking-[0.3em] text-center">
+              Vanguard Node v2.0.6
+            </p>
           </div>
         </div>
       </aside>

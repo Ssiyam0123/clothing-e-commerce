@@ -3,9 +3,9 @@ export default function FormInput({
   name,
   register,
   errors,
-  type = 'text',
+  type = "text",
   required = false,
-  placeholder = '',
+  placeholder = "",
   ...props
 }) {
   return (
@@ -15,7 +15,9 @@ export default function FormInput({
       </label>
       <input
         type={type}
-        {...register(name, { required: required ? `${label} is required` : false })}
+        {...register(name, {
+          required: required ? `${label} is required` : false,
+        })}
         placeholder={placeholder}
         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
         {...props}

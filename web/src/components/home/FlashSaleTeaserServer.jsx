@@ -1,12 +1,17 @@
-import FlashSaleTeaser from './FlashSaleTeaser';
+import FlashSaleTeaser from "./FlashSaleTeaser";
 
-export default function FlashSaleTeaserServer({ activeSale, products, lang, ui }) {
+export default function FlashSaleTeaserServer({
+  activeSale,
+  products,
+  lang,
+  ui,
+}) {
   return (
-    <FlashSaleTeaser 
-      activeSale={activeSale} 
+    <FlashSaleTeaser
+      activeSale={activeSale}
       flashSaleProducts={products}
-      ui={ui} 
-      lang={lang} 
+      ui={ui}
+      lang={lang}
     />
   );
 }

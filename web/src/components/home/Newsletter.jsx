@@ -1,79 +1,81 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { useState } from "react";
+import { Mail, Send, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { swalToast, swalError } from "@/utils/swal";
 
-// 🦴 Newsletter Skeleton View
-const NewsletterSkeleton = () => (
-  <div className="animate-pulse flex flex-col items-center">
-    <div className="h-12 md:h-20 w-3/4 bg-zinc-800 rounded-2xl mb-6" />
-    <div className="h-4 w-1/2 bg-zinc-800 rounded-full mb-12" />
-    <div className="flex flex-col sm:flex-row gap-3 w-full max-w-lg">
-      <div className="flex-1 h-14 bg-zinc-800 rounded-full" />
-      <div className="w-full sm:w-32 h-14 bg-zinc-800 rounded-full" />
-    </div>
-  </div>
-);
+export default function Newsletter({ lang = "en" }) {
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-export default function Newsletter({ ui, lang = 'en' }) {
-  const isBn = lang === 'bn';
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email) return;
 
-  if (!ui) {
-    return (
-      <section className="py-40 bg-black text-white relative overflow-hidden">
-        <div className="relative z-10 max-w-2xl mx-auto px-6">
-          <NewsletterSkeleton />
-        </div>
-      </section>
-    );
-  }
+    setIsSubmitting(true);
+    try {
+      // Mock API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setIsSuccess(true);
+      swalToast("Transmission Successful", "success");
+      setEmail("");
+    } catch (err) {
+      swalError("Sync Failed", "Could not join the sequence.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <section className="py-40 bg-black text-white relative overflow-hidden">
-      {/* Decorative Glow */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-zinc-800 rounded-full blur-[150px] opacity-20 -mr-48 -mt-48"></div>
-      
-      <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
-        <motion.h2 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className={`text-5xl md:text-7xl font-black tracking-tighter uppercase mb-6 leading-none ${isBn ? 'font-sans' : ''}`}
-        >
-          {ui.newsletterTitle || 'Join the Syndicate'}
-        </motion.h2>
-        
-        <motion.p 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="text-zinc-400 mb-12 text-lg font-light tracking-wide"
-        >
-          {ui.newsletterSub || 'Subscribe for early access and exclusive drops.'}
-        </motion.p>
-
-        <motion.form 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-3"
-          onSubmit={(e) => e.preventDefault()}
-        >
-          <input 
-            type="email" 
-            placeholder={isBn ? "আপনার ইমেইল..." : "EMAIL@ADDRESS.COM"} 
-            className="flex-1 bg-[#111] border border-zinc-800 rounded-full px-8 py-5 text-sm focus:outline-none focus:border-zinc-600 transition-all uppercase tracking-widest placeholder:text-zinc-700"
-            required
-          />
-          <button 
-            type="submit" 
-            className="bg-white text-black px-10 py-5 rounded-full font-black text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-200 active:scale-95 transition-all shadow-xl shadow-white/5"
-          >
-            {ui.subscribe || 'Subscribe'}
-          </button>
-        </motion.form>
-      </div>
-    </section>
+    <div className="max-w-xl mx-auto mt-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      {isSuccess ? (
+        <div className="flex flex-col items-center gap-6 p-10 rounded-[3rem] bg-accent/20 border border-accent-secondary/10">
+          <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500">
+            <CheckCircle2 size={32} />
+          </div>
+          <p className="text-sm font-black uppercase tracking-[0.3em] text-foreground">Entry Secured</p>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-accent-secondary/20 to-transparent blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <div className="relative flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground/30 h-5 w-5" />
+              <Input
+                type="email"
+                placeholder="CODENAME@VAN-GUARD.COM"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="h-16 rounded-full bg-background/50 border-none px-16 font-black text-xs uppercase tracking-widest shadow-2xl focus-visible:ring-2 focus-visible:ring-accent-secondary/30 transition-all placeholder:text-muted-foreground/20"
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="h-16 rounded-full bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-10 shadow-2xl shadow-foreground/5 min-w-[180px]"
+            >
+              {isSubmitting ? (
+                <span className="flex items-center gap-2">
+                   <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
+                   Syncing...
+                </span>
+              ) : (
+                <span className="flex items-center gap-3">
+                  <Send size={16} />
+                  <span className="font-black uppercase text-[10px] tracking-[0.2em]">Transmit</span>
+                </span>
+              )}
+            </Button>
+          </div>
+          <p className="mt-6 text-[8px] font-bold text-muted-foreground/30 uppercase tracking-[0.4em] text-center">
+            By joining, you agree to our Protocol and Privacy Framework.
+          </p>
+        </form>
+      )}
+    </div>
   );
 }

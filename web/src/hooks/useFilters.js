@@ -1,27 +1,27 @@
 // src/hooks/useFilters.js
-import { useReducer, useEffect, useCallback } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useReducer, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 const initialState = (searchParams, initialSort) => ({
-  search: searchParams.get('search') || '',
-  sort: searchParams.get('sort') || initialSort,
-  category: searchParams.get('category') || 'all',
-  page: Number(searchParams.get('page')) || 1,
+  search: searchParams.get("search") || "",
+  sort: searchParams.get("sort") || initialSort,
+  category: searchParams.get("category") || "all",
+  page: Number(searchParams.get("page")) || 1,
 });
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'SET_SEARCH':
+    case "SET_SEARCH":
       return { ...state, search: action.payload, page: 1 };
-    case 'SET_SORT':
+    case "SET_SORT":
       return { ...state, sort: action.payload, page: 1 };
-    case 'SET_CATEGORY':
+    case "SET_CATEGORY":
       return { ...state, category: action.payload, page: 1 };
-    case 'SET_PAGE':
+    case "SET_PAGE":
       return { ...state, page: action.payload };
-    case 'CLEAR_FILTERS':
-      return { ...state, search: '', sort: '', category: 'all', page: 1 };
-    case 'SYNC_FROM_URL':
+    case "CLEAR_FILTERS":
+      return { ...state, search: "", sort: "", category: "all", page: 1 };
+    case "SYNC_FROM_URL":
       return {
         ...state,
         search: action.payload.search,
@@ -34,7 +34,7 @@ function reducer(state, action) {
   }
 }
 
-export function useFilters({ initialLimit = 12, initialSort = '' } = {}) {
+export function useFilters({ initialLimit = 12, initialSort = "" } = {}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -42,16 +42,16 @@ export function useFilters({ initialLimit = 12, initialSort = '' } = {}) {
   const [state, dispatch] = useReducer(
     reducer,
     { searchParams, initialSort },
-    (initial) => initialState(initial.searchParams, initial.initialSort)
+    (initial) => initialState(initial.searchParams, initial.initialSort),
   );
 
   // Update URL when filter state changes
   useEffect(() => {
     const params = new URLSearchParams();
-    if (state.search) params.set('search', state.search);
-    if (state.sort) params.set('sort', state.sort);
-    if (state.category !== 'all') params.set('category', state.category);
-    if (state.page > 1) params.set('page', state.page);
+    if (state.search) params.set("search", state.search);
+    if (state.sort) params.set("sort", state.sort);
+    if (state.category !== "all") params.set("category", state.category);
+    if (state.page > 1) params.set("page", state.page);
 
     const newQueryString = params.toString();
     router.replace(`${pathname}?${newQueryString}`, { scroll: false });
@@ -60,20 +60,35 @@ export function useFilters({ initialLimit = 12, initialSort = '' } = {}) {
   // Sync state when URL changes (e.g., browser back/forward)
   useEffect(() => {
     const newState = {
-      search: searchParams.get('search') || '',
-      sort: searchParams.get('sort') || initialSort,
-      category: searchParams.get('category') || 'all',
-      page: Number(searchParams.get('page')) || 1,
+      search: searchParams.get("search") || "",
+      sort: searchParams.get("sort") || initialSort,
+      category: searchParams.get("category") || "all",
+      page: Number(searchParams.get("page")) || 1,
     };
-    dispatch({ type: 'SYNC_FROM_URL', payload: newState });
+    dispatch({ type: "SYNC_FROM_URL", payload: newState });
   }, [searchParams, initialSort]);
 
   // Stable action creators
-  const setSearch = useCallback((val) => dispatch({ type: 'SET_SEARCH', payload: val }), []);
-  const setSort = useCallback((val) => dispatch({ type: 'SET_SORT', payload: val }), []);
-  const setCategory = useCallback((val) => dispatch({ type: 'SET_CATEGORY', payload: val }), []);
-  const setPage = useCallback((val) => dispatch({ type: 'SET_PAGE', payload: val }), []);
-  const clearFilters = useCallback(() => dispatch({ type: 'CLEAR_FILTERS' }), []);
+  const setSearch = useCallback(
+    (val) => dispatch({ type: "SET_SEARCH", payload: val }),
+    [],
+  );
+  const setSort = useCallback(
+    (val) => dispatch({ type: "SET_SORT", payload: val }),
+    [],
+  );
+  const setCategory = useCallback(
+    (val) => dispatch({ type: "SET_CATEGORY", payload: val }),
+    [],
+  );
+  const setPage = useCallback(
+    (val) => dispatch({ type: "SET_PAGE", payload: val }),
+    [],
+  );
+  const clearFilters = useCallback(
+    () => dispatch({ type: "CLEAR_FILTERS" }),
+    [],
+  );
 
   return {
     search: state.search,
@@ -90,7 +105,7 @@ export function useFilters({ initialLimit = 12, initialSort = '' } = {}) {
       limit: initialLimit,
       search: state.search,
       sort: state.sort,
-      ...(state.category !== 'all' && { category: state.category }),
+      ...(state.category !== "all" && { category: state.category }),
     },
   };
 }

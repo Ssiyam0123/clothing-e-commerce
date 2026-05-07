@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function CountdownTimer({ targetDate, onExpire, label }) {
   const [timeLeft, setTimeLeft] = useState(null);
@@ -32,16 +32,16 @@ export default function CountdownTimer({ targetDate, onExpire, label }) {
   if (!timeLeft) return null;
 
   const Unit = ({ val, label }) => (
-    <motion.div 
+    <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-      className="flex flex-col items-center bg-white/10 dark:bg-black/80 backdrop-blur-xl border border-zinc-200 dark:border-white/10 px-3 md:px-4 py-2 md:py-3 rounded-xl md:rounded-2xl min-w-[60px] md:min-w-[70px] shadow-2xl"
+      transition={{ type: "spring", stiffness: 200, damping: 20 }}
+      className="flex flex-col items-center bg-surface backdrop-blur-xl border border-light px-3 md:px-4 py-2 md:py-3 rounded-xl md:rounded-2xl min-w-[60px] md:min-w-[70px] shadow-2xl"
     >
-      <span className="text-xl md:text-3xl font-black text-zinc-900 dark:text-white leading-none">
-        {String(val).padStart(2, '0')}
+      <span className="text-xl md:text-3xl font-black text-primary leading-none">
+        {String(val).padStart(2, "0")}
       </span>
-      <span className="text-[7px] md:text-[9px] font-black uppercase text-zinc-500 tracking-[0.2em] mt-1 md:mt-2">
+      <span className="text-[7px] md:text-[9px] font-black uppercase text-secondary tracking-[0.2em] mt-1 md:mt-2">
         {label}
       </span>
     </motion.div>
@@ -49,10 +49,16 @@ export default function CountdownTimer({ targetDate, onExpire, label }) {
 
   return (
     <div className="flex flex-col items-center">
-      {label && <p className="text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-[0.4em] mb-4">{label}</p>}
+      {label && (
+        <p className="text-[10px] font-black text-secondary uppercase tracking-[0.4em] mb-4">
+          {label}
+        </p>
+      )}
       <div className="flex gap-2">
         <AnimatePresence>
-          {timeLeft.days > 0 && <Unit key="days" val={timeLeft.days} label="Days" />}
+          {timeLeft.days > 0 && (
+            <Unit key="days" val={timeLeft.days} label="Days" />
+          )}
           <Unit key="hours" val={timeLeft.hours} label="Hrs" />
           <Unit key="minutes" val={timeLeft.minutes} label="Min" />
           <Unit key="seconds" val={timeLeft.seconds} label="Sec" />

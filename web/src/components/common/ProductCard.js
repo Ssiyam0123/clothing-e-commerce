@@ -1,123 +1,145 @@
-'use client';
+"use client";
 
-import { useState, memo } from 'react';
-import Link from 'next/link';
-import { useProductStore } from '@/store/productStore';
-import OptimizedImage from '@/components/common/OptimizedImage'; 
-import PrefetchLink from '@/components/common/PrefetchLink';
-import { Heart, ShoppingBag, Zap, Star } from 'lucide-react';
-import QuickSelectModal from '../store/QuickSelectModal';
-import { useAuthStore } from '@/store/authStore';
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Star, ShoppingCart, Zap } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { getImageUrl } from "@/utils/imageUtils";
+import { cn } from "@/lib/utils";
+import WishlistButtonClient from "@/components/products/WishlistButtonClient";
+import SizeSelectionModal from "@/components/products/SizeSelectionModal";
+import { useAuthStore } from "@/store/authStore";
 
-const ProductCard = memo(({ product, lang = 'en', index = 0 }) => {
+export default function ProductCard({ product, className }) {
+  const { isAuthenticated } = useAuthStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { user } = useAuthStore();
-  
-  const wishlistItems = useProductStore((state) => state.wishlistItems);
-  const toggleWishlist = useProductStore((state) => state.toggleWishlist);
+  const [modalMode, setModalMode] = useState("cart");
 
   if (!product) return null;
 
-  const inWishlist = wishlistItems.some((p) => String(p._id) === String(product._id));
-  const discountedPrice = product.price - (product.price * (product.discount || 0) / 100);
+  const discountedPrice = product.price - (product.price * (product.discount || 0)) / 100;
+  const hasDiscount = product.discount > 0;
+
+  const triggerModal = (e, mode) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setModalMode(mode);
+    setIsModalOpen(true);
+  };
 
   return (
-    <div className="group relative flex flex-col h-full bg-white dark:bg-[#0a0a0a] rounded-2xl md:rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
-      
-      {/* Image Section */}
-      <div className="relative aspect-[4/5] overflow-hidden bg-zinc-100 dark:bg-zinc-900">
-        <PrefetchLink 
-          href={`/products/${product.slug}`} 
-          queryKey={['product', product.slug]}
-          queryFn={() => fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/products/details/${product.slug}`).then(res => res.json())}
-          className="absolute inset-0 z-10"
-          aria-label={`View details of ${product.name}`}
-        />
-        <OptimizedImage
-          src={product.images?.[0]}
-          alt={product.name}
-          className="transition-transform duration-500 group-hover:scale-105 object-cover w-full h-full"
-          loading={index < 4 ? "eager" : "lazy"}
-          priority={index < 4}
-          fetchPriority={index === 0 ? "high" : "auto"}
-        />
-        
-        {/* Rating Overlay - accessible contrast */}
-        <div className="absolute bottom-2 left-2 z-20 flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-sm">
-          <Star size={8} className="fill-amber-400 text-amber-400" aria-hidden="true" />
-          <span className="text-[8px] font-bold text-white">{product.averageRating?.toFixed(1) || '4.8'}</span>
+    <>
+      <div
+        className={cn(
+          "group relative flex flex-col w-full bg-card rounded-xl border border-border/40 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md",
+          className
+        )}
+      >
+        {/* Image Section */}
+        <div className="relative aspect-square w-full overflow-hidden bg-accent/5">
+          <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10">
+            <Image
+              src={getImageUrl(product.images?.[0], 600, 80)}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          </Link>
+
+          {/* Badges */}
+          <div className="absolute top-2 left-2 z-20 flex flex-col gap-1">
+            {hasDiscount && (
+              <Badge className="bg-red-500 text-white border-none px-2 py-0.5 text-[10px] font-semibold rounded-sm shadow-sm">
+                -{product.discount}%
+              </Badge>
+            )}
+            {product.isNew && (
+              <Badge className="bg-emerald-500 text-white border-none px-2 py-0.5 text-[10px] font-semibold rounded-sm shadow-sm">
+                New
+              </Badge>
+            )}
+          </div>
+
+          {/* Wishlist Button */}
+          <div className="absolute top-2 right-2 z-20">
+            <WishlistButtonClient product={product} />
+          </div>
         </div>
 
-        {/* Wishlist Button - larger touch target */}
-        <button 
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWishlist(product, !!user); }}
-          className={`absolute top-2 right-2 z-20 p-2.5 rounded-full backdrop-blur-sm transition-all active:scale-90 ${
-            inWishlist 
-              ? 'bg-rose-500 text-white shadow-md' 
-              : 'bg-white/70 dark:bg-black/50 text-zinc-800 dark:text-zinc-200'
-          }`}
-          aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-        >
-          <Heart size={14} fill={inWishlist ? "currentColor" : "none"} strokeWidth={2} />
-        </button>
-      </div>
-
-      {/* Content Section */}
-      <div className="p-3 md:p-5 flex flex-col flex-1">
-        {/* Category Badge - improved contrast */}
-        <p className="text-[9px] md:text-[10px] font-black text-rose-700 dark:text-rose-400 uppercase tracking-wider mb-1">
-          {product.category?.name || 'Artifact'}
-        </p>
-
-        {/* Title */}
-        <h3 className="font-black text-sm md:text-base tracking-tight uppercase dark:text-white line-clamp-1 mb-1">
-          {product.name}
-        </h3>
-
-        {/* Pricing */}
-        <div className="flex items-baseline gap-2 mt-1 mb-3">
-          <span className="text-base md:text-xl font-black dark:text-white">
-            ৳{discountedPrice.toFixed(0)}
-          </span>
-          {product.discount > 0 && (
-            <span className="text-[9px] md:text-xs font-bold text-zinc-400 line-through">
-              ৳{product.price}
+        {/* Product Info Section */}
+        <div className="p-3 sm:p-4 flex flex-col gap-2">
+          {/* Category */}
+          {product.category?.name && (
+            <span className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider truncate">
+              {product.category.name}
             </span>
           )}
-        </div>
 
-        {/* Action Buttons */}
-        <div className="mt-auto flex items-center gap-2">
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="w-10 h-10 md:w-12 md:h-12 bg-zinc-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center hover:bg-black hover:text-white transition-all active:scale-95"
-            aria-label="Quick add to cart"
-          >
-            <ShoppingBag size={16} className="md:w-5 md:h-5" aria-hidden="true" />
-          </button>
+          {/* Name */}
+          <Link href={`/products/${product.slug}`}>
+            <h3 className="font-medium text-sm sm:text-base line-clamp-2 hover:text-primary transition-colors">
+              {product.name}
+            </h3>
+          </Link>
 
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="flex-1 bg-black dark:bg-white text-white dark:text-black font-bold h-10 md:h-12 rounded-xl flex items-center justify-center gap-1.5 hover:bg-rose-600 hover:text-white transition-all active:scale-95 shadow-md"
-            aria-label={lang === 'bn' ? 'অর্ডার করুন' : 'Buy now'}
-          >
-            <Zap size={12} className="fill-current hidden sm:block" aria-hidden="true" />
-            <span className="text-[9px] md:text-[10px] font-black uppercase tracking-wide">
-              {lang === 'bn' ? 'অর্ডার' : 'Buy Now'}
-            </span>
-          </button>
+          {/* Rating */}
+          {product.averageRating > 0 && (
+            <div className="flex items-center gap-1">
+              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+              <span className="text-xs font-medium">
+                {product.averageRating.toFixed(1)}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                ({product.reviewCount || 0})
+              </span>
+            </div>
+          )}
+
+          {/* Price & Actions Row */}
+          <div className="flex items-center justify-between gap-2 mt-1">
+            <div className="flex items-baseline gap-1.5 flex-wrap">
+              <span className="text-lg sm:text-xl font-bold tracking-tight">
+                ৳{discountedPrice.toFixed(0)}
+              </span>
+              {hasDiscount && (
+                <span className="text-xs sm:text-sm text-muted-foreground line-through">
+                  ৳{product.price}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                onClick={(e) => triggerModal(e, "buy-now")}
+                variant="outline"
+                size="sm"
+                className="h-8 px-2 sm:px-3 text-[10px] font-bold uppercase tracking-tight gap-1 rounded-md border-foreground/10 hover:bg-foreground hover:text-background"
+              >
+                <Zap size={12} className="fill-current" />
+                <span className="hidden xs:inline">Buy</span>
+              </Button>
+              <Button
+                onClick={(e) => triggerModal(e, "cart")}
+                size="sm"
+                className="h-8 px-2 sm:px-3 text-[10px] font-bold uppercase tracking-tight gap-1 rounded-md"
+              >
+                <ShoppingCart size={12} />
+                <span className="hidden xs:inline text-[9px]">Add</span>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <QuickSelectModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        product={product} 
-        lang={lang} 
+      <SizeSelectionModal 
+        product={product}
+        isOpen={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        mode={modalMode}
       />
-    </div>
+    </>
   );
-});
-
-ProductCard.displayName = 'ProductCard';
-export default ProductCard;
+}

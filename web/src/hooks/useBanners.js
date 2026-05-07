@@ -1,11 +1,15 @@
-import { useQuery } from '@tanstack/react-query';
-import api from '@/lib/api';
+import { useQuery } from "@tanstack/react-query";
+import api from "@/lib/api";
 
 export const useBanners = () => {
-  const { data: banners, isLoading, error } = useQuery({
-    queryKey: ['banners'],
+  const {
+    data: banners,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["banners"],
     queryFn: async () => {
-      const { data } = await api.get('/banners/active');
+      const { data } = await api.get("/banners/active");
       return data;
     },
   });

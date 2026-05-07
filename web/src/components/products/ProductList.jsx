@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-import { useInfiniteProducts } from '@/hooks/useInfiniteProducts';
-import { useSearchParams } from 'next/navigation';
-import { ProductCardSkeleton } from '@/components/common/Skeletons';
-import ProductCard from '../common/ProductCard';
+import { useEffect, useRef } from "react";
+import { useInfiniteProducts } from "@/hooks/useInfiniteProducts";
+import { useSearchParams } from "next/navigation";
+import { ProductCardSkeleton } from "@/components/common/Skeletons";
+import ProductCard from "../common/ProductCard";
 
 export default function ProductList({ initialData }) {
   const searchParams = useSearchParams();
   const loadMoreRef = useRef(null);
 
   const filters = {
-    search: searchParams.get('search') || '',
-    sort: searchParams.get('sort') || '',
-    category: searchParams.get('category') || 'all',
+    search: searchParams.get("search") || "",
+    sort: searchParams.get("sort") || "",
+    category: searchParams.get("category") || "all",
   };
 
   const {
@@ -33,7 +33,7 @@ export default function ProductList({ initialData }) {
           fetchNextPage();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     if (loadMoreRef.current) {
@@ -45,7 +45,9 @@ export default function ProductList({ initialData }) {
 
   // Combine and deduplicate products using a Map
   const allProducts = data?.pages.flatMap((page) => page.products) || [];
-  const uniqueProducts = Array.from(new Map(allProducts.map(p => [p._id, p])).values());
+  const uniqueProducts = Array.from(
+    new Map(allProducts.map((p) => [p._id, p])).values(),
+  );
 
   const showLoading = isLoading && !initialData;
 
@@ -60,7 +62,9 @@ export default function ProductList({ initialData }) {
   }
 
   return (
-    <div className={`transition-opacity duration-300 ${isFetching && !isFetchingNextPage ? 'opacity-40' : 'opacity-100'}`}>
+    <div
+      className={`transition-opacity duration-300 ${isFetching && !isFetchingNextPage ? "opacity-40" : "opacity-100"}`}
+    >
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8 mb-16">
         {uniqueProducts.map((p, idx) => (
           <ProductCard key={p._id} product={p} index={idx} />
@@ -71,17 +75,22 @@ export default function ProductList({ initialData }) {
       <div ref={loadMoreRef} className="h-20 flex items-center justify-center">
         {isFetchingNextPage && (
           <div className="flex gap-2">
-            <div className="w-2 h-2 bg-rose-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
-            <div className="w-2 h-2 bg-rose-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
-            <div className="w-2 h-2 bg-rose-600 rounded-full animate-bounce" />
+            <div className="w-2 h-2 bg-accent-secondary rounded-full animate-bounce [animation-delay:-0.3s]" />
+            <div className="w-2 h-2 bg-accent-secondary rounded-full animate-bounce [animation-delay:-0.15s]" />
+            <div className="w-2 h-2 bg-accent-secondary rounded-full animate-bounce" />
           </div>
         )}
       </div>
 
       {uniqueProducts.length === 0 && !isFetching && (
         <div className="py-24 text-center">
-          <span className="text-5xl block mb-4 grayscale opacity-20" aria-hidden="true">📦</span>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">
+          <span
+            className="text-5xl block mb-4 grayscale opacity-20"
+            aria-hidden="true"
+          >
+            📦
+          </span>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted">
             No artifacts found.
           </p>
         </div>

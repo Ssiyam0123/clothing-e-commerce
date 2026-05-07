@@ -1,96 +1,105 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { FreeMode } from 'swiper/modules';
-import { getImageUrl } from '@/utils/imageUtils';
+import Image from "next/image";
+import Link from "next/link";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { FreeMode } from "swiper/modules";
+import { getImageUrl } from "@/utils/imageUtils";
 
 // Swiper Styles
-import 'swiper/css';
-import 'swiper/css/free-mode';
+import "swiper/css";
+import "swiper/css/free-mode";
 
-export default function CategoryGrid({ categories, ui }) {
+import { Card } from "@/components/ui/card";
+
+export default function CategoryGrid({ categories }) {
   if (!categories || categories.length === 0) return null;
 
   return (
-    <section
-      className="bg-white dark:bg-[#050505] overflow-hidden transition-colors duration-700"
-      aria-label="Product categories"
-    >
-      {/* Header Section */}
-      <div className="container mx-auto px-6 mb-10 md:mb-16">
-        <div className="flex flex-col items-center text-center space-y-3">
-          <h2 className="text-3xl md:text-6xl font-black tracking-tighter text-gray-900 dark:text-white uppercase italic">
-            {ui.catTitle}
-          </h2>
-          <div className="h-1 w-16 bg-indigo-600 rounded-full transition-all duration-700 group-hover:w-24" />
-          <p className="text-gray-500 dark:text-gray-400 tracking-[0.3em] uppercase text-[9px] md:text-xs font-bold pt-1">
-            {ui.catSub}
-          </p>
-        </div>
-      </div>
+    <div className="w-full overflow-hidden">
+      <Swiper
+        slidesPerView={1.4}
+        spaceBetween={16}
+        freeMode={true}
+        modules={[FreeMode]}
+        breakpoints={{
+          640: {
+            slidesPerView: 2.2,
+            spaceBetween: 16,
+          },
+          768: {
+            slidesPerView: 3.2,
+            spaceBetween: 20,
+          },
+          1024: {
+            slidesPerView: 4.2,
+            spaceBetween: 24,
+          },
+        }}
+        className="category-swiper"
+      >
+        {categories.map((cat, idx) => (
+          <SwiperSlide key={cat._id || idx}>
+            <Card className="relative aspect-[4/5] min-h-[280px] md:min-h-[500px] w-full rounded-[2rem] overflow-hidden shadow-2xl select-none group border-none bg-elevated">
+              <Link
+                href={`/products?category=${cat.slug || cat._id}`}
+                className="block w-full h-full"
+                aria-label={`Browse ${cat.name} category`}
+              >
+                {/* Background Image with advanced hover */}
+                <div className="absolute inset-0 transition-all duration-[1.5s] cubic-bezier(0.4, 0, 0.2, 1) group-hover:scale-110 group-hover:rotate-1">
+                  <Image
+                    src={getImageUrl(
+                      cat.image || "/placeholder-cat.jpg",
+                      800,
+                      80,
+                    )}
+                    alt={cat.name}
+                    fill
+                    sizes="(max-width: 768px) 80vw, 33vw"
+                    className="object-cover grayscale-[100%] contrast-125 transition-all duration-700 group-hover:grayscale-0 group-hover:contrast-100"
+                    loading="lazy"
+                  />
+                </div>
 
-      {/* Swiper Slider Container */}
-      <div className="px-4 md:px-[6%]">
-        <Swiper
-          slidesPerView={2.2}
-          spaceBetween={12}
-          freeMode={true}
-          modules={[FreeMode]}
-          breakpoints={{
-            768: {
-              slidesPerView: 3.2,
-              spaceBetween: 20,
-            },
-            1024: {
-              slidesPerView: 4.2,
-              spaceBetween: 24,
-            },
-          }}
-          className="category-swiper !overflow-visible"
-        >
-          {categories.map((cat) => (
-            <SwiperSlide key={cat._id}>
-              <div className="relative aspect-[3/4] w-full rounded-[1.25rem] md:rounded-[2rem] overflow-hidden shadow-lg select-none group">
-                <Link
-                  href={`/products?category=${cat.slug || cat._id}`}
-                  className="block w-full h-full"
-                  aria-label={`Browse ${cat.name} category`}
-                >
-                  {/* Image with CSS hover scale */}
-                  <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-110">
-                    <Image
-                      src={getImageUrl(cat.image || '/placeholder-cat.jpg', 600, 80)}
-                      alt={cat.name}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                      className="object-cover grayscale-[80%] transition-all duration-700 group-hover:grayscale-0"
-                      loading="lazy"
-                    />
+                {/* Multi-layered Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-700" />
+                <div className="absolute inset-0 bg-accent-primary/10 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+                {/* Content Container */}
+                <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 z-10">
+                  <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                    <div className="inline-flex items-center gap-2 mb-3">
+                      <span className="w-8 h-[1px] bg-accent-secondary" />
+                      <span className="text-accent-secondary text-[8px] md:text-[10px] font-black tracking-[0.4em] uppercase">
+                        Syndicate
+                      </span>
+                    </div>
+                    
+                    <div className="relative">
+                      <h3 className="text-2xl md:text-5xl font-black text-white uppercase tracking-tighter leading-[0.85] italic mb-4 drop-shadow-2xl">
+                        {cat.name}
+                      </h3>
+                      
+                      {/* Interactive Button-like text */}
+                      <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 translate-x--4 group-hover:translate-x-0 transition-all duration-500 delay-100">
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+                          View Collection
+                        </span>
+                      </div>
+                    </div>
                   </div>
+                </div>
 
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
-
-                  {/* Content */}
-                  <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-8 z-10">
-                    <span className="text-indigo-400 text-[8px] md:text-[10px] font-black tracking-[0.2em] uppercase mb-1">
-                      Explore
-                    </span>
-                    <h3 className="text-sm md:text-3xl font-black text-white uppercase tracking-tighter leading-tight">
-                      {cat.name}
-                    </h3>
-
-                    {/* Active line on hover (Desktop only) */}
-                    <div className="hidden md:block h-1 w-0 group-hover:w-16 bg-white mt-3 transition-all duration-300 rounded-full" />
-                  </div>
-                </Link>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-    </section>
+                {/* Decorative index number */}
+                <div className="absolute top-6 right-6 text-white/10 text-6xl font-black italic tracking-tighter select-none">
+                  0{idx + 1}
+                </div>
+              </Link>
+            </Card>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </div>
   );
 }

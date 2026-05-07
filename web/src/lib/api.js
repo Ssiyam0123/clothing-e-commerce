@@ -7,7 +7,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Add token or guest ID to every request
+// Add token, guest ID, and brand context to every request
 api.interceptors.request.use((config) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   if (token) {
@@ -19,6 +19,13 @@ api.interceptors.request.use((config) => {
       config.headers['x-guest-id'] = guestId;
     }
   }
+
+  // Add Multi-Tenant Context Headers
+  if (typeof window !== 'undefined') {
+    const html = document.documentElement;
+    config.headers['x-vanguard-theme'] = html.getAttribute('data-theme') || 'executive';
+  }
+
   return config;
 });
 

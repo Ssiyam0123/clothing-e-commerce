@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { cookies, headers } from "next/headers";
 import { DICTIONARY } from "@/app/homeDictionary";
 import HeroSectionServer from "@/components/home/HeroSectionServer";
@@ -9,16 +10,25 @@ import ProductSection from "@/components/home/ProductSection";
 import Newsletter from "@/components/home/Newsletter";
 import { GridSkeleton, HeroSkeleton } from "@/components/common/Skeletons";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 async function getHomeData() {
   try {
-    const [productsRes, categoriesRes, flashSalesRes, bannerRes] = await Promise.all([
-      fetch(`${API_URL}/products?limit=24`, { next: { revalidate: 60, tags: ['products', 'home-data'] } }),
-      fetch(`${API_URL}/categories`, { next: { revalidate: 3600, tags: ['categories', 'home-data'] } }),
-      fetch(`${API_URL}/flash-sales/active`, { next: { revalidate: 30, tags: ['flash-sale', 'home-data'] } }),
-      fetch(`${API_URL}/banner-campaigns/active`, { next: { revalidate: 60, tags: ['banners', 'home-data'] } })
-    ]);
+    const [productsRes, categoriesRes, flashSalesRes, bannerRes] =
+      await Promise.all([
+        fetch(`${API_URL}/products?limit=24`, {
+          next: { revalidate: 60, tags: ["products", "home-data"] },
+        }),
+        fetch(`${API_URL}/categories`, {
+          next: { revalidate: 3600, tags: ["categories", "home-data"] },
+        }),
+        fetch(`${API_URL}/flash-sales/active`, {
+          next: { revalidate: 30, tags: ["flash-sale", "home-data"] },
+        }),
+        fetch(`${API_URL}/banner-campaigns/active`, {
+          next: { revalidate: 60, tags: ["banners", "home-data"] },
+        }),
+      ]);
 
     return {
       products: productsRes.ok ? (await productsRes.json()).products : [],
@@ -28,93 +38,102 @@ async function getHomeData() {
     };
   } catch (e) {
     console.error("Home data fetch failed:", e);
-    return { products: [], categories: [], flashSales: null, activeCampaign: null };
+    return {
+      products: [],
+      categories: [],
+      flashSales: null,
+      activeCampaign: null,
+    };
   }
 }
 
+import SectionHeader from "@/components/common/SectionHeader";
+
 export default async function HomePage() {
-  const cookieStore = await cookies();
-  const lang = cookieStore.get("lang")?.value || "en";
-  const ui = DICTIONARY[lang] || DICTIONARY.en;
-  
+  const lang = "en";
+  const ui = DICTIONARY.en;
+
   const data = await getHomeData();
-  
-  const featuredProducts = data.products.filter(p => p.isFeatured).slice(0, 4);
+
+  const featuredProducts = data.products
+    .filter((p) => p.isFeatured)
+    .slice(0, 4);
   const newArrivals = data.products.slice(0, 8);
-  const saleProducts = data.products.filter(p => p.discount > 0).slice(0, 4);
+  const saleProducts = data.products.filter((p) => p.discount > 0).slice(0, 4);
 
   return (
-    <main className="w-full bg-white dark:bg-[#050505] transition-colors duration-700">
+    <main className="w-full bg-surface transition-colors duration-700">
       {/* 1. Hero Section */}
       <Suspense fallback={<HeroSkeleton />}>
         <HeroSectionServer campaign={data.activeCampaign} lang={lang} ui={ui} />
       </Suspense>
 
-      {/* 2. USP Section */}
-      {/* <UspSection ui={ui} /> */}
-
-      <div className="space-y-28 md:space-y-36 pb-36 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto mt-20">
-        {/* 3. Flash Sale */}
+      <div className="space-y-20 md:space-y-28 pb-36 mt-10 md:mt-16">
+        {/* 2. Flash Sale Section */}
         {data.flashSales?.flashSale && (
-          <Suspense fallback={<GridSkeleton count={4} />}>
-            <FlashSaleTeaserServer 
-              activeSale={data.flashSales.flashSale} 
-              products={data.flashSales} 
-              lang={lang}
-              ui={ui}
-            />
-          </Suspense>
-        )}
-
-        {/* 4. Category Grid */}
-        <CategoryGrid categories={data.categories} ui={ui} />
-
-        {/* 5. Featured Artifacts */}
-        <section className="space-y-16">
-          <div className="flex flex-col mb-16 gap-3">
-            <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white">
-              {ui.featTitle}
-            </h2>
-            <div className="h-1.5 w-20 bg-rose-600 rounded-full" />
-            <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.3em] pt-1">
-              {ui.featSub}
-            </p>
-          </div>
-          <ProductSection products={featuredProducts} lang={lang} />
-        </section>
-
-        {/* 6. New Arrivals */}
-        <section className="space-y-16">
-          <div className="flex flex-col mb-16 gap-3">
-            <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white">
-              {ui.newTitle}
-            </h2>
-            <div className="h-1.5 w-20 bg-rose-600 rounded-full" />
-            <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.3em] pt-1">
-              {ui.newSub}
-            </p>
-          </div>
-          <ProductSection products={newArrivals} showLoadMore={true} lang={lang} ui={ui} />
-        </section>
-
-        {/* 7. Sale Section */}
-        {saleProducts.length > 0 && (
-          <section className="space-y-16">
-            <div className="flex flex-col mb-16 gap-3">
-              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white">
-                {ui.saleTitle}
-              </h2>
-              <div className="h-1.5 w-20 bg-rose-600 rounded-full" />
-              <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.3em] pt-1">
-                {ui.saleSub}
-              </p>
-            </div>
-            <ProductSection products={saleProducts} lang={lang} isDarkBg={true} />
+          <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
+             <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 md:mb-24">
+               <SectionHeader title="Flash Sale" subtitle={ui.flashSub || "Live Drops"} className="mb-0" />
+               <Link
+                 href="/flash-sale"
+                 className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-elevated px-8 py-4 rounded-full border border-light hover:bg-accent-secondary hover:text-white transition-all duration-500"
+               >
+                 See More
+               </Link>
+             </div>
+             <Suspense fallback={<GridSkeleton count={4} />}>
+               <FlashSaleTeaserServer
+                 activeSale={data.flashSales.flashSale}
+                 products={data.flashSales}
+                 lang={lang}
+                 ui={ui}
+               />
+             </Suspense>
           </section>
         )}
 
-        {/* 8. Newsletter */}
-        <Newsletter ui={ui} lang={lang} />
+        {/* 3. Category Grid Section */}
+        <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
+          <SectionHeader title={ui.catTitle} subtitle={ui.catSub} className="mb-16 md:mb-24" />
+          <CategoryGrid categories={data.categories} />
+        </section>
+
+        {/* 4. Featured Artifacts */}
+        <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
+          <SectionHeader title={ui.featTitle} subtitle={ui.featSub} className="mb-16 md:mb-24" />
+          <ProductSection products={featuredProducts} lang={lang} />
+        </section>
+
+        {/* 5. New Arrivals */}
+        <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
+          <SectionHeader title={ui.newTitle} subtitle={ui.newSub} className="mb-16 md:mb-24" />
+          <ProductSection
+            products={newArrivals}
+            showLoadMore={true}
+            lang={lang}
+            ui={ui}
+          />
+        </section>
+
+        {/* 6. Sale Section */}
+        {saleProducts.length > 0 && (
+          <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
+            <SectionHeader title={ui.saleTitle} subtitle={ui.saleSub} className="mb-16 md:mb-24" />
+            <ProductSection products={saleProducts} lang={lang} />
+          </section>
+        )}
+
+        {/* 7. Newsletter Section - Full Width */}
+        {/* <section className="bg-elevated py-16 md:py-20 border-y border-light">
+          <div className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
+            <SectionHeader 
+              title={ui.newsletterTitle || "Join the Syndicate"} 
+              subtitle={ui.newsletterSub || "Early access and exclusive drops."} 
+              className="items-center text-center"
+            />
+            <Newsletter lang={lang} />
+          </div>
+        </section> */}
       </div>
     </main>
   );

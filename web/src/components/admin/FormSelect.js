@@ -5,7 +5,7 @@ export default function FormSelect({
   errors,
   options,
   required = false,
-  placeholder = 'Select an option',
+  placeholder = "Select an option",
   ...props
 }) {
   return (
@@ -14,7 +14,9 @@ export default function FormSelect({
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       <select
-        {...register(name, { required: required ? `${label} is required` : false })}
+        {...register(name, {
+          required: required ? `${label} is required` : false,
+        })}
         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
         {...props}
       >

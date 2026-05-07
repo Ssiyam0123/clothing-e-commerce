@@ -1,133 +1,160 @@
 "use client";
 
-const Shimmer = () => (
-  <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 dark:via-white/5 to-transparent" />
-);
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
-export const HeroSkeleton = () => (
-  <div className="relative w-full h-[70vh] md:h-[80vh] bg-zinc-200 dark:bg-zinc-900 rounded-[2.5rem] md:rounded-[3rem] overflow-hidden m-2 md:m-4">
-    <Shimmer />
-  </div>
-);
-
-export const ProductCardSkeleton = () => (
-  <div className="bg-white dark:bg-[#0a0a0a] rounded-[2rem] border border-zinc-100 dark:border-zinc-800 p-4 h-full relative overflow-hidden shadow-sm">
-    <div className="aspect-[4/5] bg-zinc-100 dark:bg-zinc-900 rounded-[1.5rem] mb-6" />
-    <div className="space-y-3 px-2">
-      <div className="h-2 w-1/3 bg-zinc-200 dark:border-zinc-800 rounded-full" />
-      <div className="h-4 w-3/4 bg-zinc-200 dark:border-zinc-800 rounded-full" />
-      <div className="h-6 w-1/2 bg-zinc-200 dark:border-zinc-800 rounded-full mt-4" />
-    </div>
-    <Shimmer />
-  </div>
-);
-
-export const GridSkeleton = ({ count = 4 }) => (
-  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 w-full">
-    {Array.from({ length: count }).map((_, i) => <ProductCardSkeleton key={i} />)}
-  </div>
-);
-
-export const FilterSkeleton = () => (
-  <div className="w-full space-y-6 animate-in fade-in duration-500">
-    <div className="h-16 w-full bg-zinc-100 dark:bg-zinc-900 rounded-full relative overflow-hidden">
-      <Shimmer />
-    </div>
-    <div className="flex gap-4 overflow-hidden py-2">
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <div key={i} className="h-12 w-32 bg-zinc-100 dark:bg-zinc-900 rounded-full shrink-0 relative overflow-hidden">
-          <Shimmer />
+export function ProductCardSkeleton() {
+  return (
+    <div className="flex flex-col gap-6 w-full">
+      <Skeleton className="aspect-[3/4] w-full rounded-[2.5rem]" />
+      <div className="space-y-3 px-2">
+        <div className="flex justify-between items-center gap-4">
+          <Skeleton className="h-5 w-2/3 rounded-lg" />
+          <Skeleton className="h-5 w-12 rounded-full" />
         </div>
+        <Skeleton className="h-8 w-1/3 rounded-lg" />
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-3 w-20 rounded-full" />
+          <div className="h-px flex-1 bg-border/5" />
+          <Skeleton className="h-3 w-10 rounded-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function GridSkeleton({ count = 8, className }) {
+  return (
+    <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-12", className)}>
+      {Array.from({ length: count }).map((_, i) => (
+        <ProductCardSkeleton key={i} />
       ))}
     </div>
-  </div>
-);
+  );
+}
 
-
-// এই অংশটুকু তোর Skeletons.jsx ফাইলে অ্যাড করবি
-export const CartItemSkeleton = () => (
-  <div className="flex flex-col md:flex-row gap-8 pb-12 border-b border-zinc-100 dark:border-white/5 animate-pulse">
-    <div className="w-full md:w-52 aspect-[3/4] bg-zinc-200 dark:bg-zinc-900 rounded-[2rem] relative overflow-hidden" />
-    <div className="flex-1 space-y-6 py-2">
-      <div className="space-y-3">
-        <div className="h-8 w-3/4 bg-zinc-200 dark:bg-zinc-900 rounded-xl" />
-        <div className="h-4 w-1/4 bg-zinc-200 dark:bg-zinc-900 rounded-lg" />
-      </div>
-      <div className="flex justify-between items-end mt-auto">
-        <div className="h-12 w-32 bg-zinc-200 dark:bg-zinc-900 rounded-full" />
-        <div className="h-10 w-24 bg-zinc-200 dark:bg-zinc-900 rounded-xl" />
+export function HeroSkeleton() {
+  return (
+    <div className="w-full h-[80vh] md:h-screen relative overflow-hidden">
+      <Skeleton className="absolute inset-0" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 p-6 text-center">
+        <Skeleton className="h-6 w-32 rounded-full" />
+        <Skeleton className="h-20 md:h-32 w-2/3 rounded-2xl" />
+        <Skeleton className="h-5 w-1/2 rounded-lg" />
+        <Skeleton className="h-16 w-48 rounded-full mt-4" />
       </div>
     </div>
-  </div>
-);
+  );
+}
 
-export const CartSummarySkeleton = () => (
-  <div className="p-8 md:p-12 rounded-[3rem] bg-zinc-100/50 dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800 space-y-8">
-    <div className="h-8 w-1/2 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-    <div className="space-y-4">
-      <div className="flex justify-between"><div className="h-3 w-20 bg-zinc-200 dark:bg-zinc-800 rounded-full"/><div className="h-3 w-16 bg-zinc-200 dark:bg-zinc-800 rounded-full"/></div>
-      <div className="flex justify-between"><div className="h-3 w-24 bg-zinc-200 dark:bg-zinc-800 rounded-full"/><div className="h-3 w-12 bg-zinc-200 dark:bg-zinc-800 rounded-full"/></div>
+export function TableSkeleton({ rows = 5, cols = 4 }) {
+  return (
+    <div className="w-full space-y-4">
+      <div className="flex gap-4">
+        {Array.from({ length: cols }).map((_, i) => (
+          <Skeleton key={i} className="h-10 flex-1 rounded-xl" />
+        ))}
+      </div>
+      {Array.from({ length: rows }).map((_, i) => (
+        <Skeleton key={i} className="h-16 w-full rounded-2xl" />
+      ))}
     </div>
-    <div className="h-16 w-full bg-zinc-300 dark:bg-zinc-700 rounded-full" />
-  </div>
-);
+  );
+}
 
-
-
-
-// src/components/common/Skeletons.jsx (Add these)
-
-export const AddressFormSkeleton = () => (
-  <div className="space-y-8 animate-pulse">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-      <div className="h-12 bg-zinc-200 dark:bg-zinc-900 rounded-xl w-full" />
-      <div className="h-12 bg-zinc-200 dark:bg-zinc-900 rounded-xl w-full" />
+export function FilterSkeleton() {
+  return (
+    <div className="space-y-12">
+      <div className="space-y-4">
+        <Skeleton className="h-4 w-24 rounded-full" />
+        <div className="flex flex-wrap gap-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-10 w-20 rounded-xl" />
+          ))}
+        </div>
+      </div>
+      <div className="space-y-4">
+        <Skeleton className="h-4 w-32 rounded-full" />
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-6 w-full rounded-lg" />
+          ))}
+        </div>
+      </div>
     </div>
-    <div className="h-12 bg-zinc-200 dark:bg-zinc-900 rounded-xl w-full" />
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-      <div className="h-12 bg-zinc-200 dark:bg-zinc-900 rounded-xl w-full" />
-      <div className="h-12 bg-zinc-200 dark:bg-zinc-900 rounded-xl w-full" />
-    </div>
-  </div>
-);
+  );
+}
 
-export const CheckoutSummarySkeleton = () => (
-  <div className="p-10 rounded-[3rem] bg-zinc-100/50 dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800 space-y-8">
-    <div className="h-8 w-1/2 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-    <div className="space-y-4">
-      {[1, 2].map(i => (
-        <div key={i} className="flex gap-4 items-center">
-          <div className="w-16 h-20 bg-zinc-200 dark:bg-zinc-900 rounded-xl" />
-          <div className="flex-1 space-y-2">
-            <div className="h-3 w-3/4 bg-zinc-200 dark:bg-zinc-900 rounded-full" />
-            <div className="h-2 w-1/4 bg-zinc-200 dark:bg-zinc-900 rounded-full" />
+export function AddressFormSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="space-y-3">
+          <Skeleton className="h-4 w-24 rounded-full" />
+          <Skeleton className="h-14 w-full rounded-2xl" />
+        </div>
+      ))}
+      <div className="md:col-span-2 mt-8">
+        <Skeleton className="h-16 w-full rounded-full" />
+      </div>
+    </div>
+  );
+}
+
+export function CartItemSkeleton() {
+  return (
+    <div className="flex gap-6 p-6 rounded-[2rem] border border-border/5 bg-accent/5">
+      <Skeleton className="w-32 h-40 rounded-2xl shrink-0" />
+      <div className="flex-1 space-y-4">
+        <div className="flex justify-between items-start">
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-48 rounded-lg" />
+            <Skeleton className="h-4 w-24 rounded-full" />
           </div>
+          <Skeleton className="h-8 w-24 rounded-lg" />
         </div>
-      ))}
+        <div className="flex items-center justify-between mt-auto">
+          <Skeleton className="h-10 w-32 rounded-full" />
+          <Skeleton className="h-10 w-10 rounded-full" />
+        </div>
+      </div>
     </div>
-    <div className="h-px bg-zinc-200 dark:bg-zinc-800" />
-    <div className="space-y-4">
-      <div className="flex justify-between"><div className="h-3 w-20 bg-zinc-200 dark:bg-zinc-900 rounded-full"/><div className="h-3 w-16 bg-zinc-200 dark:bg-zinc-800 rounded-full"/></div>
-      <div className="flex justify-between"><div className="h-6 w-32 bg-zinc-200 dark:bg-zinc-900 rounded-lg"/><div className="h-8 w-24 bg-zinc-200 dark:bg-zinc-800 rounded-lg"/></div>
+  );
+}
+
+export function CartSummarySkeleton() {
+  return (
+    <div className="p-8 rounded-[3rem] border border-border/10 glass space-y-8">
+      <Skeleton className="h-8 w-1/2 rounded-xl" />
+      <div className="space-y-4">
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-20 rounded-full" />
+          <Skeleton className="h-4 w-16 rounded-full" />
+        </div>
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-24 rounded-full" />
+          <Skeleton className="h-4 w-16 rounded-full" />
+        </div>
+        <div className="h-px bg-border/10 my-4" />
+        <div className="flex justify-between">
+          <Skeleton className="h-6 w-20 rounded-lg" />
+          <Skeleton className="h-6 w-24 rounded-lg" />
+        </div>
+      </div>
+      <Skeleton className="h-16 w-full rounded-full" />
     </div>
-  </div>
-);
+  );
+}
 
-
-
-
-
-
-
-
-
-
-export const FlashBannerSkeleton = () => (
-  <div className="relative w-full h-[40vh] md:h-[50vh] bg-zinc-200 dark:bg-zinc-900 rounded-[3rem] overflow-hidden mb-12 relative">
-    <div className="absolute bottom-12 left-12 space-y-4 z-10">
-      <div className="h-12 w-64 md:w-96 bg-zinc-300 dark:bg-zinc-800 rounded-2xl" />
-      <div className="h-4 w-48 md:w-64 bg-zinc-300 dark:bg-zinc-800 rounded-full" />
+export function FlashBannerSkeleton() {
+  return (
+    <div className="w-full aspect-[21/9] md:aspect-[3/1] rounded-[3rem] overflow-hidden relative">
+      <Skeleton className="absolute inset-0" />
+      <div className="absolute inset-0 flex flex-col justify-center p-12 gap-6">
+        <Skeleton className="h-6 w-32 rounded-full" />
+        <Skeleton className="h-16 w-1/2 rounded-2xl" />
+        <Skeleton className="h-4 w-1/3 rounded-full" />
+      </div>
     </div>
-    <Shimmer />
-  </div>
-);
+  );
+}

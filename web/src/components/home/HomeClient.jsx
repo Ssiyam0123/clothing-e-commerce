@@ -38,13 +38,13 @@ const SectionHeader = ({ title, subtitle, badge }) => (
         {badge}
       </div>
     )}
-    <h2 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase italic tracking-tighter text-zinc-900 dark:text-white leading-[0.8] transition-all">
+    <h2 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase italic tracking-tighter text-primary leading-[0.8] transition-all">
       {title}
     </h2>
     <div className="flex items-center gap-4 mt-2">
-      <div className="h-[2px] md:h-[3px] w-12 md:w-20 bg-rose-600 rounded-full" />
+      <div className="h-[2px] md:h-[3px] w-12 md:w-20 bg-accent-secondary rounded-full" />
       {subtitle && (
-        <p className="max-w-md text-[9px] md:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest leading-none">
+        <p className="max-w-md text-[9px] md:text-[11px] font-bold text-secondary uppercase tracking-widest leading-none">
           {subtitle}
         </p>
       )}
@@ -59,25 +59,33 @@ export default function HomeClient() {
   const { products, isLoading: productsLoading } = useProducts({ limit: 8 });
   const { categories, isLoading: categoriesLoading } = useCategories();
   const { allActiveSales, isLoading: flashSaleLoading } = useFlashSales();
-  const { activeCampaign, isLoading: bannerLoading } = useActiveBannerCampaign();
+  const { activeCampaign, isLoading: bannerLoading } =
+    useActiveBannerCampaign();
 
-  const featuredProducts = useMemo(() => products?.filter((p) => p.isFeatured) || [], [products]);
+  const featuredProducts = useMemo(
+    () => products?.filter((p) => p.isFeatured) || [],
+    [products],
+  );
   const newArrivals = useMemo(() => products || [], [products]);
 
   // 🛰️ Senior Spacing Rules: Reduced from py-40 to py-12/20
-  const sectionClass = "py-10 md:py-16 lg:py-20"; 
+  const sectionClass = "py-10 md:py-16 lg:py-20";
 
   return (
     <motion.main
       initial="hidden"
       animate="visible"
-      className="w-full bg-white dark:bg-[#050505] transition-colors duration-700 overflow-x-hidden"
+      className="w-full bg-surface dark:bg-[#050505] transition-colors duration-700 overflow-x-hidden"
     >
       {/* 1. Hero Section */}
       <section className="relative w-full">
-        {bannerLoading ? <HeroSkeleton /> : (
+        {bannerLoading ? (
+          <HeroSkeleton />
+        ) : (
           <HeroSection
-            slides={activeCampaign?.slides?.sort((a, b) => a.order - b.order) || []}
+            slides={
+              activeCampaign?.slides?.sort((a, b) => a.order - b.order) || []
+            }
             ui={ui}
             lang={lang}
           />
@@ -85,18 +93,17 @@ export default function HomeClient() {
       </section>
 
       {/* 2. USP Section - Tighter Padding */}
-      <section className="border-y border-zinc-100 dark:border-white/5 bg-zinc-50/30 dark:bg-zinc-900/10 py-8 md:py-12">
+      <section className="border-y border-light bg-surface-alt dark:bg-accent-primary/10 py-8 md:py-12">
         <UspSection ui={ui} />
       </section>
 
       {/* ⚡ Main Content Area: Removed 'space-y-XX' to prevent margin collisions */}
       <div className="container mx-auto max-w-[1536px] px-5 sm:px-10 lg:px-14">
-        
         {/* 3. Flash Sale Teaser */}
         {!flashSaleLoading && allActiveSales?.length > 0 && (
-          <motion.section 
-            variants={sectionVariants} 
-            whileInView="visible" 
+          <motion.section
+            variants={sectionVariants}
+            whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             className={sectionClass}
           >
@@ -110,19 +117,23 @@ export default function HomeClient() {
         )}
 
         {/* 4. Category Grid */}
-        <motion.section 
-          variants={sectionVariants} 
-          whileInView="visible" 
+        <motion.section
+          variants={sectionVariants}
+          whileInView="visible"
           viewport={{ once: true }}
           className={sectionClass}
         >
-          <CategoryGrid categories={categories} ui={ui} isLoading={categoriesLoading} />
+          <CategoryGrid
+            categories={categories}
+            ui={ui}
+            isLoading={categoriesLoading}
+          />
         </motion.section>
 
         {/* 5. Featured Artifacts - The "Tight" Layout */}
-        <motion.section 
-          variants={sectionVariants} 
-          whileInView="visible" 
+        <motion.section
+          variants={sectionVariants}
+          whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
           className={sectionClass}
         >
@@ -135,24 +146,29 @@ export default function HomeClient() {
             />
             <Link
               href="/products"
-              className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 hover:text-rose-600 transition-all pb-1 border-b-2 border-transparent hover:border-rose-600"
+              className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-secondary hover:text-rose-600 transition-all pb-1 border-b-2 border-transparent hover:border-rose-600"
             >
               {lang === "bn" ? "সব দেখুন" : "Explore All"}
-              <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+              <ArrowRight
+                size={14}
+                className="group-hover:translate-x-2 transition-transform"
+              />
             </Link>
           </div>
 
           <div className="relative w-full">
-            {productsLoading ? <GridSkeleton count={4} /> : (
+            {productsLoading ? (
+              <GridSkeleton count={4} />
+            ) : (
               <ProductSection products={featuredProducts} lang={lang} ui={ui} />
             )}
           </div>
         </motion.section>
 
         {/* 6. New Arrivals */}
-        <motion.section 
-          variants={sectionVariants} 
-          whileInView="visible" 
+        <motion.section
+          variants={sectionVariants}
+          whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
           className={sectionClass}
         >
@@ -164,22 +180,31 @@ export default function HomeClient() {
             />
           </div>
 
-          {productsLoading ? <GridSkeleton count={4} /> : (
-            <ProductSection products={newArrivals} lang={lang} showLoadMore={true} ui={ui} />
+          {productsLoading ? (
+            <GridSkeleton count={4} />
+          ) : (
+            <ProductSection
+              products={newArrivals}
+              lang={lang}
+              showLoadMore={true}
+              ui={ui}
+            />
           )}
         </motion.section>
 
         {/* 7. Newsletter */}
-        <motion.section 
-          variants={sectionVariants} 
-          whileInView="visible" 
+        <motion.section
+          variants={sectionVariants}
+          whileInView="visible"
           className="py-20 md:py-32"
         >
           <Newsletter ui={ui} lang={lang} />
         </motion.section>
       </div>
 
-      {!isMounted && <div className="fixed inset-0 bg-white dark:bg-[#050505] z-[9999] opacity-0" />}
+      {!isMounted && (
+        <div className="fixed inset-0 bg-surface dark:bg-[#050505] z-[9999] opacity-0" />
+      )}
     </motion.main>
   );
 }

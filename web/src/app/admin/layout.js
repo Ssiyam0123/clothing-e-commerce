@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { getImageUrl } from '@/utils/imageUtils';
-import Sidebar from '@/components/admin/Sidebar';
-import Loader from '@/components/common/Loader';
-import { useAppStore } from '@/store/appStore';
-import { useAuthStore } from '@/store/authStore';
-import { Menu, Globe, Sun, Moon, LogOut } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { getImageUrl } from "@/utils/imageUtils";
+import Sidebar from "@/components/admin/Sidebar";
+import Loader from "@/components/common/Loader";
+import { useAppStore } from "@/store/appStore";
+import { useAuthStore } from "@/store/authStore";
+import { Menu, Globe, Sun, Moon, LogOut } from "lucide-react";
 
 export default function AdminLayout({ children }) {
   const { user, isLoading: authLoading, logout } = useAuthStore();
@@ -18,23 +18,23 @@ export default function AdminLayout({ children }) {
 
   // 🛡️ Redirect non-admins
   useEffect(() => {
-    if (!authLoading && (!user || user.role !== 'admin')) {
-      router.replace('/');
+    if (!authLoading && (!user || user.role !== "admin")) {
+      router.replace("/");
     }
   }, [user, authLoading, router]);
 
   // 🔒 Lock Body Scroll when Sidebar is open on Mobile
   useEffect(() => {
     if (isSidebarOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
   }, [isSidebarOpen]);
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push("/login");
   };
 
   if (authLoading || !isMounted) {
@@ -45,7 +45,7 @@ export default function AdminLayout({ children }) {
     );
   }
 
-  if (!user || user.role !== 'admin') return null;
+  if (!user || user.role !== "admin") return null;
 
   return (
     <div className="flex h-screen bg-white dark:bg-[#050505] transition-colors duration-700">
@@ -55,7 +55,6 @@ export default function AdminLayout({ children }) {
         {/* 🛰️ Top Header Bar */}
         <header className="bg-white/70 dark:bg-[#080808]/70 backdrop-blur-2xl border-b border-zinc-100 dark:border-zinc-900 z-40 transition-all">
           <div className="flex justify-between items-center px-4 md:px-10 py-4 md:py-6">
-            
             <div className="flex items-center gap-5">
               {/* 🍔 Mobile Hamburger */}
               <button
@@ -64,7 +63,7 @@ export default function AdminLayout({ children }) {
               >
                 <Menu size={20} />
               </button>
-              
+
               <div className="hidden sm:flex items-center gap-3 bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
@@ -83,12 +82,12 @@ export default function AdminLayout({ children }) {
                   <Globe size={14} className="opacity-50" />
                   <span className="hidden md:inline">Portal</span>
                 </Link>
-                
+
                 <button
                   onClick={toggleTheme}
                   className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-all shadow-inner"
                 >
-                  {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                  {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
                 </button>
               </div>
 
@@ -96,16 +95,26 @@ export default function AdminLayout({ children }) {
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-2xl overflow-hidden bg-zinc-900 dark:bg-white border border-zinc-200 dark:border-zinc-800 shadow-xl">
                   {user?.avatar ? (
-                    <img src={getImageUrl(user.avatar)} alt={user.name} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all" />
+                    <img
+                      src={getImageUrl(user.avatar)}
+                      alt={user.name}
+                      className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                       <span className="text-xs font-black text-white dark:text-black">{user?.name?.charAt(0)}</span>
+                      <span className="text-xs font-black text-white dark:text-black">
+                        {user?.name?.charAt(0)}
+                      </span>
                     </div>
                   )}
                 </div>
                 <div className="hidden lg:block">
-                   <p className="text-[10px] font-black text-zinc-900 dark:text-white uppercase tracking-wider">{user?.name}</p>
-                   <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">Administrator</p>
+                  <p className="text-[10px] font-black text-zinc-900 dark:text-white uppercase tracking-wider">
+                    {user?.name}
+                  </p>
+                  <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">
+                    Administrator
+                  </p>
                 </div>
               </div>
 

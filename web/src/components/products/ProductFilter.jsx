@@ -1,16 +1,18 @@
-'use client';
+"use client";
 
-import { useRef, useCallback } from 'react';
-import Image from 'next/image';
-import { useProducts } from '@/hooks/useProducts';
-import { useCategories } from '@/hooks/useCategories';
-import { getImageUrl } from '@/utils/imageUtils';
-import FilterBar from '@/components/common/FilterBar';
-import { useTrackingStore } from '@/store/trackingStore';
+import { useRef, useCallback } from "react";
+import Image from "next/image";
+import { useProducts } from "@/hooks/useProducts";
+import { useCategories } from "@/hooks/useCategories";
+import { getImageUrl } from "@/utils/imageUtils";
+import FilterBar from "@/components/common/FilterBar";
+import { useTrackingStore } from "@/store/trackingStore";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
-export default function ProductFilter() {
+export default function ProductFilter({ initialCategories }) {
   const { filters, setSearch, setSort, setCategory } = useProducts();
-  const { categories } = useCategories();
+  const { categories } = useCategories(initialCategories);
   const trackSearch = useTrackingStore((state) => state.trackSearch);
 
   const sliderRef = useRef(null);
@@ -20,127 +22,148 @@ export default function ProductFilter() {
     dragState.current.isDragging = true;
     dragState.current.startX = e.pageX - sliderRef.current.offsetLeft;
     dragState.current.scrollLeft = sliderRef.current.scrollLeft;
-    
+
     if (sliderRef.current) {
-      sliderRef.current.style.cursor = 'grabbing';
-      sliderRef.current.style.transform = 'scale(0.99)';
+      sliderRef.current.style.cursor = "grabbing";
+      sliderRef.current.style.transform = "scale(0.995)";
     }
   };
 
   const handleMouseLeaveOrUp = () => {
     dragState.current.isDragging = false;
     if (sliderRef.current) {
-      sliderRef.current.style.cursor = 'grab';
-      sliderRef.current.style.transform = 'scale(1)';
+      sliderRef.current.style.cursor = "grab";
+      sliderRef.current.style.transform = "scale(1)";
     }
   };
 
   const handleMouseMove = (e) => {
     if (!dragState.current.isDragging || !sliderRef.current) return;
-    e.preventDefault(); 
+    e.preventDefault();
     const x = e.pageX - sliderRef.current.offsetLeft;
-    const walk = (x - dragState.current.startX) * 2; 
+    const walk = (x - dragState.current.startX) * 2;
     sliderRef.current.scrollLeft = dragState.current.scrollLeft - walk;
   };
 
-  const handleSearchSubmit = useCallback((val) => {
-    if (val && val.trim().length > 1) {
-      trackSearch(val.trim(), filters.category !== 'all' ? filters.category : null); 
-    }
-  }, [trackSearch, filters.category]);
+  const handleSearchSubmit = useCallback(
+    (val) => {
+      if (val && val.trim().length > 1) {
+        trackSearch(
+          val.trim(),
+          filters.category !== "all" ? filters.category : null,
+        );
+      }
+    },
+    [trackSearch, filters.category],
+  );
 
-  const handleCategoryUpdate = useCallback((slug, name) => {
-    setCategory(slug);
-    if (slug !== 'all') {
-      trackSearch(null, name); 
-    }
-  }, [setCategory, trackSearch]);
+  const handleCategoryUpdate = useCallback(
+    (slug, name) => {
+      setCategory(slug);
+      if (slug !== "all") {
+        trackSearch(null, name);
+      }
+    },
+    [setCategory, trackSearch],
+  );
 
   return (
-    <div className="mb-12" aria-label="Product filters">
+    <div className="mb-16 space-y-10" aria-label="Product filters">
       <FilterBar
         search={filters.search}
-        onSearchChange={setSearch}          
-        onSearchSubmit={handleSearchSubmit} 
+        onSearchChange={setSearch}
+        onSearchSubmit={handleSearchSubmit}
         sort={filters.sort}
         onSortChange={setSort}
         sortOptions={[
-          { value: "", label: "🌟 Default" },
-          { value: "-createdAt", label: "✨ Newest" },
-          { value: "price", label: "💵 Low Price" },
-          { value: "-price", label: "💎 High Price" },
+          { value: "all", label: "🌟 Default Sequence" },
+          { value: "-createdAt", label: "✨ New Artifacts" },
+          { value: "price", label: "💵 Low Investment" },
+          { value: "-price", label: "💎 High Artifacts" },
         ]}
       />
 
       {/* Category Filter Buttons with drag-to-scroll */}
-      <div 
-        ref={sliderRef}
-        onMouseDown={handleMouseDown}
-        onMouseLeave={handleMouseLeaveOrUp}
-        onMouseUp={handleMouseLeaveOrUp}
-        onMouseMove={handleMouseMove}
-        className="mt-8 flex overflow-x-auto w-full no-scrollbar gap-4 pb-4 px-1 snap-x snap-mandatory scroll-smooth touch-pan-x transition-transform cursor-grab"
-        role="region"
-        aria-label="Category filter carousel"
-      >
-        {/* All Categories button */}
-        <button
-          onClick={() => handleCategoryUpdate('all', 'All Categories')}
-          className={`flex items-center gap-3 pr-6 pl-2 py-2 rounded-full border transition-all duration-300 shrink-0 snap-start group select-none pointer-events-auto ${
-            filters.category === 'all'
-              ? 'bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.15)]'
-              : 'bg-white dark:bg-[#111] border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 shadow-sm'
-          }`}
-          aria-label="Show all categories"
-          aria-pressed={filters.category === 'all'}
+      <div className="relative group/carousel">
+        <div
+          ref={sliderRef}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeaveOrUp}
+          onMouseUp={handleMouseLeaveOrUp}
+          onMouseMove={handleMouseMove}
+          className="flex overflow-x-auto w-full no-scrollbar gap-4 pb-6 px-2 snap-x snap-mandatory scroll-smooth touch-pan-x transition-all cursor-grab active:cursor-grabbing"
+          role="region"
+          aria-label="Category filter carousel"
         >
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg transition-colors pointer-events-none ${
-             filters.category === 'all' ? 'bg-zinc-800 dark:bg-zinc-100' : 'bg-zinc-100 dark:bg-[#0a0a0a] grayscale opacity-50 group-hover:opacity-100'
-          }`}>
-            ♾️
-          </div>
-          <span className={`text-[10px] font-black uppercase tracking-widest transition-colors pointer-events-none ${
-            filters.category === 'all' ? 'text-white dark:text-black' : 'text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white'
-          }`}>
-            All Categories
-          </span>
-        </button>
-
-        {/* Dynamic Category Buttons with optimized images */}
-        {categories?.map((cat) => {
-          const isSelected = filters.category === cat.slug;
-          return (
-            <button
-              key={cat._id}
-              onClick={() => handleCategoryUpdate(cat.slug, cat.name)}
-              className={`flex items-center gap-3 pr-6 pl-2 py-2 rounded-full border transition-all duration-300 shrink-0 snap-start group select-none pointer-events-auto ${
-                isSelected
-                  ? 'bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.15)]'
-                  : 'bg-white dark:bg-[#111] border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 shadow-sm'
-              }`}
-              aria-label={`Filter by ${cat.name}`}
-              aria-pressed={isSelected}
+          {/* All Categories button */}
+          <button
+            onClick={() => handleCategoryUpdate("all", "All Categories")}
+            className={cn(
+              "flex items-center gap-4 pr-8 pl-3 py-3 rounded-full border-none transition-all duration-500 shrink-0 snap-start group select-none shadow-xl",
+              filters.category === "all"
+                ? "bg-foreground text-background scale-105 shadow-foreground/20"
+                : "glass text-muted-foreground hover:text-foreground hover:bg-accent"
+            )}
+            aria-label="Show all categories"
+            aria-pressed={filters.category === "all"}
+          >
+            <div
+              className={cn(
+                "w-12 h-12 rounded-full flex items-center justify-center text-xl transition-all duration-500",
+                filters.category === "all"
+                  ? "bg-background text-foreground"
+                  : "bg-foreground/5 grayscale opacity-50 group-hover:opacity-100 group-hover:grayscale-0"
+              )}
             >
-              <div className="relative w-10 h-10 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-700/50 pointer-events-none shrink-0">
-                <Image
-                  src={getImageUrl(cat.image, 80, 75)}
-                  alt={cat.name}
-                  fill
-                  sizes="40px"
-                  className={`object-cover transition-all duration-500 ${
-                    isSelected ? 'grayscale-0 scale-110' : 'grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100'
-                  }`}
-                  loading="lazy"
-                />
-              </div>
-              <span className={`text-[10px] font-black uppercase tracking-widest transition-colors pointer-events-none ${
-                isSelected ? 'text-white dark:text-black' : 'text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white'
-              }`}>
-                {cat.name}
-              </span>
-            </button>
-          );
-        })}
+              ♾️
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] transition-colors">
+              All Categories
+            </span>
+          </button>
+
+          {/* Dynamic Category Buttons */}
+          {categories?.map((cat) => {
+            const isSelected = filters.category === cat.slug;
+            return (
+              <button
+                key={cat._id}
+                onClick={() => handleCategoryUpdate(cat.slug, cat.name)}
+                className={cn(
+                  "flex items-center gap-4 pr-8 pl-3 py-3 rounded-full border-none transition-all duration-500 shrink-0 snap-start group select-none shadow-xl",
+                  isSelected
+                    ? "bg-foreground text-background scale-105 shadow-foreground/20"
+                    : "glass text-muted-foreground hover:text-foreground hover:bg-accent"
+                )}
+                aria-label={`Filter by ${cat.name}`}
+                aria-pressed={isSelected}
+              >
+                <div className="relative w-12 h-12 rounded-full overflow-hidden bg-accent pointer-events-none shrink-0 shadow-inner">
+                  <Image
+                    src={getImageUrl(cat.image, 100, 100)}
+                    alt={cat.name}
+                    fill
+                    sizes="48px"
+                    className={cn(
+                      "object-cover transition-all duration-700",
+                      isSelected
+                        ? "grayscale-0 scale-110"
+                        : "grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
+                    )}
+                    loading="lazy"
+                  />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] transition-colors">
+                  {cat.name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        
+        {/* Subtle Fade Indicators */}
+        <div className="absolute top-0 right-0 h-full w-20 bg-gradient-to-l from-background to-transparent pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity" />
+        <div className="absolute top-0 left-0 h-full w-20 bg-gradient-to-r from-background to-transparent pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity" />
       </div>
     </div>
   );

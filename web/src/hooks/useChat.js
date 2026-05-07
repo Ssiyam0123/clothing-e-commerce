@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { io } from 'socket.io-client';
-import { useAuthStore } from '@/store/authStore';
-import axios from 'axios';
+import { useEffect, useState, useRef } from "react";
+import { io } from "socket.io-client";
+import { useAuthStore } from "@/store/authStore";
+import axios from "axios";
 
 export const useChat = (isOpen) => {
   const { token, user } = useAuthStore();
@@ -15,9 +15,12 @@ export const useChat = (isOpen) => {
     if (isOpen && token) {
       const fetchHistory = async () => {
         try {
-          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/chat/my-conversation`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+          const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/chat/my-conversation`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
           setMessages(res.data?.messages || []);
         } catch (err) {
           console.error("🚨 History Sync Failed", err);
@@ -29,10 +32,13 @@ export const useChat = (isOpen) => {
 
   useEffect(() => {
     if (isOpen && token && !socketRef.current) {
-      socketRef.current = io(process.env.NEXT_PUBLIC_API_URL.replace('/api', ''), {
-        auth: { token },
-        transports: ['websocket']
-      });
+      socketRef.current = io(
+        process.env.NEXT_PUBLIC_API_URL.replace("/api", ""),
+        {
+          auth: { token },
+          transports: ["websocket"],
+        },
+      );
 
       socketRef.current.on("connect", () => setIsConnected(true));
       socketRef.current.on("disconnect", () => setIsConnected(false));
@@ -56,7 +62,10 @@ export const useChat = (isOpen) => {
 
   const sendMessage = (text) => {
     if (socketRef.current && isConnected && text.trim()) {
-      socketRef.current.emit("send_message", { text, recipientId: "admin_room" });
+      socketRef.current.emit("send_message", {
+        text,
+        recipientId: "admin_room",
+      });
     }
   };
 

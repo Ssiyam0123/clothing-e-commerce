@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react"; 
+import { useCallback } from "react";
 import api from "@/lib/api";
 
 export const useFlashSales = (fetchAll = false) => {
@@ -66,11 +66,6 @@ export const useFlashSales = (fetchAll = false) => {
       };
     });
 
-
-
-
-
-
     return { flashSale: data, products: productsWithDiscount };
   }, []);
 
@@ -87,13 +82,12 @@ export const useFlashSales = (fetchAll = false) => {
   };
 };
 
-
 export const useSingleFlashSale = (slug) => {
   return useQuery({
     queryKey: ["flash-sale", slug],
     queryFn: async () => (await api.get(`/flash-sales/details/${slug}`)).data,
     enabled: !!slug,
     staleTime: 1000 * 60 * 10,
-    refetchInterval: 10000, 
+    refetchInterval: 10000,
   });
 };

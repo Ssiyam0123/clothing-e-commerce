@@ -1,24 +1,28 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useSubcategories } from '@/hooks/useSubcategories';
-import DataTable from '@/components/admin/DataTable';
-import ActionButtons from '@/components/admin/ActionButtons';
-import Loader from '@/components/common/Loader';
+import Link from "next/link";
+import { useSubcategories } from "@/hooks/useSubcategories";
+import DataTable from "@/components/admin/DataTable";
+import ActionButtons from "@/components/admin/ActionButtons";
+import Loader from "@/components/common/Loader";
 
 export default function Subcategories() {
   const { subcategories, isLoading, deleteSubcategory } = useSubcategories();
 
   const handleDelete = async (id) => {
-    if (confirm('Are you sure you want to delete this subcategory?')) {
+    if (confirm("Are you sure you want to delete this subcategory?")) {
       await deleteSubcategory.mutateAsync(id);
     }
   };
 
   const columns = [
-    { label: 'Name', key: 'name' },
-    { label: 'Slug', key: 'slug' },
-    { label: 'Category', key: 'category', render: (item) => item.category?.name },
+    { label: "Name", key: "name" },
+    { label: "Slug", key: "slug" },
+    {
+      label: "Category",
+      key: "category",
+      render: (item) => item.category?.name,
+    },
   ];
 
   if (isLoading) return <Loader />;

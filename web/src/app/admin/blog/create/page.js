@@ -1,12 +1,18 @@
 // src/app/admin/blog/create/page.js
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useBlogs } from '@/hooks/useBlogs';
-import RichTextEditor from '@/components/admin/RichTextEditor'; // Use the upgraded editor
-import { ShieldCheck, ArrowLeft, Globe, ImageIcon, Loader2 } from 'lucide-react';
-import { swalError, swalToast } from '@/utils/swal'; // ✅ Import missing swal utilities
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useBlogs } from "@/hooks/useBlogs";
+import RichTextEditor from "@/components/admin/RichTextEditor"; // Use the upgraded editor
+import {
+  ShieldCheck,
+  ArrowLeft,
+  Globe,
+  ImageIcon,
+  Loader2,
+} from "lucide-react";
+import { swalError, swalToast } from "@/utils/swal"; // ✅ Import missing swal utilities
 
 export default function CreateBlog() {
   const router = useRouter();
@@ -16,11 +22,11 @@ export default function CreateBlog() {
   const [imageFile, setImageFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-    category: 'LIFESTYLE',
-    status: 'PUBLISHED',
-    seo: { metaTitle: '', metaDescription: '' },
+    title: "",
+    content: "",
+    category: "LIFESTYLE",
+    status: "PUBLISHED",
+    seo: { metaTitle: "", metaDescription: "" },
   });
 
   const handleImageChange = (e) => {
@@ -35,32 +41,36 @@ export default function CreateBlog() {
     e.preventDefault();
 
     if (!imageFile) {
-      return swalError('Visual Missing', 'Please select a featured image.');
+      return swalError("Visual Missing", "Please select a featured image.");
     }
     if (!formData.title.trim()) {
-      return swalError('Missing Title', 'The narrative needs a title.');
+      return swalError("Missing Title", "The narrative needs a title.");
     }
     if (!formData.content.trim()) {
-      return swalError('Empty Content', 'Please write something before publishing.');
+      return swalError(
+        "Empty Content",
+        "Please write something before publishing.",
+      );
     }
 
     setIsSubmitting(true);
 
     const data = new FormData();
-    data.append('title', formData.title);
-    data.append('content', formData.content);
-    data.append('category', formData.category);
-    data.append('status', formData.status);
-    data.append('seo', JSON.stringify(formData.seo));
-    data.append('image', imageFile); // Matches backend upload.single('image')
+    data.append("title", formData.title);
+    data.append("content", formData.content);
+    data.append("category", formData.category);
+    data.append("status", formData.status);
+    data.append("seo", JSON.stringify(formData.seo));
+    data.append("image", imageFile); // Matches backend upload.single('image')
 
     try {
       await createBlog.mutateAsync(data); // ✅ Use mutateAsync to catch errors easily
-      swalToast('Narrative deployed successfully!', 'success');
-      router.push('/admin/blog'); // Redirect to blog list
+      swalToast("Narrative deployed successfully!", "success");
+      router.push("/admin/blog"); // Redirect to blog list
     } catch (err) {
-      const message = err.response?.data?.message || 'Deployment failed. Check your inputs.';
-      swalError('Publication Failed', message);
+      const message =
+        err.response?.data?.message || "Deployment failed. Check your inputs.";
+      swalError("Publication Failed", message);
     } finally {
       setIsSubmitting(false);
     }
@@ -88,7 +98,9 @@ export default function CreateBlog() {
             placeholder="SEQUENCE TITLE"
             required
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
             className="w-full bg-transparent text-5xl font-black uppercase tracking-tighter outline-none dark:text-white border-b-4 border-zinc-100 dark:border-zinc-900 pb-4 focus:border-rose-600 transition-all"
           />
           <div className="bg-white dark:bg-zinc-900 rounded-[3rem] overflow-hidden border dark:border-white/5 shadow-inner">
@@ -109,10 +121,17 @@ export default function CreateBlog() {
               </label>
               <div className="relative group aspect-video rounded-3xl overflow-hidden bg-white dark:bg-zinc-800 border-2 border-dashed border-zinc-200 dark:border-zinc-700 flex flex-col items-center justify-center cursor-pointer">
                 {imagePreview ? (
-                  <img src={imagePreview} className="w-full h-full object-cover" alt="Preview" />
+                  <img
+                    src={imagePreview}
+                    className="w-full h-full object-cover"
+                    alt="Preview"
+                  />
                 ) : (
                   <div className="text-center p-6">
-                    <ImageIcon className="mx-auto mb-2 text-zinc-400" size={32} />
+                    <ImageIcon
+                      className="mx-auto mb-2 text-zinc-400"
+                      size={32}
+                    />
                     <p className="text-[9px] font-black text-zinc-500 uppercase">
                       Click to Select Artifact
                     </p>
@@ -146,14 +165,18 @@ export default function CreateBlog() {
               </label>
               <select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
                 className="w-full bg-white dark:bg-zinc-800 p-4 rounded-2xl outline-none text-xs font-bold"
               >
-                {['LIFESTYLE', 'COLLECTION', 'FABRIC', 'CULTURE', 'NEWS'].map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
+                {["LIFESTYLE", "COLLECTION", "FABRIC", "CULTURE", "NEWS"].map(
+                  (c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ),
+                )}
               </select>
             </div>
 
@@ -167,8 +190,10 @@ export default function CreateBlog() {
                   <input
                     type="radio"
                     value="PUBLISHED"
-                    checked={formData.status === 'PUBLISHED'}
-                    onChange={() => setFormData({ ...formData, status: 'PUBLISHED' })}
+                    checked={formData.status === "PUBLISHED"}
+                    onChange={() =>
+                      setFormData({ ...formData, status: "PUBLISHED" })
+                    }
                     className="accent-rose-600"
                   />
                   <span className="text-xs font-bold">Publish now</span>
@@ -177,8 +202,10 @@ export default function CreateBlog() {
                   <input
                     type="radio"
                     value="DRAFT"
-                    checked={formData.status === 'DRAFT'}
-                    onChange={() => setFormData({ ...formData, status: 'DRAFT' })}
+                    checked={formData.status === "DRAFT"}
+                    onChange={() =>
+                      setFormData({ ...formData, status: "DRAFT" })
+                    }
                     className="accent-zinc-500"
                   />
                   <span className="text-xs font-bold">Save as Draft</span>

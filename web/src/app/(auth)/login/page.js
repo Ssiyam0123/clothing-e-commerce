@@ -33,30 +33,33 @@ export default function LoginPage() {
       swalToast("Login successful!", "success");
       router.push("/");
     } catch (err) {
-      swalError("Login Failed", err.response?.data?.message || "Invalid credentials");
+      swalError(
+        "Login Failed",
+        err.response?.data?.message || "Invalid credentials",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-8 bg-white dark:bg-zinc-900 rounded-[3rem] shadow-2xl border border-zinc-100 dark:border-white/5">
+    <div className="w-full max-w-md mx-auto p-8 bg-surface dark:bg-accent-primary rounded-[3rem] shadow-2xl border border-light">
       <div className="text-center mb-10">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl font-black text-zinc-900 dark:text-white uppercase italic tracking-tighter"
+          className="text-4xl font-black text-primary uppercase italic tracking-tighter"
         >
           Access Vault
         </motion.h1>
-        <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.4em] mt-2">
+        <p className="text-[9px] font-black text-muted uppercase tracking-[0.4em] mt-2">
           Sign in to your account
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2 ml-1">
+          <label className="block text-[9px] font-black text-muted uppercase tracking-widest mb-2 ml-1">
             Email Address
           </label>
           <input
@@ -64,13 +67,13 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full bg-zinc-50 dark:bg-[#0d0d0d] border border-zinc-200 dark:border-white/5 rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-zinc-900 dark:text-white font-medium"
+            className="w-full bg-surface-alt dark:bg-[#0d0d0d] border border-light rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-primary font-medium"
             placeholder="name@example.com"
           />
         </div>
 
         <div>
-          <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2 ml-1">
+          <label className="block text-[9px] font-black text-muted uppercase tracking-widest mb-2 ml-1">
             Password
           </label>
           <input
@@ -78,7 +81,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full bg-zinc-50 dark:bg-[#0d0d0d] border border-zinc-200 dark:border-white/5 rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-zinc-900 dark:text-white font-medium"
+            className="w-full bg-surface-alt dark:bg-[#0d0d0d] border border-light rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-primary font-medium"
             placeholder="••••••••"
           />
         </div>
@@ -86,7 +89,7 @@ export default function LoginPage() {
         <div className="text-right">
           <Link
             href="/forgot-password"
-            className="text-[9px] font-black text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
+            className="text-[9px] font-black text-secondary hover:text-primary dark:hover:text-primary transition-colors"
           >
             Forgot password?
           </Link>
@@ -97,18 +100,18 @@ export default function LoginPage() {
           whileTap={{ scale: 0.98 }}
           type="submit"
           disabled={isSubmitting || isLoading}
-          className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-xl transition-all disabled:opacity-50"
+          className="w-full bg-accent-primary text-primary  py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-xl transition-all disabled:opacity-50"
         >
           {isSubmitting ? "SIGNING IN..." : "Sign In"}
         </motion.button>
       </form>
 
-      <div className="mt-8 pt-8 border-t border-zinc-100 dark:border-white/5 text-center">
-        <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest">
+      <div className="mt-8 pt-8 border-t border-light text-center">
+        <p className="text-muted text-[10px] font-black uppercase tracking-widest">
           Don't have an account?{" "}
           <Link
             href="/register"
-            className="text-zinc-900 dark:text-white border-b-2 border-zinc-900 dark:border-white pb-0.5 ml-1"
+            className="text-primary border-b-2 border-zinc-900  pb-0.5 ml-1"
           >
             Create Account
           </Link>

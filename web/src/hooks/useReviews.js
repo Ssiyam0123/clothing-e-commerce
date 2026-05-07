@@ -1,11 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/lib/api';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/api";
 
 export const useReviews = (productId) => {
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['reviews', productId],
+    queryKey: ["reviews", productId],
     queryFn: async () => {
       const { data } = await api.get(`/reviews/product/${productId}`);
       return data;
@@ -14,31 +14,33 @@ export const useReviews = (productId) => {
   });
 
   const createReview = useMutation({
-    mutationFn: (formData) => api.post('/reviews', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }),
+    mutationFn: (formData) =>
+      api.post("/reviews", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      }),
     onSuccess: () => {
       // 👈 FIXED: React Query v5 syntax { queryKey: [...] }
-      queryClient.invalidateQueries({ queryKey: ['reviews', productId] });
-      queryClient.invalidateQueries({ queryKey: ['product', productId] });
+      queryClient.invalidateQueries({ queryKey: ["reviews", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product", productId] });
     },
   });
 
   const updateReview = useMutation({
-    mutationFn: ({ reviewId, data }) => api.put(`/reviews/${reviewId}`, data, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }),
+    mutationFn: ({ reviewId, data }) =>
+      api.put(`/reviews/${reviewId}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviews', productId] });
-      queryClient.invalidateQueries({ queryKey: ['product', productId] });
+      queryClient.invalidateQueries({ queryKey: ["reviews", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product", productId] });
     },
   });
 
   const deleteReview = useMutation({
     mutationFn: (reviewId) => api.delete(`/reviews/${reviewId}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviews', productId] });
-      queryClient.invalidateQueries({ queryKey: ['product', productId] });
+      queryClient.invalidateQueries({ queryKey: ["reviews", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product", productId] });
     },
   });
 

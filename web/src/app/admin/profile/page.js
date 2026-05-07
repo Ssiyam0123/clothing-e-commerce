@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { getImageUrl } from '@/utils/imageUtils';
-import api from '@/lib/api';
-import Alert from '@/components/common/Alert';
-import Loader from '@/components/common/Loader';
-import ProtectedRoute from '@/components/admin/ProtectedRoute';
-import AdminLayout from '../layout';
-import { useAuthStore } from '@/store/authStore';
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { getImageUrl } from "@/utils/imageUtils";
+import api from "@/lib/api";
+import Alert from "@/components/common/Alert";
+import Loader from "@/components/common/Loader";
+import ProtectedRoute from "@/components/admin/ProtectedRoute";
+import AdminLayout from "../layout";
+import { useAuthStore } from "@/store/authStore";
 
 export default function AdminProfile() {
   const { user, isLoading: authLoading } = useAuthStore();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [avatarPreview, setAvatarPreview] = useState(null);
 
   const {
@@ -26,9 +26,9 @@ export default function AdminProfile() {
 
   useEffect(() => {
     if (user) {
-      setValue('name', user.name);
-      setValue('phone', user.phone || '');
-      setValue('bio', user.bio || '');
+      setValue("name", user.name);
+      setValue("phone", user.phone || "");
+      setValue("bio", user.bio || "");
       if (user.avatar) {
         setAvatarPreview(getImageUrl(user.avatar));
       }
@@ -37,22 +37,22 @@ export default function AdminProfile() {
 
   const onSubmit = async (data) => {
     const formData = new FormData();
-    formData.append('name', data.name);
-    if (data.phone) formData.append('phone', data.phone);
-    if (data.bio) formData.append('bio', data.bio);
+    formData.append("name", data.name);
+    if (data.phone) formData.append("phone", data.phone);
+    if (data.bio) formData.append("bio", data.bio);
     if (data.avatar && data.avatar[0]) {
-      formData.append('avatar', data.avatar[0]);
+      formData.append("avatar", data.avatar[0]);
     }
 
     try {
       setLoading(true);
-      const response = await api.put('/users/profile', formData);
-      setSuccess('Profile updated successfully!');
+      const response = await api.put("/users/profile", formData);
+      setSuccess("Profile updated successfully!");
       // Update user in localStorage
-      localStorage.setItem('user', JSON.stringify(response.data));
+      localStorage.setItem("user", JSON.stringify(response.data));
       setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
-      setError(err.response?.data?.message || 'Error updating profile');
+      setError(err.response?.data?.message || "Error updating profile");
     } finally {
       setLoading(false);
     }
@@ -79,12 +79,26 @@ export default function AdminProfile() {
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
               <h1 className="text-2xl font-bold text-gray-800">My Profile</h1>
-              <p className="text-sm text-gray-600 mt-1">Manage your account information</p>
+              <p className="text-sm text-gray-600 mt-1">
+                Manage your account information
+              </p>
             </div>
 
             <div className="p-6">
-              {error && <Alert type="error" message={error} onClose={() => setError('')} />}
-              {success && <Alert type="success" message={success} onClose={() => setSuccess('')} />}
+              {error && (
+                <Alert
+                  type="error"
+                  message={error}
+                  onClose={() => setError("")}
+                />
+              )}
+              {success && (
+                <Alert
+                  type="success"
+                  message={success}
+                  onClose={() => setSuccess("")}
+                />
+              )}
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Avatar Upload */}
@@ -110,11 +124,13 @@ export default function AdminProfile() {
                       <input
                         type="file"
                         accept="image/*"
-                        {...register('avatar')}
+                        {...register("avatar")}
                         onChange={handleAvatarChange}
                         className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                       />
-                      <p className="text-xs text-gray-500 mt-1">JPEG, PNG, GIF up to 5MB</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        JPEG, PNG, GIF up to 5MB
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -126,11 +142,13 @@ export default function AdminProfile() {
                   </label>
                   <input
                     type="text"
-                    {...register('name', { required: 'Name is required' })}
+                    {...register("name", { required: "Name is required" })}
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
                   />
                   {errors.name && (
-                    <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.name.message}
+                    </p>
                   )}
                 </div>
 
@@ -145,7 +163,9 @@ export default function AdminProfile() {
                     disabled
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50 text-gray-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Email cannot be changed
+                  </p>
                 </div>
 
                 {/* Phone */}
@@ -155,7 +175,7 @@ export default function AdminProfile() {
                   </label>
                   <input
                     type="tel"
-                    {...register('phone')}
+                    {...register("phone")}
                     placeholder="+1 234 567 8900"
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
                   />
@@ -167,7 +187,7 @@ export default function AdminProfile() {
                     Bio
                   </label>
                   <textarea
-                    {...register('bio')}
+                    {...register("bio")}
                     rows="4"
                     placeholder="Tell us about yourself..."
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
@@ -181,7 +201,7 @@ export default function AdminProfile() {
                   </label>
                   <input
                     type="text"
-                    value={user.role === 'admin' ? 'Administrator' : 'Customer'}
+                    value={user.role === "admin" ? "Administrator" : "Customer"}
                     disabled
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50 text-gray-500"
                   />
@@ -194,7 +214,7 @@ export default function AdminProfile() {
                     disabled={loading}
                     className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
                   >
-                    {loading ? 'Saving...' : 'Save Changes'}
+                    {loading ? "Saving..." : "Save Changes"}
                   </button>
                   <button
                     type="button"
