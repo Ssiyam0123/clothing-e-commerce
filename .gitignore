@@ -37,3 +37,11 @@ agent/**
 **/web_codebase.txt
 **/extract.js
 backend/create-admin.js
+
+# AI / agent metadata
+.agents/
+**/AGENTS.md
+**/CLAUDE.md
+**/graphify-out/
+**/.claude
+**/.claude/**
