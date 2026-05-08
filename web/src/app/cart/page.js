@@ -42,6 +42,7 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 import Loader from "@/components/common/Loader";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -627,10 +628,19 @@ export default function CartPage() {
   return (
     <Suspense
       fallback={
-        <div className="h-screen flex items-center justify-center bg-background">
-          <div className="flex flex-col items-center gap-6">
-             <ShoppingBag className="text-accent-secondary animate-bounce" size={48} />
-             <p className="text-[10px] font-black uppercase tracking-[0.5em] animate-pulse">Initializing Manifest...</p>
+        <div className="min-h-screen bg-background p-4 sm:p-12 lg:p-24 space-y-12">
+          <div className="flex items-center gap-6">
+            <Skeleton className="h-14 w-14 rounded-2xl" />
+            <Skeleton className="h-20 w-[60%] rounded-2xl" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+             <div className="lg:col-span-7 space-y-8">
+                <Skeleton className="h-[200px] w-full rounded-[2.5rem]" />
+                <Skeleton className="h-[200px] w-full rounded-[2.5rem]" />
+             </div>
+             <div className="lg:col-span-5">
+                <Skeleton className="h-[400px] w-full rounded-[3.5rem]" />
+             </div>
           </div>
         </div>
       }

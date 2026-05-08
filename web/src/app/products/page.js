@@ -102,10 +102,8 @@ async function getCategories() {
 
 export default async function ProductsPage({ searchParams }) {
   const params = await searchParams;
-  const [initialData, categories] = await Promise.all([
-    getInitialProducts(params),
-    getCategories(),
-  ]);
+  const productsPromise = getInitialProducts(params);
+  const categoriesPromise = getCategories();
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -127,17 +125,29 @@ export default async function ProductsPage({ searchParams }) {
   };
 
   return (
-    <main className="min-h-screen bg-page pt-10  transition-colors duration-700">
+    <main className="min-h-screen bg-page pt-10 transition-colors duration-700">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <div className="container mx-auto px-4 md:px-6">
-        
         <Suspense fallback={<ProductsPageSkeleton />}>
-          <ProductsClient initialData={initialData} initialCategories={categories} />
+          <ProductsDataWrapper 
+            productsPromise={productsPromise} 
+            categoriesPromise={categoriesPromise} 
+          />
         </Suspense>
       </div>
     </main>
   );
 }
+
+async function ProductsDataWrapper({ productsPromise, categoriesPromise }) {
+  const [initialData, categories] = await Promise.all([
+    productsPromise,
+    categoriesPromise,
+  ]);
+  return <ProductsClient initialData={initialData} initialCategories={categories} />;
+}
+
+

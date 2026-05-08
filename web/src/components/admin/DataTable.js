@@ -1,5 +1,14 @@
 import { getImageUrl } from "@/utils/imageUtils";
 import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 const ImageCell = ({ src, alt }) => {
   const [error, setError] = useState(false);
@@ -7,7 +16,7 @@ const ImageCell = ({ src, alt }) => {
 
   if (!imageUrl || error) {
     return (
-      <div className="h-12 w-12 bg-zinc-100 dark:bg-zinc-900 rounded-2xl flex items-center justify-center text-zinc-400 text-[9px] font-black uppercase tracking-widest border border-zinc-200 dark:border-zinc-800">
+      <div className="h-12 w-12 bg-muted rounded-2xl flex items-center justify-center text-muted-foreground text-[9px] font-black uppercase tracking-widest border border-border">
         N/A
       </div>
     );
@@ -17,43 +26,43 @@ const ImageCell = ({ src, alt }) => {
     <img
       src={imageUrl}
       alt={alt || "Image"}
-      className="h-12 w-12 object-cover rounded-2xl border border-zinc-200 dark:border-zinc-800 grayscale hover:grayscale-0 transition-all duration-500 cursor-zoom-in"
+      className="h-12 w-12 object-cover rounded-2xl border border-border grayscale hover:grayscale-0 transition-all duration-500 cursor-zoom-in"
       onError={() => setError(true)}
     />
   );
 };
 
-export default function DataTable({ columns, data, actions }) {
+export default function DataTable({ columns, data, actions, className }) {
   return (
-    <div className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 overflow-x-auto shadow-2xl">
-      <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800/50">
-        <thead className="bg-zinc-50 dark:bg-[#111]">
-          <tr>
+    <div className={cn("bg-card text-card-foreground rounded-[2.5rem] border border-border overflow-hidden shadow-2xl", className)}>
+      <Table>
+        <TableHeader className="bg-muted/50">
+          <TableRow className="hover:bg-transparent border-border">
             {columns.map((col, idx) => (
-              <th
+              <TableHead
                 key={idx}
-                className="px-8 py-6 text-left text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] whitespace-nowrap"
+                className="px-8 py-6 text-left text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap"
               >
                 {col.label}
-              </th>
+              </TableHead>
             ))}
             {actions && (
-              <th className="px-8 py-6 text-right text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
+              <TableHead className="px-8 py-6 text-right text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
                 Actions
-              </th>
+              </TableHead>
             )}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {data?.map((item, rowIdx) => (
-            <tr
+            <TableRow
               key={item._id || rowIdx}
-              className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30 transition-colors group"
+              className="hover:bg-muted/30 border-border group transition-colors"
             >
               {columns.map((col, colIdx) => (
-                <td
+                <TableCell
                   key={colIdx}
-                  className="px-8 py-6 whitespace-nowrap text-sm font-bold text-zinc-800 dark:text-zinc-200"
+                  className="px-8 py-6 whitespace-nowrap text-sm font-bold text-foreground"
                 >
                   {col.render ? (
                     col.render(item)
@@ -62,32 +71,32 @@ export default function DataTable({ columns, data, actions }) {
                   ) : (
                     item[col.key]
                   )}
-                </td>
+                </TableCell>
               ))}
               {actions && (
-                <td className="px-8 py-6 whitespace-nowrap text-right text-sm font-medium opacity-50 group-hover:opacity-100 transition-opacity">
+                <TableCell className="px-8 py-6 whitespace-nowrap text-right text-sm font-medium opacity-50 group-hover:opacity-100 transition-opacity">
                   {actions(item)}
-                </td>
+                </TableCell>
               )}
-            </tr>
+            </TableRow>
           ))}
           {(!data || data.length === 0) && (
-            <tr>
-              <td
+            <TableRow>
+              <TableCell
                 colSpan={columns.length + (actions ? 1 : 0)}
                 className="px-8 py-24 text-center"
               >
                 <span className="text-5xl block mb-4 grayscale opacity-20">
                   📭
                 </span>
-                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                   No Database Records Found
                 </p>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }

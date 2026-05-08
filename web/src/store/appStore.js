@@ -77,5 +77,12 @@ export const useAppStore = create((set, get) => ({
   },
 
   setChatOpen: (isOpen) => set({ isChatOpen: isOpen }),
-  toggleChat: () => set((state) => ({ isChatOpen: !state.isChatOpen }))
+  toggleChat: () => set((state) => ({ isChatOpen: !state.isChatOpen })),
+  
+  toggleTheme: () => {
+    const currentTheme = get().theme;
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+    set({ theme: newTheme });
+    setCookie("vanguard-theme-mode", newTheme);
+  },
 }));

@@ -7,8 +7,10 @@ import DataTable from "@/components/admin/DataTable";
 import TableSkeleton from "@/components/common/TableSkeleton";
 import FilterBar from "@/components/common/FilterBar";
 import Pagination from "@/components/common/Pagination";
-import Loader from "@/components/common/Loader";
+import StatusBadge from "@/components/admin/StatusBadge";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function AdminOrdersContent() {
   const { search, setSearch, sort, setSort, page, setPage, queryParams } =
@@ -49,7 +51,7 @@ function AdminOrdersContent() {
       render: (item) => (
         <Link
           href={`/admin/orders/${item._id}`}
-          className="text-[10px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-800 hover:scale-105 transition-all inline-block"
+          className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20 hover:scale-105 transition-all inline-block italic"
         >
           #{item?._id?.slice(-8)}
         </Link>
@@ -59,30 +61,29 @@ function AdminOrdersContent() {
       label: "Customer",
       render: (item) => (
         <div>
-          <p className="font-black text-zinc-900 dark:text-zinc-100 text-sm uppercase tracking-tight">
+          <p className="font-black text-foreground text-sm uppercase tracking-tight">
             {item?.user?.name || "Guest"}
           </p>
-          <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold tracking-widest mt-1">
+          <p className="text-[10px] text-muted-foreground font-bold tracking-widest mt-1">
             {item?.shippingAddress?.phone}
           </p>
         </div>
       ),
     },
-    // 🚀 UPDATED: Date with Time Visualization
     {
       label: "Date & Time",
       render: (item) => {
         const dateObj = new Date(item.createdAt);
         return (
           <div className="flex flex-col gap-0.5">
-            <span className="text-[11px] font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tighter leading-none">
+            <span className="text-[11px] font-black text-foreground uppercase tracking-tighter leading-none">
               {dateObj.toLocaleDateString("en-GB", {
                 day: "2-digit",
                 month: "short",
                 year: "numeric",
               })}
             </span>
-            <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.1em]">
+            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-[0.1em]">
               {dateObj.toLocaleTimeString("en-US", {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -96,36 +97,23 @@ function AdminOrdersContent() {
     {
       label: "Total",
       render: (item) => (
-        <span className="text-base font-black text-zinc-900 dark:text-white tracking-tighter">
+        <span className="text-base font-black text-foreground tracking-tighter">
           ৳{item?.totalPrice?.toLocaleString()}
         </span>
       ),
     },
     {
       label: "Status",
-      render: (item) => {
-        const colors = {
-          Delivered: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-          Pending: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-          Cancelled: "bg-rose-500/10 text-rose-600 border-rose-500/20",
-          Shipped: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-          Processing: "bg-indigo-500/10 text-indigo-600 border-indigo-500/20",
-        };
-        return (
-          <span
-            className={`px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-full border ${colors[item.orderStatus] || "bg-zinc-100"}`}
-          >
-            {item.orderStatus}
-          </span>
-        );
-      },
+      render: (item) => (
+        <StatusBadge value={item.orderStatus} />
+      ),
     },
     {
       label: "Action",
       render: (item) => (
         <Link
           href={`/admin/orders/${item._id}`}
-          className="p-2 bg-zinc-100 dark:bg-zinc-800 rounded-lg hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-all inline-block"
+          className="p-2.5 bg-muted rounded-xl hover:bg-foreground hover:text-background transition-all inline-block shadow-sm"
         >
           <svg
             className="w-4 h-4"
@@ -152,21 +140,21 @@ function AdminOrdersContent() {
   ];
 
   return (
-    <div className="space-y-8 pb-20 max-w-[1600px] mx-auto px-4">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
+    <div className="space-y-8 pb-20 max-w-[1600px] mx-auto px-4 animate-in fade-in duration-700">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card p-8 rounded-[2.5rem] border border-border shadow-sm">
         <div>
-          <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase mb-2">
-            Orders Archive
+          <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tighter uppercase mb-2 italic">
+            Orders <span className="text-muted-foreground/50">Archive</span>
           </h1>
-          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
+          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">
             Logistics & Dispatch Management
           </p>
         </div>
-        <div className="bg-zinc-50 dark:bg-[#111] px-6 py-4 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex items-center gap-4">
-          <span className="text-[10px] text-zinc-400 font-black uppercase tracking-[0.2em]">
+        <div className="bg-muted px-6 py-4 rounded-2xl border border-border flex items-center gap-4">
+          <span className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em]">
             Total Orders
           </span>
-          <span className="text-2xl font-black text-zinc-900 dark:text-white leading-none">
+          <span className="text-2xl font-black text-foreground leading-none">
             {allOrdersData?.total || 0}
           </span>
         </div>
@@ -184,10 +172,10 @@ function AdminOrdersContent() {
           <button
             key={s}
             onClick={() => handleStatusChange(s)}
-            className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${
+            className={`px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border ${
               status === s
-                ? "bg-zinc-900 text-white border-zinc-900 dark:bg-white dark:text-black"
-                : "bg-white dark:bg-zinc-900 text-zinc-500 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400"
+                ? "bg-foreground text-background border-foreground"
+                : "bg-card text-muted-foreground border-border hover:border-foreground"
             }`}
           >
             {s}
@@ -202,6 +190,7 @@ function AdminOrdersContent() {
         sort={sort}
         onSortChange={setSort}
         sortOptions={[
+          { label: "🌟 Default Sequence", value: "all" },
           { label: "Newest First", value: "-createdAt" },
           { label: "Oldest First", value: "createdAt" },
           { label: "Price: High", value: "-totalPrice" },
@@ -239,8 +228,13 @@ export default function AdminOrders() {
   return (
     <Suspense
       fallback={
-        <div className="h-screen flex items-center justify-center">
-          <Loader />
+        <div className="p-10 space-y-10">
+          <Skeleton className="h-[120px] rounded-[2.5rem]" />
+          <div className="flex gap-2">
+            {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-10 w-24 rounded-full" />)}
+          </div>
+          <Skeleton className="h-20 rounded-full" />
+          <Skeleton className="h-[600px] rounded-[2.5rem]" />
         </div>
       }
     >

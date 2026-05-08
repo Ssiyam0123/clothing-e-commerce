@@ -11,14 +11,24 @@ import {
   Zap,
   Package,
   Truck,
-  CheckCircle2,
-  XCircle,
-  Clock,
   ShieldCheck,
   Mail,
   Phone,
   MapPin,
+  ChevronLeft,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import OrderEditModal from "@/components/admin/OrderEditModal";
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
@@ -27,10 +37,11 @@ export default function OrderDetailsPage() {
     orderDetailsLoading,
     updateStatus,
     syncToPathao,
+    updateOrder,
   } = useOrders({}, id);
   const [syncing, setSyncing] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // 🕵️ Senior Logic: ইউজার রেজিস্টার্ড নাকি গেস্ট তা ডিটেক্ট করা
   const customerName = useMemo(
     () => order?.user?.name || order?.shippingAddress?.name || "Unknown Guest",
     [order],
@@ -79,63 +90,76 @@ export default function OrderDetailsPage() {
 
   if (orderDetailsLoading)
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader />
       </div>
     );
   if (!order)
     return (
-      <div className="p-20 text-center uppercase font-black text-zinc-400">
+      <div className="p-20 text-center uppercase font-black text-muted-foreground bg-background">
         Order not found
       </div>
     );
 
-  const statusColors = {
-    Delivered: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-    Cancelled: "bg-rose-500/10 text-rose-600 border-rose-500/20",
-    Pending: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-    Processing: "bg-indigo-500/10 text-indigo-600 border-indigo-500/20",
-    Shipped: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+  const statusVariants = {
+    Delivered: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20",
+    Cancelled: "bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/20",
+    Pending: "bg-amber-500/10 text-amber-600 border-amber-500/20 hover:bg-amber-500/20",
+    Processing: "bg-indigo-500/10 text-indigo-600 border-indigo-500/20 hover:bg-indigo-500/20",
+    Shipped: "bg-blue-500/10 text-blue-600 border-blue-500/20 hover:bg-blue-500/20",
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-8 pb-32 px-4 sm:px-10 pt-10">
+    <div className="max-w-[1400px] mx-auto space-y-8 pb-32 px-4 sm:px-10 pt-10 animate-in fade-in duration-700">
       {/* 🧭 NAVIGATION & ACTIONS */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card p-8 rounded-[2.5rem] border border-border shadow-sm">
         <div className="space-y-2">
           <Link
             href="/admin/orders"
-            className="text-[10px] font-black text-zinc-400 hover:text-rose-600 uppercase tracking-[0.3em] flex items-center gap-2 transition-all"
+            className="text-[10px] font-black text-muted-foreground hover:text-primary uppercase tracking-[0.3em] flex items-center gap-2 transition-all group"
           >
-            <Package size={12} /> Order Archives
+            <ChevronLeft size={12} className="group-hover:-translate-x-1 transition-transform" /> Order Archives
           </Link>
           <div className="flex items-center gap-4">
-            <h1 className="text-3xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase italic">
+            <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter uppercase italic">
               #{order._id.slice(-8)}
             </h1>
-            <span
-              className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${statusColors[order.orderStatus]}`}
+            <Badge
+              variant="outline"
+              className={cn("px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all", statusVariants[order.orderStatus])}
             >
               {order.orderStatus}
-            </span>
+            </Badge>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <select
-            value={order.orderStatus}
-            onChange={(e) => handleStatusUpdate(e.target.value)}
-            disabled={["Delivered", "Cancelled"].includes(order.orderStatus)}
-            className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl px-6 py-4 text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer hover:border-zinc-400 transition-all disabled:opacity-50"
+          <Button
+            variant="outline"
+            onClick={() => setIsEditModalOpen(true)}
+            className="h-14 border-border bg-muted/30 hover:bg-foreground hover:text-background rounded-2xl px-8 text-[10px] font-black uppercase tracking-widest transition-all"
           >
-            {["Pending", "Processing", "Shipped", "Delivered", "Cancelled"].map(
-              (s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ),
-            )}
-          </select>
+            Edit Protocol
+          </Button>
+
+          <Select
+            value={order.orderStatus}
+            onValueChange={handleStatusUpdate}
+            disabled={["Delivered", "Cancelled"].includes(order.orderStatus)}
+          >
+            <SelectTrigger className="w-[180px] h-14 bg-muted/50 border-border rounded-2xl px-6 text-[10px] font-black uppercase tracking-widest outline-none transition-all focus:ring-2 focus:ring-primary/20">
+              <SelectValue placeholder="Update Status" />
+            </SelectTrigger>
+            <SelectContent className="bg-card border-border rounded-2xl p-2">
+              {["Pending", "Processing", "Shipped", "Delivered", "Cancelled"].map(
+                (s) => (
+                  <SelectItem key={s} value={s} className="rounded-xl py-2 px-4 font-black text-[9px] uppercase tracking-widest focus:bg-primary focus:text-primary-foreground cursor-pointer">
+                    {s}
+                  </SelectItem>
+                ),
+              )}
+            </SelectContent>
+          </Select>
 
           {order.pathaoConsignmentId ? (
             <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 px-8 py-4 rounded-2xl flex items-center gap-3">
@@ -145,13 +169,13 @@ export default function OrderDetailsPage() {
               </span>
             </div>
           ) : (
-            <button
+            <Button
               onClick={handlePathaoSync}
               disabled={
                 syncing ||
                 ["Cancelled", "Delivered"].includes(order.orderStatus)
               }
-              className="bg-zinc-900 dark:bg-white text-white dark:text-black px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-rose-600 hover:text-white transition-all disabled:opacity-50 shadow-xl flex items-center gap-3"
+              className="bg-foreground text-background hover:bg-primary hover:text-primary-foreground px-10 py-7 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all disabled:opacity-50 shadow-xl flex items-center gap-3"
             >
               {syncing ? (
                 <Loader size="small" />
@@ -160,7 +184,7 @@ export default function OrderDetailsPage() {
                   <Zap size={16} fill="currentColor" /> Sync Pathao
                 </>
               )}
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -168,18 +192,20 @@ export default function OrderDetailsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* 📦 LEFT: Manifest (8 Cols) */}
         <div className="lg:col-span-8 space-y-8">
-          <div className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 shadow-sm">
-            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em] mb-10 border-b dark:border-zinc-800 pb-4">
-              01. Artifact Manifest
-            </h3>
+          <Card className="rounded-[2.5rem] border-border bg-card p-4 md:p-8 shadow-sm">
+            <CardHeader className="px-4 pb-10">
+              <CardTitle className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] border-b border-border pb-4">
+                01. Artifact Manifest
+              </CardTitle>
+            </CardHeader>
 
-            <div className="space-y-6">
+            <CardContent className="space-y-6 px-4">
               {order.orderItems.map((item, i) => (
                 <div
                   key={i}
-                  className="flex flex-col sm:flex-row items-center gap-8 p-6 rounded-3xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-white/5 group"
+                  className="flex flex-col sm:flex-row items-center gap-8 p-6 rounded-3xl bg-muted/30 border border-border/50 group transition-all hover:bg-muted/50"
                 >
-                  <div className="h-32 w-24 bg-zinc-200 dark:bg-zinc-800 rounded-2xl overflow-hidden shrink-0 border dark:border-white/5 shadow-inner">
+                  <div className="h-32 w-24 bg-muted rounded-2xl overflow-hidden shrink-0 border border-border shadow-inner">
                     <img
                       src={getImageUrl(item.image || item.product?.images?.[0])}
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
@@ -187,82 +213,82 @@ export default function OrderDetailsPage() {
                     />
                   </div>
                   <div className="flex-1 text-center sm:text-left space-y-2">
-                    <p className="font-black text-zinc-900 dark:text-white uppercase tracking-tight text-xl italic">
+                    <p className="font-black text-foreground uppercase tracking-tight text-xl italic">
                       {item.name}
                     </p>
-                    <p className="text-[9px] font-black text-rose-600 uppercase tracking-widest">
+                    <p className="text-[9px] font-black text-primary uppercase tracking-widest">
                       Price per unit: ৳{item.price}
                     </p>
                   </div>
                   <div className="flex items-center gap-10">
                     <div className="text-center">
-                      <p className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">
+                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">
                         Quantity
                       </p>
-                      <p className="text-3xl font-black text-zinc-900 dark:text-white">
+                      <p className="text-3xl font-black text-foreground">
                         ×{item.quantity}
                       </p>
                     </div>
                     <div className="text-right min-w-[100px]">
-                      <p className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">
+                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">
                         Subtotal
                       </p>
-                      <p className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter">
+                      <p className="text-2xl font-black text-foreground tracking-tighter">
                         ৳{(item.price * item.quantity).toFixed(0)}
                       </p>
                     </div>
                   </div>
                 </div>
               ))}
-            </div>
 
-            {/* FINANCIAL SUMMARY */}
-            <div className="mt-12 pt-10 border-t border-zinc-100 dark:border-zinc-800 flex flex-col md:flex-row justify-between gap-10">
-              <div className="space-y-4 flex-1">
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                  <span>Subtotal</span>
-                  <span className="text-zinc-900 dark:text-white">
-                    ৳{order.itemsPrice?.toFixed(0)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                  <span>Logistics Fee</span>
-                  <span className="text-zinc-900 dark:text-white">
-                    ৳{order.shippingPrice?.toFixed(0)}
-                  </span>
-                </div>
-                {order.discountAmount > 0 && (
-                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-emerald-500">
-                    <span>Voucher Discount</span>
-                    <span>- ৳{order.discountAmount.toFixed(0)}</span>
+              {/* FINANCIAL SUMMARY */}
+              <div className="mt-12 pt-10 border-t border-border flex flex-col md:flex-row justify-between gap-10">
+                <div className="space-y-4 flex-1">
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    <span>Subtotal</span>
+                    <span className="text-foreground">
+                      ৳{order.itemsPrice?.toFixed(0)}
+                    </span>
                   </div>
-                )}
-              </div>
-              <div className="md:text-right md:border-l dark:border-zinc-800 md:pl-12">
-                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-2">
-                  Total Settlement
-                </p>
-                <p className="text-6xl md:text-7xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none italic">
-                  ৳{order.totalPrice.toFixed(0)}
-                </p>
-                <div className="flex items-center md:justify-end gap-2 mt-4 text-[10px] font-black uppercase text-zinc-400">
-                  <ShieldCheck size={14} className="text-emerald-500" />
-                  Secured by {order.paymentMethod}
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    <span>Logistics Fee</span>
+                    <span className="text-foreground">
+                      ৳{order.shippingPrice?.toFixed(0)}
+                    </span>
+                  </div>
+                  {order.discountAmount > 0 && (
+                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-emerald-500">
+                      <span>Voucher Discount</span>
+                      <span>- ৳{order.discountAmount.toFixed(0)}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="md:text-right md:border-l border-border md:pl-12">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] mb-2">
+                    Total Settlement
+                  </p>
+                  <p className="text-6xl md:text-7xl font-black text-foreground tracking-tighter leading-none italic">
+                    ৳{order.totalPrice.toFixed(0)}
+                  </p>
+                  <div className="flex items-center md:justify-end gap-2 mt-4 text-[10px] font-black uppercase text-muted-foreground">
+                    <ShieldCheck size={14} className="text-emerald-500" />
+                    Secured by {order.paymentMethod}
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* 📋 RIGHT: Intelligence (4 Cols) */}
         <div className="lg:col-span-4 space-y-8">
           {/* CUSTOMER INTELLIGENCE */}
-          <div className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 shadow-sm">
-            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em] mb-8">
+          <Card className="rounded-[2.5rem] border-border bg-card p-8 shadow-sm">
+            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] mb-8">
               02. Identity Profile
             </h3>
             <div className="flex items-center gap-5 mb-10">
-              <div className="h-20 w-20 rounded-[2rem] bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center font-black text-zinc-400 border border-zinc-200 dark:border-zinc-800 text-3xl shadow-inner overflow-hidden">
+              <div className="h-20 w-20 rounded-[2rem] bg-muted flex items-center justify-center font-black text-muted-foreground border border-border text-3xl shadow-inner overflow-hidden uppercase">
                 {order.user?.avatar ? (
                   <img
                     src={getImageUrl(order.user.avatar)}
@@ -273,71 +299,72 @@ export default function OrderDetailsPage() {
                 )}
               </div>
               <div>
-                <p className="font-black text-2xl text-zinc-900 dark:text-white uppercase tracking-tighter italic">
+                <p className="font-black text-2xl text-foreground uppercase tracking-tighter italic leading-tight">
                   {customerName}
                 </p>
-                <span
-                  className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border ${isRegistered ? "bg-indigo-500/10 text-indigo-500 border-indigo-500/20" : "bg-zinc-500/10 text-zinc-500 border-zinc-500/20"}`}
+                <Badge
+                  variant="outline"
+                  className={cn("text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border mt-1", isRegistered ? "bg-primary/10 text-primary border-primary/20" : "bg-muted text-muted-foreground border-border")}
                 >
                   {isRegistered ? "Verified Member" : "Guest Identity"}
-                </span>
+                </Badge>
               </div>
             </div>
 
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <Mail size={16} className="text-zinc-400 mt-1" />
+                <Mail size={16} className="text-muted-foreground mt-1" />
                 <div>
-                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">
                     Neural Address
                   </p>
-                  <p className="text-xs font-bold text-zinc-900 dark:text-white break-all">
+                  <p className="text-xs font-bold text-foreground break-all">
                     {customerEmail}
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <Phone size={16} className="text-zinc-400 mt-1" />
+                <Phone size={16} className="text-muted-foreground mt-1" />
                 <div>
-                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">
                     Contact Link
                   </p>
-                  <p className="text-xs font-bold text-zinc-900 dark:text-white">
+                  <p className="text-xs font-bold text-foreground">
                     {order.shippingAddress.phone}
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <MapPin size={16} className="text-zinc-400 mt-1" />
+                <MapPin size={16} className="text-muted-foreground mt-1" />
                 <div>
-                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">
                     Deployment Base
                   </p>
-                  <p className="text-xs font-bold text-zinc-900 dark:text-white leading-relaxed uppercase">
+                  <p className="text-xs font-bold text-foreground leading-relaxed uppercase">
                     {order.shippingAddress.street},<br />
                     {order.shippingAddress.city}
                   </p>
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* PAYMENT METADATA */}
-          <div className="bg-zinc-50 dark:bg-zinc-900/20 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 shadow-inner">
-            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em] mb-6">
+          <Card className="bg-muted/30 rounded-[2.5rem] border-border p-8 shadow-inner">
+            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] mb-6">
               03. Financial Metadata
             </h3>
             <div className="space-y-4">
-              <div className="flex justify-between items-center py-3 border-b dark:border-zinc-800">
-                <span className="text-[10px] font-black text-zinc-500 uppercase">
+              <div className="flex justify-between items-center py-3 border-b border-border">
+                <span className="text-[10px] font-black text-muted-foreground uppercase">
                   Clearance Status
                 </span>
                 <div className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full animate-pulse ${order.paymentResult?.status === "Completed" ? "bg-emerald-500" : "bg-amber-500"}`}
+                    className={cn("w-2 h-2 rounded-full animate-pulse", order.paymentResult?.status === "Completed" ? "bg-emerald-500" : "bg-amber-500")}
                   />
                   <span
-                    className={`text-[10px] font-black uppercase ${order.paymentResult?.status === "Completed" ? "text-emerald-500" : "text-amber-500"}`}
+                    className={cn("text-[10px] font-black uppercase", order.paymentResult?.status === "Completed" ? "text-emerald-500" : "text-amber-500")}
                   >
                     {order.paymentResult?.status || "In Transit"}
                   </span>
@@ -345,18 +372,25 @@ export default function OrderDetailsPage() {
               </div>
               {order.paymentResult?.transactionId && (
                 <div className="pt-2">
-                  <p className="text-[9px] font-black text-zinc-500 uppercase mb-2">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase mb-2">
                     Sequence ID
                   </p>
-                  <p className="font-mono text-[10px] font-bold text-zinc-900 dark:text-zinc-400 break-all bg-white dark:bg-black p-4 rounded-2xl border dark:border-white/5">
+                  <p className="font-mono text-[10px] font-bold text-foreground break-all bg-card p-4 rounded-2xl border border-border">
                     {order.paymentResult.transactionId}
                   </p>
                 </div>
               )}
             </div>
-          </div>
+          </Card>
         </div>
       </div>
+      
+      <OrderEditModal
+        order={order}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onUpdate={(id, data) => updateOrder({ id, data })}
+      />
     </div>
   );
 }

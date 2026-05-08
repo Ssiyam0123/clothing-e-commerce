@@ -52,97 +52,105 @@ import SectionHeader from "@/components/common/SectionHeader";
 export default async function HomePage() {
   const lang = "en";
   const ui = DICTIONARY.en;
-
-  const data = await getHomeData();
-
-  const featuredProducts = data.products
-    .filter((p) => p.isFeatured)
-    .slice(0, 4);
-  const newArrivals = data.products.slice(0, 8);
-  const saleProducts = data.products.filter((p) => p.discount > 0).slice(0, 4);
+  const dataPromise = getHomeData();
 
   return (
     <main className="w-full bg-surface transition-colors duration-700">
-      {/* 1. Hero Section */}
       <Suspense fallback={<HeroSkeleton />}>
-        <HeroSectionServer campaign={data.activeCampaign} lang={lang} ui={ui} />
+        <HeroSectionWrapper dataPromise={dataPromise} lang={lang} ui={ui} />
       </Suspense>
 
       <div className="space-y-20 md:space-y-28 pb-36 mt-10 md:mt-16">
-        {/* 2. Flash Sale Section */}
-        {data.flashSales?.flashSale && (
-          <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-             <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 md:mb-24">
-               <SectionHeader title="Flash Sale" subtitle={ui.flashSub || "Live Drops"} className="mb-0" />
-               <Link
-                 href="/flash-sale"
-                 className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-elevated px-8 py-4 rounded-full border border-light hover:bg-accent-secondary hover:text-white transition-all duration-500"
-               >
-                 See More
-               </Link>
-             </div>
-             <Suspense fallback={<GridSkeleton count={4} />}>
-               <FlashSaleTeaserServer
-                 activeSale={data.flashSales.flashSale}
-                 products={data.flashSales}
-                 lang={lang}
-                 ui={ui}
-               />
-             </Suspense>
-          </section>
-        )}
+        <Suspense fallback={<GridSkeleton count={4} />}>
+          <FlashSaleWrapper dataPromise={dataPromise} lang={lang} ui={ui} />
+        </Suspense>
 
-        {/* 3. Category Grid Section */}
-        <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-          <SectionHeader title={ui.catTitle} subtitle={ui.catSub} className="mb-16 md:mb-24" />
-          <CategoryGrid categories={data.categories} />
-        </section>
+        <Suspense fallback={<GridSkeleton count={6} />}>
+          <CategoryWrapper dataPromise={dataPromise} ui={ui} />
+        </Suspense>
 
-        {/* 4. Featured Product Section */}
-        <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 md:mb-24">
-            <SectionHeader title={ui.featTitle} subtitle={ui.featSub} className="mb-0" />
-            <Link
-              href="/products?category=isFeatured"
-              className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-elevated px-8 py-4 rounded-full border border-light hover:bg-accent-secondary hover:text-white transition-all duration-500"
-            >
-              View More
-            </Link>
-          </div>
-          <ProductSection products={featuredProducts} lang={lang} />
-        </section>
+        <Suspense fallback={<GridSkeleton count={4} />}>
+          <FeaturedWrapper dataPromise={dataPromise} lang={lang} ui={ui} />
+        </Suspense>
 
-        {/* 5. New Arrivals */}
-        <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-          <SectionHeader title={ui.newTitle} subtitle={ui.newSub} className="mb-16 md:mb-24" />
-          <ProductSection
-            products={newArrivals}
-            showLoadMore={true}
-            lang={lang}
-            ui={ui}
-          />
-        </section>
+        <Suspense fallback={<GridSkeleton count={8} />}>
+          <NewArrivalsWrapper dataPromise={dataPromise} lang={lang} ui={ui} />
+        </Suspense>
 
-        {/* 6. Sale Section */}
-        {saleProducts.length > 0 && (
-          <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-            <SectionHeader title={ui.saleTitle} subtitle={ui.saleSub} className="mb-16 md:mb-24" />
-            <ProductSection products={saleProducts} lang={lang} />
-          </section>
-        )}
-
-        {/* 7. Newsletter Section - Full Width */}
-        {/* <section className="bg-elevated py-16 md:py-20 border-y border-light">
-          <div className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-            <SectionHeader 
-              title={ui.newsletterTitle || "Join the Syndicate"} 
-              subtitle={ui.newsletterSub || "Early access and exclusive drops."} 
-              className="items-center text-center"
-            />
-            <Newsletter lang={lang} />
-          </div>
-        </section> */}
+        <Suspense fallback={<GridSkeleton count={4} />}>
+          <SaleWrapper dataPromise={dataPromise} lang={lang} ui={ui} />
+        </Suspense>
       </div>
     </main>
+  );
+}
+
+async function HeroSectionWrapper({ dataPromise, lang, ui }) {
+  const data = await dataPromise;
+  return <HeroSectionServer campaign={data.activeCampaign} lang={lang} ui={ui} />;
+}
+
+async function FlashSaleWrapper({ dataPromise, lang, ui }) {
+  const data = await dataPromise;
+  if (!data.flashSales?.flashSale) return null;
+  return (
+    <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 md:mb-24">
+        <SectionHeader title="Flash Sale" subtitle={ui.flashSub || "Live Drops"} className="mb-0" />
+        <Link href="/flash-sale" className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-elevated px-8 py-4 rounded-full border border-light hover:bg-accent-secondary hover:text-white transition-all duration-500">
+          See More
+        </Link>
+      </div>
+      <FlashSaleTeaserServer activeSale={data.flashSales.flashSale} products={data.flashSales} lang={lang} ui={ui} />
+    </section>
+  );
+}
+
+async function CategoryWrapper({ dataPromise, ui }) {
+  const data = await dataPromise;
+  return (
+    <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
+      <SectionHeader title={ui.catTitle} subtitle={ui.catSub} className="mb-16 md:mb-24" />
+      <CategoryGrid categories={data.categories} />
+    </section>
+  );
+}
+
+async function FeaturedWrapper({ dataPromise, lang, ui }) {
+  const data = await dataPromise;
+  const featuredProducts = data.products.filter((p) => p.isFeatured).slice(0, 4);
+  return (
+    <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 md:mb-24">
+        <SectionHeader title={ui.featTitle} subtitle={ui.featSub} className="mb-0" />
+        <Link href="/products?category=isFeatured" className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-elevated px-8 py-4 rounded-full border border-light hover:bg-accent-secondary hover:text-white transition-all duration-500">
+          View More
+        </Link>
+      </div>
+      <ProductSection products={featuredProducts} lang={lang} />
+    </section>
+  );
+}
+
+async function NewArrivalsWrapper({ dataPromise, lang, ui }) {
+  const data = await dataPromise;
+  const newArrivals = data.products.slice(0, 8);
+  return (
+    <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
+      <SectionHeader title={ui.newTitle} subtitle={ui.newSub} className="mb-16 md:mb-24" />
+      <ProductSection products={newArrivals} showLoadMore={true} lang={lang} ui={ui} />
+    </section>
+  );
+}
+
+async function SaleWrapper({ dataPromise, lang, ui }) {
+  const data = await dataPromise;
+  const saleProducts = data.products.filter((p) => p.discount > 0).slice(0, 4);
+  if (saleProducts.length === 0) return null;
+  return (
+    <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
+      <SectionHeader title={ui.saleTitle} subtitle={ui.saleSub} className="mb-16 md:mb-24" />
+      <ProductSection products={saleProducts} lang={lang} />
+    </section>
   );
 }

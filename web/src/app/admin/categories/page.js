@@ -5,9 +5,14 @@ import { useCategories } from "@/hooks/useCategories";
 import { useSubcategories } from "@/hooks/useSubcategories";
 import { useSizes } from "@/hooks/useSizes";
 import { getImageUrl } from "@/utils/imageUtils";
-import Loader from "@/components/common/Loader";
+import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Edit2, Trash2, Layers, Maximize2, Hash } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function CategoryMasterControl() {
   const { categories, isLoading: catLoading, deleteCategory } = useCategories();
@@ -18,12 +23,10 @@ export default function CategoryMasterControl() {
   } = useSubcategories();
   const { sizes, isLoading: sizeLoading, deleteSize } = useSizes();
 
-  // Local loading states for individual deletions (to disable buttons)
   const [deletingCategoryId, setDeletingCategoryId] = useState(null);
   const [deletingSubId, setDeletingSubId] = useState(null);
   const [deletingSizeId, setDeletingSizeId] = useState(null);
 
-  // --- Delete Handlers with proper loading and error handling ---
   const handleDeleteCategory = useCallback(
     async (id) => {
       const confirmed = await swalConfirm(
@@ -37,9 +40,7 @@ export default function CategoryMasterControl() {
         await deleteCategory.mutateAsync(id);
         swalToast("Category Removed", "success");
       } catch (err) {
-        const message =
-          err.response?.data?.message || "Check if this category is in use.";
-        swalError("Delete Failed", message);
+        swalError("Delete Failed", err.response?.data?.message || "Check if this category is in use.");
       } finally {
         setDeletingCategoryId(null);
       }
@@ -60,9 +61,7 @@ export default function CategoryMasterControl() {
         await deleteSubcategory.mutateAsync(id);
         swalToast("Sub-category Purged", "success");
       } catch (err) {
-        const message =
-          err.response?.data?.message || "Could not delete subcategory.";
-        swalError("Action Blocked", message);
+        swalError("Action Blocked", err.response?.data?.message || "Could not delete subcategory.");
       } finally {
         setDeletingSubId(null);
       }
@@ -83,9 +82,7 @@ export default function CategoryMasterControl() {
         await deleteSize.mutateAsync(id);
         swalToast("Size Template Deleted", "success");
       } catch (err) {
-        const message =
-          err.response?.data?.message || "Could not delete size template.";
-        swalError("Sync Error", message);
+        swalError("Sync Error", err.response?.data?.message || "Could not delete size template.");
       } finally {
         setDeletingSizeId(null);
       }
@@ -93,241 +90,220 @@ export default function CategoryMasterControl() {
     [deleteSize],
   );
 
-  // Show global loader while any of the main lists are loading
   if (catLoading || subLoading || sizeLoading) {
     return (
-      <div className="p-20">
-        <Loader />
+      <div className="space-y-10 pb-20 max-w-[1600px] mx-auto px-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 p-10 rounded-[2.5rem] bg-card border border-border shadow-sm">
+          <div className="space-y-2">
+            <Skeleton className="h-10 w-[300px] rounded-xl" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+          <Skeleton className="h-14 w-56 rounded-full" />
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-[600px] rounded-[3rem]" />
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-10 pb-20 max-w-[1600px] mx-auto">
+    <div className="space-y-10 pb-20 max-w-[1600px] mx-auto px-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card p-10 rounded-[2.5rem] border border-border shadow-xl backdrop-blur-md">
         <div>
-          <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase mb-2">
-            Store Architecture
+          <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tighter uppercase leading-none italic mb-3">
+            Architecture
           </h1>
-          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-            Categories & Taxonomy Hub
+          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] ml-1">
+            Taxonomy & Store Hierarchy
           </p>
         </div>
-        <Link
-          href="/admin/categories/new"
-          className="bg-zinc-900 dark:bg-white text-white dark:text-black px-10 py-4 rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl"
-        >
-          + Initialize Category
+        <Link href="/admin/categories/new">
+          <Button className="bg-foreground text-background hover:bg-primary hover:text-primary-foreground h-14 px-10 rounded-full font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-2xl active:scale-95">
+            <Plus className="mr-2" size={16} /> Initialize Category
+          </Button>
         </Link>
       </div>
 
-      {/* Main Grid: Category Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 animate-in fade-in slide-in-from-bottom-6 duration-1000">
         {categories?.map((cat) => (
-          <div
+          <Card
             key={cat._id}
-            className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden flex flex-col group hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-500 hover:-translate-y-1"
+            className="group overflow-hidden rounded-[3rem] border-border bg-card shadow-2xl hover:border-primary/50 transition-all duration-700 hover:-translate-y-2"
           >
-            {/* Banner Section */}
-            <div className="relative h-64 overflow-hidden bg-zinc-100 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+            {/* Banner */}
+            <div className="relative h-72 overflow-hidden bg-muted">
               <img
                 src={getImageUrl(cat.image)}
-                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 grayscale-[15%] group-hover:grayscale-0"
+                className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
                 alt={cat.name}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-8 flex items-end">
-                <div className="flex justify-between items-end w-full">
-                  <div>
-                    <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.4em] mb-2 drop-shadow-md">
-                      Category
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent p-10 flex flex-col justify-end">
+                <div className="flex justify-between items-end gap-4">
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-white/60 uppercase tracking-[0.5em] drop-shadow-md mb-2">
+                      Department Artifact
                     </p>
-                    <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none">
+                    <h2 className="text-4xl lg:text-6xl font-black text-white uppercase tracking-tighter leading-none italic drop-shadow-2xl">
                       {cat.name}
                     </h2>
-                    <p className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest mt-2">
-                      Slug: {cat.slug}
-                    </p>
+                    <div className="flex items-center gap-3 mt-3">
+                      <Badge variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 text-white font-black text-[8px] px-3 py-1 uppercase tracking-widest">
+                        Slug: {cat.slug}
+                      </Badge>
+                    </div>
                   </div>
 
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/admin/categories/${cat._id}`}
-                      className="bg-white/10 backdrop-blur-md border border-white/20 text-white p-3 rounded-2xl hover:bg-white hover:text-black transition-all"
-                      title="Edit Category"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                        />
-                      </svg>
+                  <div className="flex gap-3">
+                    <Link href={`/admin/categories/${cat._id}`}>
+                      <Button variant="outline" size="icon" className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white hover:text-black transition-all">
+                        <Edit2 size={18} />
+                      </Button>
                     </Link>
-                    <button
-                      onClick={() => handleDeleteCategory(cat._id)}
+                    <Button
+                      variant="destructive"
+                      size="icon"
                       disabled={deletingCategoryId === cat._id}
-                      className="bg-rose-500/80 backdrop-blur-md border border-rose-500/20 text-white p-3 rounded-2xl hover:bg-rose-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Delete Category"
+                      onClick={() => handleDeleteCategory(cat._id)}
+                      className="h-12 w-12 rounded-2xl shadow-xl shadow-rose-500/20"
                     >
                       {deletingCategoryId === cat._id ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       ) : (
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          strokeWidth="2"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
+                        <Trash2 size={18} />
                       )}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Inner Content Section */}
-            <div className="p-8 space-y-10">
-              {/* Subcategories Subsection */}
-              <section>
-                <div className="flex justify-between items-center mb-6 border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                  <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-                    Sub-Categories
-                  </h4>
-                  <Link
-                    href="/admin/subcategories/new"
-                    className="text-[9px] font-black text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-4 py-2 rounded-xl hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase tracking-widest"
-                  >
-                    + ADD NEW
+            {/* Content Panels */}
+            <CardContent className="p-10 space-y-12">
+              {/* Subcategories */}
+              <div className="space-y-6">
+                <div className="flex justify-between items-center border-b border-border pb-4">
+                  <div className="flex items-center gap-2">
+                    <Layers className="text-muted-foreground" size={14} />
+                    <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">
+                      Sub-Departments
+                    </h4>
+                  </div>
+                  <Link href={`/admin/subcategories/new?category=${cat._id}`}>
+                    <Button variant="ghost" className="h-8 px-4 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground">
+                      <Plus size={12} className="mr-1" /> New Entry
+                    </Button>
                   </Link>
                 </div>
+                
                 <div className="flex flex-wrap gap-3">
-                  {subcategories
-                    ?.filter((sub) => sub.category?._id === cat._id)
-                    .map((sub) => (
-                      <div
-                        key={sub._id}
-                        className="group/item flex items-center gap-2 bg-zinc-50 dark:bg-[#111] px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all"
+                  {subcategories?.filter((sub) => sub.category?._id === cat._id || sub.category === cat._id).map((sub) => (
+                    <div
+                      key={sub._id}
+                      className="group/item flex items-center gap-3 bg-muted/30 px-4 py-2.5 rounded-2xl border border-border hover:border-primary/40 transition-all shadow-sm"
+                    >
+                      <Link
+                        href={`/admin/subcategories/${sub._id}`}
+                        className="text-[10px] font-black text-foreground/80 uppercase tracking-widest hover:text-primary transition-colors"
                       >
-                        <Link
-                          href={`/admin/subcategories/new?category=${cat._id}`}
-                          className="text-[10px] font-black text-zinc-700 dark:text-zinc-300 uppercase tracking-widest hover:text-indigo-500 transition-colors"
-                        >
-                          {sub.name}
-                        </Link>
-                        <div className="w-px h-3 bg-zinc-300 dark:bg-zinc-700 mx-1"></div>
-                        <button
-                          onClick={() => handleDeleteSub(sub._id)}
-                          disabled={deletingSubId === sub._id}
-                          className="text-zinc-400 hover:text-rose-500 transition-colors disabled:opacity-50"
-                        >
-                          {deletingSubId === sub._id ? (
-                            <div className="w-3 h-3 border border-rose-500 border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <svg
-                              className="w-3 h-3"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              strokeWidth="3"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M6 18L18 6M6 6l12 12"
-                              />
-                            </svg>
-                          )}
-                        </button>
-                      </div>
-                    ))}
-                  {subcategories?.filter((sub) => sub.category?._id === cat._id)
-                    .length === 0 && (
-                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest bg-zinc-50 dark:bg-zinc-900/50 px-4 py-2 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-800">
-                      No Sub-categories
+                        {sub.name}
+                      </Link>
+                      <div className="w-px h-3 bg-border"></div>
+                      <button
+                        onClick={() => handleDeleteSub(sub._id)}
+                        disabled={deletingSubId === sub._id}
+                        className="text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
+                      >
+                        {deletingSubId === sub._id ? (
+                          <div className="w-3 h-3 border border-destructive border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <X size={12} strokeWidth={3} />
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                  {subcategories?.filter((sub) => sub.category?._id === cat._id || sub.category === cat._id).length === 0 && (
+                    <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em] py-4 w-full text-center border-2 border-dashed border-border rounded-3xl">
+                      Manifest Empty
                     </p>
                   )}
                 </div>
-              </section>
+              </div>
 
-              {/* Sizes Subsection */}
-              <section>
-                <div className="flex justify-between items-center mb-6 border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                  <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-                    Available Sizes
-                  </h4>
-                  <Link
-                    href={`/admin/sizes/new?category=${cat._id}`}
-                    className="text-[9px] font-black text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-4 py-2 rounded-xl hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase tracking-widest"
-                  >
-                    + ADD NEW
+              {/* Sizes */}
+              <div className="space-y-6">
+                <div className="flex justify-between items-center border-b border-border pb-4">
+                  <div className="flex items-center gap-2">
+                    <Maximize2 className="text-muted-foreground" size={14} />
+                    <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">
+                      Dimensional Matrix
+                    </h4>
+                  </div>
+                  <Link href={`/admin/sizes/new?category=${cat._id}`}>
+                    <Button variant="ghost" className="h-8 px-4 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground">
+                      <Plus size={12} className="mr-1" /> New Entry
+                    </Button>
                   </Link>
                 </div>
+                
                 <div className="flex flex-wrap gap-3">
-                  {sizes
-                    ?.filter((s) => s.category?._id === cat._id)
-                    .map((s) => (
-                      <div
-                        key={s._id}
-                        className="group/size flex items-center gap-2 bg-zinc-50 dark:bg-[#111] px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all"
+                  {sizes?.filter((s) => s.category?._id === cat._id || s.category === cat._id).map((s) => (
+                    <div
+                      key={s._id}
+                      className="group/size flex items-center gap-3 bg-muted/30 px-4 py-2.5 rounded-2xl border border-border hover:border-primary/40 transition-all shadow-sm"
+                    >
+                      <Link
+                        href={`/admin/sizes/${s._id}`}
+                        className="text-[10px] font-black text-foreground/80 uppercase tracking-widest hover:text-primary transition-colors"
                       >
-                        <Link
-                          href={`/admin/sizes/${s._id}`}
-                          className="text-[10px] font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest hover:text-indigo-500 transition-colors"
-                        >
-                          {s.name}
-                        </Link>
-                        <div className="w-px h-3 bg-zinc-300 dark:bg-zinc-700 mx-1"></div>
-                        <button
-                          onClick={() => handleDeleteSize(s._id)}
-                          disabled={deletingSizeId === s._id}
-                          className="text-zinc-400 hover:text-rose-500 transition-colors disabled:opacity-50"
-                        >
-                          {deletingSizeId === s._id ? (
-                            <div className="w-3 h-3 border border-rose-500 border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <svg
-                              className="w-3 h-3"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              strokeWidth="3"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M6 18L18 6M6 6l12 12"
-                              />
-                            </svg>
-                          )}
-                        </button>
-                      </div>
-                    ))}
-                  {sizes?.filter((s) => s.category?._id === cat._id).length ===
-                    0 && (
-                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest bg-zinc-50 dark:bg-zinc-900/50 px-4 py-2 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-800">
-                      No Sizes Defined
+                        {s.name}
+                      </Link>
+                      <div className="w-px h-3 bg-border"></div>
+                      <button
+                        onClick={() => handleDeleteSize(s._id)}
+                        disabled={deletingSizeId === s._id}
+                        className="text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
+                      >
+                        {deletingSizeId === s._id ? (
+                          <div className="w-3 h-3 border border-destructive border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <X size={12} strokeWidth={3} />
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                  {sizes?.filter((s) => s.category?._id === cat._id || s.category === cat._id).length === 0 && (
+                    <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em] py-4 w-full text-center border-2 border-dashed border-border rounded-3xl">
+                      Manifest Empty
                     </p>
                   )}
                 </div>
-              </section>
-            </div>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>
   );
 }
+
+const X = ({ size = 12, ...props }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M18 6 6 18" />
+    <path d="m6 6 12 12" />
+  </svg>
+);

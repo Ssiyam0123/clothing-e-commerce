@@ -97,6 +97,15 @@ export const useOrders = (params = {}, orderId = null) => {
     },
   });
 
+  // 7. Admin: Update Order
+  const updateOrderMutation = useMutation({
+    mutationFn: ({ id, data }) => api.put(`/orders/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allOrders"] });
+      if (orderId) queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+    },
+  });
+
   return {
     allOrdersData,
     allOrdersLoading,
@@ -110,5 +119,7 @@ export const useOrders = (params = {}, orderId = null) => {
     isUpdatingStatus: updateStatusMutation.isPending,
     syncToPathao: syncToPathaoMutation.mutateAsync,
     isSyncingPathao: syncToPathaoMutation.isPending,
+    updateOrder: updateOrderMutation.mutateAsync,
+    isUpdatingOrder: updateOrderMutation.isPending,
   };
 };

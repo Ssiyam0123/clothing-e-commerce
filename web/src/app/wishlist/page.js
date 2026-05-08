@@ -13,6 +13,7 @@ import { ShoppingBag, X, ArrowRight, Info, Zap, Heart } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -76,10 +77,21 @@ export default function WishlistPage() {
 
   if (!isMounted || authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-6">
-           <Heart className="text-accent-secondary animate-pulse" size={48} />
-           <p className="text-[10px] font-black uppercase tracking-[0.5em] animate-pulse">Syncing Vault...</p>
+      <div className="min-h-screen bg-background pt-32 px-4 sm:px-10 space-y-20">
+        <div className="space-y-6">
+          <Skeleton className="h-32 w-2/3 rounded-3xl" />
+          <Skeleton className="h-4 w-1/4 rounded-full" />
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-10">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="space-y-6">
+              <Skeleton className="h-[400px] w-full rounded-[2.5rem]" />
+              <div className="space-y-3 px-2">
+                <Skeleton className="h-6 w-3/4 rounded-xl" />
+                <Skeleton className="h-4 w-1/2 rounded-full" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );

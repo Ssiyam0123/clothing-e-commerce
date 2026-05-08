@@ -9,20 +9,20 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import api from "@/lib/api";
 
-export const useAdminProducts = () => {
+export const useAdminProducts = (initialFilters = {}) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const filters = useMemo(
     () => ({
-      search: searchParams.get("search") || "",
-      sort: searchParams.get("sort") || "",
-      category: searchParams.get("category") || "all",
-      page: Number(searchParams.get("page")) || 1,
-      limit: 12,
+      search: initialFilters.search !== undefined ? initialFilters.search : (searchParams.get("search") || ""),
+      sort: initialFilters.sort !== undefined ? initialFilters.sort : (searchParams.get("sort") || ""),
+      category: initialFilters.category !== undefined ? initialFilters.category : (searchParams.get("category") || "all"),
+      page: initialFilters.page !== undefined ? initialFilters.page : (Number(searchParams.get("page")) || 1),
+      limit: initialFilters.limit || 12,
     }),
-    [searchParams],
+    [searchParams, initialFilters],
   );
 
   const updateFilters = useCallback(
@@ -76,7 +76,7 @@ export const useAdminProducts = () => {
       return response.data;
     },
     placeholderData: keepPreviousData,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     gcTime: 1000 * 60 * 30,
   });
 

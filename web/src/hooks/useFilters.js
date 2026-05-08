@@ -1,10 +1,10 @@
 // src/hooks/useFilters.js
-import { useReducer, useEffect, useCallback } from "react";
+import { useReducer, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 const initialState = (searchParams, initialSort) => ({
   search: searchParams.get("search") || "",
-  sort: searchParams.get("sort") || initialSort,
+  sort: searchParams.get("sort") || initialSort || "",
   category: searchParams.get("category") || "all",
   page: Number(searchParams.get("page")) || 1,
 });
@@ -21,14 +21,18 @@ function reducer(state, action) {
       return { ...state, page: action.payload };
     case "CLEAR_FILTERS":
       return { ...state, search: "", sort: "", category: "all", page: 1 };
-    case "SYNC_FROM_URL":
-      return {
-        ...state,
-        search: action.payload.search,
-        sort: action.payload.sort,
-        category: action.payload.category,
-        page: action.payload.page,
-      };
+    case "SYNC_FROM_URL": {
+      const { search, sort, category, page } = action.payload;
+      if (
+        state.search === search &&
+        state.sort === sort &&
+        state.category === category &&
+        state.page === page
+      ) {
+        return state;
+      }
+      return { ...state, ...action.payload };
+    }
     default:
       return state;
   }
@@ -38,6 +42,7 @@ export function useFilters({ initialLimit = 12, initialSort = "" } = {}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isInternalUpdate = useRef(false);
 
   const [state, dispatch] = useReducer(
     reducer,
@@ -49,19 +54,29 @@ export function useFilters({ initialLimit = 12, initialSort = "" } = {}) {
   useEffect(() => {
     const params = new URLSearchParams();
     if (state.search) params.set("search", state.search);
-    if (state.sort) params.set("sort", state.sort);
-    if (state.category !== "all") params.set("category", state.category);
-    if (state.page > 1) params.set("page", state.page);
+    if (state.sort && state.sort !== "all") params.set("sort", state.sort);
+    if (state.category && state.category !== "all") params.set("category", state.category);
+    if (state.page > 1) params.set("page", state.page.toString());
 
     const newQueryString = params.toString();
-    router.replace(`${pathname}?${newQueryString}`, { scroll: false });
-  }, [state.search, state.sort, state.category, state.page, pathname, router]);
+    const currentQueryString = searchParams.toString();
+
+    if (newQueryString !== currentQueryString) {
+      isInternalUpdate.current = true;
+      router.replace(`${pathname}?${newQueryString}`, { scroll: false });
+    }
+  }, [state, pathname, router, searchParams]);
 
   // Sync state when URL changes (e.g., browser back/forward)
   useEffect(() => {
+    if (isInternalUpdate.current) {
+      isInternalUpdate.current = false;
+      return;
+    }
+
     const newState = {
       search: searchParams.get("search") || "",
-      sort: searchParams.get("sort") || initialSort,
+      sort: searchParams.get("sort") || initialSort || "",
       category: searchParams.get("category") || "all",
       page: Number(searchParams.get("page")) || 1,
     };
@@ -90,6 +105,17 @@ export function useFilters({ initialLimit = 12, initialSort = "" } = {}) {
     [],
   );
 
+  const queryParams = useMemo(() => {
+    const p = {
+      page: state.page,
+      limit: initialLimit,
+      search: state.search,
+    };
+    if (state.sort && state.sort !== "all") p.sort = state.sort;
+    if (state.category && state.category !== "all") p.category = state.category;
+    return p;
+  }, [state.page, state.search, state.sort, state.category, initialLimit]);
+
   return {
     search: state.search,
     setSearch,
@@ -100,12 +126,6 @@ export function useFilters({ initialLimit = 12, initialSort = "" } = {}) {
     page: state.page,
     setPage,
     clearFilters,
-    queryParams: {
-      page: state.page,
-      limit: initialLimit,
-      search: state.search,
-      sort: state.sort,
-      ...(state.category !== "all" && { category: state.category }),
-    },
+    queryParams,
   };
 }

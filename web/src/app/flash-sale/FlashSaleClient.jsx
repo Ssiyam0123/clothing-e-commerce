@@ -10,6 +10,7 @@ import ProductCard from "@/components/common/ProductCard";
 import { Clock, Zap, ArrowRight, Timer, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import {
   Card,
@@ -57,10 +58,20 @@ export default function FlashSaleClient() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-6">
-           <Zap className="text-accent-secondary animate-pulse" size={48} />
-           <p className="text-[10px] sm:text-[12px] font-black uppercase tracking-[0.5em] animate-pulse text-foreground/50">Syncing Flash Protocol...</p>
+      <div className="min-h-screen bg-background pt-32 pb-40 space-y-24">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-12 space-y-12">
+          <Skeleton className="h-[400px] w-full rounded-[4rem] bg-accent/10" />
+          <div className="space-y-4">
+            <Skeleton className="h-20 w-3/4 rounded-2xl" />
+            <Skeleton className="h-4 w-1/4 rounded-full" />
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-10">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="space-y-4">
+                <Skeleton className="h-[400px] w-full rounded-3xl" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

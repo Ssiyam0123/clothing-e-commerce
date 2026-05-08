@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import BlogMagazineClient from "./BlogMagazineClient";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
@@ -15,20 +17,10 @@ export const metadata = {
 };
 
 export default async function BlogPage() {
-  let posts = [];
-  try {
-    const res = await fetch(
-      `${API_URL}/blogs?fields=title,slug,featuredImage,category,readingTime,author,createdAt`,
-      {
-        next: { revalidate: 3600 },
-      },
-    );
-    if (res.ok) {
-      posts = await res.json();
-    }
-  } catch (error) {
-    console.error("Failed to fetch blogs:", error);
-  }
+  const postsPromise = fetch(
+    `${API_URL}/blogs?fields=title,slug,featuredImage,category,readingTime,author,createdAt`,
+    { next: { revalidate: 3600 } }
+  ).then(res => res.ok ? res.json() : []);
 
   const faqSchema = {
     "@context": "https://schema.org",
@@ -54,12 +46,41 @@ export default async function BlogPage() {
   };
 
   return (
-    <>
+    <main className="min-h-screen bg-background">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <BlogMagazineClient posts={posts} />
-    </>
+      <Suspense fallback={<BlogSkeleton />}>
+        <BlogDataWrapper postsPromise={postsPromise} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function BlogDataWrapper({ postsPromise }) {
+  const posts = await postsPromise;
+  return <BlogMagazineClient posts={posts} />;
+}
+
+function BlogSkeleton() {
+  return (
+    <div className="container mx-auto px-6 pt-32 space-y-20">
+      <div className="space-y-4">
+        <Skeleton className="h-24 w-2/3 rounded-3xl" />
+        <Skeleton className="h-4 w-1/3 rounded-full" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="space-y-6">
+            <Skeleton className="h-[300px] w-full rounded-[2.5rem]" />
+            <div className="space-y-3 px-2">
+              <Skeleton className="h-6 w-3/4 rounded-xl" />
+              <Skeleton className="h-3 w-1/2 rounded-full" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

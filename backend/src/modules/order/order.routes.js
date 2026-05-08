@@ -10,6 +10,7 @@ import {
   getOrderById,
   bkashSuccess,
   getOrders,
+  updateOrder,
 } from "./order.controller.js";
 import { requireAuth, admin, optionalAuth } from "../../middleware/auth.js";
 import { validateObjectId } from "../../middleware/validate.js";
@@ -37,6 +38,8 @@ router.get("/", requireAuth, admin, getOrders);
 router.post("/:id/pathao-sync", requireAuth, admin, validateObjectId, syncOrderToPathao);
 
 router.get('/:id', optionalAuth, getOrderById);
+router.put('/:id', requireAuth, admin, validateObjectId, updateOrder);
+router.put('/:id/status', requireAuth, admin, validateObjectId, updateOrder);
 
 
 export default router;

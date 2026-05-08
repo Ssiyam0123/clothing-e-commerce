@@ -6,13 +6,12 @@ import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { getImageUrl } from "@/utils/imageUtils";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Search, X, Loader2, ChevronDown } from "lucide-react";
+import { Search, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
@@ -96,12 +95,12 @@ export default function FilterBar({
   };
 
   return (
-    <div className="bg-background/80 backdrop-blur-2xl rounded-[3rem] shadow-2xl border border-border/50 p-3 flex flex-col md:flex-row gap-4 items-center justify-between relative z-50 transition-all w-full glass">
+    <div className="bg-card/80 backdrop-blur-2xl rounded-[3rem] shadow-2xl border border-border p-3 flex flex-col md:flex-row gap-4 items-center justify-between relative z-50 transition-all w-full">
       {/* Search Input with Popover Suggestions */}
       <div className="w-full md:w-1/2 relative group">
         <Popover open={open && inputValue.trim().length > 1} onOpenChange={setOpen}>
           <div className="relative w-full">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-all group-focus-within:text-accent-secondary z-10" />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-all group-focus-within:text-primary z-10" />
             <input
               type="text"
               placeholder={searchPlaceholder}
@@ -119,13 +118,13 @@ export default function FilterBar({
                   if (onSearchSubmit) onSearchSubmit(inputValue);
                 }
               }}
-              className="w-full pl-14 pr-12 py-5 bg-accent/30 border-none rounded-full outline-none font-black text-foreground transition-all placeholder:text-muted-foreground/30 text-[10px] uppercase tracking-[0.2em] relative z-10 hover:bg-accent/50 focus:ring-2 focus:ring-accent-secondary/20"
+              className="w-full pl-14 pr-12 py-5 bg-muted/50 border border-transparent rounded-full outline-none font-black text-foreground transition-all placeholder:text-muted-foreground/30 text-[10px] uppercase tracking-[0.2em] relative z-10 hover:bg-muted focus:ring-2 focus:ring-primary/20 focus:border-border"
             />
             {inputValue && (
               <button
                 type="button"
                 onClick={handleClearSearch}
-                className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-accent-secondary transition-colors z-20"
+                className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors z-20"
               >
                 <X size={16} />
               </button>
@@ -135,7 +134,7 @@ export default function FilterBar({
             <div className="absolute inset-0 pointer-events-none invisible" />
           </PopoverTrigger>
           <PopoverContent 
-            className="w-[calc(100vw-3rem)] md:w-[var(--radix-popover-trigger-width)] p-0 border-none bg-background/95 backdrop-blur-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] rounded-[2.5rem] mt-4"
+            className="w-[calc(100vw-3rem)] md:w-[var(--radix-popover-trigger-width)] p-0 border border-border bg-card/95 backdrop-blur-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] rounded-[2.5rem] mt-4"
             align="start"
             sideOffset={8}
           >
@@ -143,11 +142,11 @@ export default function FilterBar({
               <CommandList className="max-h-[400px]">
                 {loadingSuggestions ? (
                   <div className="p-8 flex flex-col items-center gap-4 text-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-accent-secondary" />
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
                     <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground animate-pulse">Scanning Databanks...</span>
                   </div>
                 ) : suggestions.length > 0 ? (
-                  <CommandGroup heading={<span className="px-4 text-[9px] font-black text-accent-secondary uppercase tracking-[0.4em]">Matching Artifacts</span>}>
+                  <CommandGroup heading={<span className="px-4 text-[9px] font-black text-primary uppercase tracking-[0.4em]">Matching Artifacts</span>}>
                     {suggestions.map((prod) => (
                       <CommandItem
                         key={prod._id}
@@ -155,9 +154,9 @@ export default function FilterBar({
                           setOpen(false);
                           router.push(`/products/${prod.slug}`);
                         }}
-                        className="flex items-center gap-6 p-4 cursor-pointer hover:bg-accent/50 transition-all rounded-3xl mx-2 my-1"
+                        className="flex items-center gap-6 p-4 cursor-pointer hover:bg-muted transition-all rounded-3xl mx-2 my-1"
                       >
-                        <div className="h-16 w-12 rounded-2xl overflow-hidden shrink-0 bg-accent relative shadow-lg">
+                        <div className="h-16 w-12 rounded-2xl overflow-hidden shrink-0 bg-muted relative shadow-lg">
                           <img
                             src={getImageUrl(prod.images?.[0], 100, 75)}
                             alt={prod.name}
@@ -168,7 +167,7 @@ export default function FilterBar({
                           <p className="text-xs font-black text-foreground uppercase tracking-tight line-clamp-1 italic">
                             {prod.name}
                           </p>
-                          <p className="text-[10px] font-bold text-accent-secondary uppercase tracking-widest">
+                          <p className="text-[10px] font-bold text-primary uppercase tracking-widest">
                             ৳{prod.price.toLocaleString()}
                           </p>
                         </div>
@@ -181,7 +180,7 @@ export default function FilterBar({
                           setOpen(false);
                           if (onSearchSubmit) onSearchSubmit(inputValue);
                         }}
-                        className="w-full h-12 rounded-2xl bg-accent/30 hover:bg-accent-secondary hover:text-white text-[9px] font-black uppercase tracking-[0.2em] transition-all"
+                        className="w-full h-12 rounded-2xl bg-muted/50 hover:bg-primary hover:text-primary-foreground text-[9px] font-black uppercase tracking-[0.2em] transition-all"
                       >
                         See all results for "{inputValue}" →
                       </Button>
@@ -206,15 +205,15 @@ export default function FilterBar({
           </span>
         )}
         <Select value={sort || "all"} onValueChange={onSortChange}>
-          <SelectTrigger className="w-full md:min-w-[200px] md:max-w-[300px] h-20 bg-accent/30 border-none rounded-full px-8 font-black text-[10px] uppercase tracking-widest hover:bg-accent/50 transition-all shadow-sm focus:ring-2 focus:ring-accent-secondary/20">
+          <SelectTrigger className="w-full md:min-w-[200px] md:max-w-[300px] h-20 bg-muted/50 border border-transparent rounded-full px-8 font-black text-[10px] uppercase tracking-widest hover:bg-muted transition-all shadow-sm focus:ring-2 focus:ring-primary/20">
             <SelectValue placeholder="SORT SEQUENCE" />
           </SelectTrigger>
-          <SelectContent className="bg-background/95 backdrop-blur-3xl border-none shadow-2xl rounded-[2rem] p-2">
+          <SelectContent className="bg-card/95 backdrop-blur-3xl border border-border shadow-2xl rounded-[2rem] p-2">
             {sortOptions.map((opt) => (
               <SelectItem
                 key={opt.value}
                 value={opt.value}
-                className="rounded-2xl py-3 px-6 font-black text-[10px] uppercase tracking-widest focus:bg-accent-secondary focus:text-white cursor-pointer"
+                className="rounded-2xl py-3 px-6 font-black text-[10px] uppercase tracking-widest focus:bg-primary focus:text-primary-foreground cursor-pointer"
               >
                 {opt.label}
               </SelectItem>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function Pagination({
-  currentPage,
+  page,
   totalPages,
   onPageChange,
   className,
@@ -22,37 +22,37 @@ export default function Pagination({
       }
     } else {
       pages.push(1);
-      if (currentPage > 3) pages.push("...");
+      if (page > 3) pages.push("...");
       
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
+      const start = Math.max(2, page - 1);
+      const end = Math.min(totalPages - 1, page + 1);
       
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
       
-      if (currentPage < totalPages - 2) pages.push("...");
+      if (page < totalPages - 2) pages.push("...");
       pages.push(totalPages);
     }
 
-    return pages.map((page, index) => (
+    return pages.map((p, index) => (
       <div key={index}>
-        {page === "..." ? (
+        {p === "..." ? (
           <div className="w-12 h-12 flex items-center justify-center text-muted-foreground">
             <MoreHorizontal size={16} />
           </div>
         ) : (
           <Button
-            variant={currentPage === page ? "default" : "outline"}
-            onClick={() => onPageChange(page)}
+            variant={page === p ? "default" : "outline"}
+            onClick={() => onPageChange(p)}
             className={cn(
               "w-12 h-12 rounded-2xl font-black text-[10px] uppercase transition-all duration-500",
-              currentPage === page 
-                ? "bg-foreground text-background shadow-xl shadow-foreground/10" 
-                : "border-border/10 bg-accent/20 hover:bg-foreground hover:text-background"
+              page === p 
+                ? "bg-foreground text-background shadow-xl shadow-foreground/10 hover:bg-foreground/90 hover:scale-105" 
+                : "border-border bg-muted/50 text-muted-foreground hover:bg-foreground hover:text-background hover:border-foreground"
             )}
           >
-            {page.toString().padStart(2, "0")}
+            {p.toString().padStart(2, "0")}
           </Button>
         )}
       </div>
@@ -60,13 +60,13 @@ export default function Pagination({
   };
 
   return (
-    <div className={cn("flex items-center justify-center gap-4 py-20", className)}>
+    <div className={cn("flex items-center justify-center gap-4 py-10 sm:py-20", className)}>
       <Button
         variant="outline"
         size="icon"
-        disabled={currentPage === 1}
-        onClick={() => onPageChange(currentPage - 1)}
-        className="w-12 h-12 rounded-2xl border-border/10 bg-accent/20 hover:bg-foreground hover:text-background disabled:opacity-20"
+        disabled={page === 1}
+        onClick={() => onPageChange(page - 1)}
+        className="w-12 h-12 rounded-2xl border-border bg-muted/50 text-muted-foreground hover:bg-foreground hover:text-background disabled:opacity-20 transition-all duration-300"
       >
         <ChevronLeft size={20} />
       </Button>
@@ -78,9 +78,9 @@ export default function Pagination({
       <Button
         variant="outline"
         size="icon"
-        disabled={currentPage === totalPages}
-        onClick={() => onPageChange(currentPage + 1)}
-        className="w-12 h-12 rounded-2xl border-border/10 bg-accent/20 hover:bg-foreground hover:text-background disabled:opacity-20"
+        disabled={page === totalPages}
+        onClick={() => onPageChange(page + 1)}
+        className="w-12 h-12 rounded-2xl border-border bg-muted/50 text-muted-foreground hover:bg-foreground hover:text-background disabled:opacity-20 transition-all duration-300"
       >
         <ChevronRight size={20} />
       </Button>

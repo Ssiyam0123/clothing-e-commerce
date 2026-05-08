@@ -37,18 +37,18 @@ export default function Sidebar({ className, onItemClick }) {
   const pathname = usePathname();
 
   return (
-    <aside className={cn("flex flex-col h-full bg-white dark:bg-[#080808] border-r border-zinc-100 dark:border-zinc-900", className)}>
+    <aside className={cn("flex flex-col h-full bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-colors duration-500", className)}>
       {/* 🏷️ Brand Header */}
       <div className="p-8">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-black dark:bg-white rounded-2xl flex items-center justify-center shadow-2xl shadow-black/20">
-            <span className="text-white dark:text-black font-black italic">V</span>
+          <div className="w-10 h-10 bg-sidebar-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-black/20">
+            <span className="text-sidebar-primary-foreground font-black italic">V</span>
           </div>
           <div className="flex flex-col">
-            <h2 className="text-sm font-black tracking-tighter uppercase text-zinc-900 dark:text-white leading-none">
+            <h2 className="text-sm font-black tracking-tighter uppercase text-sidebar-foreground leading-none">
               Vanguard
             </h2>
-            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-zinc-400 mt-1">
+            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mt-1 opacity-70">
               OS Foundry
             </span>
           </div>
@@ -57,7 +57,7 @@ export default function Sidebar({ className, onItemClick }) {
 
       {/* 🧭 Navigation */}
       <nav className="flex-1 overflow-y-auto no-scrollbar px-6 py-4">
-        <p className="text-[9px] font-black text-zinc-300 dark:text-zinc-600 uppercase tracking-[0.5em] mb-8 pl-4">
+        <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.5em] mb-8 pl-4">
           Core Protocol
         </p>
         <ul className="space-y-1.5">
@@ -72,8 +72,8 @@ export default function Sidebar({ className, onItemClick }) {
                   className={cn(
                     "flex items-center gap-4 px-5 py-4 rounded-[1.2rem] transition-all duration-300 font-bold text-[10px] uppercase tracking-[0.15em] group",
                     isActive
-                      ? "bg-zinc-900 dark:bg-white text-white dark:text-black shadow-xl scale-[1.02]"
-                      : "text-zinc-500 dark:text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:text-zinc-900 dark:hover:text-white"
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-xl scale-[1.02]"
+                      : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
                 >
                   <span className={cn("transition-transform duration-300", isActive ? "scale-110" : "opacity-70 group-hover:opacity-100")}>
@@ -89,8 +89,8 @@ export default function Sidebar({ className, onItemClick }) {
 
       {/* 🔐 Footer Info */}
       <div className="p-8">
-        <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl p-4 border border-zinc-100 dark:border-zinc-800/50">
-          <p className="text-[8px] font-black text-zinc-400 uppercase tracking-[0.3em] text-center">
+        <div className="bg-sidebar-accent/50 rounded-2xl p-4 border border-sidebar-border">
+          <p className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.3em] text-center opacity-60">
             Vanguard Node v2.0.6
           </p>
         </div>

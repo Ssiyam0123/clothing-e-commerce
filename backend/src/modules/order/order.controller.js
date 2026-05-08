@@ -495,3 +495,56 @@ export const syncOrderToPathao = asyncHandler(async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+export const updateOrder = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).json({ message: "Order not found." });
+
+  // 🕵️ CRITICAL: If orderItems are being updated, we must handle stock and financials
+  if (req.body.orderItems) {
+    // 1. Restore stock for existing items
+    const restoreOps = order.orderItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product, "sizes.size": item.size },
+        update: { $inc: { "sizes.$.stock": item.quantity } },
+      },
+    }));
+    if (restoreOps.length > 0) await Product.bulkWrite(restoreOps);
+
+    // 2. Calculate new validated data
+    const cityId = req.body.shippingAddress?.pathao_city_id || order.shippingAddress.pathao_city_id;
+    const orderData = await calculateValidatedOrder(
+      req.body.orderItems,
+      order.couponCode,
+      cityId
+    );
+
+    // 3. Update order fields
+    order.orderItems = orderData.validatedItems;
+    order.itemsPrice = orderData.itemsPrice;
+    order.discountAmount = orderData.discountAmount;
+    order.shippingPrice = orderData.shippingPrice;
+    order.totalPrice = orderData.totalPrice;
+
+    // 4. Deduct stock for new items
+    const deductOps = order.orderItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product, "sizes.size": item.size },
+        update: { $inc: { "sizes.$.stock": -item.quantity } },
+      },
+    }));
+    if (deductOps.length > 0) await Product.bulkWrite(deductOps);
+  }
+
+  // Update other metadata
+  if (req.body.shippingAddress) {
+    order.shippingAddress = { ...order.shippingAddress, ...req.body.shippingAddress };
+  }
+  if (req.body.orderStatus) order.orderStatus = req.body.orderStatus;
+  if (req.body.paymentMethod) order.paymentMethod = req.body.paymentMethod;
+  if (req.body.paymentResult) {
+    order.paymentResult = { ...order.paymentResult, ...req.body.paymentResult };
+  }
+
+  const updatedOrder = await order.save();
+  res.json(updatedOrder);
+});

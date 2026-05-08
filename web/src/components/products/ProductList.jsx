@@ -36,7 +36,7 @@ export default function ProductList({ initialData }) {
       {products.length > 0 && (
         <div className="mt-12 mb-24">
           <Pagination
-            currentPage={pagination.page}
+            page={pagination.page}
             totalPages={pagination.pages}
             onPageChange={setPage}
           />
