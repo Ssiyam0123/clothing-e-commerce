@@ -173,6 +173,11 @@ export default function Navbar() {
                     Archive Log
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/live-support" className="rounded-xl p-3 font-bold text-sm cursor-pointer text-blue-500 bg-blue-500/5 hover:bg-blue-500/10">
+                    Live Support
+                  </Link>
+                </DropdownMenuItem>
                 {user?.role === 'admin' && (
                    <DropdownMenuItem asChild>
                     <Link href="/admin" className="rounded-xl p-3 font-bold text-sm cursor-pointer text-accent-secondary bg-accent-secondary/5 hover:bg-accent-secondary/10">
@@ -240,6 +245,10 @@ export default function Navbar() {
                         </Link>
                         <Link href="/profile?tab=orders" onClick={() => setIsMenuOpen(false)} className="text-xl font-bold uppercase tracking-tight flex items-center justify-between group">
                           Archive Log
+                          <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                        <Link href="/live-support" onClick={() => setIsMenuOpen(false)} className="text-xl font-bold uppercase tracking-tight flex items-center justify-between text-blue-500 group">
+                          Live Support
                           <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                         </Link>
                         {user?.role === 'admin' && (

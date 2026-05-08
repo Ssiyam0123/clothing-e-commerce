@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Send, ArrowLeft, MoreVertical, Check, CheckCheck } from "lucide-react";
+import { Send, ArrowLeft, MoreVertical, Check, CheckCheck, Search } from "lucide-react";
 import { useChat } from "../ChatContext";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
