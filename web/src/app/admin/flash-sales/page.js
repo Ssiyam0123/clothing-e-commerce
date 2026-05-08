@@ -5,15 +5,30 @@ import { useFlashSales } from "@/hooks/useFlashSale";
 import Link from "next/link";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import CountdownTimer from "@/components/store/CountdownTimer";
+import { 
+  Plus, 
+  Trash2, 
+  Edit3, 
+  Zap, 
+  Clock, 
+  Package, 
+  Power,
+  BarChart3,
+  Timer
+} from "lucide-react";
 
-const PremiumStatusBadge = ({ status }) => {
+// Shadcn UI Imports
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+
+const TacticalStatusBadge = ({ status }) => {
   const styles = {
-    active:
-      "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-    pending:
-      "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-    inactive:
-      "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+    active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]",
+    pending: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+    inactive: "bg-zinc-500/10 text-zinc-500 border-zinc-500/20",
   };
   const text = {
     active: "● LIVE NOW",
@@ -21,203 +36,188 @@ const PremiumStatusBadge = ({ status }) => {
     inactive: "○ ENDED",
   };
   return (
-    <span
-      className={`px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest ${styles[status]}`}
-    >
+    <Badge variant="outline" className={cn("px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em]", styles[status])}>
       {text[status]}
-    </span>
+    </Badge>
   );
 };
 
 export default function AdminFlashSales() {
-  const { allFlashSales, allLoading, updateFlashSale, deleteFlashSale } =
-    useFlashSales(true);
+  const { allFlashSales, allLoading, updateFlashSale, deleteFlashSale } = useFlashSales(true);
 
   const handleToggleActive = async (saleId, currentActive) => {
     try {
       await updateFlashSale({ id: saleId, data: { isActive: !currentActive } });
-      swalToast(
-        `Campaign ${!currentActive ? "Activated" : "Deactivated"}`,
-        "success",
-      );
+      swalToast(`Protocol ${!currentActive ? "Activated" : "Deactivated"}`, "success");
     } catch (err) {
-      swalError("Status Update Failed", "Could not sync with the server.");
+      swalError("System Sync Failure", "Status update protocol rejected.");
     }
   };
 
   const handleDelete = async (id) => {
     const confirmed = await swalConfirm(
-      "Delete Campaign?",
-      "This promotion will be permanently removed from all linked products.",
+      "Purge Campaign?",
+      "This promotion will be permanently erased from the neural marketing archives."
     );
     if (confirmed) {
       try {
         await deleteFlashSale(id);
         swalToast("Campaign Purged", "success");
       } catch (err) {
-        swalError("Action Blocked", "Could not delete the campaign.");
+        swalError("Access Denied", "Deletion request blocked by core system.");
       }
     }
   };
 
   return (
-    <div className="space-y-10 pb-20 max-w-[1600px] mx-auto">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase mb-2">
-            Campaigns
+    <div className="space-y-12 pb-24 px-4 sm:px-6 max-w-[1600px] mx-auto">
+      {/* 🛰️ System Header */}
+      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 bg-card/30 p-10 rounded-[3rem] border border-border/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-rose-600/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-rose-600/10 transition-colors duration-1000" />
+        
+        <div className="space-y-4 relative z-10">
+          <div className="flex items-center gap-3">
+             <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-rose-600/30 text-rose-600 bg-rose-600/5 px-3 py-1">Tactical Ops</Badge>
+             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-40">// FLASH_DROP_v2.4</span>
+          </div>
+          <h1 className="text-5xl sm:text-6xl font-black uppercase tracking-tighter dark:text-white italic leading-none">
+            Flash <span className="text-rose-600">Drops</span>
           </h1>
-          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-            Flash Sale & Promotions
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-3">
+            <Zap size={12} className="text-rose-600 animate-pulse" /> Global Promotions Foundry • Active: {allFlashSales?.filter(s => s.isActive).length || 0}
           </p>
         </div>
-        <Link
-          href="/admin/flash-sales/new"
-          className="bg-zinc-900 dark:bg-white text-white dark:text-black px-10 py-4 rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl"
-        >
-          + Initialize Campaign
-        </Link>
-      </div>
 
-      {/* Grid Area */}
-      {allLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {[1, 2, 3].map((n) => (
-            <div
-              key={n}
-              className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 h-[400px] animate-pulse"
-            ></div>
-          ))}
-        </div>
-      ) : allFlashSales?.length === 0 ? (
-        <div className="col-span-full text-center py-24 bg-white dark:bg-[#0a0a0a] rounded-[3rem] border border-dashed border-zinc-200 dark:border-zinc-800 shadow-inner">
-          <span className="text-7xl block mb-6 grayscale opacity-20">🏷️</span>
-          <h2 className="text-3xl font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tighter mb-2">
-            No Active Campaigns
-          </h2>
-          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-            Launch a new protocol to start selling
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          {allFlashSales?.map((sale) => {
+        <Button
+          asChild
+          className="bg-foreground text-background hover:bg-rose-600 hover:text-white h-16 px-10 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group relative z-10"
+        >
+          <Link href="/admin/flash-sales/new">
+            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Initialize Protocol
+          </Link>
+        </Button>
+      </header>
+
+      {/* 📊 High-Performance Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        {allLoading ? (
+          [1, 2, 3].map((n) => (
+            <Card key={n} className="rounded-[2.5rem] border-border/10 bg-card/20 h-[450px] overflow-hidden">
+               <CardContent className="p-10 space-y-8">
+                  <div className="flex justify-between items-start">
+                     <Skeleton className="h-20 w-20 rounded-2xl" />
+                     <Skeleton className="h-8 w-32 rounded-full" />
+                  </div>
+                  <Skeleton className="h-10 w-full rounded-xl" />
+                  <div className="space-y-3">
+                     <Skeleton className="h-14 w-full rounded-2xl" />
+                     <Skeleton className="h-14 w-full rounded-2xl" />
+                  </div>
+               </CardContent>
+            </Card>
+          ))
+        ) : allFlashSales?.length === 0 ? (
+          <Card className="col-span-full border-dashed border-border/20 bg-accent/5 rounded-[3rem] py-32 flex flex-col items-center justify-center text-center">
+            <div className="w-24 h-24 rounded-full bg-accent/10 flex items-center justify-center mb-8 opacity-20">
+               <Zap size={48} className="text-rose-600" />
+            </div>
+            <h2 className="text-3xl font-black uppercase tracking-tighter mb-2">Zero Active Protocols</h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground italic">Launch a new campaign sequence to drive neural engagement</p>
+          </Card>
+        ) : (
+          allFlashSales.map((sale) => {
             const now = new Date();
             const start = new Date(sale.startDate);
             const end = new Date(sale.endDate);
             let status;
-            if (!sale.isActive) status = "inactive";
-            else if (now > end) status = "inactive";
+            if (!sale.isActive || now > end) status = "inactive";
             else if (now < start) status = "pending";
             else status = "active";
 
             return (
-              <div
-                key={sale._id}
-                className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm hover:-translate-y-1 transition-all duration-500 flex flex-col p-8 group"
-              >
-                <div className="flex justify-between items-start mb-8">
-                  <div className="bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 px-4 py-2 rounded-2xl flex flex-col items-center">
-                    <span className="text-3xl font-black leading-none">
-                      {sale.discount}%
-                    </span>
-                    <span className="text-[9px] font-black uppercase tracking-widest mt-1">
-                      Off
-                    </span>
+              <Card key={sale._id} className="group rounded-[2.5rem] border-border/10 bg-card/30 backdrop-blur-xl shadow-xl hover:shadow-rose-600/5 transition-all duration-700 overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-rose-600/5 blur-3xl rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                
+                <CardHeader className="p-10 pb-0">
+                  <div className="flex justify-between items-start mb-8">
+                    <div className="bg-rose-600 text-white w-20 h-20 rounded-[1.5rem] flex flex-col items-center justify-center shadow-[0_10px_30px_rgba(225,29,72,0.3)] transform -rotate-6 group-hover:rotate-0 transition-transform duration-700">
+                      <span className="text-3xl font-black italic">{sale.discount}%</span>
+                      <span className="text-[8px] font-black uppercase tracking-widest -mt-1">BURN</span>
+                    </div>
+                    <div className="flex flex-col items-end gap-4">
+                      <TacticalStatusBadge status={status} />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleToggleActive(sale._id, sale.isActive)}
+                        className={cn(
+                          "h-10 px-5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all",
+                          sale.isActive 
+                            ? "bg-foreground text-background border-transparent hover:bg-rose-600 hover:text-white"
+                            : "bg-accent/10 border-border/20 text-muted-foreground hover:border-rose-600/50 hover:text-rose-600"
+                        )}
+                      >
+                        <Power size={12} className="mr-2" />
+                        {sale.isActive ? "Deactivate" : "Initialize"}
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex flex-col items-end gap-3">
-                    <PremiumStatusBadge status={status} />
-                    <button
-                      onClick={() =>
-                        handleToggleActive(sale._id, sale.isActive)
-                      }
-                      className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border ${
-                        sale.isActive
-                          ? "bg-zinc-900 dark:bg-white text-white dark:text-black border-transparent"
-                          : "bg-transparent text-zinc-500 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400"
-                      }`}
+                  <CardTitle className="text-2xl font-black uppercase tracking-tighter leading-tight group-hover:text-rose-600 transition-colors duration-500">
+                    {sale.name}
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="p-10 space-y-6">
+                  {status === "pending" && (
+                    <div className="p-6 bg-accent/5 rounded-[1.5rem] border border-border/5 flex flex-col items-center gap-4">
+                       <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest italic flex items-center gap-2">
+                         <Timer size={12} /> Syncing Launch Sequence
+                       </span>
+                       <CountdownTimer targetDate={start} />
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 gap-3">
+                    <DataPoint icon={<Clock size={14} />} label="Inception" value={start.toLocaleString([], { dateStyle: "medium", timeStyle: "short" })} />
+                    <DataPoint icon={<BarChart3 size={14} />} label="Expiration" value={end.toLocaleString([], { dateStyle: "medium", timeStyle: "short" })} />
+                    <DataPoint icon={<Package size={14} />} label="Neural Load" value={`${sale.products?.length || 0} Assets Linked`} />
+                  </div>
+
+                  <div className="pt-8 border-t border-border/5 flex items-center gap-4">
+                    <Button asChild variant="outline" className="flex-1 h-12 rounded-xl border-border/10 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-all">
+                      <Link href={`/admin/flash-sales/${sale._id}`}>
+                        <Edit3 size={14} className="mr-2" /> Modify Config
+                      </Link>
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => handleDelete(sale._id)}
+                      className="h-12 w-12 rounded-xl border-border/10 hover:border-rose-600/50 hover:bg-rose-600 hover:text-white transition-all"
                     >
-                      {sale.isActive ? "Turn Off" : "Turn On"}
-                    </button>
+                      <Trash2 size={16} />
+                    </Button>
                   </div>
-                </div>
-
-                <h3 className="text-2xl font-black text-zinc-900 dark:text-white uppercase tracking-tighter line-clamp-1 mb-6">
-                  {sale.name}
-                </h3>
-
-                {/* Countdown for pending sales */}
-                {status === "pending" && (
-                  <div className="mb-6 flex justify-center">
-                    <CountdownTimer targetDate={start} label="Starts In" />
-                  </div>
-                )}
-
-                <div className="space-y-4 mb-8">
-                  <div className="flex justify-between items-center p-3 rounded-xl bg-zinc-50 dark:bg-[#111] border border-zinc-100 dark:border-zinc-800/50">
-                    <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">
-                      Starts
-                    </span>
-                    <span className="text-xs font-bold text-zinc-900 dark:text-white uppercase">
-                      {start.toLocaleString([], {
-                        dateStyle: "short",
-                        timeStyle: "short",
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 rounded-xl bg-zinc-50 dark:bg-[#111] border border-zinc-100 dark:border-zinc-800/50">
-                    <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">
-                      Ends
-                    </span>
-                    <span className="text-xs font-bold text-zinc-900 dark:text-white uppercase">
-                      {end.toLocaleString([], {
-                        dateStyle: "short",
-                        timeStyle: "short",
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 rounded-xl bg-zinc-50 dark:bg-[#111] border border-zinc-100 dark:border-zinc-800/50">
-                    <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">
-                      Inventory
-                    </span>
-                    <span className="text-xs font-black text-zinc-900 dark:text-white">
-                      {sale.products?.length || 0} Items
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mt-auto flex gap-3 pt-6 border-t border-zinc-100 dark:border-zinc-800">
-                  <Link
-                    href={`/admin/flash-sales/${sale._id}`}
-                    className="flex-1 text-center bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-white py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all border border-zinc-200 dark:border-zinc-800"
-                  >
-                    Edit Config
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(sale._id)}
-                    className="bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 p-3.5 rounded-2xl hover:bg-rose-600 hover:text-white transition-all border border-rose-100 dark:border-rose-500/20"
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2.5"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      ></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             );
-          })}
-        </div>
-      )}
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DataPoint({ icon, label, value }) {
+  return (
+    <div className="flex items-center justify-between p-4 rounded-2xl bg-accent/5 border border-border/5 group/point hover:bg-accent/10 transition-colors">
+       <div className="flex items-center gap-4">
+          <div className="p-2 rounded-lg bg-background text-muted-foreground group-hover/point:text-rose-600 transition-colors">
+             {icon}
+          </div>
+          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{label}</span>
+       </div>
+       <span className="text-[11px] font-bold uppercase tracking-tight text-foreground">{value}</span>
     </div>
   );
 }

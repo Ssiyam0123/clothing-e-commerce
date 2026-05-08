@@ -84,8 +84,35 @@ export const changePassword = asyncHandler(async (req, res) => {
 // @route   GET /api/users
 // @access  Private/Admin
 export const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await User.find({}).select("-password");
-  res.json(users);
+  const { search, sort, page = 1, limit = 10 } = req.query;
+  
+  const query = {};
+  
+  // 🛰️ Search Logic (Name or Email)
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } }
+    ];
+  }
+
+  // 🏛️ Sorting Logic
+  // Default to newest first
+  const sortOrder = sort ? sort.split(",").join(" ") : "-createdAt";
+
+  const total = await User.countDocuments(query);
+  const users = await User.find(query)
+    .select("-password")
+    .sort(sortOrder)
+    .limit(Number(limit))
+    .skip((Number(page) - 1) * Number(limit));
+
+  res.json({
+    users,
+    total,
+    page: Number(page),
+    pages: Math.ceil(total / Number(limit))
+  });
 });
 
 // @desc    Get single user by ID (admin)

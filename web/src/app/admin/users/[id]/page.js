@@ -1,84 +1,49 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { useEffect, useState, useRef } from "react";
 import { useUsers } from "@/hooks/useUsers";
+import { useOrders } from "@/hooks/useOrders";
+import { useMemo } from "react";
 import Loader from "@/components/common/Loader";
-import { getImageUrl } from "@/utils/imageUtils";
 import Link from "next/link";
-// 1. Swal Utilities Import
-import { swalToast, swalError } from "@/utils/swal";
+import { 
+  ShoppingBag, 
+  ArrowLeft, 
+  ShieldCheck, 
+  Activity,
+  DollarSign,
+  Package,
+  Calendar,
+  Clock,
+  ChevronRight,
+  TrendingUp,
+  Edit3
+} from "lucide-react";
+import { motion } from "framer-motion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getImageUrl } from "@/utils/imageUtils";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
-export default function UserForm() {
+export default function UserAuditPage() {
   const { id } = useParams();
-  const router = useRouter();
-  const isEdit = id !== "new";
+  const { useUser } = useUsers();
+  const { data: userData, isLoading: isUserLoading } = useUser(id);
+  
+  const { allOrdersData, allOrdersLoading } = useOrders({ user: id });
+  const orders = allOrdersData?.orders || [];
 
-  const { users, updateUser } = useUsers();
-  const [loading, setLoading] = useState(isEdit);
-  const [avatarPreview, setAvatarPreview] = useState(null);
+  const stats = useMemo(() => {
+    if (!orders) return { totalSpent: 0, totalOrders: 0 };
+    const successfulOrders = orders.filter(o => o.paymentResult?.status === "Completed" || o.orderStatus === "Delivered");
+    return {
+      totalSpent: successfulOrders.reduce((acc, curr) => acc + curr.totalPrice, 0),
+      totalOrders: orders.length
+    };
+  }, [orders]);
 
-  const fileInputRef = useRef(null);
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm();
-
-  useEffect(() => {
-    if (isEdit && users) {
-      const user = users.find((u) => u._id === id);
-      if (user) {
-        setValue("name", user.name);
-        setValue("email", user.email);
-        setValue("role", user.role);
-        if (user.avatar) setAvatarPreview(getImageUrl(user.avatar));
-        setLoading(false);
-      } else if (users) {
-        setLoading(false);
-      }
-    } else {
-      setLoading(false);
-    }
-  }, [isEdit, id, users, setValue]);
-
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setAvatarPreview(reader.result);
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const onSubmit = async (data) => {
-    const formData = new FormData();
-    formData.append("name", data.name.trim());
-    formData.append("email", data.email.trim());
-    formData.append("role", data.role);
-
-    if (data.imageFile && data.imageFile[0]) {
-      formData.append("avatar", data.imageFile[0]);
-    }
-
-    try {
-      await updateUser.mutateAsync({ id, data: formData });
-      // SUCCESS TOAST
-      swalToast("Identity Synchronized", "success");
-      setTimeout(() => router.push("/admin/users"), 1500);
-    } catch (err) {
-      // ERROR MODAL
-      swalError(
-        "Sync Failed",
-        err.response?.data?.message || "Could not update user configuration.",
-      );
-    }
-  };
-
-  if (loading)
+  if (isUserLoading || allOrdersLoading)
     return (
       <div className="p-20">
         <Loader />
@@ -86,125 +51,173 @@ export default function UserForm() {
     );
 
   return (
-    <div className="max-w-4xl mx-auto pb-20 space-y-10 animate-in fade-in duration-500">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase mb-2">
-            {isEdit ? "Configure User" : "Initialize Identity"}
-          </h1>
-          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-            Identity & Role Protocol
-          </p>
-        </div>
-        <Link
-          href="/admin/users"
-          className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
-        >
-          ← Cancel & Return
-        </Link>
-      </div>
-
-      {/* Main Form */}
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 shadow-sm space-y-8"
-      >
-        {/* Avatar Upload */}
-        <div className="flex flex-col items-center justify-center mb-8">
-          <div className="relative h-32 w-32 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-900 border-4 border-zinc-50 dark:border-[#111] shadow-xl mb-4 group">
-            {avatarPreview ? (
-              <img
-                src={avatarPreview}
-                alt="Avatar"
-                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-4xl grayscale opacity-30">
-                👤
-              </div>
-            )}
-            <div
-              onClick={() => fileInputRef.current.click()}
-              className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white text-[10px] font-black uppercase tracking-widest"
-            >
-              Update
+    <div className="max-w-7xl mx-auto pb-24 px-4 sm:px-6 space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+      {/* 🏔️ Tactical Identity Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card/50 backdrop-blur-3xl p-8 sm:p-10 rounded-[3rem] border border-border/10 shadow-2xl relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-blue-600/10 transition-colors duration-1000" />
+        
+        <div className="flex items-center gap-6 relative z-10">
+          <div className="relative">
+             <Avatar className="h-24 w-24 rounded-3xl border-2 border-border/10 shadow-2xl">
+                <AvatarImage src={getImageUrl(userData?.avatar)} className="object-cover" />
+                <AvatarFallback className="bg-accent text-2xl font-black">{userData?.name?.[0]}</AvatarFallback>
+             </Avatar>
+             <div className="absolute -bottom-2 -right-2 bg-foreground text-background p-2 rounded-xl shadow-xl border border-border/10">
+                <ShieldCheck size={16} />
+             </div>
+          </div>
+          
+          <div className="space-y-1">
+            <h1 className="text-3xl font-black uppercase tracking-tighter italic">
+               {userData?.name}
+            </h1>
+            <div className="flex items-center gap-3">
+               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground">
+                 {userData?.email}
+               </p>
+               <Badge className={cn(
+                 "text-[8px] font-black uppercase tracking-widest border-none px-3 py-0.5 rounded-full",
+                 userData?.role === "admin" ? "bg-amber-500/10 text-amber-500" : "bg-blue-500/10 text-blue-500"
+               )}>
+                 {userData?.role === "admin" ? "★ Vanguard Admin" : "Syndicate Member"}
+               </Badge>
             </div>
           </div>
-          <input
-            type="file"
-            accept="image/*"
-            {...register("imageFile")}
-            onChange={handleAvatarChange}
-            ref={(e) => {
-              register("imageFile").ref(e);
-              fileInputRef.current = e;
-            }}
-            className="hidden"
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current.click()}
-            className="text-[10px] font-black text-zinc-500 uppercase tracking-widest hover:text-zinc-900 dark:hover:text-white transition-colors"
+        </div>
+        
+        <div className="flex items-center gap-3 relative z-10">
+          <Link
+            href={`/admin/users/${id}/edit`}
+            className="group flex items-center gap-3 px-6 py-3 rounded-2xl bg-foreground text-background text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all"
           >
-            Upload Identification Visual
-          </button>
+            <Edit3 size={14} />
+            Modify Profile
+          </Link>
+          <Link
+            href="/admin/users"
+            className="group flex items-center gap-3 px-6 py-3 rounded-2xl bg-accent/10 border border-border/5 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-all"
+          >
+            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+            Abort
+          </Link>
+        </div>
+      </div>
+
+      {/* 📊 Strategic Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card/50 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-border/10 shadow-xl space-y-4">
+           <div className="flex justify-between items-center">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                 <DollarSign size={24} />
+              </div>
+              <Badge variant="outline" className="text-[8px] uppercase tracking-widest border-emerald-500/20 text-emerald-500">Lifetime Value</Badge>
+           </div>
+           <div className="space-y-1">
+              <p className="text-4xl font-black tracking-tighter italic">৳{stats.totalSpent.toLocaleString()}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total Capital Deployed</p>
+           </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-card/50 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-border/10 shadow-xl space-y-4">
+           <div className="flex justify-between items-center">
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+                 <Package size={24} />
+              </div>
+              <Badge variant="outline" className="text-[8px] uppercase tracking-widest border-blue-500/20 text-blue-500">Protocols</Badge>
+           </div>
+           <div className="space-y-1">
+              <p className="text-4xl font-black tracking-tighter italic">{stats.totalOrders}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Execution Volume</p>
+           </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-card/50 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-border/10 shadow-xl space-y-4">
+           <div className="flex justify-between items-center">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                 <Calendar size={24} />
+              </div>
+              <Badge variant="outline" className="text-[8px] uppercase tracking-widest border-amber-500/20 text-amber-500">Chronology</Badge>
+           </div>
+           <div className="space-y-1">
+              <p className="text-2xl font-black tracking-tighter uppercase italic truncate">
+                {new Date(userData?.createdAt).toLocaleDateString("en-US", { month: 'long', year: 'numeric' })}
+              </p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Member Inception</p>
+           </div>
+        </motion.div>
+      </div>
+
+      {/* 🕵️ Transactional Ledger Sector */}
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+           <div className="space-y-1">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground flex items-center gap-3">
+                <Activity size={14} className="text-blue-500" /> Operational_Ledger
+              </h2>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest italic opacity-60">Tracing chronological transaction commits for {userData?.name}</p>
+           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <div>
-            <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-3">
-              Legal Name *
-            </label>
-            <input
-              type="text"
-              {...register("name", { required: true })}
-              className="w-full bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-2xl px-5 py-4 outline-none font-bold text-zinc-900 dark:text-zinc-100 focus:border-zinc-900 dark:focus:border-white transition-all"
-            />
-          </div>
-
-          <div>
-            <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-3">
-              Registered Email *
-            </label>
-            <input
-              type="email"
-              {...register("email", { required: true })}
-              className={`w-full bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-2xl px-5 py-4 outline-none font-bold ${isEdit ? "text-zinc-500 opacity-60 cursor-not-allowed" : "text-zinc-900 dark:text-zinc-100 focus:border-zinc-900 dark:focus:border-white"} transition-all`}
-              readOnly={isEdit}
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-3">
-            Clearance Assignment *
-          </label>
-          <select
-            {...register("role", { required: true })}
-            className="w-full bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-2xl px-5 py-4 outline-none font-bold text-zinc-900 dark:text-zinc-100 focus:border-zinc-900 dark:focus:border-white transition-all cursor-pointer"
-          >
-            <option value="customer">Syndicate Member (Customer)</option>
-            <option value="admin">Vanguard Admin (Power User)</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-4 pt-10 border-t border-zinc-100 dark:border-zinc-800 mt-8">
-          <button
-            type="submit"
-            className="flex-[2] bg-zinc-900 dark:bg-white text-white dark:text-black py-5 rounded-full font-black uppercase tracking-[0.2em] text-[10px] hover:scale-105 active:scale-95 transition-all shadow-2xl"
-          >
-            {isEdit ? "Sync Architecture" : "Initialize Identity"}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push("/admin/users")}
-            className="flex-1 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 py-5 rounded-full font-black uppercase tracking-[0.2em] text-[10px] hover:text-zinc-900 dark:hover:text-white transition-all border border-zinc-200 dark:border-zinc-800"
-          >
-            Discard
-          </button>
-        </div>
-      </form>
+        <Card className="rounded-[3.5rem] border-border/10 bg-card/30 backdrop-blur-xl shadow-2xl overflow-hidden min-h-[600px]">
+           <div className="overflow-x-auto">
+              {!orders || orders.length === 0 ? (
+                <div className="h-[500px] flex flex-col items-center justify-center space-y-4 text-muted-foreground opacity-30">
+                   <div className="w-16 h-16 rounded-full border-2 border-dashed border-current flex items-center justify-center">
+                      <ShoppingBag size={24} />
+                   </div>
+                   <p className="text-[10px] font-black uppercase tracking-[0.4em]">Zero Transactions Detected</p>
+                </div>
+              ) : (
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-accent/5">
+                      <th className="p-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground">Protocol</th>
+                      <th className="p-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground">Status</th>
+                      <th className="p-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground text-right">Commit Value</th>
+                      <th className="p-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/5">
+                    {orders.map((order) => (
+                      <tr key={order._id} className="hover:bg-accent/5 transition-colors group">
+                        <td className="p-8">
+                          <div className="flex flex-col gap-1">
+                             <span className="text-xs font-black uppercase tracking-tighter italic">#{order._id.slice(-8).toUpperCase()}</span>
+                             <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        </td>
+                        <td className="p-8">
+                          <Badge variant="outline" className={cn(
+                            "px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border-none shadow-sm",
+                            order.orderStatus === "Delivered" ? "bg-emerald-500/10 text-emerald-500" :
+                            order.orderStatus === "Processing" ? "bg-blue-500/10 text-blue-500" :
+                            order.orderStatus === "Cancelled" ? "bg-rose-500/10 text-rose-500" :
+                            "bg-amber-500/10 text-amber-500"
+                          )}>
+                            ● {order.orderStatus}
+                          </Badge>
+                        </td>
+                        <td className="p-8 text-right">
+                          <p className="text-sm font-black text-foreground italic">৳{order.totalPrice.toLocaleString()}</p>
+                          <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">{order.paymentMethod}</p>
+                        </td>
+                        <td className="p-8 text-right">
+                          <Link 
+                            href={`/admin/orders/${order._id}`}
+                            className="inline-flex items-center gap-3 px-5 py-2.5 rounded-xl bg-accent/10 border border-border/5 text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all group/btn shadow-inner"
+                          >
+                            Verify
+                            <ChevronRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+           </div>
+        </Card>
+      </div>
     </div>
   );
 }

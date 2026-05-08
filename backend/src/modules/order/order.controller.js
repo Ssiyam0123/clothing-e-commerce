@@ -257,11 +257,15 @@ export const ipn = asyncHandler(async (req, res) => {
 
 // --- Admin: Fetch All Orders (Updated to show Guest Name from Form) ---
 export const getOrders = asyncHandler(async (req, res) => {
-  const { search, status, page = 1, limit = 10 } = req.query;
+  const { search, status, user, page = 1, limit = 10 } = req.query;
   const filter = {};
 
   if (status && status !== "all") {
     filter.orderStatus = status;
+  }
+
+  if (user) {
+    filter.user = user;
   }
 
   if (search && search.trim()) {

@@ -179,7 +179,7 @@ export default function AdminLayout({ children }) {
         )}
 
         {/* 💻 Main Viewport */}
-        <main className={cn("flex-1 no-scrollbar bg-background/50", !isChatRoute ? "p-4 md:p-10 overflow-y-auto" : "p-0 overflow-hidden")}>
+        <main className={cn("flex-1 no-scrollbar bg-background/50", !isChatRoute ? "px-4 pt-4 pb-10 md:px-10 md:pt-6 md:pb-12 overflow-y-auto" : "p-0 overflow-hidden")}>
           <div className={cn("mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700", !isChatRoute ? "max-w-[1400px]" : "max-w-none h-full")}>
             {children}
           </div>

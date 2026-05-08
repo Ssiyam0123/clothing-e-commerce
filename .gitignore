@@ -30,6 +30,7 @@ backend/extract.js
 web/combined_codebase.txt
 web/extract.js
 
+agent/**
 
 **/combined_codebase.txt
 **/backend_codebase.txt

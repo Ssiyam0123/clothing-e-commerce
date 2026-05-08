@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,10 @@ import { getImageUrl } from "@/utils/imageUtils";
 export default function ProfileIdentity({ user, ui, onUpdate, loading }) {
   const fileInputRef = useRef(null);
   const [avatarPreview, setAvatarPreview] = useState(getImageUrl(user.avatar));
+  
+  useEffect(() => {
+    setAvatarPreview(getImageUrl(user.avatar));
+  }, [user.avatar]);
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
@@ -71,10 +75,16 @@ export default function ProfileIdentity({ user, ui, onUpdate, loading }) {
             <input
               type="file"
               accept="image/*"
-              {...register("avatar")}
-              onChange={handleAvatarChange}
-              ref={fileInputRef}
               className="hidden"
+              {...register("avatar", {
+                onChange: (e) => {
+                  handleAvatarChange(e);
+                }
+              })}
+              ref={(e) => {
+                register("avatar").ref(e);
+                fileInputRef.current = e;
+              }}
             />
           </div>
         </div>

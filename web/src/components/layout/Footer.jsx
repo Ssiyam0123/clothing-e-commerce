@@ -19,7 +19,7 @@ const FOOTER_SECTIONS = [
   {
     title: "Support",
     links: [
-      { label: "Transit Tracking", href: "/profile/orders" },
+      { label: "Transit Tracking", href: "/profile/order" },
       { label: "Size Blueprint", href: "/size-guide" },
       { label: "Recovery Protocol", href: "/returns" },
       { label: "Direct Comms", href: "/contact" },

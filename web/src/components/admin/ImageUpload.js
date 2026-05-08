@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { getImageUrl } from "@/utils/imageUtils";
+import { Label } from "@/components/ui/label";
+import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function ImageUpload({
   label,
@@ -11,11 +14,11 @@ export default function ImageUpload({
   onImageChange,
   accept = "image/*",
   multiple = false,
+  className
 }) {
   const [preview, setPreview] = useState(null);
   const [previews, setPreviews] = useState([]);
 
-  // Ei useEffect ta asynchronous data ashar por preview ke automatic update kore dibe
   useEffect(() => {
     if (multiple) {
       if (currentImage && Array.isArray(currentImage)) {
@@ -57,67 +60,60 @@ export default function ImageUpload({
   };
 
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label}
-      </label>
-      <input
-        type="file"
-        accept={accept}
-        {...register(name)}
-        onChange={handleFileChange}
-        multiple={multiple}
-        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-      />
-
-      {/* Single Image Preview using normal img tag */}
-      {!multiple && preview && (
-        <div className="mt-2">
-          <p className="text-sm text-gray-500 mb-2">Preview:</p>
-          <div className="relative h-32 w-32 overflow-hidden rounded-lg border">
-            <img
-              src={preview}
-              alt="Preview"
-              className="w-full h-full object-cover"
-            />
-            <button
-              type="button"
-              onClick={() => removeImage()}
-              className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
-            >
-              ×
-            </button>
-          </div>
-        </div>
+    <div className={cn("space-y-4", className)}>
+      {label && (
+        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 ml-1">
+          {label} { <span className="text-rose-500">*</span>}
+        </Label>
       )}
 
-      {/* Multiple Images Preview using normal img tag */}
-      {multiple && previews.length > 0 && (
-        <div className="mt-2">
-          <p className="text-sm text-gray-500 mb-2">
-            Preview ({previews.length} images):
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {previews.map((img, idx) => (
-              <div
-                key={idx}
-                className="relative h-20 w-20 overflow-hidden rounded-lg border"
-              >
-                <img
-                  src={img}
-                  alt={`Preview ${idx + 1}`}
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeImage(idx)}
-                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
+      <div className="relative group">
+        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border/20 rounded-[2rem] bg-accent/5 hover:bg-accent/10 hover:border-rose-600/30 transition-all cursor-pointer group">
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            <Upload size={24} className="text-muted-foreground group-hover:text-rose-600 transition-colors mb-2" />
+            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+              Initialize Data Upload
+            </p>
           </div>
+          <input
+            type="file"
+            className="hidden"
+            accept={accept}
+            {...register(name)}
+            onChange={handleFileChange}
+            multiple={multiple}
+          />
+        </label>
+      </div>
+
+      {/* Preview Section */}
+      {(preview || (multiple && previews.length > 0)) && (
+        <div className="flex flex-wrap gap-4 mt-4 animate-in fade-in slide-in-from-bottom-2">
+          {!multiple && preview && (
+            <div className="relative w-28 h-28 rounded-2xl overflow-hidden border border-border/10 shadow-xl group">
+              <img src={preview} alt="Preview" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" />
+              <button
+                type="button"
+                onClick={() => removeImage()}
+                className="absolute top-2 right-2 bg-rose-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          )}
+
+          {multiple && previews.map((img, idx) => (
+            <div key={idx} className="relative w-24 h-24 rounded-2xl overflow-hidden border border-border/10 shadow-xl group">
+              <img src={img} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" />
+              <button
+                type="button"
+                onClick={() => removeImage(idx)}
+                className="absolute top-2 right-2 bg-rose-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          ))}
         </div>
       )}
     </div>

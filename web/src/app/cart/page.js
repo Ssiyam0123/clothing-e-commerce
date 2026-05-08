@@ -231,7 +231,7 @@ function UnifiedSettlementContent() {
           items.map((i) => i.product._id),
         );
         clearCart();
-        router.push("/profile?tab=orders");
+        router.push("/profile/order");
       }
     } catch (err) {
       setIsProcessing(false);

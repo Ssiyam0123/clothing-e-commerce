@@ -4,12 +4,28 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAdminBannerCampaigns } from "@/hooks/useAdminBannerCampaigns";
 import { getImageUrl } from "@/utils/imageUtils";
-// 1. Swal Utilities Import
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
+import { 
+  Plus, 
+  Trash2, 
+  Edit3, 
+  Layers, 
+  Layout, 
+  Settings2,
+  TrendingUp,
+  FileImage,
+  Power
+} from "lucide-react";
+
+// Shadcn UI Imports
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export default function AdminBannerCampaigns() {
-  const { campaigns, isLoading, deleteCampaign, toggleActive } =
-    useAdminBannerCampaigns();
+  const { campaigns, isLoading, deleteCampaign, toggleActive } = useAdminBannerCampaigns();
 
   const handleToggleActive = async (id) => {
     try {
@@ -22,8 +38,8 @@ export default function AdminBannerCampaigns() {
 
   const handleDelete = async (id) => {
     const isConfirmed = await swalConfirm(
-      "Obliterate Campaign?",
-      "This will permanently delete the campaign and all its visual slides.",
+      "Purge Campaign?",
+      "This sequence will be permanently removed from the homepage hero archives."
     );
 
     if (isConfirmed) {
@@ -31,142 +47,159 @@ export default function AdminBannerCampaigns() {
         await deleteCampaign(id);
         swalToast("Campaign Purged", "success");
       } catch (err) {
-        swalError("Action Failed", "Error removing campaign from databanks.");
+        swalError("Action Blocked", "System failure during purge protocol.");
       }
     }
   };
 
   return (
-    <div className="space-y-10 pb-20 max-w-[1600px] mx-auto">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase mb-2">
-            Hero Campaigns
+    <div className="space-y-12 pb-24 px-4 sm:px-6 max-w-[1600px] mx-auto">
+      {/* 🛰️ System Header */}
+      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 bg-card/30 p-10 rounded-[3rem] border border-border/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-indigo-600/10 transition-colors duration-1000" />
+        
+        <div className="space-y-4 relative z-10">
+          <div className="flex items-center gap-3">
+             <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-indigo-600/30 text-indigo-600 bg-indigo-600/5 px-3 py-1">Visual Ops</Badge>
+             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-40">// CAMPAIGN_FOUNDRY_v1.2</span>
+          </div>
+          <h1 className="text-5xl sm:text-6xl font-black uppercase tracking-tighter dark:text-white italic leading-none">
+            Hero <span className="text-indigo-600">Archives</span>
           </h1>
-          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-            Manage Homepage Carousel
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-3">
+            <Layers size={12} className="text-indigo-600 animate-pulse" /> Media Deck Orchestration • Active: {campaigns?.filter(c => c.isActive).length || 0}
           </p>
         </div>
-        <Link
-          href="/admin/banner-campaigns/new"
-          className="bg-zinc-900 dark:bg-white text-white dark:text-black px-10 py-4 rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl"
+
+        <Button
+          asChild
+          className="bg-foreground text-background hover:bg-indigo-600 hover:text-white h-16 px-10 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group relative z-10"
         >
-          + Initialize Campaign
-        </Link>
-      </div>
+          <Link href="/admin/banner-campaigns/new">
+            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Initialize Deck
+          </Link>
+        </Button>
+      </header>
 
-      {/* Grid Area: Skeleton vs Real Data */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {[1, 2, 3].map((n) => (
-            <div
-              key={n}
-              className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 h-[350px] animate-pulse"
-            ></div>
-          ))}
-        </div>
-      ) : !campaigns || campaigns.length === 0 ? (
-        <div className="col-span-full text-center py-24 bg-white dark:bg-[#0a0a0a] rounded-[3rem] border border-dashed border-zinc-200 dark:border-zinc-800 shadow-inner">
-          <span className="text-7xl block mb-6 grayscale opacity-20">🎴</span>
-          <h2 className="text-3xl font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tighter mb-2">
-            No Campaigns Found
-          </h2>
-          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-            Create a deck to power the homepage hero
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          {campaigns.map((campaign) => (
-            <div
-              key={campaign._id}
-              className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm hover:-translate-y-1 hover:shadow-xl transition-all duration-500 flex flex-col group p-8"
-            >
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h2 className="text-2xl font-black text-zinc-900 dark:text-white uppercase tracking-tighter mb-2">
-                    {campaign.name}
-                  </h2>
-                  <p className="text-xs font-medium text-zinc-500 line-clamp-2">
-                    {campaign.description || "No description provided"}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleToggleActive(campaign._id)}
-                  className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border shrink-0 ${
-                    campaign.isActive
-                      ? "bg-zinc-900 dark:bg-white text-white dark:text-black border-transparent shadow-md"
-                      : "bg-transparent text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400"
-                  }`}
-                >
-                  {campaign.isActive ? "● ACTIVE" : "○ INACTIVE"}
-                </button>
-              </div>
-
-              {/* Slides Preview Gallery */}
-              <div className="bg-zinc-50 dark:bg-[#111] border border-zinc-100 dark:border-zinc-800/50 rounded-[1.5rem] p-4 mb-8">
-                <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-3 px-2">
-                  Deck Setup ({campaign.slides.length} Slides)
-                </p>
-                <div className="flex -space-x-4 overflow-hidden px-2 pb-2">
-                  {campaign.slides.slice(0, 4).map((slide, idx) => (
-                    <div
-                      key={idx}
-                      className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-white dark:border-[#0a0a0a] shadow-sm shrink-0 relative group/img"
-                    >
-                      {slide.image ? (
-                        <img
-                          src={getImageUrl(slide.image)}
-                          alt="slide"
-                          className="w-full h-full object-cover grayscale-[20%] group-hover/img:grayscale-0 transition-all"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-xs grayscale">
-                          🖼️
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  {campaign.slides.length > 4 && (
-                    <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-[10px] font-black text-zinc-500 border-2 border-white dark:border-[#0a0a0a] z-10 shadow-sm">
-                      +{campaign.slides.length - 4}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="mt-auto flex gap-3 pt-6 border-t border-zinc-100 dark:border-zinc-800">
-                <Link
-                  href={`/admin/banner-campaigns/${campaign._id}`}
-                  className="flex-1 text-center bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-white py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all border border-zinc-200 dark:border-zinc-800"
-                >
-                  Configure Deck
-                </Link>
-                <button
-                  onClick={() => handleDelete(campaign._id)}
-                  className="bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 p-3.5 rounded-2xl hover:bg-rose-600 hover:text-white transition-all border border-rose-100 dark:border-rose-500/20"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2.5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    ></path>
-                  </svg>
-                </button>
-              </div>
+      {/* 📁 Visual Deck Foundry */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        {isLoading ? (
+          [1, 2, 3].map((n) => (
+            <Card key={n} className="rounded-[2.5rem] border-border/10 bg-card/20 h-[400px] animate-pulse overflow-hidden">
+               <CardContent className="p-10 space-y-8">
+                  <div className="flex justify-between">
+                     <Skeleton className="h-10 w-2/3" />
+                     <Skeleton className="h-8 w-24 rounded-full" />
+                  </div>
+                  <Skeleton className="h-20 w-full rounded-2xl" />
+                  <div className="flex gap-2">
+                     <Skeleton className="h-16 w-16 rounded-xl" />
+                     <Skeleton className="h-16 w-16 rounded-xl" />
+                  </div>
+               </CardContent>
+            </Card>
+          ))
+        ) : !campaigns || campaigns.length === 0 ? (
+          <Card className="col-span-full border-dashed border-border/20 bg-accent/5 rounded-[3rem] py-32 flex flex-col items-center justify-center text-center">
+            <div className="w-24 h-24 rounded-full bg-accent/10 flex items-center justify-center mb-8 opacity-20">
+               <Layout size={48} className="text-indigo-600" />
             </div>
-          ))}
-        </div>
-      )}
+            <h2 className="text-3xl font-black uppercase tracking-tighter mb-2">Zero Narrative Decks</h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground italic">Construct a new campaign deck to drive portal traffic</p>
+          </Card>
+        ) : (
+          campaigns.map((campaign) => (
+            <Card key={campaign._id} className="group rounded-[2.5rem] border-border/10 bg-card/30 backdrop-blur-xl shadow-xl hover:shadow-indigo-600/5 transition-all duration-700 overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600/5 blur-3xl rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+              
+              <CardHeader className="p-10">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="space-y-1">
+                    <CardTitle className="text-2xl font-black uppercase tracking-tighter leading-none group-hover:text-indigo-600 transition-colors duration-500">
+                      {campaign.name}
+                    </CardTitle>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                      ID: {campaign._id.slice(-8).toUpperCase()}
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleToggleActive(campaign._id)}
+                    className={cn(
+                      "h-10 px-5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all",
+                      campaign.isActive 
+                        ? "bg-foreground text-background border-transparent hover:bg-indigo-600 hover:text-white"
+                        : "bg-accent/10 border-border/20 text-muted-foreground hover:border-indigo-600/50 hover:text-indigo-600"
+                    )}
+                  >
+                    <Power size={12} className="mr-2" />
+                    {campaign.isActive ? "Live" : "Inactive"}
+                  </Button>
+                </div>
+                <CardDescription className="text-xs font-medium text-muted-foreground line-clamp-2 leading-relaxed">
+                  {campaign.description || "No tactical description provided for this visual sequence."}
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="p-10 pt-0 space-y-8">
+                {/* Deck Visualization */}
+                <div className="bg-accent/5 border border-border/5 rounded-[1.5rem] p-6 relative">
+                  <div className="flex items-center justify-between mb-4">
+                     <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] flex items-center gap-2">
+                        <FileImage size={12} /> Narrative Deck
+                     </span>
+                     <span className="text-[10px] font-black text-indigo-600 bg-indigo-600/10 px-3 py-0.5 rounded-full">
+                        {campaign.slides.length} Slides
+                     </span>
+                  </div>
+                  <div className="flex -space-x-4 overflow-hidden">
+                    {campaign.slides.slice(0, 4).map((slide, idx) => (
+                      <div
+                        key={idx}
+                        className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-background shadow-lg shrink-0 relative group/img z-[calc(10-idx)]"
+                      >
+                        {slide.image ? (
+                          <img
+                            src={getImageUrl(slide.image)}
+                            alt="slide"
+                            className="w-full h-full object-cover grayscale group-hover/img:grayscale-0 transition-all duration-700"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-accent/10 flex items-center justify-center">
+                            <ImageIcon size={16} className="text-muted-foreground/30" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {campaign.slides.length > 4 && (
+                      <div className="w-16 h-16 rounded-2xl bg-accent text-[10px] font-black text-foreground flex items-center justify-center border-2 border-background z-0 shadow-lg">
+                        +{campaign.slides.length - 4}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <Button asChild variant="outline" className="flex-1 h-14 rounded-xl border-border/10 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-all">
+                    <Link href={`/admin/banner-campaigns/${campaign._id}`}>
+                      <Settings2 size={14} className="mr-2" /> Configure Sequence
+                    </Link>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => handleDelete(campaign._id)}
+                    className="h-14 w-14 rounded-xl border-border/10 hover:border-rose-600/50 hover:bg-rose-600 hover:text-white transition-all"
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
     </div>
   );
 }

@@ -19,7 +19,7 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId, 
       ref: "User", 
       required: false,
-      index: true, // 🚀 Speed up user-based queries
+      index: true,
     },
     isGuest: { 
       type: Boolean, 

@@ -166,7 +166,7 @@ function SuccessContent() {
 
             <div className="grid gap-4">
               <button
-                onClick={() => router.push("/profile?tab=orders")}
+                onClick={() => router.push("/profile/order")}
                 className="w-full bg-accent-primary text-primary  py-7 rounded-[2rem] font-black uppercase text-[10px] tracking-[0.3em] flex items-center justify-center gap-3 hover:bg-accent-secondary hover:text-primary transition-all shadow-xl"
               >
                 <Package size={18} /> Track Sequence <ArrowRight size={14} />

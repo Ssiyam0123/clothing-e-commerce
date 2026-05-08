@@ -3,23 +3,27 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { swalToast, swalError } from "@/utils/swal";
 
-export const useBlogs = (id = null) => {
+export const useBlogs = (id = null, isId = false) => {
   const queryClient = useQueryClient();
 
-  // Fetch all blogs (public or admin)
+  // 📰 Fetch all blogs (public or admin)
   const { data: blogs, isLoading: blogsLoading } = useQuery({
     queryKey: ["blogs"],
     queryFn: async () => (await api.get("/blogs")).data,
   });
 
-  // Fetch single blog by slug (public)
+  // 📖 Fetch single blog (Admin by ID or Public by Slug)
   const { data: blog, isLoading: blogLoading } = useQuery({
-    queryKey: ["blog", id],
-    queryFn: async () => (await api.get(`/blogs/${id}`)).data,
+    queryKey: ["blog", id, isId],
+    queryFn: async () => {
+      const endpoint = isId ? `/blogs/admin/${id}` : `/blogs/${id}`;
+      const { data } = await api.get(endpoint);
+      return data;
+    },
     enabled: !!id,
   });
 
-  // Create blog (admin only)
+  // 🚀 Create blog (admin only)
   const createBlog = useMutation({
     mutationFn: async (formData) => {
       const { data } = await api.post("/blogs", formData, {
@@ -29,43 +33,46 @@ export const useBlogs = (id = null) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      swalToast("Blog published successfully!", "success");
+      swalToast("Narrative deployed successfully!", "success");
     },
     onError: (err) => {
-      swalError("Creation failed", err.response?.data?.message);
+      swalError("Deployment failed", err.response?.data?.message);
     },
   });
 
-  // Update blog (admin only)
+  // 🔄 Update blog (admin only)
   const updateBlog = useMutation({
     mutationFn: async ({ id, formData }) => {
-      const { data } = await api.put(`/blogs/${id}`, formData, {
+      // Use /admin/:id to match backend route
+      const { data } = await api.put(`/blogs/admin/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      queryClient.invalidateQueries({ queryKey: ["blog", id] });
-      swalToast("Blog updated successfully!", "success");
+      queryClient.invalidateQueries({ queryKey: ["blog", variables.id, true] });
+      queryClient.invalidateQueries({ queryKey: ["blog", variables.id, false] });
+      swalToast("Archive reconfigured successfully!", "success");
     },
     onError: (err) => {
       swalError("Update failed", err.response?.data?.message);
     },
   });
 
-  // Delete blog (admin only)
+  // 🗑️ Delete blog (admin only)
   const deleteBlog = useMutation({
     mutationFn: async (id) => {
-      await api.delete(`/blogs/${id}`);
+      // Use /admin/:id to match backend route
+      await api.delete(`/blogs/admin/${id}`);
       return id;
     },
-    onSuccess: (id) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      swalToast("Blog deleted permanently.", "success");
+      swalToast("Narrative purged successfully.", "success");
     },
     onError: (err) => {
-      swalError("Deletion failed", err.response?.data?.message);
+      swalError("Purge failed", err.response?.data?.message);
     },
   });
 

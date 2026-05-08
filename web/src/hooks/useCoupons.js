@@ -40,8 +40,17 @@ export const useCoupons = () => {
     },
   });
 
+  const getCoupon = (id) => {
+    return useQuery({
+      queryKey: ["admin-coupon", id],
+      queryFn: async () => (await api.get(`/coupons/${id}`)).data,
+      enabled: !!user && user.role === "admin" && !!id && id !== "new",
+    });
+  };
+
   return {
     coupons,
+    getCoupon,
     isLoading,
     error,
     createCoupon: createCoupon.mutateAsync,

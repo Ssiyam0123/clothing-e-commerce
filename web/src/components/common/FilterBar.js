@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { getImageUrl } from "@/utils/imageUtils";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Search, X, Loader2 } from "lucide-react";
+import { Search, X, Loader2, User as UserIcon, FileText, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -36,6 +36,10 @@ export default function FilterBar({
   sortLabel = "Sort By:",
   liveSearch = true,
   debounceMs = 300,
+  // New props for dynamic suggestions
+  suggestionEndpoint = "/products",
+  suggestionKey = "products",
+  entityType = "product", // "product", "user", "blog"
 }) {
   const router = useRouter();
   const [inputValue, setInputValue] = useState(search || "");
@@ -67,14 +71,14 @@ export default function FilterBar({
   }, [debouncedInput, liveSearch]);
 
   useEffect(() => {
-    if (inputValue.trim().length > 1 && open) {
+    if (inputValue.trim().length > 1 && open && suggestionEndpoint) {
       const fetchSuggestions = async () => {
         setLoadingSuggestions(true);
         try {
           const { data } = await api.get(
-            `/products?search=${inputValue}&limit=5`,
+            `${suggestionEndpoint}?search=${inputValue}&limit=5`,
           );
-          setSuggestions(data.products || []);
+          setSuggestions(data[suggestionKey] || []);
         } catch (error) {
           setSuggestions([]);
         } finally {
@@ -86,12 +90,18 @@ export default function FilterBar({
     } else {
       setSuggestions([]);
     }
-  }, [inputValue, open]);
+  }, [inputValue, open, suggestionEndpoint, suggestionKey]);
 
   const handleClearSearch = (e) => {
     e.preventDefault();
     setInputValue("");
     if (onSearchChange) onSearchChange("");
+  };
+
+  const getEntityIcon = () => {
+    if (entityType === "user") return <UserIcon size={16} />;
+    if (entityType === "blog") return <FileText size={16} />;
+    return <Package size={16} />;
   };
 
   return (
@@ -146,29 +156,31 @@ export default function FilterBar({
                     <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground animate-pulse">Scanning Databanks...</span>
                   </div>
                 ) : suggestions.length > 0 ? (
-                  <CommandGroup heading={<span className="px-4 text-[9px] font-black text-primary uppercase tracking-[0.4em]">Matching Artifacts</span>}>
-                    {suggestions.map((prod) => (
+                  <CommandGroup heading={<span className="px-4 text-[9px] font-black text-primary uppercase tracking-[0.4em]">Matching {entityType}s</span>}>
+                    {suggestions.map((item) => (
                       <CommandItem
-                        key={prod._id}
+                        key={item._id}
                         onSelect={() => {
                           setOpen(false);
-                          router.push(`/products/${prod.slug}`);
+                          const path = entityType === "user" ? `/admin/users/${item._id}` : (entityType === "blog" ? `/blog/${item.slug}` : `/products/${item.slug}`);
+                          router.push(path);
                         }}
                         className="flex items-center gap-6 p-4 cursor-pointer hover:bg-muted transition-all rounded-3xl mx-2 my-1"
                       >
-                        <div className="h-16 w-12 rounded-2xl overflow-hidden shrink-0 bg-muted relative shadow-lg">
+                        <div className="h-16 w-16 rounded-2xl overflow-hidden shrink-0 bg-muted relative shadow-lg">
                           <img
-                            src={getImageUrl(prod.images?.[0], 100, 75)}
-                            alt={prod.name}
-                            className="h-full w-full object-cover transition-all"
+                            src={getImageUrl(entityType === "user" ? item.avatar : (entityType === "blog" ? item.featuredImage : item.images?.[0]), 100, 75)}
+                            alt={item.name || item.title}
+                            className="h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
                           />
                         </div>
                         <div className="flex-1 space-y-1">
                           <p className="text-xs font-black text-foreground uppercase tracking-tight line-clamp-1 italic">
-                            {prod.name}
+                            {item.name || item.title}
                           </p>
-                          <p className="text-[10px] font-bold text-primary uppercase tracking-widest">
-                            ৳{prod.price.toLocaleString()}
+                          <p className="text-[10px] font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+                             {getEntityIcon()}
+                             {entityType === "user" ? item.email : (entityType === "blog" ? "Tactical Post" : `৳${item.price?.toLocaleString()}`)}
                           </p>
                         </div>
                       </CommandItem>
@@ -182,13 +194,13 @@ export default function FilterBar({
                         }}
                         className="w-full h-12 rounded-2xl bg-muted/50 hover:bg-primary hover:text-primary-foreground text-[9px] font-black uppercase tracking-[0.2em] transition-all"
                       >
-                        See all results for "{inputValue}" →
+                        See all {entityType}s for "{inputValue}" →
                       </Button>
                     </div>
                   </CommandGroup>
                 ) : (
                   <CommandEmpty className="p-8 text-center text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50">
-                    No matching artifacts found
+                    No matching {entityType}s found
                   </CommandEmpty>
                 )}
               </CommandList>
@@ -209,7 +221,7 @@ export default function FilterBar({
             <SelectValue placeholder="SORT SEQUENCE" />
           </SelectTrigger>
           <SelectContent className="bg-card/95 backdrop-blur-3xl border border-border shadow-2xl rounded-[2rem] p-2">
-            {sortOptions.map((opt) => (
+            {sortOptions?.map((opt) => (
               <SelectItem
                 key={opt.value}
                 value={opt.value}

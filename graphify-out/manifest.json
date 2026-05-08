@@ -1,0 +1,1254 @@
+{
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\extract.js": {
+    "mtime": 1778069322.1266658,
+    "hash": "c10eda4e1c66a9f710f42f10e9832bda"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\create-admin.js": {
+    "mtime": 1778068379.4292586,
+    "hash": "58d1711fb4dd1530a567062240e8fc2c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\jsons\\fakeUser.js": {
+    "mtime": 1775423407.7626033,
+    "hash": "9df96938fb462896fbea0ad56a294105"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\jsons\\orderScript.js": {
+    "mtime": 1775423782.1404164,
+    "hash": "a53a36122302900c71edb77dd6240ef9"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\app.js": {
+    "mtime": 1778147167.77808,
+    "hash": "c227cdf896c43e8b704e40a68d17d797"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\server.js": {
+    "mtime": 1778073080.4290948,
+    "hash": "304ec5de8209dc570cb2925168df50ec"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\config\\redis.js": {
+    "mtime": 1775154057.809551,
+    "hash": "8301928f0649c729d1e7731cba7e71b3"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\middleware\\asyncHandler.js": {
+    "mtime": 1775154057.8268354,
+    "hash": "cc861c6001721851ec01bd4c908b4fc5"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\middleware\\auth.js": {
+    "mtime": 1775289068.7906468,
+    "hash": "11a3b90ec0214afb68c8997fb198ab17"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\middleware\\cleanup.js": {
+    "mtime": 1775154057.8352387,
+    "hash": "f68340460aef46e986fc42aff5c23abb"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\middleware\\context.js": {
+    "mtime": 1778148708.8845038,
+    "hash": "087ec86a6b18da8448e7e32e677e1798"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\middleware\\errorHandler.js": {
+    "mtime": 1775154057.8397634,
+    "hash": "6252480a12b3cec4adc74e7409e150e5"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\middleware\\socketAuth.js": {
+    "mtime": 1775726843.9328983,
+    "hash": "534094a2b996acd391f43fbd62fd04cf"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\middleware\\upload.js": {
+    "mtime": 1775154057.8437784,
+    "hash": "5685176dea6e233be715d3f0ec8f1694"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\middleware\\validate.js": {
+    "mtime": 1775154057.8481462,
+    "hash": "fb0968e8fe87bdbb52d0a7c6bc1e075d"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\admin\\admin.controller.js": {
+    "mtime": 1775425371.9458804,
+    "hash": "979beeda43f63b2feb327e3e8844d889"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\admin\\admin.routes.js": {
+    "mtime": 1775154057.862782,
+    "hash": "b64054ac04cb6b7004c7246e6032d4a6"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\apiKeys\\apiKey.controller.js": {
+    "mtime": 1775303839.5822453,
+    "hash": "1652a82f03ed43815ea0c24e17518624"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\apiKeys\\apiKey.model.js": {
+    "mtime": 1775154057.8744278,
+    "hash": "cd33e2252c492eed7bd8245846460925"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\apiKeys\\apiKey.routes.js": {
+    "mtime": 1775154057.8789458,
+    "hash": "9ed3df2f664facbaabb202b19a2888aa"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\apiKeys\\apiKey.validator.js": {
+    "mtime": 1775154057.8830912,
+    "hash": "4335f439826f7b30c0ad763b805c4ae4"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\auth\\auth.controller.js": {
+    "mtime": 1778102690.020463,
+    "hash": "3a9c82b90676763d4511ff557e6c7461"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\auth\\auth.routes.js": {
+    "mtime": 1775289010.2816172,
+    "hash": "b8d50ce707b265f9f15ba0f82d4e0f9b"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\bannerCampaign\\bannerCampaign.controller.js": {
+    "mtime": 1775154057.9148474,
+    "hash": "061d2d25a71b08a25458629a07dbd68c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\bannerCampaign\\bannerCampaign.model.js": {
+    "mtime": 1775154057.9188654,
+    "hash": "6272d4c89899f109811a13fe64dcef78"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\bannerCampaign\\bannerCampaign.routes.js": {
+    "mtime": 1775154057.9233358,
+    "hash": "1aa82e34ec5ff06f80168f58854a54bf"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\blog\\blog-image.route.js": {
+    "mtime": 1775381944.7286208,
+    "hash": "cbfd8fcc566ec5dd8d64c5cbd50a5297"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\blog\\blog.controller.js": {
+    "mtime": 1778094187.195784,
+    "hash": "7a75130326eefe53eac258750bfc3c5d"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\blog\\blog.model.js": {
+    "mtime": 1778094162.0763087,
+    "hash": "acbc52f2146b0eb6991a692fc4997dec"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\blog\\blog.route.js": {
+    "mtime": 1775378682.2664485,
+    "hash": "f34ea7df5ff95476323c8a249741d6ab"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\cart\\cart.controller.js": {
+    "mtime": 1775333130.9270947,
+    "hash": "4fddb08a555812a5e86a8613e6f1039b"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\cart\\cart.model.js": {
+    "mtime": 1775154057.9354475,
+    "hash": "192165d63b66b231d681893405aa1cdf"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\cart\\cart.routes.js": {
+    "mtime": 1775333190.6405199,
+    "hash": "1e781e3fe0e116d1e8e06263b57ccb77"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\category\\category.controller.js": {
+    "mtime": 1778194201.8060505,
+    "hash": "066bd78b2cbeabe02399f46dc79f0912"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\category\\category.model.js": {
+    "mtime": 1778194201.8060505,
+    "hash": "3f91a5cb0aa61ae3573811dfa78763e2"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\category\\category.routes.js": {
+    "mtime": 1775154057.9578483,
+    "hash": "5f9203db2d4c3c35759069936360aaf4"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\category\\validators\\category.validator.js": {
+    "mtime": 1775154057.9661224,
+    "hash": "44d4d0f884e16da0da2229d51aa667f4"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\chat\\chat.controller.js": {
+    "mtime": 1778072085.3444107,
+    "hash": "bf359dab4abd81b1d95f46ee16c78912"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\chat\\chat.model.js": {
+    "mtime": 1778070596.3064919,
+    "hash": "b765c85ad6dadcc6e6862465bcf0ca6b"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\chat\\chat.routes.js": {
+    "mtime": 1778070650.9598432,
+    "hash": "495d0d0a4285c6323670e79e880835aa"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\chat\\chat.socket.js": {
+    "mtime": 1778070620.6937506,
+    "hash": "33c0bcac42e4b447e86a28e947cec492"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\coupon\\coupon.controller.js": {
+    "mtime": 1775154057.9747388,
+    "hash": "e133b156de2e85385048c1f0bb631eda"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\coupon\\coupon.model.js": {
+    "mtime": 1775154057.978784,
+    "hash": "9d89180054f4c4fe2d800eae91e2b87b"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\coupon\\coupon.routes.js": {
+    "mtime": 1775154057.9832363,
+    "hash": "f5916b28371a58612ac161f9e7f01339"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\flashSale\\flashSale.controller.js": {
+    "mtime": 1775413152.2060037,
+    "hash": "773095abbdd6978d57c0396af3907f75"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\flashSale\\flashSale.model.js": {
+    "mtime": 1778094154.9081795,
+    "hash": "47e8e85d70f4682c8643fe597c23e6e1"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\flashSale\\flashSale.routes.js": {
+    "mtime": 1778189879.4254436,
+    "hash": "4f57cd1423eb97b8cf52edd35c4eaf14"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\order\\order.controller.js": {
+    "mtime": 1778225786.1082563,
+    "hash": "3099d50ef7f079564bd1b222910e9089"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\order\\order.gateway.js": {
+    "mtime": 1775421174.9829886,
+    "hash": "b41163742d9c4263f9dbd8abff584d03"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\order\\order.model.js": {
+    "mtime": 1775424482.4089336,
+    "hash": "da3ae9652a9063597d8e3069c386963e"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\order\\order.routes.js": {
+    "mtime": 1778225555.4321928,
+    "hash": "072b8f7dd245ee6ebfd0f2aa09d119d0"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\order\\order.utils.js": {
+    "mtime": 1775154058.025679,
+    "hash": "c65d2c2ccc0a42b580a5c8ecda123fcf"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\pathao\\pathao.controller.js": {
+    "mtime": 1775421366.9546041,
+    "hash": "f15c0218ad44f7aed373c57826e7e730"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\pathao\\pathao.routes.js": {
+    "mtime": 1775154058.0378802,
+    "hash": "b36c73f1faf828f86f8ebc6eec5bcb99"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\product\\product.controller.js": {
+    "mtime": 1778194472.0670469,
+    "hash": "c93b58c2faeff84712ac4a5dccb3c8de"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\product\\product.model.js": {
+    "mtime": 1778093621.5589232,
+    "hash": "5d88d60028ef845171f67046c8dca311"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\product\\product.routes.js": {
+    "mtime": 1775385668.7632332,
+    "hash": "82403d0e977345d313752353956bc3ad"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\product\\validators\\product.validator.js": {
+    "mtime": 1775154058.0627446,
+    "hash": "a4c30779d39083e5ff5ec25e65468f1d"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\review\\review.controller.js": {
+    "mtime": 1775154058.070991,
+    "hash": "9eb72355602cea3131545ba55b3eb4ab"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\review\\review.model.js": {
+    "mtime": 1775154058.075496,
+    "hash": "0394af92492153fd84736f39c04da1d9"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\review\\review.routes.js": {
+    "mtime": 1775154058.0796566,
+    "hash": "078519021b038a82e363c62fe7675fab"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\settings\\settings.controller.js": {
+    "mtime": 1778077349.398851,
+    "hash": "2acac132089e33709d30889a7f190bda"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\settings\\settings.model.js": {
+    "mtime": 1778191793.1814525,
+    "hash": "7c8cfdbefe6477fe1bc398c997da4c78"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\settings\\settings.routes.js": {
+    "mtime": 1778158898.8367312,
+    "hash": "ff5781e24b3dd8e2b83f05c6003eec1c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\size\\size.controller.js": {
+    "mtime": 1775154058.1043112,
+    "hash": "9cb93c418f81949fb18024691cc1f62c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\size\\size.model.js": {
+    "mtime": 1775154058.1083326,
+    "hash": "1881e10977e4bc2119a06436aad4eaff"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\size\\size.routes.js": {
+    "mtime": 1775154058.1128566,
+    "hash": "58887f00ace2f92fb8b7ca046ff1aebf"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\size\\validators\\size.validator.js": {
+    "mtime": 1775154058.120339,
+    "hash": "f77e22928fd694ab752f111237ebd9d0"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\subcategory\\subcategory.controller.js": {
+    "mtime": 1775154058.1276758,
+    "hash": "5a7b0ef90d0bc6b3a0036a40f9fbded3"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\subcategory\\subcategory.model.js": {
+    "mtime": 1775154058.1321998,
+    "hash": "dbfe99b0d810446da869a4bfc1ed8271"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\subcategory\\subcategory.routes.js": {
+    "mtime": 1775154058.136912,
+    "hash": "198e070861896be7b52d4645b4335973"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\subcategory\\validators\\subcategory.validator.js": {
+    "mtime": 1775303930.2007158,
+    "hash": "c9f44529c44f8af708db4d12f0c6d784"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\tracking\\tracking.routes.js": {
+    "mtime": 1775154058.152252,
+    "hash": "ff3614ca063055bf3410282bee6e3974"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\user\\user.controller.js": {
+    "mtime": 1775288760.2149723,
+    "hash": "072621e6d8e2e0ad77a9de457a1f8c06"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\user\\user.model.js": {
+    "mtime": 1775288337.9732962,
+    "hash": "f9cf1822afae99beb67b1ab3f6dbe26c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\user\\user.routes.js": {
+    "mtime": 1775288766.247826,
+    "hash": "701f88bfae4df9e90fd8376c29d70009"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\user\\validators\\user.validator.js": {
+    "mtime": 1775154058.1722877,
+    "hash": "82993183da0266f64d7976193c599537"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\wishlist\\wishlist.controller.js": {
+    "mtime": 1775330541.2853792,
+    "hash": "b7dea27a7e0da9ec9d8104b297c8b97f"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\wishlist\\wishlist.model.js": {
+    "mtime": 1775154058.185184,
+    "hash": "1df2837c34f9ef8754377c7dff9c946d"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\modules\\wishlist\\wishlist.routes.js": {
+    "mtime": 1775330586.9360125,
+    "hash": "b3437c97fc5d4eb120580dabeed08be0"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\services\\bkash.service.js": {
+    "mtime": 1775154058.1976888,
+    "hash": "55d3b520b164febb07bded67809254a5"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\services\\email.service.js": {
+    "mtime": 1775287859.3818002,
+    "hash": "1be8c176c6e3acd855d7d7f7f84c2f40"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\services\\facebookCapiService.js": {
+    "mtime": 1775154058.206618,
+    "hash": "9ff630f87386cea51e53a6476c505514"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\services\\imageUploadService.js": {
+    "mtime": 1775409740.210897,
+    "hash": "b5bfda078b67add1e6303084978ef6d5"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\backend\\src\\services\\pathao.service.js": {
+    "mtime": 1775409865.280255,
+    "hash": "6d7ea0c100753e557637049cd9e49c1e"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\eslint.config.mjs": {
+    "mtime": 1775154058.2408352,
+    "hash": "bcb00e240634dd9448e57386fdff1902"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\next.config.mjs": {
+    "mtime": 1778222916.9259963,
+    "hash": "299dfab9ed7c0784564e6f179feb02ef"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\postcss.config.mjs": {
+    "mtime": 1775154058.2632303,
+    "hash": "239f3ebf717465dc636818a1a619398d"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\debug_api.js": {
+    "mtime": 1778088415.119135,
+    "hash": "dbfdb12dd9039b4088c05bd2a242c225"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\debug_api_v2.js": {
+    "mtime": 1778088494.715332,
+    "hash": "43d27044ce3e90ab2bd08240a5a194d8"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\middleware.js": {
+    "mtime": 1778100743.1134186,
+    "hash": "402167b2d85daaed0101dbd1a532d321"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\homeDictionary.js": {
+    "mtime": 1778194693.467392,
+    "hash": "1b8554a3169a82ca53432d6a4ef1a219"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\layout.js": {
+    "mtime": 1778171921.2577777,
+    "hash": "313dd3f908493d77228dc57046a09eb6"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\loading.js": {
+    "mtime": 1778227736.0791492,
+    "hash": "a964e0a9c64e46a93921803b9f58d920"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\page.js": {
+    "mtime": 1778227773.762288,
+    "hash": "485be388947671f2abcce81c30f8d108"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\robots.js": {
+    "mtime": 1778139667.5282772,
+    "hash": "cfcbf8f4b49a48e23fb6603799371bb2"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\sitemap.js": {
+    "mtime": 1778139667.5493886,
+    "hash": "5da433b115dbf2c19949dd8002aefaea"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\ThemeProvider.jsx": {
+    "mtime": 1778136108.8321297,
+    "hash": "f241f9c40a162d2f2a22d4cf9aae8040"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\(auth)\\layout.js": {
+    "mtime": 1778139665.2558262,
+    "hash": "cdb8ff0b9e32a68c4891ee016bd6f171"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\(auth)\\forgot-password\\page.js": {
+    "mtime": 1778142060.881049,
+    "hash": "6f10521924191401cf9b0f26879d1077"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\(auth)\\login\\page.js": {
+    "mtime": 1778142060.8860493,
+    "hash": "ede4977ea0387ebdbafdc1dbafe43383"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\(auth)\\register\\page.js": {
+    "mtime": 1778139665.2925096,
+    "hash": "971740ad4a1b377e21e7f95477de5789"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\(auth)\\reset-password\\page.js": {
+    "mtime": 1778139665.3460264,
+    "hash": "86c8e09f60e94db7259d9dbb2ef1da80"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\actions\\revalidate.js": {
+    "mtime": 1778139665.3638313,
+    "hash": "9b5d81a11f2093e4da85b0edd0af88ec"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\layout.js": {
+    "mtime": 1778228081.3967674,
+    "hash": "5533b7d60fe86a9887d97854d4195847"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\loading.js": {
+    "mtime": 1778223606.379016,
+    "hash": "465592e1c5a9cbcd644d6baeded25300"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\page.js": {
+    "mtime": 1778224249.8534746,
+    "hash": "9cd4754019de6edd04ce8f1f61625be2"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\banner-campaigns\\page.js": {
+    "mtime": 1778139665.4350538,
+    "hash": "de8e0ae187c84dc1f3730b419eb186a0"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\banner-campaigns\\[id]\\page.js": {
+    "mtime": 1778139665.4100423,
+    "hash": "b18111996584213c7a9887ecec33df4f"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\blog\\page.js": {
+    "mtime": 1778139665.5514293,
+    "hash": "91b4336f6b67213688914dd623aadcf4"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\blog\\create\\page.js": {
+    "mtime": 1778139665.5068674,
+    "hash": "34c54244255df33fac105284f039946d"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\blog\\[id]\\page.js": {
+    "mtime": 1778139665.4752047,
+    "hash": "029f989ddeeb1ab96163fbad4db19f3f"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\categories\\page.js": {
+    "mtime": 1778226074.852388,
+    "hash": "a3f327ff85a475d21c0f8f3f132cf7eb"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\categories\\[id]\\page.js": {
+    "mtime": 1778226093.4808252,
+    "hash": "a8e9c8bf2348c10353ca5dac498c6c66"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\chat\\ChatContext.js": {
+    "mtime": 1778226704.878563,
+    "hash": "4202d382c3e0bfa657b4c14e4502cbd2"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\chat\\layout.js": {
+    "mtime": 1778228203.1237595,
+    "hash": "f5f7415213ea232e0a50f4a9d520301d"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\chat\\page.js": {
+    "mtime": 1778226773.7426298,
+    "hash": "61edfc7946c3f4a8b76c6c4c8a6ef0a6"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\chat\\[id]\\page.js": {
+    "mtime": 1778230125.3442001,
+    "hash": "85de2993172cad17d7c3ce0379a941aa"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\coupons\\page.js": {
+    "mtime": 1778139665.7826135,
+    "hash": "1f0ece86cf3ef4608d2fb1eeb2a87dca"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\coupons\\[id]\\page.js": {
+    "mtime": 1778139665.7435472,
+    "hash": "77d0a51294eff6fcc67f275d07dfad02"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\flash-sales\\page.js": {
+    "mtime": 1778139665.9165914,
+    "hash": "db3c536dc8b14e35b88339bd6d0e7e14"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\flash-sales\\[id]\\page.js": {
+    "mtime": 1778139665.8980813,
+    "hash": "5d04654fa30de8d470ad7565b0c55c34"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\orders\\page.js": {
+    "mtime": 1778227612.6172354,
+    "hash": "92a4859d2d46278756b5ee0b624defe1"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\orders\\[id]\\page.js": {
+    "mtime": 1778225617.2905319,
+    "hash": "35703a1181013a8f61acefbda5031f1f"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\products\\page.js": {
+    "mtime": 1778225481.835219,
+    "hash": "0126892f5654490369bf8d0af4812b8c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\products\\[id]\\page.js": {
+    "mtime": 1778225453.5770292,
+    "hash": "3cec483aa8c87d2feb31882d631fc90e"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\products\\[id]\\manage\\page.js": {
+    "mtime": 1778139666.3632417,
+    "hash": "0fdb88130a23f78cf7cc573f24c03342"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\profile\\page.js": {
+    "mtime": 1778139666.5098262,
+    "hash": "116738673952e127dd761817b1bb9ca7"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\settings\\page.js": {
+    "mtime": 1778191659.687284,
+    "hash": "f71c53206f8f57e6de7657e638ef2f1a"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\sizes\\page.js": {
+    "mtime": 1778139666.600604,
+    "hash": "a9268c16933d0357ab38ab4ffa6a0fb6"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\sizes\\[id]\\page.js": {
+    "mtime": 1778226124.380067,
+    "hash": "9b5827a906bce8d487b6cf25aeb58675"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\subcategories\\page.js": {
+    "mtime": 1778139666.6276858,
+    "hash": "34bccdd22b65116bf97f1970a4607b11"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\subcategories\\[id]\\page.js": {
+    "mtime": 1778226109.985188,
+    "hash": "2369cd692421761facd57868a79b5d56"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\users\\page.js": {
+    "mtime": 1778139666.682912,
+    "hash": "10cf3cbcb72fdbe6265722790ce43972"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\admin\\users\\[id]\\page.js": {
+    "mtime": 1778139666.6602323,
+    "hash": "25bdb9941139fada10196c86de9be63d"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\blog\\BlogMagazineClient.jsx": {
+    "mtime": 1778189206.3479483,
+    "hash": "c42a2ea7f397240785fb3296fa67876c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\blog\\loading.js": {
+    "mtime": 1778189229.0682476,
+    "hash": "546eb9fc04733c4095a2d66f820e6b16"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\blog\\page.js": {
+    "mtime": 1778227833.0224144,
+    "hash": "3bb7bdf3c13fd00f84cb45cc15859739"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\blog\\[slug]\\BlogDetailsClient.jsx": {
+    "mtime": 1778189220.580334,
+    "hash": "630e7594eeb4eaf89166f93327f5642f"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\blog\\[slug]\\loading.js": {
+    "mtime": 1778139666.7522361,
+    "hash": "f0cda4e0594fde832112d268f6848d18"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\blog\\[slug]\\page.js": {
+    "mtime": 1778139666.7709625,
+    "hash": "b7f3175d35e53535c69964485ea21627"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\cart\\loading.js": {
+    "mtime": 1778139666.840021,
+    "hash": "59bf78223ca3b561dd346e079c049056"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\cart\\page.js": {
+    "mtime": 1778227844.2477987,
+    "hash": "0fbae8473054bf8df570056fc526b715"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\flash-sale\\FlashSaleClient.jsx": {
+    "mtime": 1778227855.162147,
+    "hash": "c94d8c34025120c7cd5ac62926ee9965"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\flash-sale\\loading.js": {
+    "mtime": 1778142060.8925543,
+    "hash": "7320205ed526bb8c1dd968bd73a0a8b0"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\flash-sale\\page.js": {
+    "mtime": 1778139667.0998607,
+    "hash": "e3dad629523a6d2f9f754420130b984c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\flash-sale\\[slug]\\FlashSaleDetailsClient.jsx": {
+    "mtime": 1778189847.3829067,
+    "hash": "32f31033e737bd7fd36d75882897b897"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\flash-sale\\[slug]\\loading.js": {
+    "mtime": 1778139666.9555168,
+    "hash": "76fcb6be057e0ec7645ad463582c2fc3"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\flash-sale\\[slug]\\page.js": {
+    "mtime": 1778139666.9911342,
+    "hash": "ef6f316610626dd2aaaf1e87f944d454"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\live-support\\page.js": {
+    "mtime": 1778230624.660751,
+    "hash": "3f02387b69e02de246e302f3487ad827"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\payment\\failed\\loading.js": {
+    "mtime": 1778139667.2718592,
+    "hash": "0412928dfffa2a7ed4d9715abfd317d0"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\payment\\failed\\page.js": {
+    "mtime": 1778142060.8960552,
+    "hash": "7cb480e0afb7c556534913ff9e5c71de"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\payment\\success\\loading.js": {
+    "mtime": 1778139667.300282,
+    "hash": "5eba85f7ee5b16aaa1967ee59d48371a"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\payment\\success\\page.js": {
+    "mtime": 1778142060.8970537,
+    "hash": "a98cc83f585e25dcb5711867cfd3c0aa"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\products\\loading.js": {
+    "mtime": 1778139667.4185846,
+    "hash": "6e6b6615ab47bdf855b2d2e37be00bfa"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\products\\page.js": {
+    "mtime": 1778227957.367258,
+    "hash": "dfc0891712572927cb5632338b58a6a3"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\products\\[slug]\\loading.js": {
+    "mtime": 1778139667.36896,
+    "hash": "a38dbb4349d393521416b715e8f343db"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\products\\[slug]\\loading.jsx": {
+    "mtime": 1778139667.3815086,
+    "hash": "f3fbc647e1a7c5091031fdc7b370cbe9"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\products\\[slug]\\page.js": {
+    "mtime": 1778195532.8826733,
+    "hash": "2c767eae882af813d9d5d87c43bebd84"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\profile\\loading.js": {
+    "mtime": 1778139667.4657338,
+    "hash": "91f12266c35dd1305cf673212961afac"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\profile\\page.js": {
+    "mtime": 1778234501.5655828,
+    "hash": "495afd91e48ecea249f7647012ab9f7b"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\wishlist\\loading.js": {
+    "mtime": 1778139667.5664282,
+    "hash": "2f70f8f2ada7dbc4fec1e5ecce9091e3"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\app\\wishlist\\page.js": {
+    "mtime": 1778227873.502371,
+    "hash": "f694c1fe5c05aca51a251342d77c896c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\ActionButtons.js": {
+    "mtime": 1778139663.763528,
+    "hash": "17a8691db3809ad1da870bace63c871c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\AdminModal.js": {
+    "mtime": 1778139663.778044,
+    "hash": "8ce1578ab997a2b094f5c00325e4bc12"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\AdminProductFilter.jsx": {
+    "mtime": 1778225633.8785205,
+    "hash": "73d30ed9ac11f8d2481f147664dc4f8a"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\BlogEditor.js": {
+    "mtime": 1778139663.8777058,
+    "hash": "3fe23ab556c6236f4e0601e4ed913c20"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\DataTable.js": {
+    "mtime": 1778223828.270103,
+    "hash": "1e1af18ded38f66cd755720ea6e8100a"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\FormInput.js": {
+    "mtime": 1778139663.907411,
+    "hash": "216ea877a7f9eaaf96d8545412f9fc81"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\FormSelect.js": {
+    "mtime": 1778139663.9174275,
+    "hash": "74a395440afa660f3654e29b0f39f79a"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\ImageUpload.js": {
+    "mtime": 1778139663.9501245,
+    "hash": "05e132fb9eaa67c0264edab008db9e54"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\OrderEditModal.jsx": {
+    "mtime": 1778225876.7349815,
+    "hash": "5960fbdbdca92f8206024205063346c6"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\ProductFilterBar.jsx": {
+    "mtime": 1778139663.9875207,
+    "hash": "73cf5be57986bcb003746883e6292d14"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\ProtectedRoute.js": {
+    "mtime": 1778139664.0005584,
+    "hash": "c042050715bb01759745d2a2cd8ce472"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\RichTextEditor.js": {
+    "mtime": 1778139664.0211036,
+    "hash": "a12402345f11e8d7eaa61619569d0cee"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\Sidebar.js": {
+    "mtime": 1778223939.3924143,
+    "hash": "a7364fa64909c89827ba2b0fecc9623d"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\StatusBadge.js": {
+    "mtime": 1778223814.7884107,
+    "hash": "6cdbc09946c757d57ffbb549edbfef43"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\dashboard\\AdminHeader.jsx": {
+    "mtime": 1778224121.8626187,
+    "hash": "7d2aa7d3b7dfa3863e5df2bba2458a58"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\dashboard\\CategoryPie.jsx": {
+    "mtime": 1778224180.0938947,
+    "hash": "3f2b9148a6af2f9ea4f5bbe17cc727d3"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\dashboard\\InventoryAlerts.jsx": {
+    "mtime": 1778224214.8109717,
+    "hash": "7ffc81ca0f91be2a57b5749a8cc2fc31"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\dashboard\\RecentOrders.jsx": {
+    "mtime": 1778224196.4963844,
+    "hash": "0d340169a11e1d1e29dbd20a84ce068d"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\dashboard\\RevenueChart.jsx": {
+    "mtime": 1778224163.4706106,
+    "hash": "faf950193200f1f8114b5901a0d65854"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\admin\\dashboard\\StatsCards.jsx": {
+    "mtime": 1778224137.9748716,
+    "hash": "9d54bdf68b52353d3d0e00aa5652ecad"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\chat\\SupportChat.jsx": {
+    "mtime": 1778175560.0967953,
+    "hash": "0b195cc8160921b90e72ce5c8d166794"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\common\\Alert.js": {
+    "mtime": 1778173095.7806275,
+    "hash": "52d37de750fb78f3d3baaef260b0ed0f"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\common\\FilterBar.js": {
+    "mtime": 1778224634.334584,
+    "hash": "414677937a5a50ce04b55f069fd475e3"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\common\\Loader.js": {
+    "mtime": 1778173164.5348315,
+    "hash": "2b9c332d2d669ac017d6d9cb03205a2c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\common\\OptimizedImage.jsx": {
+    "mtime": 1778139664.1994295,
+    "hash": "17876f332dae198f09769deb91cf9dc9"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\common\\Pagination.js": {
+    "mtime": 1778225199.424511,
+    "hash": "f7ac758bad37a04f8a75c0f9b55b620b"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\common\\PrefetchLink.jsx": {
+    "mtime": 1778139664.2492447,
+    "hash": "2d5b3d8ebdacd8eaa4446e5668d7324d"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\common\\ProductCard.js": {
+    "mtime": 1778195563.3883896,
+    "hash": "3e022b630ea00a361aceb5ccc2c34411"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\common\\ProductSkeleton.js": {
+    "mtime": 1778142060.820268,
+    "hash": "9b619ea287286f9648741352f6640048"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\common\\SectionHeader.jsx": {
+    "mtime": 1778195515.3503098,
+    "hash": "87fb48aace7c6bf14284cf24b5dedafd"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\common\\Skeletons.jsx": {
+    "mtime": 1778174160.402115,
+    "hash": "86e7412439ad5e3295a4880fce410698"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\common\\TableSkeleton.js": {
+    "mtime": 1778224710.9980237,
+    "hash": "3ed82e743d4887170961b57a35f19ea4"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\home\\CategoryGrid.jsx": {
+    "mtime": 1778154657.2255285,
+    "hash": "1045ccbdb2db90ab3d520dde25f0dcce"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\home\\FlashSaleTeaser.jsx": {
+    "mtime": 1778152198.7041976,
+    "hash": "8198e6d52dde9a3f0e43778097a01549"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\home\\FlashSaleTeaserServer.jsx": {
+    "mtime": 1778139664.3572743,
+    "hash": "bec00029a05fcef31b84225495e65b5c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\home\\HeroSection.jsx": {
+    "mtime": 1778195570.7148838,
+    "hash": "643c1a5b70a1632a1c61c0bfe10072e4"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\home\\HeroSectionServer.jsx": {
+    "mtime": 1778139664.3677745,
+    "hash": "d89cb655b5fffaeeca89644c8a7e318c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\home\\HomeClient.jsx": {
+    "mtime": 1778142060.8227682,
+    "hash": "a207e3213b1daab74c1de0719f972d4e"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\home\\Newsletter.jsx": {
+    "mtime": 1778173144.4485424,
+    "hash": "f164e7f72c4a8383d2249d9c4f0cffd0"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\home\\ProductSection.jsx": {
+    "mtime": 1778151577.1460214,
+    "hash": "648ba39b5d5023174b41d66cf96eff26"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\home\\ShowcaseClient.jsx": {
+    "mtime": 1778142060.8232684,
+    "hash": "0f966d6052e7ecbb54f427e41734ef4e"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\home\\UspSection.jsx": {
+    "mtime": 1778139664.4704614,
+    "hash": "63f17e6538cce7ac96dc00772a778592"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\layout\\ClientInitialization.js": {
+    "mtime": 1778139664.481966,
+    "hash": "034694ce7dbb3b43ceaaa63ee73a7604"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\layout\\ClientWrapper.js": {
+    "mtime": 1778139664.491004,
+    "hash": "b018d64c0031b85f963780139a5ac719"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\layout\\Footer.jsx": {
+    "mtime": 1778193339.1133082,
+    "hash": "c550998d95976f19d4b11fdd58284934"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\layout\\LayoutResolver.jsx": {
+    "mtime": 1778148497.1190016,
+    "hash": "211816ae49e6a8b44d89603c91367a27"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\layout\\Navbar.jsx": {
+    "mtime": 1778228526.0921872,
+    "hash": "f87b381ffb0f1792cf9374a85c8a63b2"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\layout\\StandardLayout.jsx": {
+    "mtime": 1778147086.358984,
+    "hash": "6e2800824aaafd89480d7e66723ad63f"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\layout\\identities\\Identities.jsx": {
+    "mtime": 1778228628.1045928,
+    "hash": "1dd91199a85ae6d070154f0ca2f03d02"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\products\\ProductActionsClient.jsx": {
+    "mtime": 1778172875.3555608,
+    "hash": "473e9fa9137f18af25ca6b6428ba2f11"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\products\\ProductFilter.jsx": {
+    "mtime": 1778194495.9103568,
+    "hash": "4c409e9be18cec2e077241341d9c3851"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\products\\ProductImageGallery.jsx": {
+    "mtime": 1778195527.584538,
+    "hash": "a067c81d3ef9166486312254109d670f"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\products\\ProductList.jsx": {
+    "mtime": 1778227454.6063719,
+    "hash": "ef676374d79df33265195f755e876f4f"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\products\\ProductsClient.jsx": {
+    "mtime": 1778188555.9887831,
+    "hash": "016d3ff9416562e3e5b564b868456eda"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\products\\RelatedProducts.jsx": {
+    "mtime": 1778193407.0297766,
+    "hash": "028cdad842d51f4e8914c2ecf1f60b5c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\products\\ReviewSectionWrapper.jsx": {
+    "mtime": 1778139664.7053566,
+    "hash": "32bf76a19ff1b36ade6c94dc307914a3"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\products\\SizeSelectionModal.jsx": {
+    "mtime": 1778189557.466287,
+    "hash": "424fc4375330454f87896408212b3d95"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\products\\WishlistButtonClient.jsx": {
+    "mtime": 1778139664.7247128,
+    "hash": "3ffd5f24be5ad662bc3ebd0d726185b3"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\profile\\OrderDetailsDialog.jsx": {
+    "mtime": 1778190738.9617457,
+    "hash": "90707b1fe137731e12ec17aa96b62b45"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\profile\\ProfileHeader.jsx": {
+    "mtime": 1778190676.1366787,
+    "hash": "41ffb657b52146035779cc23212df10b"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\profile\\ProfileIdentity.jsx": {
+    "mtime": 1778177232.266439,
+    "hash": "98344a4f025a1bd9a987f9619ec240d3"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\profile\\ProfileOrders.jsx": {
+    "mtime": 1778190728.863021,
+    "hash": "1075aec3333ea8120f6a72171601798d"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\profile\\ProfileSecurity.jsx": {
+    "mtime": 1778177244.6584196,
+    "hash": "318a412d957204ab01603f98dfb0d6e9"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\providers\\QueryProvider.js": {
+    "mtime": 1778174667.3519764,
+    "hash": "76cb120503a417e1b1fa9733a9c49cb6"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\store\\CountdownTimer.jsx": {
+    "mtime": 1778189109.759849,
+    "hash": "04fa126cf2b9c6a7d44fa1cd5bfb4758"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\store\\FlashSaleBanner.jsx": {
+    "mtime": 1778189124.042072,
+    "hash": "bd9003d6c98f3b53856ae2ddc096f84f"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\store\\QuickSelectModal.jsx": {
+    "mtime": 1778142060.8297672,
+    "hash": "d65f3b8e62e492ce744d31dd6d0a1484"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\store\\ReviewSection.jsx": {
+    "mtime": 1778172939.4947157,
+    "hash": "67e6e1f94ccea101c1245c4bafa0e9cb"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\store\\StarRating.jsx": {
+    "mtime": 1778172894.4629247,
+    "hash": "7fe82097b28c5c68ffbf62a6e1a052b0"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\store\\WishlistButton.jsx": {
+    "mtime": 1778142060.8317678,
+    "hash": "50704c7f71cfac5f070f578905e99dce"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\accordion.jsx": {
+    "mtime": 1778171690.610171,
+    "hash": "afe8584f30fa8f91ee9a5ac7665ea5b2"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\alert.jsx": {
+    "mtime": 1778171828.177834,
+    "hash": "c2441dccf1583a9111bfb3554be29d20"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\aspect-ratio.jsx": {
+    "mtime": 1778171690.2067323,
+    "hash": "9407912f5b46053038def2eba47074bf"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\avatar.jsx": {
+    "mtime": 1778150478.8836887,
+    "hash": "960166cd6a4b5aaac125383881ff726b"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\badge.jsx": {
+    "mtime": 1778150434.9244988,
+    "hash": "ee78f28a471b911fb96608d0510f62e7"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\button.jsx": {
+    "mtime": 1778171743.683309,
+    "hash": "8a6dfb6e37a503345053132b0bc79e21"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\card.jsx": {
+    "mtime": 1778139664.968743,
+    "hash": "eac65c4796e2123f8f2905e1ee33653b"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\checkbox.jsx": {
+    "mtime": 1778171689.054965,
+    "hash": "f1255e078b881b7e35340ea784b3f359"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\command.js": {
+    "mtime": 1778172483.9969914,
+    "hash": "70c53c8d7995bc05405ba949e80b6a1c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\dialog.js": {
+    "mtime": 1778172483.5886638,
+    "hash": "53eb4317b9111c7a3b424aedbcffa893"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\dropdown-menu.jsx": {
+    "mtime": 1778150478.709728,
+    "hash": "2b6ca19722ec41c5167a76516bb06543"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\input-group.js": {
+    "mtime": 1778172483.783325,
+    "hash": "79bdea476bb98340667d28be5ca7b8bb"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\input.jsx": {
+    "mtime": 1778172468.913121,
+    "hash": "3beebe1880a680acafbe6fe1bc655f25"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\label.jsx": {
+    "mtime": 1778139664.9891381,
+    "hash": "b2d53bc2271e062e142f9760764a7cd9"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\navigation-menu.jsx": {
+    "mtime": 1778171688.425609,
+    "hash": "58ffb457f49a2036849537cd4b52e893"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\pagination.jsx": {
+    "mtime": 1778171863.3095691,
+    "hash": "4e4302334d4df9010e91e7529420e4cd"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\popover.jsx": {
+    "mtime": 1778171690.3846536,
+    "hash": "91aa6a65530c2ebe45411ccf23e3bd65"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\radio-group.jsx": {
+    "mtime": 1778172021.2089956,
+    "hash": "9b7d4b29034e0514f7bfd6e38b584e15"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\scroll-area.jsx": {
+    "mtime": 1778171689.31909,
+    "hash": "af739c0bc4369287d5a8aa58c2fcb0d0"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\select.jsx": {
+    "mtime": 1778139665.0147667,
+    "hash": "a301016f71f36f2029fdcc5211f5edf5"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\separator.jsx": {
+    "mtime": 1778171689.9993627,
+    "hash": "070ba0935b00d3e8d3fdb585c07b6f3a"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\sheet.jsx": {
+    "mtime": 1778186740.187876,
+    "hash": "0fce6ef6dbdffaae44ff3c04de3bd6c5"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\skeleton.jsx": {
+    "mtime": 1778150434.7412949,
+    "hash": "d95a109a79b7aa8a2f8abbdc2e7464b7"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\sonner.jsx": {
+    "mtime": 1778171688.052772,
+    "hash": "b33a5a40d05957ca71aff9704823c1dd"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\table.jsx": {
+    "mtime": 1778171688.7787776,
+    "hash": "cf720128854ace6ca506b5c4971734bd"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\tabs.jsx": {
+    "mtime": 1778171689.5808225,
+    "hash": "f78bc81be8365efc049c0f2a5b5a7983"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\textarea.js": {
+    "mtime": 1778172469.142492,
+    "hash": "81a4a447e36fef532c1279c730a1595a"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\components\\ui\\tooltip.jsx": {
+    "mtime": 1778171689.7914672,
+    "hash": "653be15eedaa292b5a5ffda0b79c00bb"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useActiveBannerCampaign.js": {
+    "mtime": 1778139667.5940127,
+    "hash": "373e927441c3542c8e0aa13388728107"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useAdminBannerCampaigns.js": {
+    "mtime": 1778139667.6015277,
+    "hash": "8a97021ad987d6a191e2c6bfb83a6b69"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useAdminBanners.js": {
+    "mtime": 1778139667.636309,
+    "hash": "5f1788f482e429d5bfceaf7d4d374295"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useAdminDashboard.js": {
+    "mtime": 1778139667.664905,
+    "hash": "523bc1c0070a9eed8dd8786fd30582e9"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useAdminProducts.js": {
+    "mtime": 1778227624.9117715,
+    "hash": "0e0bc433d295a49685f4f8c8998dff56"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useApiKeys.js": {
+    "mtime": 1778139667.7062278,
+    "hash": "2496b16bab5b0c7047d59c7f6ebb09f0"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useAuth.js": {
+    "mtime": 1778139667.7283385,
+    "hash": "280377589e5e765b21906133a6563d0e"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useBanners.js": {
+    "mtime": 1778139667.7537203,
+    "hash": "b4dc55a4a91ae3c2292bbc7f3521ab15"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useBlogs.js": {
+    "mtime": 1778139667.7687495,
+    "hash": "32eb2fbcede8829efacc7303be3bd130"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useCart.js": {
+    "mtime": 1778139667.779277,
+    "hash": "ed20a0befa3e2fdc2beb836ec013e157"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useCategories.js": {
+    "mtime": 1778174595.0238335,
+    "hash": "8bc6ae9662946029b9d1787c92d4e09a"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useChat.js": {
+    "mtime": 1778230615.8531487,
+    "hash": "8a544b94c6ff041ec2ff2cb5d0824557"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useCoupons.js": {
+    "mtime": 1775311436.9560113,
+    "hash": "7da26d174c7d7370ceb042354e7e0972"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useDebounce.js": {
+    "mtime": 1778139667.8141773,
+    "hash": "29377b4cfe26017f78b8d12062567d45"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useFilters.js": {
+    "mtime": 1778225238.0809362,
+    "hash": "968b9922a4c664d5b09a9ea5ccb427cb"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useFlashSale.js": {
+    "mtime": 1778139667.8413932,
+    "hash": "663a70e277647925f1e3f4420f7d3d9e"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useInfiniteProducts.js": {
+    "mtime": 1778139667.8599453,
+    "hash": "0af72d6a3b7bdc66e497b3cf1b02a639"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useOrders.js": {
+    "mtime": 1778225586.1021965,
+    "hash": "eec00329e1e6c9f0fb41176bb1dddb9e"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\usePathao.js": {
+    "mtime": 1778139667.8794649,
+    "hash": "f46407cfd08bb8c37696218b8fb154df"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useProducts.js": {
+    "mtime": 1778194483.8806129,
+    "hash": "a35425872177ce323aa401707ee0378a"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useReviews.js": {
+    "mtime": 1778139667.9170935,
+    "hash": "f8ab246f480a3f5bc7f0c4ef784e07d7"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useSettings.js": {
+    "mtime": 1778158533.8292134,
+    "hash": "c14b0b7f8f5619c15dbcaf7994590f84"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useSingleProduct.js": {
+    "mtime": 1778139667.9371204,
+    "hash": "6fe9efce260da77bc30a226e654f8cf1"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useSizes.js": {
+    "mtime": 1778139667.9572005,
+    "hash": "05fc463eb666d9d75c80278558fc4b16"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useSubcategories.js": {
+    "mtime": 1778139667.981249,
+    "hash": "22feed42089fa160677e971eb1cf5710"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useTheme.js": {
+    "mtime": 1778176872.7771337,
+    "hash": "e00fe55468e256b3e70a4be81c20a676"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useUsers.js": {
+    "mtime": 1778139668.017479,
+    "hash": "ed2775b53d30f4b2f593b6e459f44f4a"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\hooks\\useWishlist.js": {
+    "mtime": 1778139668.0335424,
+    "hash": "b2754c35c9a61f42f990de1c0cf095d2"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\lib\\api.js": {
+    "mtime": 1778148696.8232167,
+    "hash": "387c84eefdc45462ade41cb77079c20e"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\lib\\cloudinaryLoader.js": {
+    "mtime": 1778100650.1093788,
+    "hash": "765ea563fbd13e37651eabde4a1ae283"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\lib\\queryClient.js": {
+    "mtime": 1775154058.969346,
+    "hash": "789986e0cb9ee9170bd7dd508cc37859"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\lib\\settings.js": {
+    "mtime": 1778106176.1103027,
+    "hash": "500b679b792f3d3805153a0e1a503fdd"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\lib\\theme-colors.js": {
+    "mtime": 1778193321.5667846,
+    "hash": "d034ac57c418dfaeef5fd593a76c71ae"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\lib\\utils.js": {
+    "mtime": 1778077493.7260964,
+    "hash": "eff53006b93cfdef4aef148f202f1c3c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\store\\appStore.js": {
+    "mtime": 1778224330.1717236,
+    "hash": "a02f3a80d32bc9a9a8ffbb8051e94df9"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\store\\authStore.js": {
+    "mtime": 1778102699.06678,
+    "hash": "1c11d9d9cb8c6c42db1636536073225f"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\store\\productStore.js": {
+    "mtime": 1775411719.9239838,
+    "hash": "c5f6c5b01163a5824928bbaad3513323"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\store\\trackingStore.js": {
+    "mtime": 1775154058.9816246,
+    "hash": "a31abb8d752ea2944aa8f4fe364157d6"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\utils\\cookies.js": {
+    "mtime": 1778147195.3103743,
+    "hash": "e04da22dffb8a899101ae6c8950e340a"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\utils\\guestId.js": {
+    "mtime": 1775320104.5195994,
+    "hash": "d61adc2c275a0fcdd0bdb052b94c8aaf"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\utils\\imageUtils.js": {
+    "mtime": 1778100664.8746488,
+    "hash": "aa36e09ec1620a50c03733c0ef1c639a"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\src\\utils\\swal.js": {
+    "mtime": 1775154058.9975858,
+    "hash": "c8d4047728d60c1c4ef93d7af3929c33"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\AGENTS.md": {
+    "mtime": 1775154058.2278035,
+    "hash": "9e09241799026ac05be315a2f0b50055"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\CLAUDE.md": {
+    "mtime": 1775154058.2327952,
+    "hash": "5c27369b226fcf2be8a6cfe52224e767"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\combined_codebase.txt": {
+    "mtime": 1775643624.2208538,
+    "hash": "271fbabd1593fa87251c9709e116c268"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\README.md": {
+    "mtime": 1775154058.2367506,
+    "hash": "ff47271e53637b2ba6ba72ad2b70f6d7"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\public\\humans.txt": {
+    "mtime": 1778069986.5156636,
+    "hash": "5a9b6fee71898f27465f4cabc354fe5c"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\public\\file.svg": {
+    "mtime": 1775154058.2745388,
+    "hash": "d09f95206c3fa0bb9bd9fefabfd0ea71"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\public\\globe.svg": {
+    "mtime": 1775154058.2811408,
+    "hash": "2aaafa6a49b6563925fe440891e32717"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\public\\next.svg": {
+    "mtime": 1775154058.2859907,
+    "hash": "8e061864f388b47f33a1c3780831193e"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\public\\vercel.svg": {
+    "mtime": 1775154058.290946,
+    "hash": "c0af2f507b369b085b35ef4bbe3bcf1e"
+  },
+  "D:\\pg\\clothing-e-commerce-main\\clothing-e-commerce-main\\web\\public\\window.svg": {
+    "mtime": 1775154058.2959082,
+    "hash": "a2760511c65806022ad20adf74370ff3"
+  }
+}

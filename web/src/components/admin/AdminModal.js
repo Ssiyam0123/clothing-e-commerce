@@ -1,29 +1,40 @@
 "use client";
 
-export default function AdminModal({ isOpen, onClose, title, children }) {
-  if (!isOpen) return null;
+import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
+export default function AdminModal({ isOpen, onClose, title, children, className }) {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
-        {/* Header */}
-        <div className="px-10 py-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 className="text-2xl font-black text-gray-900 tracking-tighter uppercase">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={cn(
+        "bg-background/80 backdrop-blur-3xl border-border/10 rounded-[2.5rem] shadow-2xl p-0 overflow-hidden max-w-2xl",
+        className
+      )}>
+        {/* Tactical Header */}
+        <DialogHeader className="px-10 py-8 border-b border-border/5 bg-accent/5 flex flex-row items-center justify-between">
+          <DialogTitle className="text-2xl font-black text-foreground tracking-tighter uppercase italic leading-none">
             {title}
-          </h3>
+          </DialogTitle>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-900 text-4xl leading-none transition-transform hover:rotate-90"
+            className="p-2 text-muted-foreground hover:text-rose-600 transition-all hover:rotate-90"
           >
-            &times;
+            <X size={24} />
           </button>
-        </div>
+        </DialogHeader>
 
-        {/* Body */}
-        <div className="p-10 max-h-[70vh] overflow-y-auto no-scrollbar">
+        {/* Modal Data Stream Body */}
+        <div className="p-10 max-h-[80vh] overflow-y-auto no-scrollbar">
           {children}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

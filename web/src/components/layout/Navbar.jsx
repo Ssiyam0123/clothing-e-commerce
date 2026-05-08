@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, ShoppingBag, User, Menu, X, Sun, Moon, Sparkles, Heart, ChevronRight, Shield } from "lucide-react";
+import { Search, ShoppingBag, User, Menu, X, Sun, Moon, Sparkles, Heart, ChevronRight, Shield, LifeBuoy, LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { useProductStore } from "@/store/productStore";
@@ -55,6 +55,14 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const dynamicNavLinks = useMemo(() => {
+    const links = [...NAV_LINKS];
+    if (user?.role === 'admin') {
+      links.push({ label: "Admin Panel", href: "/admin", isSpecial: true });
+    }
+    return links;
+  }, [user]);
+
   if (pathname.startsWith("/admin")) return null;
 
   return (
@@ -77,19 +85,22 @@ export default function Navbar() {
 
         {/* DESKTOP NAV */}
         <nav className="hidden lg:flex items-center gap-10">
-          {NAV_LINKS.map((link) => (
+          {dynamicNavLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                "text-[10px] font-black uppercase tracking-[0.4em] transition-all hover:text-accent-secondary relative group",
-                pathname === link.href ? "text-accent-secondary" : "text-foreground/70"
+                "text-[10px] font-black uppercase tracking-[0.4em] transition-all hover:text-accent-secondary relative group flex items-center gap-2",
+                pathname === link.href ? "text-accent-secondary" : "text-foreground/70",
+                link.isSpecial && "text-rose-500 hover:text-rose-600"
               )}
             >
+              {link.isSpecial && <Shield size={12} className="animate-pulse" />}
               {link.label}
               <span className={cn(
                 "absolute -bottom-2 left-0 h-0.5 bg-accent-secondary transition-all duration-500",
-                pathname === link.href ? "w-full" : "w-0 group-hover:w-full"
+                pathname === link.href ? "w-full" : "w-0 group-hover:w-full",
+                link.isSpecial && "bg-rose-500"
               )} />
             </Link>
           ))}
@@ -97,53 +108,47 @@ export default function Navbar() {
 
         {/* ACTIONS */}
         <div className="flex items-center gap-2 md:gap-5">
-          {/* Theme Toggle */}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="w-10 h-10 rounded-full hover:bg-accent/30"
-            aria-label={mounted ? `Switch to ${theme === "dark" ? "light" : "dark"} mode` : "Switch theme"}
           >
             {mounted ? (
               theme === "dark" ? <Sun size={18} /> : <Moon size={18} />
             ) : (
-              <div className="w-[18px] h-[18px]" /> // Placeholder to prevent layout shift
+              <div className="w-[18px] h-[18px]" />
             )}
           </Button>
 
-          {/* Search Trigger */}
-          <Link href="/products?search=open" aria-label="Search products">
+          <Link href="/products?search=open">
              <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30">
                <Search size={18} />
              </Button>
           </Link>
 
-          {/* Wishlist */}
-          <Link href="/wishlist" className="relative" aria-label={`View wishlist, ${wishlistCount} items`}>
+          <Link href="/wishlist" className="relative">
             <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30">
               <Heart size={18} />
             </Button>
             {wishlistCount > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] flex items-center justify-center bg-accent-secondary text-white border-none text-[8px] font-black rounded-full px-1 animate-in zoom-in duration-300">
+              <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] bg-accent-secondary text-white border-none text-[8px] font-black rounded-full px-1">
                 {wishlistCount}
               </Badge>
             )}
           </Link>
 
-          {/* Cart */}
-          <Link href="/cart" className="relative" aria-label={`View shopping cart, ${cartCount} items`}>
+          <Link href="/cart" className="relative">
             <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30">
               <ShoppingBag size={18} />
             </Button>
             {cartCount > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] flex items-center justify-center bg-accent-secondary text-white border-none text-[8px] font-black rounded-full px-1 animate-in zoom-in duration-300">
+              <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] bg-accent-secondary text-white border-none text-[8px] font-black rounded-full px-1">
                 {cartCount}
               </Badge>
             )}
           </Link>
 
-          {/* Auth / Profile */}
           <div className="hidden md:block h-8 w-px bg-border/20 mx-2" />
           
           {isAuthenticated ? (
@@ -158,38 +163,33 @@ export default function Navbar() {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 rounded-2xl p-2 bg-background/95 backdrop-blur-xl border-border/20 shadow-2xl" align="end">
-                <DropdownMenuLabel className="font-black text-[10px] uppercase tracking-widest text-muted-foreground p-3">
-                  Account Control
+              <DropdownMenuContent className="w-72 rounded-[2rem] p-4 bg-background/95 backdrop-blur-xl border-border/20 shadow-2xl mt-4 animate-in fade-in zoom-in-95 duration-300" align="end">
+                <DropdownMenuLabel className="font-black text-[11px] uppercase tracking-[0.4em] text-muted-foreground px-6 py-4 opacity-50">
+                  Tactical Identity
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-border/10" />
+                <DropdownMenuSeparator className="bg-border/5 mx-2" />
+                
                 <DropdownMenuItem asChild>
-                  <Link href="/profile?tab=profile" className="rounded-xl p-3 font-bold text-sm cursor-pointer hover:bg-accent/50">
-                    Identity Control
+                  <Link href="/profile" className="flex items-center gap-4 rounded-2xl p-5 font-black text-[12px] uppercase tracking-widest cursor-pointer hover:bg-accent/50 group transition-all">
+                    <User size={18} className="text-muted-foreground group-hover:text-foreground transition-colors" />
+                    Profile Identity
                   </Link>
                 </DropdownMenuItem>
+                
                 <DropdownMenuItem asChild>
-                  <Link href="/profile?tab=orders" className="rounded-xl p-3 font-bold text-sm cursor-pointer hover:bg-accent/50">
-                    Archive Log
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/live-support" className="rounded-xl p-3 font-bold text-sm cursor-pointer text-blue-500 bg-blue-500/5 hover:bg-blue-500/10">
+                  <Link href="/live-support" className="flex items-center gap-4 rounded-2xl p-5 font-black text-[12px] uppercase tracking-widest cursor-pointer text-blue-500 bg-blue-500/5 hover:bg-blue-500/10 group transition-all">
+                    <LifeBuoy size={18} className="group-hover:rotate-45 transition-transform" />
                     Live Support
                   </Link>
                 </DropdownMenuItem>
-                {user?.role === 'admin' && (
-                   <DropdownMenuItem asChild>
-                    <Link href="/admin" className="rounded-xl p-3 font-bold text-sm cursor-pointer text-accent-secondary bg-accent-secondary/5 hover:bg-accent-secondary/10">
-                      System Admin
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator className="bg-border/10" />
+
+                <DropdownMenuSeparator className="bg-border/5 mx-2" />
+                
                 <DropdownMenuItem 
                   onClick={logout}
-                  className="rounded-xl p-3 font-bold text-sm cursor-pointer text-rose-500 hover:bg-rose-500/10 focus:bg-rose-500/10"
+                  className="flex items-center gap-4 rounded-2xl p-5 font-black text-[12px] uppercase tracking-widest cursor-pointer text-rose-500 hover:bg-rose-500/10 focus:bg-rose-500/10 group transition-all"
                 >
+                  <LogOut size={18} className="group-hover:translate-x-1 transition-transform" />
                   Terminate Session
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -205,10 +205,7 @@ export default function Navbar() {
           {/* MOBILE MENU */}
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
-              <button 
-                className="lg:hidden w-10 h-10 rounded-full hover:bg-accent/30 flex items-center justify-center transition-all active:scale-90 border border-border/10"
-                aria-label="Open navigation menu"
-              >
+              <button className="lg:hidden w-10 h-10 rounded-full hover:bg-accent/30 flex items-center justify-center border border-border/10">
                 <Menu size={20} />
               </button>
             </SheetTrigger>
@@ -221,12 +218,15 @@ export default function Navbar() {
                 <div className="flex flex-col gap-8">
                   <div className="space-y-4">
                     <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-6">Directory</p>
-                    {NAV_LINKS.map((link) => (
+                    {dynamicNavLinks.map((link) => (
                       <Link
                         key={link.href}
                         href={link.href}
                         onClick={() => setIsMenuOpen(false)}
-                        className="text-4xl font-black uppercase tracking-tighter text-foreground hover:text-accent-secondary transition-colors italic block"
+                        className={cn(
+                          "text-4xl font-black uppercase tracking-tighter hover:text-accent-secondary transition-colors italic block",
+                          link.isSpecial ? "text-rose-500" : "text-foreground"
+                        )}
                       >
                         {link.label}
                       </Link>
@@ -239,24 +239,14 @@ export default function Navbar() {
                     <div className="space-y-6">
                       <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-6">Account Control</p>
                       <div className="grid grid-cols-1 gap-4">
-                        <Link href="/profile?tab=profile" onClick={() => setIsMenuOpen(false)} className="text-xl font-bold uppercase tracking-tight flex items-center justify-between group">
-                          Identity Control
-                          <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                        <Link href="/profile?tab=orders" onClick={() => setIsMenuOpen(false)} className="text-xl font-bold uppercase tracking-tight flex items-center justify-between group">
-                          Archive Log
-                          <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="text-xl font-bold uppercase tracking-tight flex items-center justify-between group">
+                          Profile Identity
+                          <ChevronRight size={18} />
                         </Link>
                         <Link href="/live-support" onClick={() => setIsMenuOpen(false)} className="text-xl font-bold uppercase tracking-tight flex items-center justify-between text-blue-500 group">
                           Live Support
-                          <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                          <ChevronRight size={18} />
                         </Link>
-                        {user?.role === 'admin' && (
-                          <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="text-xl font-bold uppercase tracking-tight flex items-center justify-between text-accent-secondary group">
-                            System Admin
-                            <Shield size={18} />
-                          </Link>
-                        )}
                       </div>
                       
                       <Button 
@@ -282,7 +272,7 @@ export default function Navbar() {
               
               <div className="p-8 border-t border-border/5 bg-accent/5">
                  <p className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground text-center">
-                   Vanguard Core Protocol v4.0.1
+                   Vanguard Core Protocol v4.2.0
                  </p>
               </div>
             </SheetContent>

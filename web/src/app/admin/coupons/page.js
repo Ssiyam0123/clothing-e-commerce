@@ -5,6 +5,24 @@ import { useCoupons } from "@/hooks/useCoupons";
 import DataTable from "@/components/admin/DataTable";
 import TableSkeleton from "@/components/common/TableSkeleton";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
+import { 
+  Plus, 
+  Trash2, 
+  Edit3, 
+  Ticket, 
+  Activity, 
+  BarChart, 
+  History,
+  ShieldCheck,
+  Power,
+  Eye
+} from "lucide-react";
+
+// Shadcn UI Imports
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export default function CouponArchive() {
   const { coupons, isLoading, deleteCoupon } = useCoupons();
@@ -12,160 +30,191 @@ export default function CouponArchive() {
   const handleDelete = async (id) => {
     const confirmed = await swalConfirm(
       "Deactivate Protocol?",
-      "This coupon will be purged from the settlement engine.",
+      "This coupon will be purged from the settlement engine."
     );
     if (confirmed) {
       try {
         await deleteCoupon(id);
         swalToast("Voucher Purged", "success");
       } catch (err) {
-        swalError("Action Failed", "Voucher is linked to existing orders.");
+        swalError("Action Rejected", "Voucher is currently linked to active order sequences.");
       }
     }
   };
 
   const columns = [
     {
-      label: "Voucher Code",
+      label: "Voucher Identity",
       render: (item) => (
-        <span className="font-black text-indigo-500 bg-indigo-500/5 px-4 py-2 rounded-xl border border-indigo-500/10 uppercase tracking-widest text-xs">
-          {item.code}
-        </span>
-      ),
-    },
-    {
-      label: "Discount",
-      render: (item) => (
-        <span className="font-black text-zinc-900 dark:text-white">
-          {item.discountType === "percentage"
-            ? `${item.discountValue}% OFF`
-            : `৳${item.discountValue} FLAT`}
-        </span>
-      ),
-    },
-    {
-      label: "Usage",
-      render: (item) => (
-        <div className="flex flex-col gap-1">
-          <p className="text-[10px] font-black uppercase text-zinc-400">
-            Limit: {item.usageLimit || "∞"}
-          </p>
-          <div className="w-24 h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-emerald-500"
-              style={{
-                width: `${Math.min((item.usedCount / (item.usageLimit || 100)) * 100, 100)}%`,
-              }}
-            />
-          </div>
+        <div className="flex items-center gap-4">
+           <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600">
+              <Ticket size={20} />
+           </div>
+           <span className="font-black text-indigo-600 bg-indigo-600/5 px-4 py-2 rounded-xl border border-indigo-600/10 uppercase tracking-[0.2em] text-[10px] shadow-sm">
+             {item.code}
+           </span>
         </div>
       ),
     },
     {
-      label: "Timeline Status",
+      label: "Benefit Logic",
+      render: (item) => (
+        <div className="flex flex-col">
+          <span className="font-black text-foreground uppercase tracking-tight text-xs">
+            {item.discountType === "percentage"
+              ? `${item.discountValue}% Reduction`
+              : `৳${item.discountValue} Flat Credit`}
+          </span>
+          <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mt-1">
+            {item.discountType === "percentage" ? "Relative Scale" : "Absolute Value"}
+          </span>
+        </div>
+      ),
+    },
+    {
+      label: "Neural Load",
+      render: (item) => {
+        const usagePercent = Math.min((item.usedCount / (item.usageLimit || 100)) * 100, 100);
+        return (
+          <div className="flex flex-col gap-2 w-32">
+            <div className="flex justify-between items-center">
+               <span className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">
+                 Load: {item.usedCount}/{item.usageLimit || "∞"}
+               </span>
+               <span className="text-[9px] font-bold text-indigo-600 italic">
+                 {Math.round(usagePercent)}%
+               </span>
+            </div>
+            <div className="w-full h-1.5 bg-accent/20 rounded-full overflow-hidden shadow-inner">
+              <div
+                className={cn(
+                  "h-full transition-all duration-1000 ease-out",
+                  usagePercent > 80 ? "bg-rose-500 shadow-[0_0_10px_rgba(225,29,72,0.5)]" : "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                )}
+                style={{ width: `${usagePercent}%` }}
+              />
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      label: "Operational Status",
       render: (item) => {
         const now = new Date();
         const start = new Date(item.startDate);
         const end = item.endDate ? new Date(item.endDate) : null;
 
         let status = {
-          label: "Active",
+          label: "● Active",
           style: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
         };
         if (!item.isActive)
           status = {
-            label: "Disabled",
-            style: "bg-zinc-100 text-zinc-400 border-zinc-200",
+            label: "○ Disabled",
+            style: "bg-zinc-500/10 text-zinc-500 border-zinc-500/20",
           };
         else if (now < start)
           status = {
-            label: "Pending",
+            label: "◐ Pending",
             style: "bg-amber-500/10 text-amber-500 border-amber-500/20",
           };
         else if (end && now > end)
           status = {
-            label: "Expired",
+            label: "× Expired",
             style: "bg-rose-500/10 text-rose-500 border-rose-500/20",
           };
 
         return (
-          <span
-            className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${status.style}`}
+          <Badge
+            variant="outline"
+            className={cn("px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.15em]", status.style)}
           >
             {status.label}
-          </span>
+          </Badge>
         );
       },
     },
     {
-      label: "Actions",
+      label: "Command Ops",
       render: (item) => (
-        <div className="flex items-center gap-2 justify-end">
-          <Link
-            href={`/admin/coupons/${item._id}`}
-            className="p-2.5 bg-zinc-100 dark:bg-zinc-900 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all"
+        <div className="flex items-center gap-3 justify-end">
+          <Button 
+            asChild 
+            variant="outline" 
+            size="icon" 
+            className="h-10 w-10 rounded-xl border-border/10 hover:border-blue-600/50 hover:bg-blue-600 hover:text-white bg-background/50 transition-all active:scale-95 group"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2.5"
-                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-              ></path>
-            </svg>
-          </Link>
-          <button
+            <Link href={`/admin/coupons/${item._id}`}>
+              <Eye size={16} className="group-hover:scale-110 transition-transform" />
+            </Link>
+          </Button>
+          <Button 
+            asChild 
+            variant="outline" 
+            size="icon" 
+            className="h-10 w-10 rounded-xl border-border/10 hover:border-indigo-600/50 hover:bg-indigo-600 hover:text-white bg-background/50 transition-all active:scale-95"
+          >
+            <Link href={`/admin/coupons/${item._id}/edit`}>
+              <Edit3 size={16} />
+            </Link>
+          </Button>
+          <Button 
+            variant="outline" 
+            size="icon" 
             onClick={() => handleDelete(item._id)}
-            className="p-2.5 bg-zinc-100 dark:bg-zinc-900 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all"
+            className="h-10 w-10 rounded-xl border-border/10 hover:border-rose-600/50 hover:bg-rose-600 hover:text-white bg-background/50 transition-all active:scale-95"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2.5"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              ></path>
-            </svg>
-          </button>
+            <Trash2 size={16} />
+          </Button>
         </div>
       ),
     },
   ];
 
   return (
-    <div className="space-y-10 pb-20 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
-        <div>
-          <h1 className="text-4xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase mb-2">
-            Voucher Hub
+    <div className="space-y-12 pb-24 px-4 sm:px-6 max-w-[1600px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* 🛰️ Tactical Header */}
+      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 bg-card/30 p-10 rounded-[3rem] border border-border/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-emerald-600/10 transition-colors duration-1000" />
+        
+        <div className="space-y-4 relative z-10">
+          <div className="flex items-center gap-3">
+             <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-emerald-600/30 text-emerald-600 bg-emerald-600/5 px-3 py-1">Settlement Hub</Badge>
+             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-40">// VOUCHER_PROTOCOLS_v1.2</span>
+          </div>
+          <h1 className="text-5xl sm:text-6xl font-black uppercase tracking-tighter dark:text-white italic leading-none">
+            Voucher <span className="text-emerald-600">Hub</span>
           </h1>
-          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-            Settlement Logic Management
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-3">
+            <ShieldCheck size={12} className="text-emerald-600 animate-pulse" /> Logic Orchestration • Total Logs: {coupons?.length || 0}
           </p>
         </div>
-        <Link
-          href="/admin/coupons/new"
-          className="bg-zinc-900 dark:bg-white text-white dark:text-black px-10 py-4 rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-xl"
-        >
-          + Initialize Voucher
-        </Link>
-      </div>
 
-      {isLoading ? (
-        <TableSkeleton rowCount={6} />
-      ) : (
-        <DataTable columns={columns} data={coupons} />
-      )}
+        <Button
+          asChild
+          className="bg-foreground text-background hover:bg-emerald-600 hover:text-white h-16 px-10 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group relative z-10"
+        >
+          <Link href="/admin/coupons/new">
+            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Initialize Voucher
+          </Link>
+        </Button>
+      </header>
+
+      {/* 📊 Intelligence Ledger */}
+      <Card className="rounded-[3rem] border-border/10 bg-card/30 backdrop-blur-2xl shadow-2xl overflow-hidden relative">
+        <CardContent className="p-0">
+          {isLoading ? (
+            <TableSkeleton rowCount={6} />
+          ) : (
+            <DataTable 
+              columns={columns} 
+              data={coupons} 
+              className="bg-transparent" 
+            />
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

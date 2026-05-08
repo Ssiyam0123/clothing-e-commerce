@@ -76,6 +76,16 @@ export const getPostBySlug = asyncHandler(async (req, res) => {
   res.json(blog);
 });
 
+// 🔎 Get Single Post by ID (Admin)
+export const getPostById = asyncHandler(async (req, res) => {
+  const blog = await Blog.findById(req.params.id)
+    .populate('author', 'name avatar')
+    .populate('comments.user', 'name avatar');
+
+  if (!blog) return res.status(404).json({ message: "Sequence not found in archives." });
+  res.json(blog);
+});
+
 // 🔄 Update Post (with image cleanup)
 export const updatePost = asyncHandler(async (req, res) => {
   const blog = await Blog.findById(req.params.id);

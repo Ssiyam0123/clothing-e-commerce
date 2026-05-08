@@ -217,14 +217,11 @@ export default async function RootLayout({ children }) {
                 </div>
               ) : (
                 <div className="layout-root">
-                  {isAdminRoute ? (
-                    <main>{children}</main>
-                  ) : (
-                    <LayoutResolver theme={identityTheme}>
-                      {children}
-                    </LayoutResolver>
-                  )}
+                  <LayoutResolver theme={identityTheme}>
+                    {children}
+                  </LayoutResolver>
                 </div>
+                
               )}
             </ThemeProvider>
             <Toaster position="top-right" expand={false} richColors />
