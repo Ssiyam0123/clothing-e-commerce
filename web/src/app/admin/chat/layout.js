@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { Home, Search, MessageSquarePlus, MoreVertical } from "lucide-react";
+import { ArrowLeft, Search, MessageSquarePlus, MoreVertical } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -22,6 +22,7 @@ export default function ChatLayout({ children }) {
 }
 
 function ChatContent({ children }) {
+  const router = useRouter();
   const { conversations } = useChat();
   const { id } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,80 +50,121 @@ function ChatContent({ children }) {
         )}
       >
         {/* Sidebar Header */}
-        <div className="h-[60px] bg-[#f0f2f5] dark:bg-[#202c33] px-4 flex items-center justify-between shrink-0">
-          <Link href="/admin">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Home size={20} />
+        <div className="h-[60px] bg-[#f0f2f5] dark:bg-[#202c33] px-4 flex items-center justify-between shrink-0 border-b border-border/5">
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors" 
+              onClick={() => router.push("/admin")}
+              title="Return to Base"
+            >
+              <ArrowLeft size={20} className="text-foreground/70" />
             </Button>
-          </Link>
-          <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <MessageSquarePlus size={20} />
+            <h2 className="text-lg font-bold tracking-tight text-foreground/90 ml-1">Messages</h2>
+          </div>
+          
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5 dark:hover:bg-white/5" title="New Transmission">
+              <MessageSquarePlus size={20} className="text-foreground/70" />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <MoreVertical size={20} />
+            <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5 dark:hover:bg-white/5">
+              <MoreVertical size={20} className="text-foreground/70" />
             </Button>
           </div>
         </div>
 
-        {/* Search */}
-        <div className="p-2 shrink-0">
-          <div className="relative flex items-center bg-[#f0f2f5] dark:bg-[#202c33] rounded-lg px-3">
-            <Search size={16} />
+        {/* Search Area */}
+        <div className="px-3 py-2 shrink-0 bg-white dark:bg-[#111b21]">
+          <div className="relative flex items-center bg-[#f0f2f5] dark:bg-[#202c33] rounded-xl px-4 transition-all focus-within:bg-white dark:focus-within:bg-[#2a3942] focus-within:shadow-sm border border-transparent focus-within:border-border/50">
+            <Search size={16} className="text-muted-foreground shrink-0 mr-3" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search or start new chat"
-              className="h-9 border-none bg-transparent text-sm focus-visible:ring-0"
+              placeholder="Search conversations..."
+              className="h-10 border-none bg-transparent text-sm focus-visible:ring-0 placeholder:text-muted-foreground/50 px-0"
             />
           </div>
         </div>
 
         {/* Conversation List */}
-        <ScrollArea className="flex-1">
-          <div className="divide-y divide-[#f0f2f5] dark:divide-[#202c33]">
+        <ScrollArea className="flex-1 bg-white dark:bg-[#111b21]">
+          <div className="flex flex-col">
             {filteredConversations.length === 0 && (
-              <div className="py-8 text-center text-sm text-[#667781]">
-                {searchQuery ? "No matching chats" : "No conversations yet"}
+              <div className="py-20 text-center space-y-3 px-6 animate-in fade-in zoom-in duration-500">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto opacity-20">
+                   <MessageSquarePlus size={24} />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  {searchQuery ? "No matching frequency found" : "No active transmissions"}
+                </p>
               </div>
             )}
+            
             {filteredConversations.map((conv) => {
               const customer = conv.participants?.find((p) => p.role === "customer");
               const isActive = id === conv._id;
               const lastMsgTime = new Date(conv.updatedAt);
+              const isToday = lastMsgTime.toDateString() === new Date().toDateString();
 
               return (
                 <Link
                   key={conv._id}
                   href={`/admin/chat/${conv._id}`}
                   className={cn(
-                    "w-full h-[72px] px-3 flex items-center gap-3 transition-colors block",
+                    "relative w-full h-[72px] flex items-center px-4 transition-all duration-200 group",
                     isActive
-                      ? "bg-[#ebebeb] dark:bg-[#2a3942]"
+                      ? "bg-[#f0f2f5] dark:bg-[#2a3942]"
                       : "hover:bg-[#f5f6f6] dark:hover:bg-[#202c33]"
                   )}
                 >
-                  <Avatar className="h-12 w-12 shrink-0">
-                    <AvatarImage src={getImageUrl(customer?.avatar)} />
-                    <AvatarFallback>
-                      {customer?.name?.charAt(0) || "?"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between">
-                      <h3 className="font-normal truncate">{customer?.name || "Customer"}</h3>
-                      <span className="text-[11px] text-[#667781]">
-                        {lastMsgTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })}
+                  {/* Active Indicator Bar */}
+                  {isActive && (
+                    <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#00a884] z-10" />
+                  )}
+
+                  <div className="relative shrink-0 mr-4">
+                    <Avatar className="h-12 w-12 border border-border/10 shadow-sm">
+                      <AvatarImage src={getImageUrl(customer?.avatar)} className="object-cover" />
+                      <AvatarFallback className="bg-accent-secondary/10 text-accent-secondary font-bold">
+                        {customer?.name?.charAt(0) || "?"}
+                      </AvatarFallback>
+                    </Avatar>
+                    {/* Online status dot - visually pleasing placeholder */}
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-[#111b21] rounded-full" />
+                  </div>
+
+                  <div className="flex-1 min-w-0 h-full flex flex-col justify-center border-b border-border/50 dark:border-white/5">
+                    <div className="flex justify-between items-baseline mb-0.5">
+                      <h3 className={cn(
+                        "text-[15px] truncate transition-colors",
+                        conv.unreadCount > 0 ? "font-bold text-foreground" : "font-medium text-foreground/90"
+                      )}>
+                        {customer?.name || "Anonymous_Artifact"}
+                      </h3>
+                      <span className={cn(
+                        "text-[11px] whitespace-nowrap ml-2",
+                        conv.unreadCount > 0 ? "text-[#00a884] font-bold" : "text-muted-foreground/60"
+                      )}>
+                        {isToday 
+                          ? lastMsgTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })
+                          : lastMsgTime.toLocaleDateString([], { month: "short", day: "numeric" })
+                        }
                       </span>
                     </div>
-                    <div className="flex justify-between mt-1">
-                      <p className="text-[13px] text-[#667781] truncate">
-                        {conv.lastMessage || "Click to start chatting"}
+                    
+                    <div className="flex justify-between items-center">
+                      <p className={cn(
+                        "text-[13px] truncate pr-4",
+                        conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground/70"
+                      )}>
+                        {conv.lastMessage || "Establish connection..."}
                       </p>
+                      
                       {conv.unreadCount > 0 && (
-                        <Badge className="bg-[#00a884] text-white text-[11px]">
+                        <div className="bg-[#00a884] text-white text-[10px] font-black min-w-[20px] h-[20px] flex items-center justify-center rounded-full px-1.5 shadow-sm animate-in zoom-in duration-300">
                           {conv.unreadCount}
-                        </Badge>
+                        </div>
                       )}
                     </div>
                   </div>

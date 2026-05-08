@@ -138,37 +138,60 @@ export default function ActiveChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#efeae2] dark:bg-[#0b141a] overflow-hidden">
+    <div className="flex flex-col h-full bg-[#efeae2] dark:bg-[#0b141a] overflow-hidden relative">
+      {/* Visual Background Pattern - WhatsApp style */}
+      <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.03] pointer-events-none bg-[url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-whatsapp-texture.jpg')] bg-repeat" />
+
       {/* Header */}
-      <div className="h-[60px] bg-[#f0f2f5] dark:bg-[#202c33] px-4 flex items-center justify-between shrink-0 shadow-sm z-10">
+      <div className="h-[60px] bg-[#f0f2f5] dark:bg-[#202c33] px-4 flex items-center justify-between shrink-0 shadow-sm z-10 border-b border-border/5">
         <div className="flex items-center gap-3 overflow-hidden">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => router.push("/admin/chat")}
-            className="lg:hidden rounded-full shrink-0"
+            className="lg:hidden rounded-full shrink-0 hover:bg-black/5 dark:hover:bg-white/5"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20} className="text-foreground/70" />
           </Button>
-          <Avatar className="h-10 w-10 shrink-0">
-            <AvatarImage src={getImageUrl(customer?.avatar)} />
-            <AvatarFallback>{customer?.name?.charAt(0) || "U"}</AvatarFallback>
-          </Avatar>
+          
+          <div className="relative shrink-0">
+            <Avatar className="h-10 w-10 border border-border/10 shadow-sm">
+              <AvatarImage src={getImageUrl(customer?.avatar)} className="object-cover" />
+              <AvatarFallback className="bg-accent-secondary/10 text-accent-secondary font-bold">
+                {customer?.name?.charAt(0) || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#f0f2f5] dark:border-[#202c33] rounded-full" />
+          </div>
+
           <div className="flex flex-col min-w-0">
-            <h3 className="text-[15px] font-medium truncate">{customer?.name || "Chat"}</h3>
-            <span className="text-[11px] text-[#667781] dark:text-[#8696a0]">Online</span>
+            <h3 className="text-[15px] font-bold text-foreground/90 truncate leading-tight">
+              {customer?.name || "Anonymous_User"}
+            </h3>
+            <span className="text-[11px] text-[#00a884] font-medium animate-pulse">Online</span>
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <MoreVertical size={20} />
-        </Button>
+        
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5 dark:hover:bg-white/5">
+            <Search size={18} className="text-foreground/60" />
+          </Button>
+          <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5 dark:hover:bg-white/5">
+            <MoreVertical size={20} className="text-foreground/60" />
+          </Button>
+        </div>
       </div>
 
       {/* Messages - ONLY scrollable area */}
-      <div className="flex-1 overflow-y-auto min-h-0">
-        <div className="max-w-4xl mx-auto px-4 py-4 space-y-2">
+      <div className="flex-1 overflow-y-auto min-h-0 z-10 no-scrollbar">
+        <div className="max-w-4xl mx-auto px-4 py-6 space-y-3">
           {messages.length === 0 ? (
-            <div className="text-center text-[#667781] py-10">No messages yet. Start the conversation!</div>
+            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 opacity-30">
+               <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
+                  <Send size={32} />
+               </div>
+               <p className="text-sm font-medium uppercase tracking-widest">No previous transmissions</p>
+            </div>
           ) : (
             messages.map((msg, idx) => {
               const myId = user?._id || user?.id;
@@ -183,23 +206,28 @@ export default function ActiveChatPage() {
       </div>
 
       {/* Input Bar - fixed bottom */}
-      <div className="bg-[#f0f2f5] dark:bg-[#202c33] px-4 py-3 shrink-0">
-        <div className="flex items-center gap-3">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type a message"
-            className="flex-1 bg-white dark:bg-[#2a3942] border-none rounded-lg"
-            disabled={isSending}
-          />
+      <div className="bg-[#f0f2f5] dark:bg-[#202c33] px-4 py-3 shrink-0 z-10 border-t border-border/5">
+        <div className="flex items-center gap-3 max-w-5xl mx-auto">
+          <div className="flex-1 relative">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Type a message..."
+              className="w-full h-11 bg-white dark:bg-[#2a3942] border-none rounded-xl px-4 py-2 text-[15px] focus-visible:ring-0 shadow-sm"
+              disabled={isSending}
+            />
+          </div>
           <Button
             onClick={handleSendMessage}
             disabled={!input.trim() || isSending}
             size="icon"
-            className="rounded-full bg-[#00a884] hover:bg-[#008f72] text-white"
+            className={cn(
+              "rounded-xl h-11 w-11 shadow-lg transition-all duration-300",
+              input.trim() ? "bg-[#00a884] hover:bg-[#008f72] scale-100" : "bg-muted text-muted-foreground scale-95 opacity-50"
+            )}
           >
-            <Send size={18} />
+            <Send size={18} className={cn("transition-transform", input.trim() && "translate-x-0.5 -translate-y-0.5")} />
           </Button>
         </div>
       </div>

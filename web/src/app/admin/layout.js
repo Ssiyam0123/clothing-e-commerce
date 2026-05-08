@@ -20,7 +20,7 @@ export default function AdminLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { theme, toggleTheme, isMounted } = useAppStore();
 
-  const isChatRoute = pathname === "/admin/chat";
+  const isChatRoute = pathname?.startsWith("/admin/chat");
 
   // 🛡️ Redirect non-admins
   useEffect(() => {
