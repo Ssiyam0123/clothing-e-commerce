@@ -79,8 +79,8 @@ export default function Navbar() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-[100] transition-all duration-700 px-4 sm:px-6 lg:px-12 py-4",
-        scrolled ? "bg-background/95 backdrop-blur-3xl border-b border-border/10 py-3 shadow-xl shadow-black/5" : "bg-transparent"
+        "fixed top-0 left-0 right-0 z-[120] transition-all duration-700 px-4 sm:px-6 lg:px-12 py-4",
+        scrolled ? "bg-background/95 backdrop-blur-3xl border-b border-border/10 py-3 shadow-xl shadow-black/5" : pathname.startsWith("/blog/") && pathname !== "/blog" ? "bg-background/90 backdrop-blur-2xl border-b border-border/10 py-3 shadow-xl shadow-black/5" : "bg-transparent"
       )}
     >
       <div className="w-full mx-auto flex items-center justify-between gap-2">

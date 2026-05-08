@@ -1,24 +1,24 @@
 {
   "en": {
-    "title": "The Vault",
-    "sub": "Your curated artifacts.",
-    "empty": "The Vault is Empty",
-    "browse": "Explore Collection",
-    "add": "Move to Bag",
+    "title": "Saved Items",
+    "sub": "Your favorite picks",
+    "empty": "No saved items yet",
+    "browse": "Browse collection",
+    "add": "Move to cart",
     "remove": "Remove",
-    "syncTip": "Log in to sync your vault across all devices.",
-    "movedToBag": "Artifact Transferred to Bag",
-    "removedFromVault": "Artifact Purged from Vault"
+    "syncTip": "Log in to save items across devices.",
+    "movedToBag": "Moved to cart",
+    "removedFromVault": "Removed from saved items"
   },
   "bn": {
-    "title": "সংরক্ষিত ভল্ট",
-    "sub": "আপনার বাছাইকৃত পণ্যসমূহ।",
-    "empty": "ভল্টটি খালি",
+    "title": "পছন্দের তালিকা",
+    "sub": "আপনার পছন্দের পণ্য",
+    "empty": "কোনো পণ্য সংরক্ষিত নেই",
     "browse": "কালেকশন দেখুন",
-    "add": "ব্যাগে নিন",
+    "add": "কার্টে নিন",
     "remove": "সরিয়ে ফেলুন",
-    "syncTip": "সব ডিভাইসে আপনার ভল্ট সিঙ্ক করতে লগইন করুন।",
-    "movedToBag": "ব্যাগে মুভ করা হয়েছে",
-    "removedFromVault": "ভল্ট থেকে সরানো হয়েছে"
+    "syncTip": "ডিভাইস জুড়ে সংরক্ষণ করতে লগইন করুন।",
+    "movedToBag": "কার্টে সরানো হয়েছে",
+    "removedFromVault": "পছন্দের তালিকা থেকে সরানো হয়েছে"
   }
 }

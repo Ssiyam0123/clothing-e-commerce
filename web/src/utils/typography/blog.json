@@ -1,20 +1,20 @@
 {
   "en": {
-    "protocol": "Protocol_Foundry",
+    "protocol": "Spectacular_Studio",
     "journal": "Journal",
-    "narrative": "Architecting Tactical Aesthetics & Digital Narratives",
-    "latest": "Latest_Sequences",
+    "narrative": "Simple style, smart choices — fashion for everyday life.",
+    "latest": "Latest_Posts",
     "readingTime": "MIN READ",
     "author": "BY",
-    "explore": "Explore Narrative"
+    "explore": "Read More"
   },
   "bn": {
-    "protocol": "প্রটোকল_ফাউন্ড্রি",
+    "protocol": "স্পেক্টাকুলার_স্টুডিও",
     "journal": "জার্নাল",
-    "narrative": "ট্যাকটিক্যাল নান্দনিকতা এবং ডিজিটাল বর্ণনার স্থাপত্য",
-    "latest": "সাম্প্রতিক_সিকোয়েন্স",
-    "readingTime": "মিনিট পাঠ",
+    "narrative": "সহজ স্টাইল, স্মার্ট পছন্দ — প্রতিদিনের জন্য ফ্যাশন।",
+    "latest": "সর্বশেষ_পোস্ট",
+    "readingTime": "মিনিট পড়া",
     "author": "লেখক",
-    "explore": "গল্পটি পড়ুন"
+    "explore": "বিস্তারিত পড়ুন"
   }
 }
