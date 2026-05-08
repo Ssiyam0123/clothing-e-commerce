@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cookies } from "next/headers";
 import { getTranslation } from "@/utils/typography/handler";
-import BlogMagazineClient from "./BlogMagazineClient";
+import BlogListing from "./BlogListing";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 const SITE_URL =
@@ -66,7 +66,7 @@ export default async function BlogPage() {
 
 async function BlogDataWrapper({ postsPromise, t }) {
   const posts = await postsPromise;
-  return <BlogMagazineClient posts={posts} t={t} />;
+  return <BlogListing posts={posts} t={t} />;
 }
 
 function BlogSkeleton() {

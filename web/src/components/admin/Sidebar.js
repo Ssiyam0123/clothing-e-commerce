@@ -37,7 +37,7 @@ export default function Sidebar({ className, onItemClick }) {
   const pathname = usePathname();
 
   return (
-    <aside className={cn("flex flex-col h-full bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-colors duration-500", className)}>
+    <aside className={cn("sidebar-vanguard", className)}>
       {/* 🏷️ Brand Header */}
       <div className="p-8">
         <div className="flex items-center gap-4">
@@ -70,10 +70,8 @@ export default function Sidebar({ className, onItemClick }) {
                   href={item.href}
                   onClick={onItemClick}
                   className={cn(
-                    "flex items-center gap-4 px-5 py-4 rounded-[1.2rem] transition-all duration-300 font-bold text-[10px] uppercase tracking-[0.15em] group",
-                    isActive
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-xl scale-[1.02]"
-                      : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    "sidebar-nav-item",
+                    isActive ? "sidebar-nav-item-active" : "sidebar-nav-item-inactive"
                   )}
                 >
                   <span className={cn("transition-transform duration-300", isActive ? "scale-110" : "opacity-70 group-hover:opacity-100")}>

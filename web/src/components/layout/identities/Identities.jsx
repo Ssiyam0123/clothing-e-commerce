@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 export const StandardLayout = ({ children, settings }) => {
   const pathname = usePathname();
   const isFullPageChat = pathname === "/live-support";
+  const isHome = pathname === "/" || pathname === "/en" || pathname === "/bn";
   const isBlogDetails = pathname.startsWith("/blog/") && pathname !== "/blog";
 
   return (
@@ -16,7 +17,7 @@ export const StandardLayout = ({ children, settings }) => {
       {!isFullPageChat && <Navbar settings={settings} />}
       <main className={cn(
         "min-h-screen",
-        isFullPageChat ? "pt-0" : isBlogDetails ? "pt-0" : "pt-16 md:pt-20"
+        isFullPageChat || isHome || isBlogDetails ? "pt-0" : "pt-16 md:pt-20"
       )}>
         {children}
       </main>

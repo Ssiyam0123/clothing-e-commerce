@@ -34,6 +34,10 @@ const apiKeySchema = new mongoose.Schema(
       testEventCode: { type: String },
       isActive: { type: Boolean, default: true }, 
     },
+    context7: {
+      apiKey: { type: String, select: false },
+      isActive: { type: Boolean, default: true },
+    },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true },

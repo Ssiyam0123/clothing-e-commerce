@@ -8,6 +8,7 @@ const isClient = typeof window !== 'undefined';
 const initialState = {
   user: null,
   isMounted: false,
+  settings: null,
   theme: (isClient && getCookie("vanguard-theme-mode")) || "dark",
   themeColor: (isClient && getCookie("vanguard-theme-color")) || "Zinc",
   themeFont: (isClient && getCookie("vanguard-theme-font")) || "Inter",
@@ -55,6 +56,7 @@ export const useAppStore = create((set, get) => ({
       const defaultLang = branding.defaultLanguage || "en";
 
       set({ 
+        settings: data,
         theme: getCookie("vanguard-theme-mode") || defaultTheme, 
         themeColor: getCookie("vanguard-theme-color") || defaultThemeColor,
         themeFont: getCookie("vanguard-theme-font") || defaultThemeFont,

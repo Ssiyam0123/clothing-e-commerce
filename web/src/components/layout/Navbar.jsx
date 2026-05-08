@@ -37,7 +37,8 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const { user, logout, isAuthenticated } = useAuthStore();
-  const { theme, setTheme, lang, setLang } = useAppStore();
+  const { theme, setTheme, lang, setLang, settings } = useAppStore();
+  const branding = settings?.branding || {};
   const { cart, wishlistItems } = useProductStore();
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -76,21 +77,33 @@ export default function Navbar() {
     router.refresh();
   };
 
+  const isHome = pathname === "/" || pathname === "/en" || pathname === "/bn";
+  const isBlogDetails = pathname.startsWith("/blog/") && pathname !== "/blog";
+  const isTransparentPage = isHome || isBlogDetails;
+
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-[120] transition-all duration-700 px-4 sm:px-6 lg:px-12 py-4",
-        scrolled ? "bg-background/95 backdrop-blur-3xl border-b border-border/10 py-3 shadow-xl shadow-black/5" : pathname.startsWith("/blog/") && pathname !== "/blog" ? "bg-background/90 backdrop-blur-2xl border-b border-border/10 py-3 shadow-xl shadow-black/5" : "bg-transparent"
+        "fixed !top-0 left-0 right-0 !mt-0 z-[120] transition-all duration-700 px-4 sm:px-6 lg:px-12 py-4",
+        (scrolled || !isTransparentPage) ? "bg-background/95 backdrop-blur-3xl border-b border-border/10 py-3 shadow-xl shadow-black/5" : "bg-transparent"
       )}
     >
       <div className="w-full mx-auto flex items-center justify-between gap-2">
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2 sm:gap-3 group flex-shrink-0" aria-label="Vanguard Home">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-foreground rounded-xl flex items-center justify-center text-background group-hover:rotate-[15deg] transition-transform duration-500 shadow-xl shadow-foreground/5">
-             <Sparkles size={16} className="sm:size-[20px] group-hover:scale-125 transition-transform" />
-          </div>
+        <Link href="/" className="flex items-center gap-2 sm:gap-3 group flex-shrink-0" aria-label={branding.siteName || "Vanguard Home"}>
+          {branding.headerLogo ? (
+            <img 
+              src={getImageUrl(branding.headerLogo)} 
+              alt={branding.siteName || "Logo"} 
+              className="h-8 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105 duration-500" 
+            />
+          ) : (
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-foreground rounded-xl flex items-center justify-center text-background group-hover:rotate-[15deg] transition-transform duration-500 shadow-xl shadow-foreground/5">
+               <Sparkles size={16} className="sm:size-[20px] group-hover:scale-125 transition-transform" />
+            </div>
+          )}
           <span className="text-base sm:text-xl font-black tracking-normal uppercase italic text-gradient block">
-            Vanguard
+            {branding.siteName || "Vanguard"}
           </span>
         </Link>
 

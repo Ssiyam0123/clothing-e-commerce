@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/store/appStore";
 import { getTranslation } from "@/utils/typography/handler";
+import { getImageUrl } from "@/utils/imageUtils";
 
 export default function Footer() {
-  const { lang } = useAppStore();
+  const { lang, settings } = useAppStore();
+  const branding = settings?.branding || {};
   const t = useMemo(() => getTranslation('footer', lang), [lang]);
 
   const footerSections = useMemo(() => [
@@ -50,10 +52,20 @@ export default function Footer() {
           {/* Brand Engine */}
           <div className="lg:col-span-5 space-y-10">
             <Link href="/" className="flex items-center gap-3 group">
-               <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background group-hover:scale-110 transition-transform duration-500 shadow-2xl">
-                  <Sparkles size={20} />
-               </div>
-               <span className="text-2xl font-black uppercase italic tracking-tighter text-gradient">Vanguard</span>
+               {branding.footerLogo ? (
+                 <img 
+                   src={getImageUrl(branding.footerLogo)} 
+                   alt={branding.siteName} 
+                   className="h-10 w-auto object-contain transition-transform group-hover:scale-110 duration-500" 
+                 />
+               ) : (
+                 <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background group-hover:scale-110 transition-transform duration-500 shadow-2xl">
+                    <Sparkles size={20} />
+                 </div>
+               )}
+               <span className="text-2xl font-black uppercase italic tracking-tighter text-gradient">
+                 {branding.siteName || "Vanguard"}
+               </span>
             </Link>
             <p className="text-base md:text-lg font-medium text-muted-foreground leading-relaxed max-w-md italic opacity-80">
               {t.description}
@@ -149,7 +161,7 @@ export default function Footer() {
            <div className="flex items-center gap-6 sm:gap-10">
               <Link href="/terms" className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground opacity-60 hover:opacity-100">{t.legal}</Link>
               <Link href="/privacy" className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground opacity-60 hover:opacity-100">{t.privacy}</Link>
-              <p className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">© 2026 {t.rights}</p>
+               <p className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">© 2026 All Rights Reserved • {branding.siteName || "Vanguard"}</p>
            </div>
         </div>
       </div>

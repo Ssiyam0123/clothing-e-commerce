@@ -21,6 +21,8 @@ export default function AdminLayout({ children }) {
   const { theme, toggleTheme, isMounted } = useAppStore();
 
   const isChatRoute = pathname?.startsWith("/admin/chat");
+  const isSettingsRoute = pathname === "/admin/settings";
+  const isFullPage = isChatRoute || isSettingsRoute;
 
   // 🛡️ Redirect non-admins
   useEffect(() => {
@@ -38,7 +40,7 @@ export default function AdminLayout({ children }) {
     return (
       <div className="flex h-screen bg-background transition-colors duration-700">
         {/* Sidebar Skeleton */}
-        {!isChatRoute && (
+        {!isFullPage && (
           <div className="hidden lg:flex w-72 flex-col border-r border-border p-8 space-y-8">
             <Skeleton className="h-10 w-40 rounded-xl" />
             <div className="space-y-4">
@@ -51,7 +53,7 @@ export default function AdminLayout({ children }) {
 
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Header Skeleton */}
-          {!isChatRoute && (
+          {!isFullPage && (
             <div className="h-20 border-b border-border px-10 flex items-center justify-between">
               <Skeleton className="h-8 w-48 rounded-full" />
               <div className="flex items-center gap-6">
@@ -66,8 +68,8 @@ export default function AdminLayout({ children }) {
           )}
 
           {/* Main Content Skeleton */}
-          <div className={cn("flex-1 space-y-10", !isChatRoute ? "p-10" : "p-0")}>
-            {!isChatRoute && (
+          <div className={cn("flex-1 space-y-10", !isFullPage ? "p-10" : "p-0")}>
+            {!isFullPage && (
               <>
                 <Skeleton className="h-16 w-1/2 rounded-2xl" />
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -78,7 +80,7 @@ export default function AdminLayout({ children }) {
                 <Skeleton className="h-[400px] w-full rounded-[3rem]" />
               </>
             )}
-            {isChatRoute && <Skeleton className="h-full w-full rounded-none" />}
+            {isFullPage && <Skeleton className="h-full w-full rounded-none" />}
           </div>
         </div>
       </div>
@@ -90,11 +92,11 @@ export default function AdminLayout({ children }) {
   return (
     <div className="flex h-screen bg-background text-foreground transition-colors duration-700">
       {/* 🖥️ Desktop Sidebar */}
-      {!isChatRoute && <Sidebar className="hidden lg:flex w-72" />}
+      {!isFullPage && <Sidebar className="hidden lg:flex w-72" />}
 
       <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* 🛰️ Top Header Bar */}
-        {!isChatRoute && (
+        {!isFullPage && (
           <header className="bg-background/70 backdrop-blur-2xl border-b border-border z-40 transition-all">
             <div className="flex justify-between items-center px-4 md:px-10 py-4 md:py-6">
               <div className="flex items-center gap-5">
@@ -178,9 +180,8 @@ export default function AdminLayout({ children }) {
           </header>
         )}
 
-        {/* 💻 Main Viewport */}
-        <main className={cn("flex-1 no-scrollbar bg-background/50", !isChatRoute ? "px-4 pt-4 pb-10 md:px-10 md:pt-6 md:pb-12 overflow-y-auto" : "p-0 overflow-hidden")}>
-          <div className={cn("mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700", !isChatRoute ? "max-w-[1400px]" : "max-w-none h-full")}>
+        <main className={cn("flex-1 no-scrollbar bg-background/50", !isFullPage ? "px-4 pt-4 pb-10 md:px-10 md:pt-6 md:pb-12 overflow-y-auto" : "p-0 overflow-hidden")}>
+          <div className={cn("mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700", !isFullPage ? "max-w-[1400px]" : "max-w-none h-full overflow-y-auto")}>
             {children}
           </div>
         </main>

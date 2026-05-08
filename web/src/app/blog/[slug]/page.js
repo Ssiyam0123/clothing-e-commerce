@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import BlogDetailsClient from "./BlogDetailsClient";
+import BlogDetails from "./BlogDetails";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 const SITE_URL =
@@ -128,7 +128,7 @@ export default async function BlogPage({ params }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <BlogDetailsClient blog={blog} />
+      <BlogDetails blog={blog} />
     </>
   );
 }

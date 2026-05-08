@@ -34,10 +34,16 @@ const metaSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
+const context7Schema = z.object({
+  apiKey: z.string().optional(),
+  isActive: z.boolean().optional(),
+});
+
 export const updateApiKeysSchema = z.object({
   sslCommerz: sslCommerzSchema.optional(),
   bkash: bkashSchema.optional(),
   pathao: pathaoSchema.optional(),
   meta: metaSchema.optional(),
+  context7: context7Schema.optional(),
   updatedBy: z.string().optional(),
 });
