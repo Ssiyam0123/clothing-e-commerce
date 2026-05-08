@@ -152,40 +152,45 @@ export default function LiveSupportPage() {
         </header>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-10 no-scrollbar z-10">
-          <div className="max-w-4xl mx-auto space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-10 no-scrollbar z-10">
+          <div className="max-w-4xl mx-auto space-y-4 md:space-y-6">
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-32 text-center space-y-6 opacity-20">
-                 <div className="w-24 h-24 bg-muted rounded-[2rem] flex items-center justify-center">
-                    <MessageSquare size={48} />
+              <div className="flex flex-col items-center justify-center py-20 md:py-32 text-center space-y-4 md:space-y-6 opacity-20">
+                 <div className="w-16 h-16 md:w-24 md:h-24 bg-muted rounded-2xl md:rounded-[2rem] flex items-center justify-center">
+                    <MessageSquare size={32} className="md:size-[48px]" />
                  </div>
-                 <p className="text-xs font-black uppercase tracking-[0.4em]">No active transmissions from HQ</p>
+                 <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em]">No active transmissions</p>
               </div>
             ) : (
-              messages.map((msg, i) => (
-                <ChatMessage 
-                  key={i} 
-                  message={msg} 
-                  isMe={msg.sender?.role === 'customer' || (msg.sender?._id || msg.sender) === user?._id} 
-                />
-              ))
+              messages.map((msg, i) => {
+                const myId = user?._id || user?.id;
+                const senderId = typeof msg.sender === "string" ? msg.sender : msg.sender?._id || msg.sender?.id;
+                const isMe = msg.sender?.role === 'customer' || senderId === myId;
+                return (
+                  <ChatMessage 
+                    key={msg._id || i} 
+                    message={msg} 
+                    isMe={isMe} 
+                  />
+                );
+              })
             )}
             <div ref={scrollRef} />
           </div>
         </div>
 
         {/* Input area */}
-        <footer className="p-6 md:p-8 bg-background/50 backdrop-blur-md border-t border-border/10 shrink-0 z-10">
-          <div className="max-w-4xl mx-auto flex gap-4">
+        <footer className="p-4 md:p-8 bg-background/50 backdrop-blur-md border-t border-border/10 shrink-0 z-10">
+          <div className="max-w-4xl mx-auto flex gap-2 md:gap-4">
             <div className="flex-1 relative group">
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="TRANSMIT MESSAGE TO VANGUARD HQ..."
-                className="w-full h-14 bg-background dark:bg-muted/50 border-border/20 rounded-2xl px-6 text-[13px] font-bold uppercase tracking-widest focus-visible:ring-accent-secondary/50 placeholder:text-muted-foreground/30 shadow-inner"
+                placeholder="MESSAGE..."
+                className="w-full h-12 md:h-14 bg-background dark:bg-muted/50 border-border/20 rounded-xl md:rounded-2xl px-4 md:px-6 text-[12px] md:text-[13px] font-bold uppercase tracking-widest focus-visible:ring-accent-secondary/50 placeholder:text-muted-foreground/30 shadow-inner"
               />
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20">
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 hidden md:block">
                  <Zap size={16} />
               </div>
             </div>
@@ -193,15 +198,15 @@ export default function LiveSupportPage() {
               onClick={handleSend}
               disabled={!input.trim() || !isConnected}
               className={cn(
-                "h-14 w-14 rounded-2xl shadow-xl transition-all duration-500",
+                "h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl shadow-xl transition-all duration-500",
                 input.trim() ? "bg-accent-secondary hover:bg-accent-secondary/90 scale-100" : "bg-muted text-muted-foreground scale-95 opacity-50"
               )}
             >
-              <Send size={20} className={cn("transition-transform", input.trim() && "translate-x-0.5 -translate-y-0.5")} />
+              <Send size={18} className={cn("md:size-[20px] transition-transform", input.trim() && "translate-x-0.5 -translate-y-0.5")} />
             </Button>
           </div>
-          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground text-center mt-6 opacity-40">
-            End-to-End Encryption Protocol Active • Vanguard Global Security
+          <p className="text-[7px] md:text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground text-center mt-4 md:mt-6 opacity-40">
+            End-to-End Encryption Protocol Active
           </p>
         </footer>
       </div>

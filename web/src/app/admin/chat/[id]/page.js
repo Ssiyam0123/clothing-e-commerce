@@ -135,21 +135,21 @@ export default function ActiveChatPage() {
       <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.03] pointer-events-none bg-[url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-whatsapp-texture.jpg')] bg-repeat" />
 
       {/* Header */}
-      <div className="h-[60px] bg-[#f0f2f5] dark:bg-[#202c33] px-4 flex items-center justify-between shrink-0 shadow-sm z-10 border-b border-border/5">
-        <div className="flex items-center gap-3 overflow-hidden">
+      <div className="h-[56px] md:h-[60px] bg-[#f0f2f5] dark:bg-[#202c33] px-2 md:px-4 flex items-center justify-between shrink-0 shadow-sm z-10 border-b border-border/5">
+        <div className="flex items-center gap-2 md:gap-3 overflow-hidden">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => router.push("/admin/chat")}
-            className="lg:hidden rounded-full shrink-0 hover:bg-black/5 dark:hover:bg-white/5"
+            className="lg:hidden rounded-full shrink-0 hover:bg-black/5 dark:hover:bg-white/5 w-9 h-9"
           >
-            <ArrowLeft size={20} className="text-foreground/70" />
+            <ArrowLeft size={18} className="text-foreground/70" />
           </Button>
           
           <div className="relative shrink-0">
-            <Avatar className="h-10 w-10 border border-border/10 shadow-sm">
+            <Avatar className="h-9 w-9 md:h-10 md:w-10 border border-border/10 shadow-sm">
               <AvatarImage src={getImageUrl(customer?.avatar)} className="object-cover" />
-              <AvatarFallback className="bg-accent-secondary/10 text-accent-secondary font-bold">
+              <AvatarFallback className="bg-accent-secondary/10 text-accent-secondary font-bold text-xs">
                 {customer?.name?.charAt(0) || "U"}
               </AvatarFallback>
             </Avatar>
@@ -157,32 +157,32 @@ export default function ActiveChatPage() {
           </div>
 
           <div className="flex flex-col min-w-0">
-            <h3 className="text-[15px] font-bold text-foreground/90 truncate leading-tight">
+            <h3 className="text-[14px] md:text-[15px] font-bold text-foreground/90 truncate leading-tight">
               {customer?.name || "Anonymous_User"}
             </h3>
-            <span className="text-[11px] text-[#00a884] font-medium animate-pulse">Online</span>
+            <span className="text-[10px] text-[#00a884] font-medium animate-pulse">Online</span>
           </div>
         </div>
         
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5 dark:hover:bg-white/5">
-            <Search size={18} className="text-foreground/60" />
+        <div className="flex items-center gap-0.5 md:gap-1">
+          <Button variant="ghost" size="icon" className="w-9 h-9 rounded-full hover:bg-black/5 dark:hover:bg-white/5">
+            <Search size={16} className="text-foreground/60" />
           </Button>
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5 dark:hover:bg-white/5">
-            <MoreVertical size={20} className="text-foreground/60" />
+          <Button variant="ghost" size="icon" className="w-9 h-9 rounded-full hover:bg-black/5 dark:hover:bg-white/5">
+            <MoreVertical size={18} className="text-foreground/60" />
           </Button>
         </div>
       </div>
 
-      {/* Messages - ONLY scrollable area */}
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto min-h-0 z-10 no-scrollbar">
-        <div className="max-w-4xl mx-auto px-4 py-6 space-y-3">
+        <div className="max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-6 space-y-2 md:space-y-3">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 opacity-30">
-               <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
-                  <Send size={32} />
+               <div className="w-16 h-16 md:w-20 md:h-20 bg-muted rounded-full flex items-center justify-center">
+                  <Send size={24} className="md:size-[32px]" />
                </div>
-               <p className="text-sm font-medium uppercase tracking-widest">No previous transmissions</p>
+               <p className="text-xs md:text-sm font-medium uppercase tracking-widest">No transmissions</p>
             </div>
           ) : (
             messages.map((msg, idx) => {
@@ -197,16 +197,16 @@ export default function ActiveChatPage() {
         </div>
       </div>
 
-      {/* Input Bar - fixed bottom */}
-      <div className="bg-[#f0f2f5] dark:bg-[#202c33] px-4 py-3 shrink-0 z-10 border-t border-border/5">
-        <div className="flex items-center gap-3 max-w-5xl mx-auto">
+      {/* Input Bar */}
+      <div className="bg-[#f0f2f5] dark:bg-[#202c33] px-2 md:px-4 py-2 md:py-3 shrink-0 z-10 border-t border-border/5">
+        <div className="flex items-center gap-2 md:gap-3 max-w-5xl mx-auto">
           <div className="flex-1 relative">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type a message..."
-              className="w-full h-11 bg-white dark:bg-[#2a3942] border-none rounded-xl px-4 py-2 text-[15px] focus-visible:ring-0 shadow-sm"
+              placeholder="Message..."
+              className="w-full h-10 md:h-11 bg-white dark:bg-[#2a3942] border-none rounded-xl px-3 md:px-4 py-1.5 md:py-2 text-[14px] md:text-[15px] focus-visible:ring-0 shadow-sm"
               disabled={isSending}
             />
           </div>
@@ -215,11 +215,11 @@ export default function ActiveChatPage() {
             disabled={!input.trim() || isSending}
             size="icon"
             className={cn(
-              "rounded-xl h-11 w-11 shadow-lg transition-all duration-300",
+              "rounded-xl h-10 w-10 md:h-11 md:w-11 shadow-lg transition-all duration-300",
               input.trim() ? "bg-[#00a884] hover:bg-[#008f72] scale-100" : "bg-muted text-muted-foreground scale-95 opacity-50"
             )}
           >
-            <Send size={18} className={cn("transition-transform", input.trim() && "translate-x-0.5 -translate-y-0.5")} />
+            <Send size={16} className={cn("md:size-[18px] transition-transform", input.trim() && "translate-x-0.5 -translate-y-0.5")} />
           </Button>
         </div>
       </div>

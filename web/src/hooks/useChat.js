@@ -8,6 +8,7 @@ import axios from "axios";
 export const useChat = (isOpen) => {
   const { token, user } = useAuthStore();
   const [messages, setMessages] = useState([]);
+  const [conversationId, setConversationId] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef(null);
 
@@ -21,7 +22,14 @@ export const useChat = (isOpen) => {
               headers: { Authorization: `Bearer ${token}` },
             },
           );
-          setMessages(res.data?.messages || []);
+          if (res.data?.success) {
+            setMessages(res.data.conversation?.messages || []);
+            setConversationId(res.data.conversation?._id);
+          } else {
+            // Fallback for different API structure
+            setMessages(res.data?.messages || []);
+            setConversationId(res.data?._id || res.data?.conversationId);
+          }
         } catch (err) {
           console.error("🚨 History Sync Failed", err);
         }
@@ -44,19 +52,15 @@ export const useChat = (isOpen) => {
       socketRef.current.on("disconnect", () => setIsConnected(false));
 
       socketRef.current.on("new_message", (data) => {
-        // For customer, data.message contains the message object
         setMessages((prev) => [...prev, data.message]);
       });
     }
 
-    if (!isOpen && socketRef.current) {
-      socketRef.current.disconnect();
-      socketRef.current = null;
-      setIsConnected(false);
-    }
-
     return () => {
-      if (socketRef.current) socketRef.current.disconnect();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
     };
   }, [isOpen, token]);
 
@@ -65,9 +69,10 @@ export const useChat = (isOpen) => {
       socketRef.current.emit("send_message", {
         text,
         recipientId: "admin_room",
+        conversationId, // Include conversationId for backend routing
       });
     }
   };
 
-  return { messages, isConnected, sendMessage };
+  return { messages, isConnected, sendMessage, conversationId };
 };
