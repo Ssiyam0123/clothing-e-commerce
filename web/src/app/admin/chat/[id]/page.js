@@ -105,14 +105,6 @@ export default function ActiveChatPage() {
   const handleSendMessage = useCallback(async () => {
     if (!input.trim() || !socket || !customer || isSending) return;
     setIsSending(true);
-    const tempMessage = {
-      _id: `temp-${Date.now()}`,
-      text: input,
-      sender: { _id: user?._id, role: "admin" },
-      createdAt: new Date().toISOString(),
-      isRead: false,
-    };
-    setMessages((prev) => [...prev, tempMessage]);
     socket.emit("send_message", {
       text: input,
       recipientId: customer._id,
