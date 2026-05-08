@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Clock, User } from "lucide-react";
 
-export default function BlogMagazineClient({ posts }) {
+export default function BlogMagazineClient({ posts, t }) {
   const featured = posts?.[0];
   const remaining = posts?.slice(1);
 
@@ -23,15 +23,15 @@ export default function BlogMagazineClient({ posts }) {
             className="inline-flex items-center gap-3 px-4 py-1 rounded-full border border-border/10 bg-accent/30 backdrop-blur-md"
           >
             <div className="w-1.5 h-1.5 rounded-full bg-accent-secondary animate-pulse" />
-            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground">Protocol_Foundry</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground">{t.protocol}</span>
           </motion.div>
-          <h1 className="text-5xl sm:text-8xl md:text-9xl font-black uppercase italic tracking-tighter leading-none text-gradient">
+          <h1 className="text-5xl sm:text-7xl md:text-8xl font-black uppercase italic tracking-tighter leading-none text-gradient">
             Vanguard
             <br />
-            <span className="text-foreground">Journal</span>
+            <span className="text-foreground">{t.journal}</span>
           </h1>
           <p className="max-w-md mx-auto text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.4em] text-muted-foreground/60 leading-relaxed">
-            Architecting Tactical Aesthetics & Digital Narratives
+            {t.narrative}
           </p>
         </header>
 
@@ -44,7 +44,7 @@ export default function BlogMagazineClient({ posts }) {
                 href={`/blog/${featured.slug}`}
                 className="block space-y-8"
               >
-                <div className="relative aspect-[16/10] sm:aspect-[16/9] overflow-hidden rounded-[2.5rem] sm:rounded-[4rem] bg-accent/20 shadow-2xl">
+                <div className="relative aspect-[16/10] sm:aspect-[16/9] overflow-hidden rounded-[2.5rem] sm:rounded-[3.5rem] bg-accent/20 shadow-2xl">
                   <Image
                     src={getImageUrl(featured.featuredImage, 1200, 85)}
                     alt={featured.title}
@@ -65,18 +65,18 @@ export default function BlogMagazineClient({ posts }) {
                 </div>
                 
                 <div className="space-y-6">
-                  <h2 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase italic tracking-tighter leading-[0.9] group-hover:text-accent-secondary transition-colors duration-500">
+                  <h2 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase italic tracking-tighter leading-[0.9] group-hover:text-accent-secondary transition-colors duration-500">
                     {featured.title}
                   </h2>
                   <div className="flex flex-wrap items-center gap-6 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                     <div className="flex items-center gap-2">
                        <User size={12} className="text-accent-secondary" />
-                       <span>{featured.author?.name}</span>
+                       <span>{t.author} {featured.author?.name}</span>
                     </div>
                     <div className="w-1 h-1 bg-border rounded-full" />
                     <div className="flex items-center gap-2">
                        <Clock size={12} className="text-accent-secondary" />
-                       <span>{featured.readingTime}</span>
+                       <span>{featured.readingTime} {t.readingTime}</span>
                     </div>
                   </div>
                 </div>
@@ -88,7 +88,7 @@ export default function BlogMagazineClient({ posts }) {
           <div className="lg:col-span-4 space-y-12">
             <div className="flex items-center gap-4">
                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground whitespace-nowrap">
-                 Latest_Sequences
+                 {t.latest}
                </h3>
                <div className="h-px flex-1 bg-border/20" />
             </div>
@@ -119,7 +119,7 @@ export default function BlogMagazineClient({ posts }) {
                     </h4>
                     <div className="flex items-center gap-3 text-[8px] font-bold text-muted-foreground uppercase tracking-widest">
                       <Clock size={10} />
-                      <span>{post.readingTime}</span>
+                      <span>{post.readingTime} {t.readingTime}</span>
                     </div>
                   </div>
                 </Link>

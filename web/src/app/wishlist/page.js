@@ -4,44 +4,22 @@ import { useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getImageUrl } from "@/utils/imageUtils";
-import Loader from "@/components/common/Loader";
 import { useProductStore } from "@/store/productStore";
 import { swalToast, swalError } from "@/utils/swal";
 import { useAppStore } from "@/store/appStore";
 import { useTrackingStore } from "@/store/trackingStore";
-import { ShoppingBag, X, ArrowRight, Info, Zap, Heart } from "lucide-react";
+import { ShoppingBag, X, Info } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { getTranslation } from "@/utils/typography/handler";
 import { motion, AnimatePresence } from "framer-motion";
-
-const DICTIONARY = {
-  en: {
-    title: "The Vault",
-    sub: "Your curated artifacts.",
-    empty: "The Vault is Empty",
-    browse: "Explore Collection",
-    add: "Move to Bag",
-    remove: "Remove",
-    syncTip: "Log in to sync your vault across all devices.",
-  },
-  bn: {
-    title: "সংরক্ষিত ভল্ট",
-    sub: "আপনার বাছাইকৃত পণ্যসমূহ।",
-    empty: "ভল্টটি খালি",
-    browse: "কালেকশন দেখুন",
-    add: "ব্যাগে নিন",
-    remove: "সরিয়ে ফেলুন",
-    syncTip: "সব ডিভাইসে আপনার ভল্ট সিঙ্ক করতে লগইন করুন।",
-  },
-};
 
 export default function WishlistPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuthStore();
   const { lang, isMounted } = useAppStore();
-  const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY.en, [lang]);
+  
+  const t = useMemo(() => getTranslation('wishlist', lang), [lang]);
 
   const trackAddToCart = useTrackingStore((state) => state.trackAddToCart);
   const wishlistItems = useProductStore((state) => state.wishlistItems);
@@ -51,7 +29,7 @@ export default function WishlistPage() {
   const handleMoveToCart = (product) => {
     const availableSizes = product.sizes?.filter((s) => s.stock > 0);
     if (!availableSizes?.length)
-      return swalError("Out of Stock", "Item unavailable.");
+      return swalError(lang === 'bn' ? "স্টক নেই" : "Out of Stock", lang === 'bn' ? "পণ্যটি এখন পাওয়া যাচ্ছে না।" : "Item unavailable.");
 
     const sizeId = availableSizes[0].size._id || availableSizes[0].size;
     const discountedPrice =
@@ -61,25 +39,19 @@ export default function WishlistPage() {
     toggleWishlist(product, isAuthenticated);
 
     trackAddToCart(product._id, discountedPrice, 1);
-    swalToast(
-      lang === "bn" ? "ব্যাগে মুভ করা হয়েছে" : "Moved to Bag",
-      "success",
-    );
+    swalToast(t.movedToBag, "success");
   };
 
   const handleRemove = (product) => {
     toggleWishlist(product, isAuthenticated);
-    swalToast(
-      lang === "bn" ? "ভল্ট থেকে সরানো হয়েছে" : "Removed from vault",
-      "success",
-    );
+    swalToast(t.removedFromVault, "success");
   };
 
   if (!isMounted || authLoading) {
     return (
       <div className="min-h-screen bg-background pt-32 px-4 sm:px-10 space-y-20">
         <div className="space-y-6">
-          <Skeleton className="h-32 w-2/3 rounded-3xl" />
+          <Skeleton className="h-24 w-2/3 rounded-3xl" />
           <Skeleton className="h-4 w-1/4 rounded-full" />
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-10">
@@ -110,11 +82,11 @@ export default function WishlistPage() {
         <header className="mb-12 sm:mb-20 border-b border-border/10 pb-8 sm:pb-12">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="space-y-4 sm:space-y-6">
-              <h1 className="text-5xl sm:text-7xl lg:text-9xl font-black tracking-tighter uppercase italic leading-[0.8] text-gradient">
-                The Vault
+              <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black tracking-tighter uppercase italic leading-[0.8] text-gradient">
+                {t.title}
               </h1>
               <p className="text-muted-foreground uppercase text-[9px] sm:text-[10px] font-black tracking-[0.4em] sm:tracking-[0.5em]">
-                {ui.sub}
+                {t.sub}
               </p>
             </div>
 
@@ -127,7 +99,7 @@ export default function WishlistPage() {
               >
                 <Info size={18} className="text-accent-secondary group-hover:scale-110 transition-transform" aria-hidden="true" />
                 <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-foreground/80">
-                  {ui.syncTip}
+                  {t.syncTip}
                 </span>
               </Link>
             )}
@@ -145,8 +117,8 @@ export default function WishlistPage() {
               <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] sm:rounded-[3rem] glass flex items-center justify-center mx-auto opacity-20">
                  <ShoppingBag size={48} className="sm:w-16 sm:h-16" />
               </div>
-              <h2 className="text-4xl sm:text-6xl md:text-8xl font-black uppercase italic tracking-tighter text-muted-foreground/20 leading-none">
-                {ui.empty}
+              <h2 className="text-3xl sm:text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-muted-foreground/20 leading-none">
+                {t.empty}
               </h2>
               <Button
                 asChild
@@ -154,7 +126,7 @@ export default function WishlistPage() {
                 className="rounded-full px-12 h-14 font-black uppercase tracking-[0.3em] text-[10px] border-border/20 hover:bg-accent-secondary hover:text-white transition-all shadow-2xl"
               >
                 <Link href="/products">
-                  {ui.browse}
+                  {t.browse}
                 </Link>
               </Button>
             </motion.div>
@@ -184,7 +156,7 @@ export default function WishlistPage() {
                       size="icon"
                       onClick={() => handleRemove(product)}
                       className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 w-10 h-10 rounded-full bg-background/80 backdrop-blur-md text-foreground hover:text-destructive hover:bg-background transition-all shadow-xl"
-                      aria-label={ui.remove}
+                      aria-label={t.remove}
                     >
                       <X size={18} aria-hidden="true" />
                     </Button>
@@ -201,7 +173,7 @@ export default function WishlistPage() {
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-xl sm:text-3xl font-black tracking-tighter">
+                      <span className="text-xl sm:text-2xl font-black tracking-tighter">
                         ৳{(product.price - (product.price * (product.discount || 0)) / 100).toFixed(0)}
                       </span>
                     </div>
@@ -209,10 +181,10 @@ export default function WishlistPage() {
                     <Button
                       onClick={() => handleMoveToCart(product)}
                       className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-foreground text-background font-black uppercase tracking-widest text-[9px] sm:text-[10px] hover:bg-accent-secondary hover:text-white transition-all duration-500 group/btn"
-                      aria-label={ui.add}
+                      aria-label={t.add}
                     >
                       <ShoppingBag size={14} className="mr-2 group-hover/btn:scale-110 transition-transform" aria-hidden="true" />
-                      {ui.add}
+                      {t.add}
                     </Button>
                   </div>
                 </motion.div>

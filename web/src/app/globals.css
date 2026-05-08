@@ -128,6 +128,21 @@
     @apply bg-background text-foreground;
     font-family: var(--font-theme, var(--font-inter)), sans-serif;
   }
+  
+  /* Bengali Specific Overrides */
+  [lang="bn"], .font-bn {
+    font-family: 'Hind Siliguri', sans-serif !important;
+  }
+
+  [lang="bn"] .tracking-tighter, .font-bn .tracking-tighter {
+    tracking: normal !important;
+    letter-spacing: 0 !important;
+  }
+
+  [lang="bn"] .leading-none, .font-bn .leading-none,
+  [lang="bn"] .leading-\[0\.8\], .font-bn .leading-\[0\.8\] {
+    line-height: 1.3 !important;
+  }
 }
 
 /* Custom Utilities */

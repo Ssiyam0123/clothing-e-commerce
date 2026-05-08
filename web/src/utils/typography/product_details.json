@@ -1,0 +1,42 @@
+{
+  "en": {
+    "about": "Narrative",
+    "related": "The Sequence",
+    "certified": "Certified",
+    "qualityLock": "Quality Lock",
+    "express": "Express",
+    "globalTransit": "Global Transit",
+    "recovery": "Recovery",
+    "secureReturns": "Secure Returns",
+    "composition": "Composition Protocol",
+    "compositionDesc": "Every Vanguard artifact is architected from premium, sustainable fibers designed for high-performance durability and an avant-garde silhouette.",
+    "reviews": "REVIEWS",
+    "featuredArtifact": "Featured Artifact",
+    "premiumArtifact": "Premium Artifact",
+    "selectSize": "Select Dimensional Protocol",
+    "addToCart": "Append to Cart",
+    "buyNow": "Execute Buy Now",
+    "addedToCart": "Artifact Added to Manifest",
+    "outOfStock": "Out of Sequence"
+  },
+  "bn": {
+    "about": "বিবরণ",
+    "related": "অনুরূপ পণ্য",
+    "certified": "প্রত্যয়িত",
+    "qualityLock": "কোয়ালিটি নিশ্চিত",
+    "express": "দ্রুত ডেলিভারি",
+    "globalTransit": "সারাদেশে শিপিং",
+    "recovery": "রিটার্ন",
+    "secureReturns": "নিরাপদ রিটার্ন",
+    "composition": "উপাদান ও গঠন",
+    "compositionDesc": "প্রতিটি ভ্যানগার্ড পণ্য প্রিমিয়াম এবং টেকসই ফাইবার থেকে তৈরি, যা উচ্চ-মানের স্থায়িত্ব এবং একটি আধুনিক লুক নিশ্চিত করে।",
+    "reviews": "রিভিউ",
+    "featuredArtifact": "সেরা পণ্য",
+    "premiumArtifact": "প্রিমিয়াম পণ্য",
+    "selectSize": "সাইজ নির্বাচন করুন",
+    "addToCart": "কার্টে যোগ করুন",
+    "buyNow": "এখনই কিনুন",
+    "addedToCart": "পণ্যটি কার্টে যোগ করা হয়েছে",
+    "outOfStock": "স্টক শেষ"
+  }
+}

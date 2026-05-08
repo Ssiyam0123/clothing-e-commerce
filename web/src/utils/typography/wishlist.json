@@ -1,0 +1,24 @@
+{
+  "en": {
+    "title": "The Vault",
+    "sub": "Your curated artifacts.",
+    "empty": "The Vault is Empty",
+    "browse": "Explore Collection",
+    "add": "Move to Bag",
+    "remove": "Remove",
+    "syncTip": "Log in to sync your vault across all devices.",
+    "movedToBag": "Artifact Transferred to Bag",
+    "removedFromVault": "Artifact Purged from Vault"
+  },
+  "bn": {
+    "title": "সংরক্ষিত ভল্ট",
+    "sub": "আপনার বাছাইকৃত পণ্যসমূহ।",
+    "empty": "ভল্টটি খালি",
+    "browse": "কালেকশন দেখুন",
+    "add": "ব্যাগে নিন",
+    "remove": "সরিয়ে ফেলুন",
+    "syncTip": "সব ডিভাইসে আপনার ভল্ট সিঙ্ক করতে লগইন করুন।",
+    "movedToBag": "ব্যাগে মুভ করা হয়েছে",
+    "removedFromVault": "ভল্ট থেকে সরানো হয়েছে"
+  }
+}

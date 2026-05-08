@@ -1,0 +1,44 @@
+{
+  "en": {
+    "heroBtn": "Shop Collection",
+    "saleBtn": "View Sale",
+    "catTitle": "The Architecture of Style",
+    "catSub": "Explore by Category",
+    "featTitle": "Featured Product",
+    "featSub": "Top Picks for You",
+    "newTitle": "The Latest Drops",
+    "newSub": "Fresh Arrivals",
+    "saleTitle": "Limited Artifacts",
+    "saleSub": "Exclusive Foundry Discounts",
+    "loadMore": "View All",
+    "newsletterTitle": "Join the Syndicate",
+    "newsletterSub": "Subscribe for early access and exclusive drops.",
+    "subscribe": "Subscribe",
+    "flashSub": "Live Drops",
+    "flashSale": "Flash Sale",
+
+    "seeMore": "See More",
+    "viewMore": "View More"
+  },
+  "bn": {
+    "heroBtn": "কালেকশন দেখুন",
+    "saleBtn": "অফার দেখুন",
+    "catTitle": "স্টাইলের নতুন সংজ্ঞা",
+    "catSub": "ক্যাটাগরি এক্সপ্লোর করুন",
+    "featTitle": "বাছাইকৃত সেরা স্টাইল",
+    "featSub": "কিউরেটেড এসেনশিয়ালস",
+    "newTitle": "নতুন কালেকশন",
+    "newSub": "সদ্য আগত",
+    "saleTitle": "বিশেষ অফার",
+    "saleSub": "সীমিত সময়ের ছাড়",
+    "loadMore": "সবগুলো দেখুন",
+    "newsletterTitle": "আমাদের সাথে যোগ দিন",
+    "newsletterSub": "নতুন ড্রপ এবং এক্সক্লুসিভ অফারের জন্য সাবস্ক্রাইব করুন।",
+    "subscribe": "সাবস্ক্রাইব",
+    "flashSub": "লাইভ ড্রপস",
+    "flashSale": "ফ্ল্যাশ সেল",
+
+    "seeMore": "আরও দেখুন",
+    "viewMore": "আরও দেখুন"
+  }
+}

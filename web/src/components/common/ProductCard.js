@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, ShoppingCart, Zap } from "lucide-react";
@@ -11,11 +11,16 @@ import { cn } from "@/lib/utils";
 import WishlistButtonClient from "@/components/products/WishlistButtonClient";
 import SizeSelectionModal from "@/components/products/SizeSelectionModal";
 import { useAuthStore } from "@/store/authStore";
+import { useAppStore } from "@/store/appStore";
+import { getTranslation } from "@/utils/typography/handler";
 
 export default function ProductCard({ product, className }) {
   const { isAuthenticated } = useAuthStore();
+  const { lang } = useAppStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("cart");
+
+  const t = useMemo(() => getTranslation('product_details', lang), [lang]);
 
   if (!product) return null;
 
@@ -58,12 +63,12 @@ export default function ProductCard({ product, className }) {
             )}
             {product.isFeatured && (
               <Badge className="bg-amber-500 text-black border-none px-2 py-0.5 text-[10px] font-semibold rounded-sm shadow-sm">
-                Featured
+                {t.featuredArtifact || "Featured"}
               </Badge>
             )}
             {product.isNew && (
               <Badge className="bg-emerald-700 text-white border-none px-2 py-0.5 text-[10px] font-semibold rounded-sm shadow-sm">
-                New
+                {t.newArtifact || "New"}
               </Badge>
             )}
           </div>
@@ -127,7 +132,7 @@ export default function ProductCard({ product, className }) {
                 aria-label={`Buy ${product.name} now`}
               >
                 <Zap size={12} className="fill-current" />
-                <span className="hidden xs:inline">Buy</span>
+                <span className="hidden xs:inline">{t.buyNow || "Buy"}</span>
               </Button>
               <Button
                 onClick={(e) => triggerModal(e, "cart")}
@@ -136,7 +141,7 @@ export default function ProductCard({ product, className }) {
                 aria-label={`Add ${product.name} to cart`}
               >
                 <ShoppingCart size={12} />
-                <span className="hidden xs:inline text-[9px]">Add</span>
+                <span className="hidden xs:inline text-[9px]">{t.addToCart || "Add"}</span>
               </Button>
             </div>
           </div>

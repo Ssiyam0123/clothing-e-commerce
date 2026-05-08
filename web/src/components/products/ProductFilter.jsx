@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback, useEffect, useState } from "react";
+import { useRef, useCallback } from "react";
 import Image from "next/image";
 import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
@@ -8,17 +8,14 @@ import { getImageUrl } from "@/utils/imageUtils";
 import FilterBar from "@/components/common/FilterBar";
 import { useTrackingStore } from "@/store/trackingStore";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, LayoutGrid, ChevronRight, ChevronLeft } from "lucide-react";
+import { Sparkles, LayoutGrid, ChevronRight } from "lucide-react";
 
-export default function ProductFilter({ initialCategories }) {
+export default function ProductFilter({ initialCategories, t }) {
   const { filters, setSearch, setSort, setCategory } = useProducts();
   const { categories } = useCategories(initialCategories);
   const trackSearch = useTrackingStore((state) => state.trackSearch);
-
-  const scrollRef = useRef(null);
 
   const handleSearchSubmit = useCallback(
     (val) => {
@@ -56,11 +53,13 @@ export default function ProductFilter({ initialCategories }) {
           onSearchSubmit={handleSearchSubmit}
           sort={filters.sort}
           onSortChange={setSort}
+          placeholder={t.search}
+          sortLabel={t.sort}
           sortOptions={[
-            { value: "all", label: "🌟 Default Sequence" },
-            { value: "-createdAt", label: "✨ New Artifacts" },
-            { value: "price", label: "💵 Low Investment" },
-            { value: "-price", label: "💎 High Artifacts" },
+            { value: "all", label: `🌟 ${t.all}` },
+            { value: "-createdAt", label: `✨ ${t.newest}` },
+            { value: "price", label: `💵 ${t.priceLowHigh}` },
+            { value: "-price", label: `💎 ${t.priceHighLow}` },
           ]}
         />
       </motion.div>
@@ -71,7 +70,7 @@ export default function ProductFilter({ initialCategories }) {
            <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-accent-secondary animate-pulse" />
               <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground">
-                Category
+                {t.category}
               </h3>
            </div>
            {filters.category !== 'all' && (
@@ -79,7 +78,7 @@ export default function ProductFilter({ initialCategories }) {
               onClick={() => handleCategoryUpdate('all', 'All')}
               className="text-[9px] font-black uppercase tracking-widest text-accent-secondary hover:underline underline-offset-4 transition-all"
              >
-                Clear Protocol
+                {t.clearFilters}
              </button>
            )}
         </div>
@@ -90,7 +89,7 @@ export default function ProductFilter({ initialCategories }) {
             <CategoryButton
               isSelected={filters.category === "all"}
               onClick={() => handleCategoryUpdate("all", "All Collections")}
-              label="All Collections"
+              label={t.all}
               icon={<LayoutGrid size={18} />}
             />
 
@@ -98,7 +97,7 @@ export default function ProductFilter({ initialCategories }) {
             <CategoryButton
               isSelected={filters.category === "isFeatured"}
               onClick={() => handleCategoryUpdate("isFeatured", "Featured")}
-              label="Featured"
+              label={t.featured}
               icon={<Sparkles size={18} className="text-amber-400" />}
             />
 

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { Share2, Star, ShieldCheck, Truck, RotateCcw } from "lucide-react";
 import StarRating from "@/components/store/StarRating";
 import ProductImageGallery from "@/components/products/ProductImageGallery";
@@ -9,16 +10,12 @@ import ReviewSectionWrapper from "@/components/products/ReviewSectionWrapper";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { getTranslation } from "@/utils/typography/handler";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
   "https://clothing-e-commerce-web.vercel.app";
-
-const DICTIONARY = {
-  en: { about: "Narrative", related: "The Sequence" },
-  bn: { about: "বিবরণ", related: "অনুরূপ পণ্য" },
-};
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -94,8 +91,10 @@ export default async function ProductPage({ params }) {
   const discountedPrice =
     product.price - (product.price * (product.discount || 0)) / 100;
   const isAvailable = product.sizes?.some((s) => s.stock > 0);
-  const lang = "en"; 
-  const ui = DICTIONARY[lang];
+  
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("vanguard-lang")?.value || "en";
+  const t = getTranslation('product_details', lang);
 
   const productSchema = {
     "@context": "https://schema.org",
@@ -143,17 +142,17 @@ export default async function ProductPage({ params }) {
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap items-center gap-3">
                   <Badge className="bg-accent-secondary text-white border-none px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg">
-                    {product.category?.name || "Premium Artifact"}
+                    {product.category?.name || t.premiumArtifact}
                   </Badge>
                   {product.isFeatured && (
                     <Badge className="bg-amber-500 text-black border-none px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg">
-                      Featured Artifact
+                      {t.featuredArtifact}
                     </Badge>
                   )}
                   <div className="flex items-center gap-2 glass px-3 py-1 rounded-xl">
                     <StarRating rating={product.averageRating || 5} size="small" />
                     <span className="text-[9px] font-black text-foreground">
-                      {product.totalReviews || 0} REVIEWS
+                      {product.totalReviews || 0} {t.reviews}
                     </span>
                   </div>
                 </div>
@@ -167,11 +166,11 @@ export default async function ProductPage({ params }) {
 
               <div className="space-y-6 lg:space-y-8">
                 <div className="space-y-4">
-                  <h1 className="text-4xl md:text-7xl lg:text-8xl font-black tracking-tighter uppercase italic leading-[0.9] text-gradient">
+                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tighter uppercase italic leading-[0.9] text-gradient">
                     {product.name}
                   </h1>
                   <div className="flex items-baseline gap-3">
-                    <span className="text-3xl md:text-5xl font-black tracking-tighter">
+                    <span className="text-2xl md:text-4xl font-black tracking-tighter">
                       ৳{discountedPrice.toFixed(0)}
                     </span>
                     {product.discount > 0 && (
@@ -182,7 +181,7 @@ export default async function ProductPage({ params }) {
                   </div>
                 </div>
 
-                <p className="text-sm md:text-lg text-muted-foreground leading-relaxed font-medium max-w-xl">
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed font-medium max-w-xl">
                   {product.description}
                 </p>
 
@@ -193,8 +192,8 @@ export default async function ProductPage({ params }) {
                         <ShieldCheck size={20} className="sm:w-6 sm:h-6" />
                      </div>
                      <div className="space-y-0.5">
-                        <span className="block text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-foreground">Certified</span>
-                        <span className="block text-[7px] sm:text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Quality Lock</span>
+                        <span className="block text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-foreground">{t.certified}</span>
+                        <span className="block text-[7px] sm:text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">{t.qualityLock}</span>
                      </div>
                    </div>
                    <div className="flex flex-col items-center gap-3 text-center group/usp p-3 sm:p-4 rounded-[1.5rem] sm:rounded-[2rem] hover:bg-accent/20 transition-all duration-500">
@@ -202,8 +201,8 @@ export default async function ProductPage({ params }) {
                         <Truck size={20} className="sm:w-6 sm:h-6" />
                      </div>
                      <div className="space-y-0.5">
-                        <span className="block text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-foreground">Express</span>
-                        <span className="block text-[7px] sm:text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Global Transit</span>
+                        <span className="block text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-foreground">{t.express}</span>
+                        <span className="block text-[7px] sm:text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">{t.globalTransit}</span>
                      </div>
                    </div>
                    <div className="flex flex-col items-center gap-3 text-center group/usp p-3 sm:p-4 rounded-[1.5rem] sm:rounded-[2rem] hover:bg-accent/20 transition-all duration-500">
@@ -211,8 +210,8 @@ export default async function ProductPage({ params }) {
                         <RotateCcw size={20} className="sm:w-6 sm:h-6" />
                      </div>
                      <div className="space-y-0.5">
-                        <span className="block text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-foreground">Recovery</span>
-                        <span className="block text-[7px] sm:text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Secure Returns</span>
+                        <span className="block text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-foreground">{t.recovery}</span>
+                        <span className="block text-[7px] sm:text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">{t.secureReturns}</span>
                      </div>
                    </div>
                 </div>
@@ -223,11 +222,11 @@ export default async function ProductPage({ params }) {
                 <div className="space-y-6 lg:space-y-8">
                   <div itemScope itemType="https://schema.org/Question" className="space-y-2">
                     <h3 itemProp="name" className="text-[9px] font-black uppercase tracking-[0.4em] text-accent-secondary">
-                      Composition Protocol
+                      {t.composition}
                     </h3>
                     <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
                       <p itemProp="text" className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-medium">
-                        Every Vanguard artifact is architected from premium, sustainable fibers designed for high-performance durability and an avant-garde silhouette.
+                        {t.compositionDesc}
                       </p>
                     </div>
                   </div>
@@ -241,7 +240,7 @@ export default async function ProductPage({ params }) {
         </div>
       </div>
 
-      <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-12 mt-20 lg:mt-56 pb-24 lg:pb-48 space-y-20 lg:space-y-64">
+      <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-12 mt-20 lg:mt-32 pb-24 lg:pb-32 space-y-20 lg:space-y-32">
         {/* Reviews */}
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
            <ReviewSectionWrapper productId={product._id} />
@@ -252,11 +251,10 @@ export default async function ProductPage({ params }) {
           <RelatedProducts
             categorySlug={product.category?.slug}
             currentProductId={product._id}
-            title={ui.related}
+            title={t.related}
           />
         </div>
       </div>
     </main>
   );
 }
-

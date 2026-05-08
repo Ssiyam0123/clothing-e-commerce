@@ -1,0 +1,38 @@
+{
+  "en": {
+    "home": "Home",
+    "products": "Products",
+    "flashSale": "Flash Sale",
+    "blog": "Journal",
+    "admin": "Admin Panel",
+    "tacticalIdentity": "Tactical Identity",
+    "profile": "Profile Identity",
+    "liveSupport": "Live Support",
+    "logout": "Terminate Session",
+    "login": "Auth Initiate",
+    "menuTitle": "Vanguard Menu",
+    "directory": "Directory",
+    "accountControl": "Account Control",
+    "authorization": "Authorization",
+    "initLogin": "Initialize Login",
+    "version": "Vanguard Core Protocol v4.2.0"
+  },
+  "bn": {
+    "home": "হোম",
+    "products": "পণ্যসমূহ",
+    "flashSale": "ফ্ল্যাশ সেল",
+    "blog": "জার্নাল",
+    "admin": "অ্যাডমিন প্যানেল",
+    "tacticalIdentity": "ট্যাকটিক্যাল আইডেন্টিটি",
+    "profile": "প্রোফাইল",
+    "liveSupport": "লাইভ সাপোর্ট",
+    "logout": "লগ আউট",
+    "login": "লগইন করুন",
+    "menuTitle": "ভ্যানগার্ড মেনু",
+    "directory": "ডিরেক্টরি",
+    "accountControl": "অ্যাকাউন্ট কন্ট্রোল",
+    "authorization": "অথোরাইজেশন",
+    "initLogin": "লগইন শুরু করুন",
+    "version": "ভ্যানগার্ড কোর প্রোটোকল v4.2.0"
+  }
+}

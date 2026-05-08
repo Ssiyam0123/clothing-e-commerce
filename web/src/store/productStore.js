@@ -34,7 +34,7 @@ export const useProductStore = create(
             let totalItems = 0;
             let totalPrice = 0;
 
-            cartRes.data.items?.forEach((item) => {
+            cartRes.data.items?.forEach((item, index) => {
               const key = getKey(getSafeId(item.product), getSafeId(item.size));
 
               const productPrice = Number(item.product?.price || 0);
@@ -48,6 +48,7 @@ export const useProductStore = create(
                 ...item,
                 discountedPrice: safeDiscountedPrice,
                 price: productPrice,
+                createdAt: item.createdAt || (Date.now() + index),
               };
 
               totalItems += Number(item.quantity || 0);
@@ -127,6 +128,7 @@ export const useProductStore = create(
                 quantity,
                 discountedPrice: discPrice,
                 originalPrice: product.price,
+                createdAt: Date.now(),
               };
             }
             return {
@@ -226,6 +228,54 @@ export const useProductStore = create(
             req.catch(() =>
               set({ wishlistSet: prevSet, wishlistItems: prevItems }),
             );
+          }
+        },
+        
+        changeItemSize: async (productId, oldSizeId, newSizeId, newSizeName, isAuth = false) => {
+          const oldKey = getKey(productId, oldSizeId);
+          const newKey = getKey(productId, newSizeId);
+          const prevCartState = { ...get().cart };
+
+          set((state) => {
+            const itemsMap = { ...state.cart.itemsMap };
+            const item = itemsMap[oldKey];
+            if (!item || String(oldSizeId) === String(newSizeId)) return state;
+
+            const quantity = item.quantity;
+
+            // 1. Delete old entry
+            delete itemsMap[oldKey];
+
+            // 2. Add or Merge into new entry
+            if (itemsMap[newKey]) {
+              itemsMap[newKey] = {
+                ...itemsMap[newKey],
+                quantity: itemsMap[newKey].quantity + quantity,
+              };
+            } else {
+              itemsMap[newKey] = {
+                ...item,
+                size: { _id: newSizeId, name: newSizeName || "Selected" },
+                quantity,
+                createdAt: item.createdAt || Date.now(),
+              };
+            }
+
+            return {
+              cart: {
+                ...state.cart,
+                itemsMap,
+              },
+            };
+          });
+
+          if (isAuth) {
+            try {
+              await api.put("/cart/change-size", { productId, oldSizeId, newSizeId });
+              // 🚀 NO syncWithServer here to prevent race conditions with stale backend state
+            } catch (err) {
+              set({ cart: prevCartState });
+            }
           }
         },
 

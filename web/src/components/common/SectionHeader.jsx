@@ -14,7 +14,7 @@ export default function SectionHeader({ title, subtitle, align = "center", class
       )}
       
       <div className={cn("space-y-4", align === "center" ? "mx-auto" : "")}>
-        <h2 className="text-[12vw] md:text-8xl lg:text-9xl font-black uppercase italic tracking-tighter leading-[0.8] text-gradient">
+        <h2 className="text-[10vw] md:text-6xl lg:text-7xl font-black uppercase italic tracking-tighter leading-[0.8] text-gradient">
           {title}
         </h2>
         {subtitle && (

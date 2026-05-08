@@ -1,0 +1,32 @@
+{
+  "en": {
+    "editTitle": "Protocol Identity",
+    "editSub": "Modify your digital footprint within the syndicate.",
+    "picLabel": "Identity Avatar",
+    "picSub": "Recommended: 1:1 Aspect Ratio",
+    "nameLabel": "Full Alias",
+    "emailLabel": "Secured Channel",
+    "phoneLabel": "Contact Frequency",
+    "bioLabel": "Identity Brief",
+    "saveBtn": "Commit Changes",
+    "saving": "Synchronizing...",
+    "identityUpdated": "Identity Updated",
+    "syncSuccess": "Your digital profile has been synchronized.",
+    "syncError": "Sync Error"
+  },
+  "bn": {
+    "editTitle": "প্রোটোকল আইডেন্টিটি",
+    "editSub": "সিন্ডিকেটের মধ্যে আপনার ডিজিটাল পদচিহ্ন পরিবর্তন করুন।",
+    "picLabel": "আইডেন্টিটি অ্যাভাটার",
+    "picSub": "পরামর্শ: ১:১ অ্যাসপেক্ট রেশিও",
+    "nameLabel": "পূর্ণ নাম",
+    "emailLabel": "সুরক্ষিত চ্যানেল",
+    "phoneLabel": "যোগাযোগ নম্বর",
+    "bioLabel": "জীবনবৃত্তান্ত",
+    "saveBtn": "পরিবর্তন সংরক্ষণ",
+    "saving": "সিংক্রোনাইজিং...",
+    "identityUpdated": "তথ্য আপডেট করা হয়েছে",
+    "syncSuccess": "আপনার প্রোফাইল সফলভাবে সিংক্রোনাইজ করা হয়েছে।",
+    "syncError": "সিংক্রোনাইজেশন ত্রুটি"
+  }
+}

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { X, ShoppingBag, Zap, Check, AlertTriangle } from "lucide-react";
+import { X, ShoppingBag, Zap, Check } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -15,24 +15,29 @@ import { Badge } from "@/components/ui/badge";
 import { getImageUrl } from "@/utils/imageUtils";
 import { useProductStore } from "@/store/productStore";
 import { useAuthStore } from "@/store/authStore";
+import { useAppStore } from "@/store/appStore";
+import { getTranslation } from "@/utils/typography/handler";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 export default function SizeSelectionModal({ product, isOpen, onOpenChange, mode = "cart" }) {
   const router = useRouter();
   const { addToCart, initiateBuyNow } = useProductStore();
   const { isAuthenticated } = useAuthStore();
+  const { lang } = useAppStore();
   const [selectedSizeId, setSelectedSizeId] = useState(null);
+
+  const t = useMemo(() => getTranslation('product_details', lang), [lang]);
 
   if (!product) return null;
 
   const discountedPrice = product.price - (product.price * (product.discount || 0)) / 100;
-  const availableSizes = product.sizes?.filter(s => s.stock > 0) || [];
+  const sizes = product.sizes || [];
 
   const handleConfirm = () => {
     if (!selectedSizeId) {
-      toast.error("Please select a size to proceed.");
+      toast.error(lang === 'bn' ? "দয়া করে একটি সাইজ নির্বাচন করুন।" : "Please select a size to proceed.");
       return;
     }
 
@@ -42,8 +47,8 @@ export default function SizeSelectionModal({ product, isOpen, onOpenChange, mode
       router.push("/cart?type=direct");
     } else {
       addToCart(product, selectedSizeId, 1, isAuthenticated);
-      toast.success(`${product.name} added to cart`, {
-        description: "Protocol updated successfully.",
+      toast.success(t.addedToCart || `${product.name} added to cart`, {
+        description: lang === 'bn' ? "সফলভাবে যোগ করা হয়েছে।" : "Protocol updated successfully.",
         icon: <ShoppingBag className="w-4 h-4 text-emerald-500" />
       });
       onOpenChange(false);
@@ -54,7 +59,7 @@ export default function SizeSelectionModal({ product, isOpen, onOpenChange, mode
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-[450px] p-0 overflow-hidden rounded-[2.5rem] border-none shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] bg-background/95 backdrop-blur-3xl [&>button]:hidden">
         <DialogHeader className="sr-only">
-          <DialogTitle>Select Protocol Size</DialogTitle>
+          <DialogTitle>{t.selectSize || "Select Dimensional Protocol"}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col">
@@ -65,14 +70,14 @@ export default function SizeSelectionModal({ product, isOpen, onOpenChange, mode
                   src={getImageUrl(product.images?.[0], 400, 160)}
                   alt={product.name}
                   fill
-                  className="object-cover scale-110 group-hover:scale-125 transition-transform duration-700"
+                  className="object-cover scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/10" />
              </div>
              
              <div className="flex-1 min-w-0 space-y-2">
                 <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest border-accent-secondary/30 text-accent-secondary bg-accent-secondary/5">
-                   {product.category?.name || "Artifact"}
+                   {product.category?.name || t.premiumArtifact}
                 </Badge>
                 <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tighter leading-[1.1] italic line-clamp-2 py-1">
                   {product.name}
@@ -98,15 +103,12 @@ export default function SizeSelectionModal({ product, isOpen, onOpenChange, mode
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">
-                   Dimensional Protocol
-                </span>
-                <span className="text-[9px] font-bold text-accent-secondary uppercase tracking-widest">
-                  {availableSizes.length} Variants Online
+                   {t.selectSize || "Dimensional Protocol"}
                 </span>
               </div>
               
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                {availableSizes.map((s) => {
+                {sizes.map((s) => {
                   const sizeId = s.size?._id || s.size;
                   const isSelected = selectedSizeId === sizeId;
                   
@@ -128,12 +130,6 @@ export default function SizeSelectionModal({ product, isOpen, onOpenChange, mode
                       )}>
                         {s.size?.name || "—"}
                       </span>
-                      <span className={cn(
-                        "text-[8px] font-bold uppercase tracking-tighter opacity-50",
-                        isSelected ? "text-white/80" : "text-muted-foreground"
-                      )}>
-                        {s.stock} Unit
-                      </span>
                       
                       {isSelected && (
                         <motion.div 
@@ -147,20 +143,13 @@ export default function SizeSelectionModal({ product, isOpen, onOpenChange, mode
                   );
                 })}
               </div>
-
-              {availableSizes.length === 0 && (
-                <div className="flex items-center gap-3 p-4 rounded-2xl bg-rose-500/5 border border-rose-500/10 text-rose-500">
-                   <AlertTriangle size={16} />
-                   <p className="text-[10px] font-black uppercase tracking-widest">Stock Depleted • Protocol Offline</p>
-                </div>
-              )}
             </div>
 
             {/* ⚡ Action Node */}
             <div className="space-y-4">
                <Button
                 onClick={handleConfirm}
-                disabled={availableSizes.length === 0}
+                disabled={sizes.length === 0}
                 className={cn(
                   "w-full h-16 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] transition-all duration-500 group shadow-2xl",
                   mode === 'buy-now' 
@@ -171,12 +160,12 @@ export default function SizeSelectionModal({ product, isOpen, onOpenChange, mode
                 {mode === "buy-now" ? (
                   <div className="flex items-center gap-3">
                     <Zap size={16} className="animate-pulse" />
-                    <span>Execute Buy_Now</span>
+                    <span>{t.buyNow || "Execute Buy Now"}</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-3">
                     <ShoppingBag size={16} />
-                    <span>Append to Cart</span>
+                    <span>{t.addToCart || "Append to Cart"}</span>
                   </div>
                 )}
               </Button>

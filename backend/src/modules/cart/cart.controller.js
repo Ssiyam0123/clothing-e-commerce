@@ -165,6 +165,55 @@ export const removeFromCart = asyncHandler(async (req, res) => {
   });
 });
 
+export const changeSize = asyncHandler(async (req, res) => {
+  const { productId, oldSizeId, newSizeId } = req.body;
+  const userId = req.user.id || req.user._id;
+
+  const cart = await Cart.findOne({ user: userId });
+  if (!cart) return res.status(404).json({ message: 'Cart not found' });
+
+  const itemIndex = cart.items.findIndex(
+    item => item.product.toString() === productId && item.size.toString() === oldSizeId
+  );
+  if (itemIndex === -1) return res.status(404).json({ message: 'Item not found in cart' });
+
+  const quantity = cart.items[itemIndex].quantity;
+
+  // Check stock for new size
+  const product = await Product.findById(productId);
+  const sizeStock = product.sizes.find(s => s.size.toString() === newSizeId);
+  if (!sizeStock || sizeStock.stock < quantity) {
+    return res.status(400).json({ message: 'Insufficient stock for new size' });
+  }
+
+  // Check if new size already exists in cart
+  const targetItemIndex = cart.items.findIndex(
+    item => item.product.toString() === productId && item.size.toString() === newSizeId
+  );
+
+  if (targetItemIndex !== -1) {
+    // Merge into existing item
+    cart.items[targetItemIndex].quantity += quantity;
+    cart.items.splice(itemIndex, 1);
+  } else {
+    // Update size of current item
+    cart.items[itemIndex].size = newSizeId;
+  }
+
+  await cart.save();
+  
+  await cart.populate('items.product', 'name price discount images slug isActive');
+  await cart.populate('items.size', 'name');
+  
+  const { totalItems, totalPrice } = calculateCartTotals(cart);
+  
+  res.json({
+    ...cart.toObject(),
+    totalItems,
+    totalPrice
+  });
+});
+
 export const clearCart = asyncHandler(async (req, res) => {
   const userId = req.user.id || req.user._id;
   const cart = await Cart.findOne({ user: userId });

@@ -6,6 +6,7 @@ import {
   removeFromCart,
   clearCart,
   bulkAddCart,
+  changeSize
 } from './cart.controller.js';
 import { optionalAuth, protect } from '../../middleware/auth.js';
 
@@ -19,6 +20,7 @@ router.route('/')
 
 router.post('/add', addToCart);
 router.put('/update', updateCartItem);
+router.put('/change-size', changeSize);
 router.delete('/remove/:productId/:sizeId', removeFromCart);
 router.post('/bulk-add', protect, bulkAddCart);
 export default router;

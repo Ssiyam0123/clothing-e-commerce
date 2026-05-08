@@ -5,7 +5,7 @@ import { ProductCardSkeleton } from "@/components/common/Skeletons";
 import ProductCard from "../common/ProductCard";
 import Pagination from "@/components/common/Pagination";
 
-export default function ProductList({ initialData }) {
+export default function ProductList({ initialData, t }) {
   const { products, pagination, setPage, isLoading, isFetching } = useProducts(
     { limit: 12 },
     initialData,
@@ -39,6 +39,7 @@ export default function ProductList({ initialData }) {
             page={pagination.page}
             totalPages={pagination.pages}
             onPageChange={setPage}
+            t={t}
           />
         </div>
       )}
@@ -52,7 +53,7 @@ export default function ProductList({ initialData }) {
             📦
           </span>
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted">
-            No artifacts found.
+            {t.noResults}
           </p>
         </div>
       )}

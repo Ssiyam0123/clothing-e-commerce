@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Search, ShoppingBag, User, Menu, X, Sun, Moon, Sparkles, Heart, ChevronRight, Shield, LifeBuoy, LogOut } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+
+import { Search, ShoppingBag, User, Menu, X, Sun, Moon, Sparkles, Heart, ChevronRight, Shield, LifeBuoy, LogOut, Languages } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { useProductStore } from "@/store/productStore";
@@ -28,22 +29,20 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { getImageUrl } from "@/utils/imageUtils";
-
-const NAV_LINKS = [
-  { label: "Home", href: "/" },
-  { label: "Products", href: "/products" },
-  { label: "Flash Sale", href: "/flash-sale" },
-  { label: "Blog", href: "/blog" },
-];
+import { getTranslation } from "@/utils/typography/handler";
 
 export default function Navbar() {
+  const router = useRouter();
   const pathname = usePathname();
+
   const { user, logout, isAuthenticated } = useAuthStore();
-  const { theme, setTheme, lang } = useAppStore();
+  const { theme, setTheme, lang, setLang } = useAppStore();
   const { cart, wishlistItems } = useProductStore();
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const t = useMemo(() => getTranslation('navbar', lang), [lang]);
 
   const cartCount = cart?.totalItems || 0;
   const wishlistCount = wishlistItems?.length || 0;
@@ -56,20 +55,32 @@ export default function Navbar() {
   }, []);
 
   const dynamicNavLinks = useMemo(() => {
-    const links = [...NAV_LINKS];
+    const links = [
+      { label: t.home, href: "/" },
+      { label: t.products, href: "/products" },
+      { label: t.flashSale, href: "/flash-sale" },
+      { label: t.blog, href: "/blog" },
+    ];
     if (user?.role === 'admin') {
-      links.push({ label: "Admin Panel", href: "/admin", isSpecial: true });
+      links.push({ label: t.admin, href: "/admin", isSpecial: true });
     }
     return links;
-  }, [user]);
+  }, [user, t]);
 
   if (pathname.startsWith("/admin")) return null;
+
+  const toggleLanguage = () => {
+    const newLang = lang === 'en' ? 'bn' : 'en';
+    setLang(newLang);
+    // Smooth refresh to update server components without full page reload
+    router.refresh();
+  };
 
   return (
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-[100] transition-all duration-700 px-6 lg:px-12 py-4",
-        scrolled ? "bg-background/95 backdrop-blur-3xl  border-border/10 py-3 shadow-xl shadow-black/5" : "bg-transparent"
+        scrolled ? "bg-background/95 backdrop-blur-3xl border-b border-border/10 py-3 shadow-xl shadow-black/5" : "bg-transparent"
       )}
     >
       <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
@@ -78,19 +89,19 @@ export default function Navbar() {
           <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background group-hover:rotate-[15deg] transition-transform duration-500 shadow-xl shadow-foreground/5">
              <Sparkles size={20} className="group-hover:scale-125 transition-transform" />
           </div>
-          <span className="text-2xl font-black tracking-tighter uppercase italic text-gradient hidden sm:block">
+          <span className="text-xl font-black tracking-normal uppercase italic text-gradient block">
             Vanguard
           </span>
         </Link>
 
         {/* DESKTOP NAV */}
-        <nav className="hidden lg:flex items-center gap-10">
+        <nav className="hidden lg:flex items-center gap-8">
           {dynamicNavLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                "text-[10px] font-black uppercase tracking-[0.4em] transition-all hover:text-accent-secondary relative group flex items-center gap-2",
+                "text-[9px] font-black uppercase tracking-[0.4em] transition-all hover:text-accent-secondary relative group flex items-center gap-2",
                 pathname === link.href ? "text-accent-secondary" : "text-foreground/70",
                 link.isSpecial && "text-rose-500 hover:text-rose-600"
               )}
@@ -107,7 +118,19 @@ export default function Navbar() {
         </nav>
 
         {/* ACTIONS */}
-        <div className="flex items-center gap-2 md:gap-5">
+        <div className="flex items-center gap-1 md:gap-3">
+          {/* Language Toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleLanguage}
+            className="w-10 h-10 rounded-full hover:bg-accent/30 gap-1"
+            aria-label="Toggle Language"
+          >
+            <Languages size={18} />
+            <span className="text-[9px] font-black uppercase tracking-tighter hidden xs:block">{lang.toUpperCase()}</span>
+          </Button>
+
           <Button
             variant="ghost"
             size="icon"
@@ -132,7 +155,7 @@ export default function Navbar() {
               <Heart size={18} />
             </Button>
             {wishlistCount > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] bg-accent-secondary text-white border-none text-[8px] font-black rounded-full px-1">
+              <Badge className="absolute -top-1 -right-1 h-4 min-w-[16px] bg-accent-secondary text-white border-none text-[7px] font-black rounded-full px-1 flex items-center justify-center">
                 {wishlistCount}
               </Badge>
             )}
@@ -143,13 +166,13 @@ export default function Navbar() {
               <ShoppingBag size={18} />
             </Button>
             {cartCount > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] bg-accent-secondary text-white border-none text-[8px] font-black rounded-full px-1">
+              <Badge className="absolute -top-1 -right-1 h-4 min-w-[16px] bg-accent-secondary text-white border-none text-[7px] font-black rounded-full px-1 flex items-center justify-center">
                 {cartCount}
               </Badge>
             )}
           </Link>
 
-          <div className="hidden md:block h-8 w-px bg-border/20 mx-2" />
+          <div className="hidden md:block h-6 w-px bg-border/20 mx-1" />
           
           {isAuthenticated ? (
             <DropdownMenu>
@@ -163,23 +186,23 @@ export default function Navbar() {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-72 rounded-[2rem] p-4 bg-background/95 backdrop-blur-xl border-border/20 shadow-2xl mt-4 animate-in fade-in zoom-in-95 duration-300" align="end">
-                <DropdownMenuLabel className="font-black text-[11px] uppercase tracking-[0.4em] text-muted-foreground px-6 py-4 opacity-50">
-                  Tactical Identity
+              <DropdownMenuContent className="w-64 rounded-[2rem] p-3 bg-background/95 backdrop-blur-xl border-border/20 shadow-2xl mt-4 animate-in fade-in zoom-in-95 duration-300" align="end">
+                <DropdownMenuLabel className="font-black text-[10px] uppercase tracking-[0.4em] text-muted-foreground px-5 py-3 opacity-50">
+                  {t.tacticalIdentity}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-border/5 mx-2" />
                 
                 <DropdownMenuItem asChild>
-                  <Link href="/profile" className="flex items-center gap-4 rounded-2xl p-5 font-black text-[12px] uppercase tracking-widest cursor-pointer hover:bg-accent/50 group transition-all">
-                    <User size={18} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-                    Profile Identity
+                  <Link href="/profile" className="flex items-center gap-3 rounded-2xl p-4 font-black text-[11px] uppercase tracking-widest cursor-pointer hover:bg-accent/50 group transition-all">
+                    <User size={16} className="text-muted-foreground group-hover:text-foreground transition-colors" />
+                    {t.profile}
                   </Link>
                 </DropdownMenuItem>
                 
                 <DropdownMenuItem asChild>
-                  <Link href="/live-support" className="flex items-center gap-4 rounded-2xl p-5 font-black text-[12px] uppercase tracking-widest cursor-pointer text-blue-500 bg-blue-500/5 hover:bg-blue-500/10 group transition-all">
-                    <LifeBuoy size={18} className="group-hover:rotate-45 transition-transform" />
-                    Live Support
+                  <Link href="/live-support" className="flex items-center gap-3 rounded-2xl p-4 font-black text-[11px] uppercase tracking-widest cursor-pointer text-blue-500 bg-blue-500/5 hover:bg-blue-500/10 group transition-all">
+                    <LifeBuoy size={16} className="group-hover:rotate-45 transition-transform" />
+                    {t.liveSupport}
                   </Link>
                 </DropdownMenuItem>
 
@@ -187,17 +210,17 @@ export default function Navbar() {
                 
                 <DropdownMenuItem 
                   onClick={logout}
-                  className="flex items-center gap-4 rounded-2xl p-5 font-black text-[12px] uppercase tracking-widest cursor-pointer text-rose-500 hover:bg-rose-500/10 focus:bg-rose-500/10 group transition-all"
+                  className="flex items-center gap-3 rounded-2xl p-4 font-black text-[11px] uppercase tracking-widest cursor-pointer text-rose-500 hover:bg-rose-500/10 focus:bg-rose-500/10 group transition-all"
                 >
-                  <LogOut size={18} className="group-hover:translate-x-1 transition-transform" />
-                  Terminate Session
+                  <LogOut size={16} className="group-hover:translate-x-1 transition-transform" />
+                  {t.logout}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Link href="/login" className="hidden md:block">
-              <Button size="sm" className="rounded-full bg-foreground text-background font-black text-[9px] uppercase tracking-widest px-6 h-10 hover:bg-accent-secondary hover:text-white transition-all shadow-xl shadow-foreground/5">
-                Auth Initiate
+              <Button size="sm" className="rounded-full bg-foreground text-background font-black text-[8px] uppercase tracking-widest px-5 h-9 hover:bg-accent-secondary hover:text-white transition-all shadow-xl shadow-foreground/5">
+                {t.login}
               </Button>
             </Link>
           )}
@@ -205,26 +228,26 @@ export default function Navbar() {
           {/* MOBILE MENU */}
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
-              <button className="lg:hidden w-10 h-10 rounded-full hover:bg-accent/30 flex items-center justify-center border border-border/10">
-                <Menu size={20} />
+              <button className="lg:hidden w-10 h-10 rounded-full hover:bg-accent/30 flex items-center justify-center border border-border/10 ml-1">
+                <Menu size={18} />
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full sm:max-w-md bg-background/95 backdrop-blur-3xl border-l border-border/10 p-0 flex flex-col [&>button]:hidden">
-              <SheetHeader className="text-left p-8 border-b border-border/5">
-                 <SheetTitle className="text-lg font-black uppercase tracking-widest italic">Vanguard Menu</SheetTitle>
+              <SheetHeader className="text-left p-6 border-b border-border/5">
+                 <SheetTitle className="text-base font-black uppercase tracking-widest italic">{t.menuTitle}</SheetTitle>
               </SheetHeader>
               
-              <ScrollArea className="flex-1 p-8">
+              <ScrollArea className="flex-1 p-6">
                 <div className="flex flex-col gap-8">
                   <div className="space-y-4">
-                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-6">Directory</p>
+                    <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-4">{t.directory}</p>
                     {dynamicNavLinks.map((link) => (
                       <Link
                         key={link.href}
                         href={link.href}
                         onClick={() => setIsMenuOpen(false)}
                         className={cn(
-                          "text-4xl font-black uppercase tracking-tighter hover:text-accent-secondary transition-colors italic block",
+                          "text-3xl font-black uppercase tracking-tighter hover:text-accent-secondary transition-colors italic block",
                           link.isSpecial ? "text-rose-500" : "text-foreground"
                         )}
                       >
@@ -237,32 +260,32 @@ export default function Navbar() {
                   
                   {isAuthenticated ? (
                     <div className="space-y-6">
-                      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-6">Account Control</p>
+                      <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-4">{t.accountControl}</p>
                       <div className="grid grid-cols-1 gap-4">
-                        <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="text-xl font-bold uppercase tracking-tight flex items-center justify-between group">
-                          Profile Identity
-                          <ChevronRight size={18} />
+                        <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="text-lg font-bold uppercase tracking-tight flex items-center justify-between group">
+                          {t.profile}
+                          <ChevronRight size={16} />
                         </Link>
-                        <Link href="/live-support" onClick={() => setIsMenuOpen(false)} className="text-xl font-bold uppercase tracking-tight flex items-center justify-between text-blue-500 group">
-                          Live Support
-                          <ChevronRight size={18} />
+                        <Link href="/live-support" onClick={() => setIsMenuOpen(false)} className="text-lg font-bold uppercase tracking-tight flex items-center justify-between text-blue-500 group">
+                          {t.liveSupport}
+                          <ChevronRight size={16} />
                         </Link>
                       </div>
                       
                       <Button 
                         variant="ghost" 
                         onClick={() => { logout(); setIsMenuOpen(false); }}
-                        className="w-full h-14 rounded-2xl border border-rose-500/20 text-rose-500 font-black uppercase tracking-widest text-[10px] hover:bg-rose-500 hover:text-white transition-all mt-8"
+                        className="w-full h-12 rounded-2xl border border-rose-500/20 text-rose-500 font-black uppercase tracking-widest text-[9px] hover:bg-rose-500 hover:text-white transition-all mt-4"
                       >
-                        Terminate Session
+                        {t.logout}
                       </Button>
                     </div>
                   ) : (
-                    <div className="space-y-8">
-                       <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-6">Authorization</p>
+                    <div className="space-y-6">
+                       <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-4">{t.authorization}</p>
                        <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full h-16 rounded-[2rem] bg-foreground text-background font-black uppercase tracking-widest text-[11px] shadow-2xl hover:bg-accent-secondary hover:text-white transition-all">
-                          Initialize Login
+                        <Button className="w-full h-14 rounded-[2rem] bg-foreground text-background font-black uppercase tracking-widest text-[10px] shadow-2xl hover:bg-accent-secondary hover:text-white transition-all">
+                          {t.initLogin}
                         </Button>
                       </Link>
                     </div>
@@ -270,9 +293,9 @@ export default function Navbar() {
                 </div>
               </ScrollArea>
               
-              <div className="p-8 border-t border-border/5 bg-accent/5">
+              <div className="p-6 border-t border-border/5 bg-accent/5">
                  <p className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground text-center">
-                   Vanguard Core Protocol v4.2.0
+                   {t.version}
                  </p>
               </div>
             </SheetContent>

@@ -157,28 +157,40 @@ export const getProducts = asyncHandler(async (req, res) => {
 
     // 🚀 5. Populate Sizes (The Fix)
     pipeline.push(
-        { $unwind: { path: '$sizes', preserveNullAndEmptyArrays: true } },
         {
             $lookup: {
-                from: 'sizes', // নিশ্চিত কর কালেকশন নাম 'sizes'
+                from: 'sizes',
                 localField: 'sizes.size',
                 foreignField: '_id',
-                as: 'sizes.size'
-            }
-        },
-        { $unwind: { path: '$sizes.size', preserveNullAndEmptyArrays: true } },
-        {
-            $group: {
-                _id: '$_id',
-                productData: { $first: '$$ROOT' },
-                sizes: { $push: '$sizes' }
+                as: 'sizeDetails'
             }
         },
         {
-            $replaceRoot: {
-                newRoot: { $mergeObjects: ['$productData', { sizes: '$sizes' }] }
+            $addFields: {
+                sizes: {
+                    $map: {
+                        input: '$sizes',
+                        as: 's',
+                        in: {
+                            size: {
+                                $arrayElemAt: [
+                                    {
+                                        $filter: {
+                                            input: '$sizeDetails',
+                                            as: 'sd',
+                                            cond: { $eq: [{ $toString: '$$sd._id' }, { $toString: '$$s.size' }] }
+                                        }
+                                    },
+                                    0
+                                ]
+                            },
+                            stock: '$$s.stock'
+                        }
+                    }
+                }
             }
-        }
+        },
+        { $project: { sizeDetails: 0 } }
     );
 
     // 6. Populate Category & Subcategory

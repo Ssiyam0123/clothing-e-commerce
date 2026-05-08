@@ -72,7 +72,7 @@ async function getInitialProducts(searchParams) {
   // Optimize data transfer
   apiParams.set(
     "fields",
-    "name,slug,price,discount,images,category,averageRating",
+    "name,slug,price,discount,images,category,averageRating,sizes,isFeatured,isNew",
   );
 
   try {

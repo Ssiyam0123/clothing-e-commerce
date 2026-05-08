@@ -1,0 +1,20 @@
+{
+  "en": {
+    "protocol": "Protocol_Foundry",
+    "journal": "Journal",
+    "narrative": "Architecting Tactical Aesthetics & Digital Narratives",
+    "latest": "Latest_Sequences",
+    "readingTime": "MIN READ",
+    "author": "BY",
+    "explore": "Explore Narrative"
+  },
+  "bn": {
+    "protocol": "প্রটোকল_ফাউন্ড্রি",
+    "journal": "জার্নাল",
+    "narrative": "ট্যাকটিক্যাল নান্দনিকতা এবং ডিজিটাল বর্ণনার স্থাপত্য",
+    "latest": "সাম্প্রতিক_সিকোয়েন্স",
+    "readingTime": "মিনিট পাঠ",
+    "author": "লেখক",
+    "explore": "গল্পটি পড়ুন"
+  }
+}

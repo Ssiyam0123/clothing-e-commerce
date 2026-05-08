@@ -1,5 +1,7 @@
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cookies } from "next/headers";
+import { getTranslation } from "@/utils/typography/handler";
 import BlogMagazineClient from "./BlogMagazineClient";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
@@ -17,6 +19,10 @@ export const metadata = {
 };
 
 export default async function BlogPage() {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("vanguard-lang")?.value || "en";
+  const t = getTranslation('blog', lang);
+
   const postsPromise = fetch(
     `${API_URL}/blogs?fields=title,slug,featuredImage,category,readingTime,author,createdAt`,
     { next: { revalidate: 3600 } }
@@ -52,15 +58,15 @@ export default async function BlogPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <Suspense fallback={<BlogSkeleton />}>
-        <BlogDataWrapper postsPromise={postsPromise} />
+        <BlogDataWrapper postsPromise={postsPromise} t={t} />
       </Suspense>
     </main>
   );
 }
 
-async function BlogDataWrapper({ postsPromise }) {
+async function BlogDataWrapper({ postsPromise, t }) {
   const posts = await postsPromise;
-  return <BlogMagazineClient posts={posts} />;
+  return <BlogMagazineClient posts={posts} t={t} />;
 }
 
 function BlogSkeleton() {
