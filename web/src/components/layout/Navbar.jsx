@@ -107,25 +107,30 @@ export default function Navbar() {
 
         {/* DESKTOP NAV */}
         <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
-          {dynamicNavLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "text-[9px] font-black uppercase tracking-[0.4em] transition-all hover:text-accent-secondary relative group flex items-center gap-2 whitespace-nowrap",
-                pathname === link.href ? "text-accent-secondary" : "text-foreground/70",
-                link.isSpecial && "text-rose-500 hover:text-rose-600"
-              )}
-            >
-              {link.isSpecial && <Shield size={12} className="animate-pulse" />}
-              {link.label}
-              <span className={cn(
-                "absolute -bottom-2 left-0 h-0.5 bg-accent-secondary transition-all duration-500",
-                pathname === link.href ? "w-full" : "w-0 group-hover:w-full",
-                link.isSpecial && "bg-rose-500"
-              )} />
-            </Link>
-          ))}
+          {dynamicNavLinks.map((link) => {
+            // Fix hydration mismatch by showing English (server default) until mounted
+            const label = mounted ? link.label : (getTranslation('navbar', 'en')[link.href === '/' ? 'home' : link.href.replace('/', '')] || link.label);
+            
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "text-[9px] font-black uppercase tracking-[0.4em] transition-all hover:text-accent-secondary relative group flex items-center gap-2 whitespace-nowrap",
+                  pathname === link.href ? "text-accent-secondary" : "text-foreground/70",
+                  link.isSpecial && "text-rose-500 hover:text-rose-600"
+                )}
+              >
+                {link.isSpecial && <Shield size={12} className="animate-pulse" />}
+                {label}
+                <span className={cn(
+                  "absolute -bottom-2 left-0 h-0.5 bg-accent-secondary transition-all duration-500",
+                  pathname === link.href ? "w-full" : "w-0 group-hover:w-full",
+                  link.isSpecial && "bg-rose-500"
+                )} />
+              </Link>
+            );
+          })}
         </nav>
 
         {/* ACTIONS - Mobile optimized with no fixed widths */}
@@ -139,7 +144,9 @@ export default function Navbar() {
             aria-label="Toggle Language"
           >
             <Languages size={16} className="sm:size-[18px]" />
-            <span className="text-[9px] font-black uppercase tracking-tighter hidden sm:inline-block">{lang.toUpperCase()}</span>
+            <span className="text-[9px] font-black uppercase tracking-tighter hidden sm:inline-block">
+              {mounted ? lang.toUpperCase() : "EN"}
+            </span>
           </Button>
 
           <Button
@@ -199,21 +206,21 @@ export default function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-64 rounded-[2rem] p-3 bg-background/95 backdrop-blur-xl border-border/20 shadow-2xl mt-4 animate-in fade-in zoom-in-95 duration-300" align="end">
                 <DropdownMenuLabel className="font-black text-[10px] uppercase tracking-[0.4em] text-muted-foreground px-5 py-3 opacity-50">
-                  {t.tacticalIdentity}
+                  {mounted ? t.tacticalIdentity : "TACTICAL IDENTITY"}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-border/5 mx-2" />
                 
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="flex items-center gap-3 rounded-2xl p-4 font-black text-[11px] uppercase tracking-widest cursor-pointer hover:bg-accent/50 group transition-all">
                     <User size={16} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-                    {t.profile}
+                    {mounted ? t.profile : "Profile"}
                   </Link>
                 </DropdownMenuItem>
                 
                 <DropdownMenuItem asChild>
                   <Link href="/live-support" className="flex items-center gap-3 rounded-2xl p-4 font-black text-[11px] uppercase tracking-widest cursor-pointer text-blue-500 bg-blue-500/5 hover:bg-blue-500/10 group transition-all">
                     <LifeBuoy size={16} className="group-hover:rotate-45 transition-transform" />
-                    {t.liveSupport}
+                    {mounted ? t.liveSupport : "Support"}
                   </Link>
                 </DropdownMenuItem>
 
@@ -224,14 +231,14 @@ export default function Navbar() {
                   className="flex items-center gap-3 rounded-2xl p-4 font-black text-[11px] uppercase tracking-widest cursor-pointer text-rose-500 hover:bg-rose-500/10 focus:bg-rose-500/10 group transition-all"
                 >
                   <LogOut size={16} className="group-hover:translate-x-1 transition-transform" />
-                  {t.logout}
+                  {mounted ? t.logout : "Logout"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Link href="/login" className="hidden md:block flex-shrink-0">
               <Button size="sm" className="rounded-full bg-foreground text-background font-black text-[8px] uppercase tracking-widest px-4 h-8 sm:px-5 sm:h-9 hover:bg-accent-secondary hover:text-white transition-all shadow-xl shadow-foreground/5">
-                {t.login}
+                {mounted ? t.login : "Login"}
               </Button>
             </Link>
           )}
@@ -245,7 +252,7 @@ export default function Navbar() {
             </SheetTrigger>
             <SheetContent side="left" className="w-full border-r border-border/10 p-0 flex flex-col bg-background/95 backdrop-blur-3xl">
               <SheetHeader className="text-left p-6 border-b border-border/5">
-                 <SheetTitle className="text-base font-black uppercase tracking-widest italic">{t.menuTitle}</SheetTitle>
+                 <SheetTitle className="text-base font-black uppercase tracking-widest italic">{mounted ? t.menuTitle : "MENU"}</SheetTitle>
               </SheetHeader>
               <div className="flex flex-wrap items-center gap-2 px-6 py-4 border-b border-border/5">
                 <Button
@@ -300,21 +307,24 @@ export default function Navbar() {
               <ScrollArea className="flex-1 p-6">
                 <div className="flex flex-col gap-8">
                   <div className="space-y-4">
-                    <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-4">{t.directory}</p>
+                    <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-4">{mounted ? t.directory : "DIRECTORY"}</p>
                     <div className="space-y-3">
-                      {dynamicNavLinks.map((link) => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          onClick={() => setIsMenuOpen(false)}
-                          className={cn(
-                            "text-2xl sm:text-3xl font-black uppercase tracking-tighter hover:text-accent-secondary transition-colors italic block break-words",
-                            link.isSpecial ? "text-rose-500" : "text-foreground"
-                          )}
-                        >
-                          {link.label}
-                        </Link>
-                      ))}
+                      {dynamicNavLinks.map((link) => {
+                        const label = mounted ? link.label : (getTranslation('navbar', 'en')[link.href === '/' ? 'home' : link.href.replace('/', '')] || link.label);
+                        return (
+                          <Link
+                            key={link.href}
+                            href={link.href}
+                            onClick={() => setIsMenuOpen(false)}
+                            className={cn(
+                              "text-2xl sm:text-3xl font-black uppercase tracking-tighter hover:text-accent-secondary transition-colors italic block break-words",
+                              link.isSpecial ? "text-rose-500" : "text-foreground"
+                            )}
+                          >
+                            {label}
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
                   
@@ -322,14 +332,14 @@ export default function Navbar() {
                   
                   {isAuthenticated ? (
                     <div className="space-y-6">
-                      <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-4">{t.accountControl}</p>
+                      <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-4">{mounted ? t.accountControl : "ACCOUNT"}</p>
                       <div className="grid grid-cols-1 gap-4">
                         <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="text-lg font-bold uppercase tracking-tight flex items-center justify-between group">
-                          {t.profile}
+                          {mounted ? t.profile : "Profile"}
                           <ChevronRight size={16} />
                         </Link>
                         <Link href="/live-support" onClick={() => setIsMenuOpen(false)} className="text-lg font-bold uppercase tracking-tight flex items-center justify-between text-blue-500 group">
-                          {t.liveSupport}
+                          {mounted ? t.liveSupport : "Support"}
                           <ChevronRight size={16} />
                         </Link>
                       </div>
@@ -339,15 +349,15 @@ export default function Navbar() {
                         onClick={() => { logout(); setIsMenuOpen(false); }}
                         className="w-full h-12 rounded-2xl border border-rose-500/20 text-rose-500 font-black uppercase tracking-widest text-[9px] hover:bg-rose-500 hover:text-white transition-all mt-4"
                       >
-                        {t.logout}
+                        {mounted ? t.logout : "Logout"}
                       </Button>
                     </div>
                   ) : (
                     <div className="space-y-6">
-                       <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-4">{t.authorization}</p>
+                       <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-4">{mounted ? t.authorization : "AUTH"}</p>
                        <Link href="/login" onClick={() => setIsMenuOpen(false)}>
                         <Button className="w-full h-14 rounded-[2rem] bg-foreground text-background font-black uppercase tracking-widest text-[10px] shadow-2xl hover:bg-accent-secondary hover:text-white transition-all">
-                          {t.initLogin}
+                          {mounted ? t.initLogin : "Login"}
                         </Button>
                       </Link>
                     </div>

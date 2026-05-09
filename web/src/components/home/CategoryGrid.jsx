@@ -17,10 +17,10 @@ export default function CategoryGrid({ categories }) {
   if (!categories || categories.length === 0) return null;
 
   return (
-    <div className="w-full overflow-hidden">
+    <div className="w-full overflow-hidden px-4 md:px-0">
       <Swiper
-        slidesPerView={1.4}
-        spaceBetween={16}
+        slidesPerView={1.8}
+        spaceBetween={12}
         freeMode={true}
         modules={[FreeMode]}
         breakpoints={{
@@ -39,9 +39,9 @@ export default function CategoryGrid({ categories }) {
         }}
         className="category-swiper"
       >
-        {categories.map((cat, idx) => (
+        {categories.filter(cat => cat.slug !== 'on-sale').map((cat, idx) => (
           <SwiperSlide key={cat._id || idx}>
-            <Card className="relative aspect-[4/5] min-h-[280px] md:min-h-[500px] w-full rounded-[2rem] overflow-hidden shadow-2xl select-none group border-none bg-elevated">
+            <Card className="relative aspect-[4/5] min-h-[200px] md:min-h-[500px] w-full rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl select-none group border-none bg-elevated">
               <Link
                 href={`/products?category=${cat.slug || cat._id}`}
                 className="block w-full h-full"

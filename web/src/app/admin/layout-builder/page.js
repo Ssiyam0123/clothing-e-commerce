@@ -88,126 +88,135 @@ function SortableSection({ section, onToggleVisibility, onRemove, onUpdateConfig
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative bg-card border border-border/50 rounded-[2.5rem] transition-all duration-300",
+        "group relative bg-card border border-border/50 rounded-[1.5rem] md:rounded-[2.5rem] transition-all duration-300",
         isDragging ? "shadow-2xl border-primary/40 bg-accent/5" : "hover:border-primary/20",
         !section.isVisible && "opacity-50 grayscale-[50%]"
       )}
     >
-      <div className="flex items-center gap-4 p-4">
-        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-2 text-muted-foreground hover:text-foreground">
+      <div className="flex items-center gap-2 md:gap-4 p-3 md:p-4">
+        <div {...attributes} {...listeners} className="shrink-0 cursor-grab active:cursor-grabbing p-1 md:p-2 text-muted-foreground hover:text-foreground">
           <GripVertical size={20} />
         </div>
 
-        <div className={cn("p-3 rounded-xl", section.isVisible ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>
+        <div className={cn("shrink-0 p-2 md:p-3 rounded-lg md:rounded-xl", section.isVisible ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>
           {getIcon(section.type)}
         </div>
 
-        <div className="flex-1">
-          <h4 className="text-[11px] font-black uppercase tracking-widest text-foreground flex items-center gap-2">
-            {section.title || section.type.replace(/_/g, ' ')}
+        <div className="flex-1 min-w-0">
+          <h4 className="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-foreground flex items-center gap-2 truncate">
+            <span className="truncate">{section.title || section.type.replace(/_/g, ' ')}</span>
             {(section.config?.categoryName || section.config?.campaignName || section.config?.saleName) && (
-              <Badge variant="outline" className="text-[8px] font-bold h-4 bg-muted/50">
+              <Badge variant="outline" className="hidden sm:inline-flex text-[8px] font-bold h-4 bg-muted/50 shrink-0">
                 {section.config.categoryName || section.config.campaignName || section.config.saleName}
               </Badge>
             )}
           </h4>
-          <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+          <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 truncate">
             {section.subtitle || "Default Header Logic"}
           </p>
         </div>
 
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={() => setIsEditing(!isEditing)} className={cn("h-10 w-10 rounded-xl", isEditing && "bg-primary text-primary-foreground")}>
+        <div className="shrink-0 flex items-center gap-0.5 md:gap-1 ml-1 md:ml-2">
+          <Button variant="ghost" size="icon" onClick={() => setIsEditing(!isEditing)} className={cn("h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl", isEditing && "bg-primary text-primary-foreground")}>
             <Edit2 size={16} />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => onToggleVisibility(section.id)} className={cn("h-10 w-10 rounded-xl", section.isVisible ? "text-primary" : "text-muted-foreground")}>
+          <Button variant="ghost" size="icon" onClick={() => onToggleVisibility(section.id)} className={cn("h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl", section.isVisible ? "text-primary" : "text-muted-foreground")}>
             {section.isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => onRemove(section.id)} className="h-10 w-10 rounded-xl hover:text-destructive transition-all opacity-0 group-hover:opacity-100">
+          <Button variant="ghost" size="icon" onClick={() => onRemove(section.id)} className="h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl hover:text-destructive transition-all opacity-0 group-hover:opacity-100 sm:opacity-100">
             <Trash2 size={16} />
           </Button>
         </div>
       </div>
 
       {isEditing && (
-        <div className="p-6 border-t border-border/50 bg-muted/20 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <h5 className="text-[9px] font-black uppercase tracking-[0.3em] text-primary/60">Display Protocol</h5>
-              {section.type === 'HEADER' ? (
-                <div className="space-y-4">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Main Heading</label>
-                    <input
-                      type="text"
-                      value={section.title || ''}
-                      onChange={(e) => onUpdateConfig(section.id, { title: e.target.value }, true)}
-                      className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
-                      placeholder="Enter Main Title"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Subtitle / Caption</label>
-                    <input
-                      type="text"
-                      value={section.subtitle || ''}
-                      onChange={(e) => onUpdateConfig(section.id, { subtitle: e.target.value }, true)}
-                      className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
-                      placeholder="Enter Subtitle"
-                    />
-                  </div>
+        <div className="p-4 md:p-6 border-t border-border/50 bg-muted/20 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="space-y-6">
+            {section.type === 'HEADER' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Main Heading</label>
+                  <input
+                    type="text"
+                    value={section.title || ''}
+                    onChange={(e) => onUpdateConfig(section.id, { title: e.target.value }, true)}
+                    className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
+                    placeholder="Enter Main Title"
+                  />
                 </div>
-              ) : (
-                <div className="p-4 bg-muted/30 rounded-2xl border border-dashed border-border flex flex-col items-center justify-center gap-2">
-                   <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Typography is managed via</p>
-                   <Badge variant="outline" className="text-[8px] font-black bg-primary/10 text-primary border-primary/20">HEADER BLOCK</Badge>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Subtitle / Caption</label>
+                  <input
+                    type="text"
+                    value={section.subtitle || ''}
+                    onChange={(e) => onUpdateConfig(section.id, { subtitle: e.target.value }, true)}
+                    className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
+                    placeholder="Enter Subtitle"
+                  />
                 </div>
-              )}
-            </div>
 
-            <div className="space-y-6">
-              <h5 className="text-[9px] font-black uppercase tracking-[0.3em] text-primary/60">Module Logic</h5>
-              {['PROMO_BANNER'].includes(section.type) ? (
-                <div className="space-y-4">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Manual Image Override</label>
-                    <input
-                      type="text"
-                      value={section.imageUrl || ''}
-                      onChange={(e) => onUpdateConfig(section.id, { imageUrl: e.target.value }, true)}
-                      className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
-                      placeholder="https://..."
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Action Link</label>
-                    <input
-                      type="text"
-                      value={section.actionLink || ''}
-                      onChange={(e) => onUpdateConfig(section.id, { actionLink: e.target.value }, true)}
-                      className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
-                      placeholder="/category/..."
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Button Text (Optional)</label>
-                    <input
-                      type="text"
-                      value={section.buttonText || ''}
-                      onChange={(e) => onUpdateConfig(section.id, { buttonText: e.target.value }, true)}
-                      className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
-                      placeholder="Shop Now, Explore, etc."
-                    />
-                  </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Title Casing</label>
+                  <select
+                    value={section.config?.casing || 'uppercase'}
+                    onChange={(e) => onUpdateConfig(section.id, { casing: e.target.value })}
+                    className="w-full bg-background border border-border/50 rounded-xl px-3 py-2 text-[10px] font-bold focus:border-primary/40 outline-none"
+                  >
+                    <option value="uppercase">ALL CAPS</option>
+                    <option value="capitalize">Capitalize</option>
+                    <option value="normal-case">Normal Case</option>
+                  </select>
                 </div>
-              ) : (
-                <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-primary leading-relaxed">
-                    This module is managed via the global state. Change its parameters via the sidebar picker.
-                  </p>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Subtitle Casing</label>
+                  <select
+                    value={section.config?.subtitleCasing || 'uppercase'}
+                    onChange={(e) => onUpdateConfig(section.id, { subtitleCasing: e.target.value })}
+                    className="w-full bg-background border border-border/50 rounded-xl px-3 py-2 text-[10px] font-bold focus:border-primary/40 outline-none"
+                  >
+                    <option value="uppercase">ALL CAPS</option>
+                    <option value="capitalize">Capitalize</option>
+                    <option value="normal-case">Normal Case</option>
+                  </select>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+
+            {section.type === 'PROMO_BANNER' && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 pt-2">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Manual Image Override</label>
+                  <input
+                    type="text"
+                    value={section.imageUrl || ''}
+                    onChange={(e) => onUpdateConfig(section.id, { imageUrl: e.target.value }, true)}
+                    className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Action Link</label>
+                  <input
+                    type="text"
+                    value={section.actionLink || ''}
+                    onChange={(e) => onUpdateConfig(section.id, { actionLink: e.target.value }, true)}
+                    className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
+                    placeholder="/category/..."
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Button Text</label>
+                  <input
+                    type="text"
+                    value={section.buttonText || ''}
+                    onChange={(e) => onUpdateConfig(section.id, { buttonText: e.target.value }, true)}
+                    className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
+                    placeholder="Shop Now"
+                  />
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       )}
@@ -327,31 +336,31 @@ export default function LayoutBuilderPage() {
 
   return (
     <div className="admin-page-container">
-      <div className="admin-section-header">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-12">
         <div>
-          <h1 className="admin-title">Architect</h1>
-          <p className="admin-subtitle">Blueprint Engine & Sequencer</p>
+          <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter italic">Architect</h1>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Blueprint Engine & Sequencer</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={resetLayout} className="rounded-full h-12 px-6 font-black text-[10px] uppercase tracking-widest border-border transition-all">
+        <div className="flex flex-wrap gap-3">
+          <Button variant="outline" onClick={resetLayout} className="flex-1 md:flex-none rounded-full h-11 px-6 font-black text-[10px] uppercase tracking-widest border-border transition-all">
             <RefreshCcw size={14} className="mr-2" /> Reset
           </Button>
-          <Button onClick={() => updateMutation.mutate(layout)} disabled={updateMutation.isPending} className="rounded-full h-12 px-10 font-black text-[10px] uppercase tracking-widest bg-foreground text-background hover:bg-primary transition-all">
+          <Button onClick={() => updateMutation.mutate(layout)} disabled={updateMutation.isPending} className="flex-1 md:flex-none rounded-full h-11 px-8 font-black text-[10px] uppercase tracking-widest bg-foreground text-background hover:bg-primary transition-all">
             {updateMutation.isPending ? <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin mr-2" /> : <Save size={14} className="mr-2" />}
             {updateMutation.isPending ? "Syncing..." : "Commit Blueprint"}
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-elevated border border-border/50 rounded-[2.5rem] p-8 md:p-12 shadow-2xl">
-            <header className="mb-10 flex items-center justify-between border-b border-border/50 pb-6">
+          <div className="bg-elevated border border-border/50 rounded-[2rem] md:rounded-[2.5rem] p-5 md:p-12 shadow-2xl">
+            <header className="mb-8 md:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/50 pb-6">
               <div>
-                <h3 className="text-xl font-black uppercase tracking-tighter italic">Structural Sequence</h3>
+                <h3 className="text-lg md:text-xl font-black uppercase tracking-tighter italic">Structural Sequence</h3>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Architectural flow of the storefront</p>
               </div>
-              <Badge variant="outline" className="rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest bg-primary/5 text-primary border-primary/20">
+              <Badge variant="outline" className="w-fit rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest bg-primary/5 text-primary border-primary/20">
                 {layout.length} Active Modules
               </Badge>
             </header>
@@ -368,16 +377,16 @@ export default function LayoutBuilderPage() {
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="bg-card border border-border/50 rounded-[2.5rem] p-8 shadow-xl">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground mb-8">Component Gallery</h4>
-            <div className="grid grid-cols-1 gap-3">
+        <div className="space-y-6 order-first lg:order-last">
+          <div className="bg-card border border-border/50 rounded-[2rem] p-6 md:p-8 shadow-xl">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground mb-6 md:mb-8">Component Gallery</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
               {[
                 { type: 'HEADER', label: 'Typography Block', desc: 'Custom Title & Subtitle' },
                 { type: 'CATEGORY_GRID', label: 'Category Matrix', desc: 'Curated groups' },
               ].map((comp) => (
                 <button key={comp.type} onClick={() => addNewSection(comp.type)} className="group flex items-center gap-4 p-4 rounded-2xl border border-border/50 bg-muted/20 hover:bg-primary/5 hover:border-primary/30 transition-all text-left">
-                  <div className="w-10 h-10 rounded-xl bg-background border border-border/50 flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
+                  <div className="shrink-0 w-10 h-10 rounded-xl bg-background border border-border/50 flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
                     <Plus size={16} />
                   </div>
                   <div>
@@ -388,16 +397,16 @@ export default function LayoutBuilderPage() {
               ))}
             </div>
 
-            <div className="pt-8 mt-8 border-t border-border/50">
+            <div className="pt-6 md:pt-8 mt-6 md:mt-8 border-t border-border/50">
               <h4 className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-6">System Blocks</h4>
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
                 {/* Global Collections */}
                 {[
                   { id: 'NEW_ARRIVALS', name: 'New Arrivals', icon: <Sparkles size={12} /> },
                   { id: 'FEATURED_PRODUCTS', name: 'Featured Products', icon: <Star size={12} /> }
                 ].map((item) => (
                   <button key={item.id} onClick={() => addNewSection(item.id)} className="flex items-center gap-3 p-2 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all group">
-                    <div className="w-5 h-5 rounded-md bg-primary/10 flex items-center justify-center text-primary ml-1">
+                    <div className="shrink-0 w-5 h-5 rounded-md bg-primary/10 flex items-center justify-center text-primary ml-1">
                       {item.icon}
                     </div>
                     <span className="text-[9px] font-black uppercase truncate flex-1">{item.name}</span>
@@ -412,10 +421,10 @@ export default function LayoutBuilderPage() {
                     onClick={() => addNewSection('CATEGORY_COLLECTION', { categoryId: cat._id, slug: cat.slug, title: cat.name })} 
                     className="flex items-center gap-3 p-2 rounded-xl border border-border/50 bg-background hover:bg-primary/5 transition-all group"
                   >
-                    <div className="w-5 h-5 rounded-md bg-muted flex items-center justify-center text-muted-foreground ml-1">
+                    <div className="shrink-0 w-5 h-5 rounded-md bg-muted flex items-center justify-center text-muted-foreground ml-1">
                       <LayoutGrid size={12} />
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 text-left">
                       <p className="text-[9px] font-black uppercase truncate">{cat.name}</p>
                       <p className="text-[6px] font-bold uppercase text-primary/40 tracking-tighter">Infrastructure Node</p>
                     </div>
@@ -426,13 +435,13 @@ export default function LayoutBuilderPage() {
             </div>
 
 
-            <div className="pt-8 mt-8 border-t border-border/50">
+            <div className="pt-6 md:pt-8 mt-6 md:mt-8 border-t border-border/50">
               <h4 className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-6">Quick-Deploy Flash Sales</h4>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
                 {flashSales.length > 0 ? (
                   flashSales.map((sale) => (
                     <button key={sale._id} onClick={() => addNewSection('FLASH_SALE', { saleId: sale._id, saleName: sale.name, title: sale.name })} className="flex items-center gap-4 p-3 rounded-2xl border border-border/50 bg-background hover:bg-primary/5 transition-all text-left">
-                      <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500">
+                      <div className="shrink-0 w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500">
                         <ShoppingBag size={16} />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -442,19 +451,19 @@ export default function LayoutBuilderPage() {
                     </button>
                   ))
                 ) : (
-                  <div className="p-4 bg-muted/20 rounded-2xl border border-dashed border-border text-center">
+                  <div className="p-4 bg-muted/20 rounded-2xl border border-dashed border-border text-center w-full">
                     <p className="text-[8px] font-bold uppercase text-muted-foreground">No active campaigns found in protocol</p>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="pt-8 mt-8 border-t border-border/50">
+            <div className="pt-6 md:pt-8 mt-6 md:mt-8 border-t border-border/50">
               <h4 className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-6">Quick-Deploy Campaigns</h4>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
                 {campaigns.map((camp) => (
                   <button key={camp._id} onClick={() => addNewSection('PROMO_BANNER', { campaignId: camp._id, campaignName: camp.name, title: camp.name, imageUrl: camp.slides?.[0]?.image || camp.imageUrl || "" })} className="flex items-center gap-4 p-3 rounded-2xl border border-border/50 bg-background hover:bg-primary/5 transition-all text-left">
-                    <div className="w-14 h-10 rounded-xl overflow-hidden bg-muted border border-border/50">
+                    <div className="shrink-0 w-14 h-10 rounded-xl overflow-hidden bg-muted border border-border/50">
                       {camp.slides?.[0]?.image ? <img src={camp.slides[0].image} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-primary/10"><Plus size={12} className="text-primary/40" /></div>}
                     </div>
                     <div className="flex-1 min-w-0">

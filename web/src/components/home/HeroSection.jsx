@@ -22,7 +22,7 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
   if (!mounted || !slide) {
     return (
       <section
-        className="relative h-[75vh] min-h-[500px] md:h-[85vh] md:min-h-[700px] bg-background flex items-center justify-center overflow-hidden"
+        className="relative h-[50vh] min-h-[400px] md:h-[85vh] md:min-h-[700px] bg-background flex items-center justify-center overflow-hidden"
         aria-label="Loading hero section"
       >
         <div className="relative z-10 w-full max-w-4xl px-8 md:px-16 flex flex-col items-center gap-6">
@@ -36,7 +36,7 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
 
   return (
     <section
-      className="relative h-[75vh] min-h-[500px] md:h-[85vh] md:min-h-[700px] overflow-hidden bg-background"
+      className="relative h-[50vh] min-h-[400px] md:h-[85vh] md:min-h-[700px] overflow-hidden bg-background"
       aria-label="Hero section"
     >
       <div className="relative h-full w-full group">
@@ -51,7 +51,7 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
         )}
 
         {showHeader && (
-          <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-16 lg:px-24 pb-20 md:pb-28 z-10">
+          <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 lg:px-24 pb-16 md:pb-28 z-10">
             <div className="max-w-4xl space-y-6">
               
               {slide.title && (
