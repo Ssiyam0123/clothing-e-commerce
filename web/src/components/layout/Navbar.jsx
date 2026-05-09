@@ -90,21 +90,18 @@ export default function Navbar() {
     >
       <div className="w-full mx-auto flex items-center justify-between gap-2">
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2 sm:gap-3 group flex-shrink-0" aria-label={branding.siteName || "Vanguard Home"}>
-          {branding.headerLogo ? (
+        <Link href="/" className="flex items-center gap-3 group flex-shrink-0" aria-label={branding.siteName || "Vanguard Home"}>
+          {branding.headerLogoLight || branding.headerLogoDark ? (
             <img 
-              src={getImageUrl(branding.headerLogo)} 
+              src={getImageUrl(theme === 'dark' ? (branding.headerLogoDark || branding.headerLogoLight) : (branding.headerLogoLight || branding.headerLogoDark))} 
               alt={branding.siteName || "Logo"} 
-              className="h-8 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105 duration-500" 
+              className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105 duration-500" 
             />
           ) : (
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-foreground rounded-xl flex items-center justify-center text-background group-hover:rotate-[15deg] transition-transform duration-500 shadow-xl shadow-foreground/5">
-               <Sparkles size={16} className="sm:size-[20px] group-hover:scale-125 transition-transform" />
+            <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background group-hover:rotate-[15deg] transition-transform duration-500 shadow-xl shadow-foreground/5">
+               <Sparkles size={20} className="group-hover:scale-125 transition-transform" />
             </div>
           )}
-          <span className="text-base sm:text-xl font-black tracking-normal uppercase italic text-gradient block">
-            {branding.siteName || "Vanguard"}
-          </span>
         </Link>
 
         {/* DESKTOP NAV */}

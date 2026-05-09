@@ -7,8 +7,11 @@ import { swalToast } from "@/utils/swal";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { getImageUrl } from "@/utils/imageUtils";
+import { useAppStore } from "@/store/appStore";
 
 export default function QuickSelectModal({ isOpen, onClose, product, lang }) {
+  const { settings } = useAppStore();
+  const siteName = settings?.branding?.siteName || "Vanguard";
   const router = useRouter();
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -224,7 +227,7 @@ export default function QuickSelectModal({ isOpen, onClose, product, lang }) {
               <div className="mt-8 flex items-center justify-center gap-3 opacity-30">
                 <PackageCheck size={14} className="" />
                 <p className="text-[8px] font-black uppercase tracking-[0.4em]  text-center">
-                  Vanguard Secure Settlement Protocol Active
+                  {settings?.branding?.siteName || "Vanguard"} Secure Settlement Protocol Active
                 </p>
               </div>
             </div>

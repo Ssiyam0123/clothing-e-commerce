@@ -1,69 +1,54 @@
 import pathaoService from '../../services/pathao.service.js';
-import ApiKey from '../apiKeys/apiKey.model.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 
-
-const PATHAO_SELECTION = '+pathao.clientId +pathao.clientSecret +pathao.userName +pathao.password +pathao.baseURL';
+const getPathaoCreds = () => ({
+    clientId: process.env.PATHAO_CLIENT_ID,
+    clientSecret: process.env.PATHAO_CLIENT_SECRET,
+    username: process.env.PATHAO_USERNAME,
+    password: process.env.PATHAO_PASSWORD,
+    baseURL: process.env.PATHAO_BASE_URL || "https://courier-api-sandbox.pathao.com",
+    isActive: !!process.env.PATHAO_CLIENT_ID // Active if credentials exist
+});
 
 export const getCities = asyncHandler(async (req, res) => {
-    const keys = await ApiKey.findOne().select(PATHAO_SELECTION);
+    const creds = getPathaoCreds();
     
-    if (!keys?.pathao?.isActive) {
-        return res.status(400).json({ message: 'Pathao service is not active in the Vault' });
+    if (!creds.clientId) {
+        return res.status(400).json({ message: 'Pathao service is not configured in environment' });
     }
-
-    const creds = {
-        ...keys.pathao.toObject(),
-        baseURL: keys.pathao.baseURL || "https://courier-api-sandbox.pathao.com"
-    };
 
     const cities = await pathaoService.getCities(creds);
     res.json(cities);
 });
 
 export const getZones = asyncHandler(async (req, res) => {
-    const keys = await ApiKey.findOne().select(PATHAO_SELECTION);
+    const creds = getPathaoCreds();
     
-    if (!keys?.pathao?.isActive) {
+    if (!creds.clientId) {
         return res.status(400).json({ message: 'Pathao service is offline' });
     }
-
-    const creds = {
-        ...keys.pathao.toObject(),
-        baseURL: keys.pathao.baseURL || "https://courier-api-sandbox.pathao.com"
-    };
 
     const zones = await pathaoService.getZones(req.params.cityId, creds);
     res.json(zones);
 });
 
 export const getAreas = asyncHandler(async (req, res) => {
-    const keys = await ApiKey.findOne().select(PATHAO_SELECTION);
+    const creds = getPathaoCreds();
     
-    if (!keys?.pathao?.isActive) {
+    if (!creds.clientId) {
         return res.status(400).json({ message: 'Pathao service is offline' });
     }
-
-    const creds = {
-        ...keys.pathao.toObject(),
-        baseURL: keys.pathao.baseURL || "https://courier-api-sandbox.pathao.com"
-    };
 
     const areas = await pathaoService.getAreas(req.params.zoneId, creds);
     res.json(areas);
 });
 
 export const getStores = asyncHandler(async (req, res) => {
-    const keys = await ApiKey.findOne().select(PATHAO_SELECTION);
+    const creds = getPathaoCreds();
     
-    if (!keys?.pathao?.isActive) {
+    if (!creds.clientId) {
         return res.status(400).json({ message: 'Pathao service is offline' });
     }
-
-    const creds = {
-        ...keys.pathao.toObject(),
-        baseURL: keys.pathao.baseURL || "https://courier-api-sandbox.pathao.com"
-    };
 
     if (typeof pathaoService.getStores === 'function') {
         const stores = await pathaoService.getStores(creds);

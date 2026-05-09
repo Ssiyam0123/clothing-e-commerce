@@ -40,11 +40,17 @@ export const updateSettings = asyncHandler(async (req, res) => {
     let branding = updateData.branding || (currentSettings ? currentSettings.branding : {});
 
     if (req.files) {
-        if (req.files.headerLogo) {
-            branding.headerLogo = await uploadImage(req.files.headerLogo[0], 'settings', currentSettings?.branding?.headerLogo);
+        if (req.files.headerLogoLight) {
+            branding.headerLogoLight = await uploadImage(req.files.headerLogoLight[0], 'settings', currentSettings?.branding?.headerLogoLight);
         }
-        if (req.files.footerLogo) {
-            branding.footerLogo = await uploadImage(req.files.footerLogo[0], 'settings', currentSettings?.branding?.footerLogo);
+        if (req.files.headerLogoDark) {
+            branding.headerLogoDark = await uploadImage(req.files.headerLogoDark[0], 'settings', currentSettings?.branding?.headerLogoDark);
+        }
+        if (req.files.footerLogoLight) {
+            branding.footerLogoLight = await uploadImage(req.files.footerLogoLight[0], 'settings', currentSettings?.branding?.footerLogoLight);
+        }
+        if (req.files.footerLogoDark) {
+            branding.footerLogoDark = await uploadImage(req.files.footerLogoDark[0], 'settings', currentSettings?.branding?.footerLogoDark);
         }
         if (req.files.favicon) {
             branding.favicon = await uploadImage(req.files.favicon[0], 'settings', currentSettings?.branding?.favicon);

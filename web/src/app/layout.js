@@ -1,13 +1,24 @@
 import QueryProvider from "@/components/providers/QueryProvider";
-import { Inter } from "next/font/google";
+import { 
+  Inter, 
+  Roboto, 
+  Outfit, 
+  Playfair_Display, 
+  Montserrat, 
+  Space_Grotesk, 
+  Poppins, 
+  Syncopate 
+} from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
-  variable: "--font-inter",
-});
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const roboto = Roboto({ weight: ["400", "700", "900"], subsets: ["latin"], variable: "--font-roboto" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat" });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
+const poppins = Poppins({ weight: ["400", "700", "900"], subsets: ["latin"], variable: "--font-poppins" });
+const syncopate = Syncopate({ weight: ["400", "700"], subsets: ["latin"], variable: "--font-syncopate" });
 
 import { cookies, headers } from "next/headers";
 import { getSettings } from "@/lib/settings";
@@ -21,15 +32,17 @@ export async function generateMetadata() {
   const settings = await getSettings();
   const branding = settings?.branding || {};
   const siteName = branding.siteName || "VANGUARD";
-  const siteTitle = branding.siteTitle || "Premium Urban Apparel & Streetwear";
-  const description =
-    settings?.branding?.description ||
-    "Discover the latest sustainable streetwear at Vanguard. Ethical fabrics, bold silhouettes, and premium urban apparel.";
+  const siteTitle = branding.siteTitle || siteName;
   const favicon = branding.favicon
     ? getImageUrl(branding.favicon)
     : "/favicon.ico";
-  const ogImage = branding.headerLogo
-    ? getImageUrl(branding.headerLogo)
+  const description =
+    branding.description ||
+    `Discover the latest premium apparel at ${siteName}.`;
+  
+  // Use headerLogoDark as primary OG image if available, otherwise Light
+  const ogImage = (branding.headerLogoDark || branding.headerLogoLight)
+    ? getImageUrl(branding.headerLogoDark || branding.headerLogoLight)
     : "/og-image.jpg";
 
   return {
@@ -51,7 +64,10 @@ export async function generateMetadata() {
     creator: `${siteName} Team`,
     publisher: siteName,
     icons: {
-      icon: favicon,
+      icon: [
+        { url: favicon },
+        { url: favicon, sizes: "32x32", type: "image/png" },
+      ],
       shortcut: favicon,
       apple: favicon,
     },
@@ -175,7 +191,7 @@ export default async function RootLayout({ children }) {
   return (
     <html 
       lang={lang} 
-      className={`${inter.variable} ${colorMode}`} 
+      className={`${inter.variable} ${roboto.variable} ${outfit.variable} ${playfair.variable} ${montserrat.variable} ${spaceGrotesk.variable} ${poppins.variable} ${syncopate.variable} ${colorMode}`} 
       data-theme={identityTheme}
       data-color-mode={colorMode}
       suppressHydrationWarning

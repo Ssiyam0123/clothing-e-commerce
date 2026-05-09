@@ -7,6 +7,17 @@ import setGlobalColorTheme from "@/lib/theme-colors";
 const ADMIN_PATH_PREFIX = "/admin";
 const IDENTITY_THEMES = ["executive", "streetwear", "earth", "luxury", "cyber"];
 
+const FONT_MAPPING = {
+  "Inter": "var(--font-inter)",
+  "Roboto": "var(--font-roboto)",
+  "Outfit": "var(--font-outfit)",
+  "Playfair Display": "var(--font-playfair)",
+  "Montserrat": "var(--font-montserrat)",
+  "Space Grotesk": "var(--font-space)",
+  "Poppins": "var(--font-poppins)",
+  "Syncopate": "var(--font-syncopate)"
+};
+
 export function useTheme() {
   const pathname = usePathname();
   const { theme, themeColor, themeFont, identityTheme } = useAppStore();
@@ -29,9 +40,8 @@ export function useTheme() {
 
       // ✅ Apply Theme Font
       if (targetFont) {
-        // Map common names to actual font families if needed, or just use directly
-        // Assuming fonts are pre-loaded in layout.js or via CSS imports
-        root.style.setProperty("--font-theme", `${targetFont}, var(--font-inter), sans-serif`);
+        const fontValue = FONT_MAPPING[targetFont] || "var(--font-inter)";
+        root.style.setProperty("--font-theme", `${fontValue}, sans-serif`);
       }
     };
 

@@ -20,8 +20,8 @@ import bannerCampaignRoutes from "./modules/bannerCampaign/bannerCampaign.routes
 import adminRoutes from "./modules/admin/admin.routes.js";
 import couponRoutes from "./modules/coupon/coupon.routes.js";
 import trackingRoutes from "./modules/tracking/tracking.routes.js";
+// import bannerRoutes from "./modules/banner/banner.routes.js";
 import settingsRoutes from "./modules/settings/settings.routes.js";
-import apiKeysRoutes from "./modules/apiKeys/apiKey.routes.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import blogRoutes from "./modules/blog/blog.route.js";
 import blogImageRoutes from './modules/blog/blog-image.route.js';
@@ -105,7 +105,7 @@ app.use("/api/banner-campaigns", bannerCampaignRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/track", trackingRoutes);
-app.use("/api/api-keys", apiKeysRoutes);
+// app.use("/api/banners", bannerRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/blogs",blogRoutes)

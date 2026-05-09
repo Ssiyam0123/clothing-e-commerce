@@ -4,13 +4,15 @@ const pageSettingSchema = new mongoose.Schema({
     branding: {
         siteName: { type: String, default: "VANGUARD" },
         siteTitle: { type: String, default: "Premium Apparel" },
-        headerLogo: { type: String }, 
-        footerLogo: { type: String },
+        headerLogoLight: { type: String }, 
+        headerLogoDark: { type: String },
+        footerLogoLight: { type: String },
+        footerLogoDark: { type: String },
         favicon: { type: String },
         activeTheme: { type: String, default: "executive", enum: ["executive", "streetwear", "earth", "luxury", "cyber"] },
-        // ✅ New fields for centralized control
         defaultTheme: { type: String, default: "dark", enum: ["light", "dark", "system"] }, 
         defaultThemeColor: { type: String, default: "Zinc", enum: ["Zinc", "Rose", "Blue", "Green", "Orange", "Amethyst", "Citrine", "Ruby", "Teal", "Brown"] },
+        defaultThemeFont: { type: String, default: "Inter" },
         defaultLanguage: { type: String, default: "en", enum: ["en", "bn"] }
     },
     socialLinks: [{

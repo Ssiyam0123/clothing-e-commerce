@@ -3,7 +3,6 @@ import Product from "../product/product.model.js";
 import Cart from "../cart/cart.model.js";
 import Coupon from "../coupon/coupon.model.js";
 import PageSetting from "../settings/settings.model.js";
-import ApiKey from "../apiKeys/apiKey.model.js";
 import User from "../user/user.model.js";
 import mongoose from "mongoose";
 import { asyncHandler } from "../../middleware/asyncHandler.js";
@@ -71,9 +70,16 @@ export const initPayment = asyncHandler(async (req, res) => {
   const isRegisteredUser = mongoose.Types.ObjectId.isValid(userId);
 
   const settings = await PageSetting.findOne();
-  const keys = await ApiKey.findOne().select(
-    "+sslCommerz.storeId +sslCommerz.storePassword +bkash.appKey +bkash.appSecret"
-  );
+  
+  const sslCreds = {
+    storeId: process.env.SSL_STORE_ID,
+    storePassword: process.env.SSL_STORE_PASSWORD
+  };
+
+  const bkashCreds = {
+    appKey: process.env.BKASH_APP_KEY,
+    appSecret: process.env.BKASH_APP_SECRET
+  };
 
   if (!settings) throw new Error("Settings not initialized.");
 
@@ -110,13 +116,13 @@ export const initPayment = asyncHandler(async (req, res) => {
     res.json(await handleCODGateway(order));
   } else if (paymentMethod === "bkash") {
     await order.save();
-    const bkashData = await initiateBkash(order, keys.bkash);
+    const bkashData = await initiateBkash(order, bkashCreds);
     order.paymentResult.bkashPaymentID = bkashData.paymentID;
     await order.save();
     res.json({ url: bkashData.url });
   } else {
     await order.save();
-    const sslUrl = await initiateSSLCommerz(order, keys.sslCommerz);
+    const sslUrl = await initiateSSLCommerz(order, sslCreds);
     res.json({ url: sslUrl });
   }
 });
@@ -141,13 +147,16 @@ export const paymentSuccess = asyncHandler(async (req, res) => {
 export const bkashSuccess = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { paymentID, status } = req.query;
-  const keys = await ApiKey.findOne().select("+bkash");
+  const bkashCreds = {
+    appKey: process.env.BKASH_APP_KEY,
+    appSecret: process.env.BKASH_APP_SECRET
+  };
   const order = await Order.findById(orderId);
 
   if (status === "success" && paymentID) {
     const executeResult = await bkashService.executePayment(
       paymentID,
-      keys.bkash
+      bkashCreds
     );
     if (executeResult.transactionStatus === "Completed") {
       order.paymentResult.status = "Completed";
@@ -430,10 +439,14 @@ export const syncOrderToPathao = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
   if (!order) return res.status(404).json({ message: "Order not found." });
 
-  const keys = await ApiKey.findOne().select(
-    "+pathao.clientId +pathao.clientSecret +pathao.userName +pathao.password +pathao.storeId"
-  );
-  const pKeys = keys?.pathao;
+  const pKeys = {
+    clientId: process.env.PATHAO_CLIENT_ID,
+    clientSecret: process.env.PATHAO_CLIENT_SECRET,
+    username: process.env.PATHAO_USERNAME,
+    password: process.env.PATHAO_PASSWORD,
+    storeId: process.env.PATHAO_STORE_ID,
+    isActive: !!process.env.PATHAO_CLIENT_ID
+  };
 
   if (!pKeys?.isActive) {
     return res

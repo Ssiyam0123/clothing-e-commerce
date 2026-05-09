@@ -37,6 +37,7 @@ export default function SettingsPage() {
     { id: "theme", label: "Theme", desc: "Visual Signature", icon: Palette },
     { id: "socials", label: "Social Links", desc: "Neural Networks", icon: Share2 },
     { id: "contact", label: "Contact", desc: "Comms Channels", icon: Mail },
+    { id: "payment", label: "Payment", desc: "Monetary Gateway", icon: Settings2 },
   ];
 
   const [formData, setFormData] = useState({
@@ -55,12 +56,20 @@ export default function SettingsPage() {
       phone: "",
       email: "",
       address: "",
+      whatsapp: "",
     },
+    paymentOptions: {
+      cod: true,
+      online: true,
+      bkash: true,
+    }
   });
 
   const [files, setFiles] = useState({
-    headerLogo: null,
-    footerLogo: null,
+    headerLogoLight: null,
+    headerLogoDark: null,
+    footerLogoLight: null,
+    footerLogoDark: null,
     favicon: null,
   });
 
@@ -74,6 +83,7 @@ export default function SettingsPage() {
             branding: { ...formData.branding, ...data.branding },
             socialLinks: data.socialLinks || [],
             contact: { ...formData.contact, ...data.contact },
+            paymentOptions: { ...formData.paymentOptions, ...data.paymentOptions },
           });
         }
       } catch (error) {
@@ -97,10 +107,13 @@ export default function SettingsPage() {
       payload.append("branding", JSON.stringify(formData.branding));
       payload.append("socialLinks", JSON.stringify(formData.socialLinks));
       payload.append("contact", JSON.stringify(formData.contact));
+      payload.append("paymentOptions", JSON.stringify(formData.paymentOptions));
 
       // Append Files
-      if (files.headerLogo) payload.append("headerLogo", files.headerLogo);
-      if (files.footerLogo) payload.append("footerLogo", files.footerLogo);
+      if (files.headerLogoLight) payload.append("headerLogoLight", files.headerLogoLight);
+      if (files.headerLogoDark) payload.append("headerLogoDark", files.headerLogoDark);
+      if (files.footerLogoLight) payload.append("footerLogoLight", files.footerLogoLight);
+      if (files.footerLogoDark) payload.append("footerLogoDark", files.footerLogoDark);
       if (files.favicon) payload.append("favicon", files.favicon);
 
       await api.put("/settings", payload, {
@@ -247,20 +260,34 @@ export default function SettingsPage() {
                       placeholder="Enter the primary mission statement..."
                     />
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pt-12 border-t border-border/5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 pt-12 border-t border-border/5">
                       <ImageUpload
-                        label="Header Array"
-                        name="headerLogo"
+                        label="Header Light"
+                        name="headerLogoLight"
                         register={() => ({})}
-                        currentImage={formData.branding?.headerLogo}
-                        onImageChange={(f) => setFiles({ ...files, headerLogo: f })}
+                        currentImage={formData.branding?.headerLogoLight}
+                        onImageChange={(f) => setFiles({ ...files, headerLogoLight: f })}
                       />
                       <ImageUpload
-                        label="Footer Array"
-                        name="footerLogo"
+                        label="Header Dark"
+                        name="headerLogoDark"
                         register={() => ({})}
-                        currentImage={formData.branding?.footerLogo}
-                        onImageChange={(f) => setFiles({ ...files, footerLogo: f })}
+                        currentImage={formData.branding?.headerLogoDark}
+                        onImageChange={(f) => setFiles({ ...files, headerLogoDark: f })}
+                      />
+                      <ImageUpload
+                        label="Footer Light"
+                        name="footerLogoLight"
+                        register={() => ({})}
+                        currentImage={formData.branding?.footerLogoLight}
+                        onImageChange={(f) => setFiles({ ...files, footerLogoLight: f })}
+                      />
+                      <ImageUpload
+                        label="Footer Dark"
+                        name="footerLogoDark"
+                        register={() => ({})}
+                        currentImage={formData.branding?.footerLogoDark}
+                        onImageChange={(f) => setFiles({ ...files, footerLogoDark: f })}
                       />
                       <ImageUpload
                         label="Favicon"
@@ -320,6 +347,88 @@ export default function SettingsPage() {
                         ))}
                       </div>
                     </section>
+
+                    <section className="space-y-10 pt-16 border-t border-border/5">
+                      <div>
+                        <h2 className="text-xl font-black uppercase tracking-tighter italic">Typography Protocol</h2>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Select the primary system font</p>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                        {[
+                          "Inter",
+                          "Roboto",
+                          "Outfit",
+                          "Playfair Display",
+                          "Montserrat",
+                          "Space Grotesk",
+                          "Poppins",
+                          "Syncopate"
+                        ].map((font) => (
+                          <button
+                            key={font}
+                            type="button"
+                            onClick={() => setFormData({
+                              ...formData,
+                              branding: { ...formData.branding, defaultThemeFont: font }
+                            })}
+                            className={cn(
+                              "group relative p-6 rounded-3xl border-2 transition-all duration-500 text-left",
+                              formData.branding?.defaultThemeFont === font
+                                ? "border-rose-600 bg-rose-600/5 shadow-2xl"
+                                : "border-border/5 hover:border-border/20 bg-muted/20"
+                            )}
+                          >
+                             <div className="flex flex-col gap-4">
+                                <span className="text-2xl font-black italic tracking-tighter" style={{ fontFamily: font }}>Aa</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest opacity-60">{font}</span>
+                             </div>
+                             {formData.branding?.defaultThemeFont === font && (
+                               <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-rose-600 animate-pulse" />
+                             )}
+                          </button>
+                        ))}
+                      </div>
+                    </section>
+
+                    <section className="space-y-10 pt-16 border-t border-border/5">
+                      <div>
+                        <h2 className="text-xl font-black uppercase tracking-tighter italic">Identity Atmosphere</h2>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Select the active branding personality</p>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+                        {[
+                          "executive",
+                          "streetwear",
+                          "earth",
+                          "luxury",
+                          "cyber",
+                        ].map((theme) => (
+                          <button
+                            key={theme}
+                            type="button"
+                            onClick={() => setFormData({
+                              ...formData,
+                              branding: { ...formData.branding, activeTheme: theme }
+                            })}
+                            className={cn(
+                              "group relative p-6 rounded-3xl border-2 transition-all duration-500",
+                              formData.branding?.activeTheme === theme
+                                ? "border-rose-600 bg-rose-600/5 shadow-2xl"
+                                : "border-border/5 hover:border-border/20 bg-muted/20"
+                            )}
+                          >
+                             <span className="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">
+                               {theme}
+                             </span>
+                             {formData.branding?.activeTheme === theme && (
+                               <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-rose-600 animate-pulse" />
+                             )}
+                          </button>
+                        ))}
+                      </div>
+                    </section>
                   </motion.div>
                 )}
 
@@ -336,6 +445,7 @@ export default function SettingsPage() {
                         { id: "instagram", label: "Instagram Visuals", placeholder: "https://instagram.com/vanguard" },
                         { id: "twitter", label: "Twitter Comms", placeholder: "https://twitter.com/vanguard" },
                         { id: "linkedin", label: "LinkedIn Network", placeholder: "https://linkedin.com/company/vanguard" },
+                        { id: "tiktok", label: "TikTok Stream", placeholder: "https://tiktok.com/@vanguard" },
                       ].map((platform) => (
                         <FormInput
                           key={platform.id}
@@ -377,22 +487,97 @@ export default function SettingsPage() {
                         register={(n) => ({ value: formData.contact?.phone, onChange: (e) => setFormData({...formData, contact: {...formData.contact, phone: e.target.value}}) })}
                         errors={{}}
                         value={formData.contact?.phone}
+                        placeholder="+880 1234 567890"
                       />
                       <FormInput
-                        label="Transmission (Email)"
+                        label="Direct Line (WhatsApp)"
+                        name="whatsapp"
+                        register={(n) => ({ value: formData.contact?.whatsapp, onChange: (e) => setFormData({...formData, contact: {...formData.contact, whatsapp: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.contact?.whatsapp}
+                        placeholder="+880 1234 567890"
+                      />
+                      <FormInput
+                        label="Neural Node (Email)"
                         name="email"
                         register={(n) => ({ value: formData.contact?.email, onChange: (e) => setFormData({...formData, contact: {...formData.contact, email: e.target.value}}) })}
                         errors={{}}
                         value={formData.contact?.email}
+                        placeholder="protocol@vanguard.com"
+                      />
+                      <FormInput
+                        label="Physical Coordinates"
+                        name="address"
+                        register={(n) => ({ value: formData.contact?.address, onChange: (e) => setFormData({...formData, contact: {...formData.contact, address: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.contact?.address}
+                        placeholder="Sector 7, Utopia Prime"
                       />
                     </div>
-                    <FormInput
-                      label="Physical Coordinates"
-                      name="address"
-                      register={(n) => ({ value: formData.contact?.address, onChange: (e) => setFormData({...formData, contact: {...formData.contact, address: e.target.value}}) })}
-                      errors={{}}
-                      value={formData.contact?.address}
-                    />
+                  </motion.div>
+                )}
+
+                {activeTab === "payment" && (
+                  <motion.div
+                    key="payment"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-16"
+                  >
+                    <section className="space-y-10">
+                      <div>
+                        <h2 className="text-xl font-black uppercase tracking-tighter italic">Payment Protocol</h2>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Manage active monetary gateways</p>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                        {[
+                          { id: "cod", label: "Cash On Delivery", desc: "Physical Currency Exchange" },
+                          { id: "online", label: "SSLCommerz", desc: "Digital Credit Matrix" },
+                          { id: "bkash", label: "bKash Token", desc: "Mobile Financial Layer" },
+                        ].map((option) => (
+                          <button
+                            key={option.id}
+                            type="button"
+                            onClick={() => setFormData({
+                              ...formData,
+                              paymentOptions: { 
+                                ...formData.paymentOptions, 
+                                [option.id]: !formData.paymentOptions[option.id] 
+                              }
+                            })}
+                            className={cn(
+                              "group relative p-8 rounded-[2.5rem] border-2 transition-all duration-500 text-left overflow-hidden",
+                              formData.paymentOptions?.[option.id]
+                                ? "border-emerald-500/50 bg-emerald-500/5 shadow-2xl"
+                                : "border-border/5 hover:border-border/20 bg-muted/20 opacity-40 hover:opacity-100"
+                            )}
+                          >
+                             <div className="flex flex-col gap-4 relative z-10">
+                                <div className={cn(
+                                  "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500",
+                                  formData.paymentOptions?.[option.id] ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground"
+                                )}>
+                                   <Settings2 size={20} />
+                                </div>
+                                <div>
+                                  <h3 className="text-sm font-black uppercase tracking-tight">{option.label}</h3>
+                                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1">{option.desc}</p>
+                                </div>
+                             </div>
+
+                             {formData.paymentOptions?.[option.id] && (
+                               <div className="absolute top-6 right-6 w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+                             )}
+                             
+                             <div className={cn(
+                               "absolute inset-0 bg-gradient-to-br transition-opacity duration-1000",
+                               formData.paymentOptions?.[option.id] ? "from-emerald-500/10 via-transparent to-transparent opacity-100" : "opacity-0"
+                             )} />
+                          </button>
+                        ))}
+                      </div>
+                    </section>
                   </motion.div>
                 )}
               </AnimatePresence>

@@ -2,17 +2,21 @@ import { Suspense } from "react";
 import ProductsClient from "@/components/products/ProductsClient";
 import { FilterSkeleton, GridSkeleton } from "@/components/common/Skeletons";
 
+import { getSettings } from "@/lib/settings";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
   "https://clothing-e-commerce-web.vercel.app";
 
 export async function generateMetadata({ searchParams }) {
-  const { category, subcategory, search } = await searchParams;
+  const { category, search } = await searchParams;
+  const settings = await getSettings();
+  const siteName = settings?.branding?.siteName || "VANGUARD";
 
-  let title = "The Collection | Vanguard";
+  let title = `The Collection | ${siteName}`;
   let description =
-    "Browse our complete collection of premium streetwear. Sustainable fabrics, bold silhouettes.";
+    `Browse our complete collection of premium apparel at ${siteName}. Sustainable fabrics, bold silhouettes.`;
 
   if (category) {
     try {
@@ -21,7 +25,7 @@ export async function generateMetadata({ searchParams }) {
         const categories = await res.json();
         const cat = categories.find((c) => c.slug === category);
         if (cat) {
-          title = `${cat.name} | Vanguard Collection`;
+          title = `${cat.name} | ${siteName} Collection`;
           description = `Explore our ${cat.name} collection. Premium urban apparel designed for the modern trendsetter.`;
         }
       }
@@ -29,7 +33,7 @@ export async function generateMetadata({ searchParams }) {
       console.error("Failed to fetch category for metadata");
     }
   } else if (search) {
-    title = `Search results for "${search}" | Vanguard`;
+    title = `Search results for "${search}" | ${siteName}`;
   }
 
   return {

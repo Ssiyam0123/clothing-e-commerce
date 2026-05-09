@@ -1,47 +1,42 @@
-# Dependencies
-**/node_modules/
-**/dist/
-**/.next/
-**/build/
+# Whitelist Policy: Ignore everything by default
+/*
 
-# Environment Files
-**/.env
-**/.env.local
-**/.env.*.local
+# Explicitly allow core project folders
+!/backend/
+!/web/
 
-# Debug and Logs
-**/npm-debug.log*
-**/yarn-debug.log*
-**/yarn-error.log*
-**/.pnpm-debug.log*
+# Explicitly allow essential root configuration
+!/.gitignore
+!/README.md
 
-# OS Files
-.DS_Store
-Thumbs.db
+# Handle nested ignores (optional but good practice)
+# If you want to ignore specific things inside backend or web, 
+# those should be handled in their respective .gitignore files or here with more specificity.
+# For example, to keep current ignores:
+/backend/node_modules/
+/backend/dist/
+/backend/build/
+/backend/uploads/
+/backend/dbdata/
+/backend/images/
+/backend/.env
 
-# Project specific
-backend/uploads/
-backend/dbdata/
-backend/images/
-backend/combined_codebase.txt
-backend/josns/
-backend/extract.js
+/web/node_modules/
+/web/.next/
+/web/dist/
+/web/build/
+/web/.env
+/web/.env.local
+/web/.env.*.local
 
-web/combined_codebase.txt
-web/extract.js
-
-agent/**
-
-**/combined_codebase.txt
-**/backend_codebase.txt
-**/web_codebase.txt
-**/extract.js
-backend/create-admin.js
-
-# AI / agent metadata
-.agents/
+# Globally ignore AI/Agent metadata and logs
+**/.agents/
+**/.agent/
+**/.gemini/
+**/.claude/
 **/AGENTS.md
 **/CLAUDE.md
 **/graphify-out/
-**/.claude
-**/.claude/**
+**/.graphify_*
+**/auditreport_*.md
+**/skills-lock.json

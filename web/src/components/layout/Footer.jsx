@@ -10,7 +10,7 @@ import { getTranslation } from "@/utils/typography/handler";
 import { getImageUrl } from "@/utils/imageUtils";
 
 export default function Footer() {
-  const { lang, settings } = useAppStore();
+  const { lang, settings, theme } = useAppStore();
   const branding = settings?.branding || {};
   const t = useMemo(() => getTranslation('footer', lang), [lang]);
 
@@ -52,20 +52,17 @@ export default function Footer() {
           {/* Brand Engine */}
           <div className="lg:col-span-5 space-y-10">
             <Link href="/" className="flex items-center gap-3 group">
-               {branding.footerLogo ? (
+               {branding.footerLogoLight || branding.footerLogoDark ? (
                  <img 
-                   src={getImageUrl(branding.footerLogo)} 
+                   src={getImageUrl(theme === 'dark' ? (branding.footerLogoDark || branding.footerLogoLight) : (branding.footerLogoLight || branding.footerLogoDark))} 
                    alt={branding.siteName} 
-                   className="h-10 w-auto object-contain transition-transform group-hover:scale-110 duration-500" 
+                   className="h-9 w-auto object-contain transition-transform group-hover:scale-110 duration-500" 
                  />
                ) : (
                  <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background group-hover:scale-110 transition-transform duration-500 shadow-2xl">
                     <Sparkles size={20} />
                  </div>
                )}
-               <span className="text-2xl font-black uppercase italic tracking-tighter text-gradient">
-                 {branding.siteName || "Vanguard"}
-               </span>
             </Link>
             <p className="text-base md:text-lg font-medium text-muted-foreground leading-relaxed max-w-md italic opacity-80">
               {t.description}

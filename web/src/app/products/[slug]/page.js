@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getTranslation } from "@/utils/typography/handler";
 
+import { getSettings } from "@/lib/settings";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -20,11 +22,15 @@ const SITE_URL =
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   try {
-    const res = await fetch(`${API_URL}/products/details/${slug}`, {
-      next: { revalidate: 3600 },
-    });
+    const [res, settings] = await Promise.all([
+      fetch(`${API_URL}/products/details/${slug}`, { next: { revalidate: 3600 } }),
+      getSettings()
+    ]);
+    
     if (!res.ok) throw new Error("Product not found");
     const product = await res.json();
+    const branding = settings?.branding || {};
+    const siteName = branding.siteName || "VANGUARD";
 
     const discountedPrice =
       product.price - (product.price * (product.discount || 0)) / 100;
@@ -36,15 +42,15 @@ export async function generateMetadata({ params }) {
       : `${SITE_URL}/og-image.jpg`;
 
     return {
-      title: `${product.name} | Vanguard Collection`,
+      title: `${product.name} | ${siteName} Collection`,
       description:
         product.description?.slice(0, 160) ||
-        `Shop ${product.name} – premium streetwear from Vanguard.`,
+        `Shop ${product.name} – premium apparel from ${siteName}.`,
       keywords: [
         product.name,
         product.category?.name,
-        "streetwear",
-        "Vanguard",
+        "premium",
+        siteName,
       ],
       openGraph: {
         title: product.name,
@@ -53,7 +59,7 @@ export async function generateMetadata({ params }) {
           { url: imageUrl, width: 1200, height: 630, alt: product.name },
         ],
         type: "website",
-        siteName: "Vanguard",
+        siteName: siteName,
         url: `${SITE_URL}/products/${slug}`,
         "og:price:amount": discountedPrice.toString(),
         "og:price:currency": "BDT",
@@ -67,7 +73,8 @@ export async function generateMetadata({ params }) {
       },
     };
   } catch (error) {
-    return { title: "Product Not Found | Vanguard" };
+    const settings = await getSettings();
+    return { title: `Product Not Found | ${settings?.branding?.siteName || "VANGUARD"}` };
   }
 }
 
@@ -96,6 +103,9 @@ export default async function ProductPage({ params }) {
   const lang = cookieStore.get("vanguard-lang")?.value || "en";
   const t = getTranslation('product_details', lang);
 
+  const settings = await getSettings();
+  const siteName = settings?.branding?.siteName || "VANGUARD";
+
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -105,7 +115,7 @@ export default async function ProductPage({ params }) {
       img.startsWith("http") ? img : `${SITE_URL}${img}`,
     ),
     sku: product.sku || product._id,
-    brand: { "@type": "Brand", name: "Vanguard" },
+    brand: { "@type": "Brand", name: siteName },
     offers: {
       "@type": "Offer",
       url: `${SITE_URL}/products/${slug}`,

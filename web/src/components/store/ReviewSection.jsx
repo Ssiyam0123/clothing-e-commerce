@@ -85,8 +85,17 @@ export default function ReviewSection({ productId, onReviewChange }) {
     deleteReview,
   } = useReviews(productId);
 
-  const { lang } = useAppStore();
-  const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY["en"], [lang]);
+  const { lang, settings } = useAppStore();
+  const siteName = settings?.branding?.siteName || "Vanguard";
+  const ui = useMemo(() => {
+    const base = DICTIONARY[lang] || DICTIONARY["en"];
+    return {
+      ...base,
+      noReviews: lang === 'bn' 
+        ? "কোনো ফিডব্যাক নেই। আপনিই প্রথম রিভিউ দিন!" 
+        : `No feedback yet. Be the ${siteName.toLowerCase()}.`
+    };
+  }, [lang, siteName]);
   const isBn = lang === "bn";
 
   const [showForm, setShowForm] = useState(false);
