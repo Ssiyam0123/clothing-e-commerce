@@ -124,7 +124,33 @@ export default async function ProductPage({ params }) {
       availability: isAvailable
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
     },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: product.category?.name || "Products",
+        item: `${SITE_URL}/products?category=${product.category?.slug || ""}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: product.name,
+        item: `${SITE_URL}/products/${slug}`,
+      },
+    ],
   };
 
   return (
@@ -132,6 +158,10 @@ export default async function ProductPage({ params }) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
       <div className="max-w-[1800px] mx-auto pt-10 lg:pt-24 px-4 sm:px-6 lg:px-12">

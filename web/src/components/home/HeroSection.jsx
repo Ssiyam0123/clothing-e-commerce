@@ -40,11 +40,14 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
       aria-label="Hero section"
     >
       <div className="relative h-full w-full group">
-        <img
-          src={getImageUrl(slide.image, 1920, 85)}
+        <Image
+          src={getImageUrl(slide.image, 1200, 85)}
           alt={slide.title || "Campaign banner"}
-          className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[15s] ease-out group-hover:scale-105"
-          loading="eager"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center transition-transform duration-[15s] ease-out group-hover:scale-105"
+          quality={85}
         />
         {showHeader && (
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent z-[5] transition-opacity duration-700" />

@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://clothing-e-commerce-web.vercel.app";
 
 // ১. সেইফ ডেট হেল্পার (যাতে ক্রাশ না করে)
 const safeDate = (dateStr) => {

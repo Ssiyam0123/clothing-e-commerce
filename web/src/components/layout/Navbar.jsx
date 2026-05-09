@@ -108,8 +108,7 @@ export default function Navbar() {
         {/* DESKTOP NAV */}
         <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
           {dynamicNavLinks.map((link) => {
-            // Fix hydration mismatch by showing English (server default) until mounted
-            const label = mounted ? link.label : (getTranslation('navbar', 'en')[link.href === '/' ? 'home' : link.href.replace('/', '')] || link.label);
+            const label = mounted ? (t[link.key] || link.label) : link.label;
             
             return (
               <Link
@@ -117,7 +116,7 @@ export default function Navbar() {
                 href={link.href}
                 className={cn(
                   "text-[9px] font-black uppercase tracking-[0.4em] transition-all hover:text-accent-secondary relative group flex items-center gap-2 whitespace-nowrap",
-                  pathname === link.href ? "text-accent-secondary" : "text-foreground/70",
+                  pathname === link.href ? "text-accent-secondary" : "text-foreground/90",
                   link.isSpecial && "text-rose-500 hover:text-rose-600"
                 )}
               >
@@ -154,6 +153,7 @@ export default function Navbar() {
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="hidden md:inline-flex w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30 flex-shrink-0"
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           >
             {mounted ? (
               theme === "dark" ? <Sun size={16} className="sm:size-[18px]" /> : <Moon size={16} className="sm:size-[18px]" />
@@ -246,7 +246,10 @@ export default function Navbar() {
           {/* MOBILE MENU - Full width, no fixed max width */}
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
-              <button className="lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30 flex items-center justify-center border border-border/10 ml-1 flex-shrink-0 text-foreground">
+              <button 
+                className="lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30 flex items-center justify-center border border-border/10 ml-1 flex-shrink-0 text-foreground"
+                aria-label="Toggle Mobile Menu"
+              >
                 <Menu size={18} className="text-foreground" />
               </button>
             </SheetTrigger>

@@ -6,6 +6,6 @@ export default function robots() {
       allow: "/",
       disallow: ["/admin/", "/cart/", "/profile/"],
     },
-    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL}/sitemap.xml`,
+    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL || "https://clothing-e-commerce-web.vercel.app"}/sitemap.xml`,
   };
 }
