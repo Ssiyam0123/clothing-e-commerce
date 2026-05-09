@@ -227,8 +227,12 @@ async function FlashSaleWrapper({ dataPromise, lang, t, section }) {
     <section className="px-6 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto py-6 md:py-10 w-full">
       <FlashSaleTeaserServer activeSale={activeSale} products={flashProducts} lang={lang} ui={t} />
       <div className="flex justify-center mt-12">
-        <Link href={`/flash-sale/${activeSale.slug}`} className="group flex items-center gap-4 px-10 py-5 rounded-full bg-foreground text-background font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500 shadow-xl hover:shadow-primary/20">
-          {t.seeMore || "Explore Full Campaign"} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+        <Link 
+          href={`/flash-sale/${activeSale.slug}`} 
+          className="group flex items-center gap-4 px-10 py-5 rounded-full bg-foreground text-background font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500 shadow-xl hover:shadow-primary/20"
+          aria-label={`${t.seeMore || "Explore"} ${activeSale.name}`}
+        >
+          {t.seeMore || "Explore"} {activeSale.name} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
     </section>
@@ -252,8 +256,12 @@ async function FeaturedWrapper({ dataPromise, lang, t, section }) {
     <section className="px-6 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto py-6 md:py-10 w-full">
       <ProductSection products={featuredProducts} lang={lang} />
       <div className="flex justify-center mt-12">
-        <Link href="/products?category=isFeatured" className="group flex items-center gap-4 px-10 py-5 rounded-full bg-foreground text-background font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500 shadow-xl hover:shadow-primary/20">
-          {t.viewMore || "View Collection"} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+        <Link 
+          href="/products?category=isFeatured" 
+          className="group flex items-center gap-4 px-10 py-5 rounded-full bg-foreground text-background font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500 shadow-xl hover:shadow-primary/20"
+          aria-label={t.viewMore || "View Featured Collection"}
+        >
+          {t.viewMore || "View Featured Collection"} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
     </section>
