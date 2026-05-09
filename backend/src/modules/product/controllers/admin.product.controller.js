@@ -1,4 +1,6 @@
+import mongoose from 'mongoose';
 import Product from '../product.model.js';
+import Category from '../../category/category.model.js';
 import { asyncHandler } from '../../../middleware/asyncHandler.js';
 import { uploadMultipleImages, deleteImage } from '../../../services/imageUploadService.js';
 import { createProductSchema, updateProductSchema } from '../validators/product.validator.js';
@@ -88,10 +90,24 @@ export const getAdminProducts = asyncHandler(async (req, res) => {
     if (isActive === 'false') matchStage.isActive = false;
     else if (isActive === 'true') matchStage.isActive = true;
 
+    // Separate Featured filter from category query if provided directly
     if (isFeatured === 'true') matchStage.isFeatured = true;
 
     if (category && category !== 'all') {
-        matchStage.category = category; // Admin uses IDs usually, or we can resolve slug if needed
+        if (category === 'isFeatured') {
+            matchStage.isFeatured = true;
+        } else if (mongoose.Types.ObjectId.isValid(category)) {
+            matchStage.category = new mongoose.Types.ObjectId(category);
+        } else {
+            // If category is a slug, find its ID
+            const foundCategory = await Category.findOne({ slug: category });
+            if (foundCategory) {
+                matchStage.category = foundCategory._id;
+            } else {
+                // If category not found, ensure query returns nothing
+                matchStage.category = new mongoose.Types.ObjectId();
+            }
+        }
     }
 
     if (search) {
@@ -161,7 +177,13 @@ export const getAdminProducts = asyncHandler(async (req, res) => {
 
     const products = await Product.aggregate(pipeline);
 
-    res.json({ success: true, total, products });
+    res.json({ 
+        success: true, 
+        total, 
+        currentPage: Number(page),
+        pages: Math.ceil(total / Number(limit)),
+        products 
+    });
 });
 
 export const getAdminProductById = asyncHandler(async (req, res) => {

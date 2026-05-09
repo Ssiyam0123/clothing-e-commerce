@@ -12,6 +12,7 @@ export const createCategory = asyncHandler(async (req, res) => {
         slug: req.body.slug,
         description: req.body.description,
         image: imageUrl,
+        isFeatured: req.body.isFeatured === 'true' || req.body.isFeatured === true,
     });
     res.status(201).json(category);
 });
@@ -25,14 +26,19 @@ export const updateCategory = asyncHandler(async (req, res) => {
         imageUrl = await uploadImage(req.file, 'categories', existingCategory.image);
     }
 
+    const updateData = {
+        name: req.body.name || existingCategory.name,
+        slug: req.body.slug || existingCategory.slug,
+        description: req.body.description || existingCategory.description,
+        image: imageUrl,
+        isFeatured: req.body.isFeatured !== undefined ? 
+            (req.body.isFeatured === 'true' || req.body.isFeatured === true) : 
+            existingCategory.isFeatured
+    };
+
     const updated = await Category.findByIdAndUpdate(
         req.params.id,
-        {
-            name: req.body.name,
-            slug: req.body.slug,
-            description: req.body.description,
-            image: imageUrl,
-        },
+        updateData,
         { new: true, runValidators: true }
     );
     res.json(updated);

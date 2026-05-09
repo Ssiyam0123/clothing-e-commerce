@@ -220,7 +220,7 @@ export default async function RootLayout({ children }) {
       <body suppressHydrationWarning>
         <QueryProvider>
           <TooltipProvider>
-            <ClientInitialization />
+            <ClientInitialization initialSettings={settings} />
             <ThemeProvider>
               {isMaintenance ? (
                 <div className="min-h-screen bg-page flex flex-col items-center justify-center text-center p-6">

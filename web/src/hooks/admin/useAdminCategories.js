@@ -56,6 +56,17 @@ export const useAdminCategories = (initialData = undefined) => {
     },
   });
 
+  const toggleFeatured = useMutation({
+    mutationFn: async ({ id, isFeatured }) => {
+      const response = await api.put(`/admin/categories/${id}`, { isFeatured });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminCategories"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+
   return {
     categories: categories || [],
     isLoading,
@@ -63,5 +74,6 @@ export const useAdminCategories = (initialData = undefined) => {
     createCategory: createCategory.mutateAsync,
     updateCategory: updateCategory.mutateAsync,
     deleteCategory: deleteCategory.mutateAsync,
+    toggleFeatured: toggleFeatured.mutateAsync,
   };
 };

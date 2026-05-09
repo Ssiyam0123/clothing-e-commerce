@@ -1,14 +1,16 @@
+import { cache } from 'react';
+
 /**
  * 🛠️ Site Settings Server Utility
  * Handles server-side fetching for dynamic metadata and SEO.
+ * Optimized with Request Memoization and Edge Caching.
  */
-
-export async function getSettings() {
+export const getSettings = cache(async () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
   try {
     const res = await fetch(`${apiUrl}/settings`, { 
       next: { 
-        revalidate: 60,
+        revalidate: 3600, // Cache for 1 hour, bust with revalidateTag('settings')
         tags: ['settings']
       }, 
     });
@@ -23,4 +25,4 @@ export async function getSettings() {
     console.error('🚨 Site Settings Sync Error:', error.message);
     return null;
   }
-}
+});

@@ -4,7 +4,7 @@ import { asyncHandler } from '../../../middleware/asyncHandler.js';
 export const getPublicCategories = asyncHandler(async (req, res) => {
     // For storefront, we only need basic info
     const categories = await Category.find({})
-        .select('name slug image description')
+        .select('name slug image description isFeatured')
         .sort('name');
 
     // 🚀 Prepend Virtual "On Sale" Category

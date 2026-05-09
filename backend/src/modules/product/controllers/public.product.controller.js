@@ -21,6 +21,11 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
     if (category && category !== 'all') {
         if (category === 'on-sale') {
             matchStage.discount = { $gt: 0 };
+        } else if (category === 'featured') {
+            const featCats = await Category.find({ isFeatured: true }).select('_id');
+            if (featCats.length > 0) {
+                matchStage.category = { $in: featCats.map(c => c._id) };
+            } else return res.json({ success: true, total: 0, pages: 0, products: [] });
         } else {
             const catDoc = await Category.findOne({ slug: category }).select('_id');
             if (catDoc) matchStage.category = catDoc._id;

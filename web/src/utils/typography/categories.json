@@ -1,0 +1,20 @@
+{
+  "en": {
+    "title": "Category Hub",
+    "subtitle": "The Archive of Vanguard Artifacts",
+    "allCategories": "All Categories",
+    "onSale": "On Sale",
+    "onSaleDesc": "Discover discounted premium artifacts",
+    "items": "Items",
+    "viewCollection": "View Collection"
+  },
+  "bn": {
+    "title": "ক্যাটাগরি হাব",
+    "subtitle": "ভ্যানগার্ডের সংগ্রহের মহাফেজখানা",
+    "allCategories": "সব ক্যাটাগরি",
+    "onSale": "ছাড় চলছে",
+    "onSaleDesc": "সাশ্রয়ী মূল্যে প্রিমিয়াম পণ্যগুলো দেখুন",
+    "items": "পণ্য",
+    "viewCollection": "কালেকশন দেখুন"
+  }
+}

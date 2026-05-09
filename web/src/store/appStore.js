@@ -44,34 +44,38 @@ export const useAppStore = create((set, get) => ({
     setCookie("vanguard-lang", lang);
   },
 
+  setSettings: (data) => {
+    if (!data) return;
+    const branding = data.branding || {};
+    
+    const defaultTheme = branding.defaultTheme || "dark";
+    const defaultThemeColor = branding.defaultThemeColor || "Zinc";
+    const defaultThemeFont = branding.defaultThemeFont || "Inter";
+    const identityTheme = branding.activeTheme || "executive";
+    const defaultLang = branding.defaultLanguage || "en";
+
+    set({ 
+      settings: data,
+      theme: getCookie("vanguard-theme-mode") || defaultTheme, 
+      themeColor: getCookie("vanguard-theme-color") || defaultThemeColor,
+      themeFont: getCookie("vanguard-theme-font") || defaultThemeFont,
+      identityTheme: getCookie("vanguard-identity-theme") || identityTheme,
+      lang: getCookie("vanguard-lang") || defaultLang,
+      isMounted: true 
+    });
+
+    // Sync cookies if not present
+    if (!getCookie("vanguard-theme-mode")) setCookie("vanguard-theme-mode", defaultTheme);
+    if (!getCookie("vanguard-theme-color")) setCookie("vanguard-theme-color", defaultThemeColor);
+    if (!getCookie("vanguard-theme-font")) setCookie("vanguard-theme-font", defaultThemeFont);
+    if (!getCookie("vanguard-identity-theme")) setCookie("vanguard-identity-theme", identityTheme);
+    if (!getCookie("vanguard-lang")) setCookie("vanguard-lang", defaultLang);
+  },
+
   initApp: async () => {
     try {
       const { data } = await api.get("/settings");
-      const branding = data?.branding || {};
-      
-      const defaultTheme = branding.defaultTheme || "dark";
-      const defaultThemeColor = branding.defaultThemeColor || "Zinc";
-      const defaultThemeFont = branding.defaultThemeFont || "Inter";
-      const identityTheme = branding.activeTheme || "executive";
-      const defaultLang = branding.defaultLanguage || "en";
-
-      set({ 
-        settings: data,
-        theme: getCookie("vanguard-theme-mode") || defaultTheme, 
-        themeColor: getCookie("vanguard-theme-color") || defaultThemeColor,
-        themeFont: getCookie("vanguard-theme-font") || defaultThemeFont,
-        identityTheme: getCookie("vanguard-identity-theme") || identityTheme,
-        lang: getCookie("vanguard-lang") || defaultLang,
-        isMounted: true 
-      });
-
-      // Sync if not already set
-      if (!getCookie("vanguard-theme-mode")) setCookie("vanguard-theme-mode", defaultTheme);
-      if (!getCookie("vanguard-theme-color")) setCookie("vanguard-theme-color", defaultThemeColor);
-      if (!getCookie("vanguard-theme-font")) setCookie("vanguard-theme-font", defaultThemeFont);
-      if (!getCookie("vanguard-identity-theme")) setCookie("vanguard-identity-theme", identityTheme);
-      if (!getCookie("vanguard-lang")) setCookie("vanguard-lang", defaultLang);
-
+      get().setSettings(data);
     } catch (error) {
       console.error("Failed to initialize app settings:", error);
       set({ isMounted: true });

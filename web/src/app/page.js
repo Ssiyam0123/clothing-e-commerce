@@ -16,19 +16,22 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 // 🚀 Request-level Memoization + Edge Caching
 const getHomeData = cache(async () => {
   try {
-    const [productsRes, categoriesRes, flashSalesRes, bannerRes] =
+    const [productsRes, categoriesRes, flashSalesRes, bannerRes, featuredCatRes] =
       await Promise.all([
         fetch(`${API_URL}/products?limit=24`, {
-          next: { revalidate: 3600, tags: ["products", "home-data"] },
+          next: { revalidate: 60, tags: ["products", "home-data"] },
         }),
         fetch(`${API_URL}/categories`, {
-          next: { revalidate: 3600, tags: ["categories", "home-data"] },
+          next: { revalidate: 60, tags: ["categories", "home-data"] },
         }),
         fetch(`${API_URL}/flash-sales/active`, {
-          next: { revalidate: 300, tags: ["flash-sale", "home-data"] }, // Flash sale is more dynamic
+          next: { revalidate: 60, tags: ["flash-sale", "home-data"] }, 
         }),
         fetch(`${API_URL}/banner-campaigns/active`, {
-          next: { revalidate: 3600, tags: ["banners", "home-data"] },
+          next: { revalidate: 60, tags: ["banners", "home-data"] },
+        }),
+        fetch(`${API_URL}/products?category=featured&limit=100`, {
+          next: { revalidate: 60, tags: ["products", "categories", "home-data"] },
         }),
       ]);
 
@@ -37,6 +40,7 @@ const getHomeData = cache(async () => {
       categories: categoriesRes.ok ? await categoriesRes.json() : [],
       flashSales: flashSalesRes.ok ? await flashSalesRes.json() : null,
       activeCampaign: bannerRes.ok ? await bannerRes.json() : null,
+      featuredCategoryProducts: featuredCatRes.ok ? (await featuredCatRes.json()).products : [],
     };
   } catch (e) {
     console.error("Home data fetch failed:", e);
@@ -80,6 +84,10 @@ export default async function HomePage() {
 
         <Suspense fallback={<GridSkeleton count={4} />}>
           <SaleWrapper dataPromise={dataPromise} lang={lang} t={t} />
+        </Suspense>
+
+        <Suspense fallback={<GridSkeleton count={4} />}>
+          <FeaturedCategoryWrapper dataPromise={dataPromise} lang={lang} t={t} />
         </Suspense>
       </div>
     </main>
@@ -153,5 +161,47 @@ async function SaleWrapper({ dataPromise, lang, t }) {
       <SectionHeader title={t.saleTitle} subtitle={t.saleSub} className="mb-16 md:mb-24" />
       <ProductSection products={saleProducts} lang={lang} />
     </section>
+  );
+}
+
+async function FeaturedCategoryWrapper({ dataPromise, lang, t }) {
+  const data = await dataPromise;
+  const featuredCategories = data.categories.filter(c => c.isFeatured);
+  const allFeaturedProducts = data.featuredCategoryProducts || [];
+
+  if (featuredCategories.length === 0 || allFeaturedProducts.length === 0) return null;
+
+  return (
+    <>
+      {featuredCategories.map((cat) => {
+        // Filter products for THIS specific category
+        const catProducts = allFeaturedProducts.filter(p => 
+          p.category?.slug === cat.slug || 
+          p.category?._id === cat._id || 
+          p.category === cat._id
+        ).slice(0, 4);
+
+        if (catProducts.length === 0) return null;
+
+        return (
+          <section key={cat._id} className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 md:mb-24">
+              <SectionHeader 
+                title={cat.name} 
+                subtitle={t.featuredCatSub} 
+                className="mb-0" 
+              />
+              <Link 
+                href={`/products?category=${cat.slug}&page=1`} 
+                className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-elevated px-8 py-4 rounded-full border border-light hover:bg-accent-secondary hover:text-white transition-all duration-500"
+              >
+                {t.viewMore || "View More"}
+              </Link>
+            </div>
+            <ProductSection products={catProducts} lang={lang} />
+          </section>
+        );
+      })}
+    </>
   );
 }

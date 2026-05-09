@@ -2,17 +2,35 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { Globe, Mail, Sparkles, Send, Share2, Activity } from "lucide-react";
+import { 
+  Globe, Mail, Sparkles, Send, Share2, Activity
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/store/appStore";
 import { getTranslation } from "@/utils/typography/handler";
 import { getImageUrl } from "@/utils/imageUtils";
 
+const PLATFORM_ICONS = {
+  facebook: Share2,
+  instagram: Activity,
+  twitter: Send,
+  x: Send,
+  linkedin: Globe,
+  youtube: Globe,
+  globe: Globe,
+};
+
 export default function Footer() {
   const { lang, settings, theme } = useAppStore();
   const branding = settings?.branding || {};
+  const socialLinks = settings?.socialLinks || [];
   const t = useMemo(() => getTranslation('footer', lang), [lang]);
+
+  const activeSocials = useMemo(() => 
+    socialLinks.filter(link => link.isActive), 
+    [socialLinks]
+  );
 
   const footerSections = useMemo(() => [
     {
@@ -68,21 +86,25 @@ export default function Footer() {
               {t.description}
             </p>
             <div className="flex items-center gap-4">
-              {[
-                { Icon: Globe, label: "Global Network" },
-                { Icon: Send, label: "Direct Transmission" },
-                { Icon: Share2, label: "Share Protocol" },
-                { Icon: Activity, label: "System Status" }
-              ].map(({ Icon, label }, i) => (
-                <Link 
-                  key={i} 
-                  href="#" 
-                  className="w-10 h-10 rounded-xl glass flex items-center justify-center text-foreground hover:text-accent-secondary hover:scale-110 hover:rotate-6 transition-all duration-500 shadow-sm border-border/10"
-                  aria-label={label}
-                >
-                  <Icon size={18} />
-                </Link>
-              ))}
+              {activeSocials.length > 0 ? (
+                activeSocials.map((link, i) => {
+                  const Icon = PLATFORM_ICONS[link.platform?.toLowerCase()] || Globe;
+                  return (
+                    <Link 
+                      key={i} 
+                      href={link.url || "#"} 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-xl glass flex items-center justify-center text-foreground hover:text-accent-secondary hover:scale-110 hover:rotate-6 transition-all duration-500 shadow-sm border-border/10"
+                      aria-label={link.platform}
+                    >
+                      <Icon size={18} />
+                    </Link>
+                  );
+                })
+              ) : (
+                <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40">Connecting to Network...</p>
+              )}
             </div>
           </div>
 

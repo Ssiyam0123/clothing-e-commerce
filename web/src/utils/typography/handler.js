@@ -15,8 +15,7 @@ import authLang from './auth.json';
 
 
 
-
-
+import categoriesLang from './categories.json';
 
 // Future expansion: Add more page languages here
 const langMaps = {
@@ -30,6 +29,7 @@ const langMaps = {
   wishlist: wishlistLang,
   footer: footerLang,
   auth: authLang,
+  categories: categoriesLang,
 };
 
 export const getTranslation = (page, lang = 'en') => {

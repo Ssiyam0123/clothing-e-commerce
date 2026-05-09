@@ -17,7 +17,9 @@
     "flashSub": "Live Drops",
     "flashSale": "Flash Sale",
     "seeMore": "See More",
-    "viewMore": "View More"
+    "viewMore": "View More",
+    "featuredCatTitle": "Featured Collection",
+    "featuredCatSub": "Curated Excellence"
   },
   "bn": {
     "heroBtn": "এখনই কিনুন",
@@ -37,6 +39,8 @@
     "flashSub": "লাইভ ড্রপ",
     "flashSale": "ফ্ল্যাশ সেল",
     "seeMore": "আরও দেখুন",
-    "viewMore": "আরও দেখুন"
+    "viewMore": "আরও দেখুন",
+    "featuredCatTitle": "সেরা কালেকশন",
+    "featuredCatSub": "বাছাই করা প্রিমিয়াম পণ্য"
   }
 }
