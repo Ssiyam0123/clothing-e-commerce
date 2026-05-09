@@ -17,38 +17,34 @@ export const revalidate = 60;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-// 🚀 Request-level Memoization + Edge Caching
+// 🚀 Request-level Memoization + High Performance Fetching
 const getHomeData = cache(async () => {
   try {
+    const fetchOptions = {
+      next: { 
+        revalidate: 60,
+        tags: ['home-data', 'layout', 'products', 'categories'] 
+      }
+    };
+
     const [productsRes, categoriesRes, flashSalesRes, bannerRes, allProductsRes, layoutRes] =
       await Promise.all([
-        fetch(`${API_URL}/products?limit=24`, {
-          cache: "no-store",
-        }),
-        fetch(`${API_URL}/categories`, {
-          cache: "no-store",
-        }),
-        fetch(`${API_URL}/flash-sales/active`, {
-          cache: "no-store",
-        }),
-        fetch(`${API_URL}/banner-campaigns`, {
-          cache: "no-store",
-        }),
-        // Fetch products for category sections (increased limit to cover multiple sections)
-        fetch(`${API_URL}/products?limit=200`, {
-          cache: "no-store",
-        }),
-        fetch(`${API_URL}/home-layouts/active`, {
-          cache: "no-store",
-        }),
+        fetch(`${API_URL}/products?limit=24`, fetchOptions),
+        fetch(`${API_URL}/categories`, fetchOptions),
+        fetch(`${API_URL}/flash-sales/active`, fetchOptions),
+        fetch(`${API_URL}/banner-campaigns`, fetchOptions),
+        fetch(`${API_URL}/products?limit=200`, fetchOptions),
+        fetch(`${API_URL}/home-layouts/active`, fetchOptions),
       ]);
 
-    const layoutData = layoutRes.ok ? await layoutRes.json() : null;
-    const campaigns = bannerRes.ok ? await bannerRes.json() : [];
-    const productData = productsRes.ok ? await productsRes.json() : { products: [] };
-    const categoryData = categoriesRes.ok ? await categoriesRes.json() : [];
-    const flashSaleData = flashSalesRes.ok ? await flashSalesRes.json() : null;
-    const allProductsData = allProductsRes.ok ? await allProductsRes.json() : { products: [] };
+    const [layoutData, campaigns, productData, categoryData, flashSaleData, allProductsData] = await Promise.all([
+      layoutRes.ok ? layoutRes.json() : null,
+      bannerRes.ok ? bannerRes.json() : [],
+      productsRes.ok ? productsRes.json() : { products: [] },
+      categoriesRes.ok ? categoriesRes.json() : [],
+      flashSalesRes.ok ? flashSalesRes.json() : null,
+      allProductsRes.ok ? allProductsRes.json() : { products: [] }
+    ]);
 
     return {
       products: productData.products || [],
@@ -79,12 +75,13 @@ export default async function HomePage() {
   const dataPromise = getHomeData();
   const data = await dataPromise;
 
-  return (
-    <main className="w-full bg-surface transition-colors duration-700">
-      <div className="flex flex-col">
-        {data.layout.map((section, idx) => {
-          if (!section.isVisible) return null;
+  // Pre-filter visible sections to avoid unnecessary processing in render
+  const visibleSections = data.layout.filter(s => s.isVisible);
 
+  return (
+    <main className="w-full bg-surface transition-colors duration-700 overflow-x-hidden" role="main">
+      <div className="flex flex-col">
+        {visibleSections.map((section, idx) => {
           const sectionProps = {
             dataPromise,
             lang,
@@ -92,74 +89,77 @@ export default async function HomePage() {
             section
           };
 
-          const standardMargin = "mt-12 md:mt-16";
+          // Precise 2:1 spacing ratio for professional visual rhythm
+          const prevSection = idx > 0 ? visibleSections[idx - 1] : null;
+          const isFollowingHeader = prevSection?.type === 'HEADER';
+          const standardMargin = isFollowingHeader ? "mt-3 md:mt-12" : "mt-12 md:mt-24 lg:mt-32";
 
           switch (section.type) {
             case 'USP':
               return (
-                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                <section key={section.id} className={cn("w-full", idx > 0 && standardMargin)} aria-label="Trust Markers">
                   <UspSection />
-                </div>
+                </section>
               );
             case 'HEADER':
               return (
-                <div key={section.id} className={cn("px-6 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto w-full", idx > 0 && standardMargin)}>
+                <section key={section.id} className={cn("px-6 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto w-full", idx > 0 && "mt-12 md:mt-20 lg:mt-24")} aria-label={section.title}>
                    <SectionHeader 
                      title={section.title || ""} 
                      subtitle={section.subtitle || ""} 
-                     className="mb-2 md:mb-4" 
+                     className="mb-1 md:mb-2" 
                      casing={section.config?.casing}
                      subtitleCasing={section.config?.subtitleCasing}
                    />
-                </div>
+                </section>
               );
             case 'FLASH_SALE':
               return (
-                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                <section key={section.id} className={cn("w-full", idx > 0 && standardMargin)} aria-label="Limited Time Flash Sale">
                   <Suspense fallback={<GridSkeleton count={4} />}>
                     <FlashSaleWrapper {...sectionProps} />
                   </Suspense>
-                </div>
+                </section>
               );
             case 'CATEGORY_GRID':
               return (
-                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                <section key={section.id} className={cn("w-full", idx > 0 && standardMargin)} aria-label="Shop by Category">
                   <Suspense fallback={<GridSkeleton count={6} />}>
                     <CategoryWrapper {...sectionProps} />
                   </Suspense>
-                </div>
+                </section>
               );
             case 'FEATURED_PRODUCTS':
               return (
-                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                <section key={section.id} className={cn("w-full", idx > 0 && standardMargin)} aria-label="Curated Featured Selection">
                   <Suspense fallback={<GridSkeleton count={4} />}>
                     <FeaturedWrapper {...sectionProps} />
                   </Suspense>
-                </div>
+                </section>
               );
             case 'NEW_ARRIVALS':
               return (
-                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                <section key={section.id} className={cn("w-full", idx > 0 && standardMargin)} aria-label="Fresh New Arrivals">
                   <Suspense fallback={<GridSkeleton count={8} />}>
                     <NewArrivalsWrapper {...sectionProps} />
                   </Suspense>
-                </div>
+                </section>
               );
             case 'SALE_PRODUCTS':
               return (
-                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                <section key={section.id} className={cn("w-full", idx > 0 && standardMargin)} aria-label="Ongoing Sales and Offers">
                   <Suspense fallback={<GridSkeleton count={4} />}>
                     <SaleWrapper {...sectionProps} />
                   </Suspense>
-                </div>
+                </section>
               );
             case 'CATEGORY_COLLECTION':
               return (
-                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                <section key={section.id} className={cn("w-full", idx > 0 && standardMargin)} aria-label={`Collection: ${section.title || 'Category'}`}>
                   <Suspense fallback={<GridSkeleton count={8} />}>
                     <CategoryCollectionWrapper {...sectionProps} />
                   </Suspense>
-                </div>
+                </section>
               );
             case "PROMO_BANNER": {
               const campaign = data.allCampaigns.find(c => String(c._id) === String(section.config?.campaignId)) || data.activeCampaign;
@@ -178,14 +178,14 @@ export default async function HomePage() {
                   })) || []);
 
               return (
-                <div className={cn("w-full", idx > 0 && standardMargin)} key={section.id}>
+                <section className={cn("w-full", idx > 0 && standardMargin)} key={section.id} aria-label="Campaign Banner">
                    <HeroSectionServer 
                      campaign={{ slides: bannerSlides }} 
                      lang={lang} 
                      ui={{ ...t, heroBtn: section.buttonText }} 
                      showHeader={section.config?.showHeader === true}
                    />
-                </div>
+                </section>
               );
             }
             default:

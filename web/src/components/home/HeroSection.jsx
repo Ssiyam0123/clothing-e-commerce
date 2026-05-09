@@ -22,13 +22,13 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
   if (!mounted || !slide) {
     return (
       <section
-        className="relative h-[50vh] min-h-[400px] md:h-[85vh] md:min-h-[700px] bg-background flex items-center justify-center overflow-hidden"
+        className="relative h-[35vh] min-h-[250px] md:h-[85vh] md:min-h-[700px] bg-background flex items-center justify-center overflow-hidden"
         aria-label="Loading hero section"
       >
         <div className="relative z-10 w-full max-w-4xl px-8 md:px-16 flex flex-col items-center gap-6">
-          <Skeleton className="h-20 w-3/4 rounded-theme opacity-20" />
-          <Skeleton className="h-6 w-1/2 rounded-theme opacity-20" />
-          <Skeleton className="h-14 w-40 rounded-theme opacity-20 mt-4" />
+          <Skeleton className="h-12 w-3/4 rounded-theme opacity-20" />
+          <Skeleton className="h-4 w-1/2 rounded-theme opacity-20" />
+          <Skeleton className="h-10 w-32 rounded-theme opacity-20 mt-2" />
         </div>
       </section>
     );
@@ -36,7 +36,7 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
 
   return (
     <section
-      className="relative h-[50vh] min-h-[400px] md:h-[85vh] md:min-h-[700px] overflow-hidden bg-background"
+      className="relative h-[35vh] min-h-[250px] md:h-[85vh] md:min-h-[700px] overflow-hidden bg-background"
       aria-label="Hero section"
     >
       <div className="relative h-full w-full group">
@@ -51,7 +51,7 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
         )}
 
         {showHeader && (
-          <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 lg:px-24 pb-16 md:pb-28 z-10">
+          <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 lg:px-24 pb-12 md:pb-28 z-10">
             <div className="max-w-4xl space-y-6">
               
               {slide.title && (
