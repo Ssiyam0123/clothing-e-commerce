@@ -55,11 +55,7 @@ export default function CategoryGrid({ categories }) {
                     </div>
                   ) : (
                     <Image
-                      src={getImageUrl(
-                        cat.image || "/placeholder-cat.jpg",
-                        800,
-                        80,
-                      )}
+                      src={getImageUrl(cat.image, 800, 80)}
                       alt={cat.name}
                       fill
                       sizes="(max-width: 768px) 80vw, 33vw"

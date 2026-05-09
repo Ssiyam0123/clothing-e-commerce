@@ -7,6 +7,7 @@ import {
   closestCenter, 
   KeyboardSensor, 
   PointerSensor, 
+  TouchSensor,
   useSensor, 
   useSensors 
 } from "@dnd-kit/core";
@@ -94,7 +95,11 @@ function SortableSection({ section, onToggleVisibility, onRemove, onUpdateConfig
       )}
     >
       <div className="flex items-center gap-2 md:gap-4 p-3 md:p-4">
-        <div {...attributes} {...listeners} className="shrink-0 cursor-grab active:cursor-grabbing p-1 md:p-2 text-muted-foreground hover:text-foreground">
+        <div 
+          {...attributes} 
+          {...listeners} 
+          className="shrink-0 cursor-grab active:cursor-grabbing p-1 md:p-2 text-muted-foreground hover:text-foreground touch-none"
+        >
           <GripVertical size={20} />
         </div>
 
@@ -272,7 +277,22 @@ export default function LayoutBuilderPage() {
     if (remoteLayout) setLayout(remoteLayout);
   }, [remoteLayout]);
 
-  const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const handleDragEnd = (event) => {
     const { active, over } = event;

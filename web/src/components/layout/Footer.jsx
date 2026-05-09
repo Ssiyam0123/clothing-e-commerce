@@ -100,7 +100,7 @@ export default function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-10 h-10 rounded-xl glass flex items-center justify-center text-foreground hover:bg-foreground hover:text-background transition-all duration-300 shadow-sm border-border/10"
-                      aria-label={link.platform}
+                      aria-label={link.platform || "Social Media Link"}
                     >
                       <Icon size={18} />
                     </Link>

@@ -116,7 +116,7 @@ export default function Navbar() {
                 href={link.href}
                 className={cn(
                   "text-[11px] font-black uppercase tracking-[0.4em] transition-all hover:text-accent-secondary relative group flex items-center gap-2 whitespace-nowrap",
-                  pathname === link.href ? "text-accent-secondary" : "text-foreground/90",
+                  pathname === link.href ? "text-accent-secondary" : "text-foreground",
                   link.isSpecial && "text-rose-500 hover:text-rose-600"
                 )}
               >
