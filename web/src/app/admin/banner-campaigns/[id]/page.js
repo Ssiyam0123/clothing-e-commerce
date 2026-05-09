@@ -3,11 +3,24 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAdminBannerCampaigns } from "@/hooks/useAdminBannerCampaigns";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import Loader from "@/components/common/Loader";
 import { getImageUrl } from "@/utils/imageUtils";
-import Link from "next/link";
-// 2. Swal Utilities Import
-import { swalConfirm, swalToast, swalError } from "@/utils/swal";
+import { swalConfirm, swalError, swalToast } from "@/utils/swal";
+import { 
+  ChevronLeft, 
+  Plus, 
+  Trash2, 
+  Image as ImageIcon, 
+  Layout, 
+  FileImage,
+  Layers,
+  Sparkles,
+  ArrowRight
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function BannerCampaignForm() {
   const { id } = useParams();
@@ -152,226 +165,192 @@ export default function BannerCampaignForm() {
 
   if (loadingForm || isLoading)
     return (
-      <div className="p-20">
+      <div className="admin-page-container">
         <Loader />
       </div>
     );
 
   return (
-    <div className="max-w-7xl mx-auto pb-20 space-y-10 animate-in fade-in duration-500">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase mb-2">
-            {isEdit ? "Configure Deck" : "Initialize Campaign"}
-          </h1>
-          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-            Hero Banner Architecture
-          </p>
-        </div>
-        <Link
-          href="/admin/banner-campaigns"
-          className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
+    <div className="admin-page-container max-w-6xl">
+      {/* 🔙 Navigation */}
+      <div className="mb-4">
+        <Button 
+          variant="ghost" 
+          onClick={() => router.back()}
+          className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground transition-all p-0 hover:bg-transparent"
         >
-          ← Back to Hub
-        </Link>
+          <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
+            <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+          </div>
+          <span>Return to Deck</span>
+        </Button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-10">
-        {/* Core Details */}
-        <div className="bg-white dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] p-8 md:p-12 shadow-sm space-y-6">
-          <h2 className="text-xs font-black text-zinc-400 uppercase tracking-[0.3em] mb-6">
-            Core Configuration
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block mb-3">
-                Campaign Name *
-              </label>
-              <input
-                type="text"
+      <div className="admin-section-header">
+        <div>
+          <h1 className="admin-title">
+            {isEdit ? "Configure" : "Initialize"} <span className="text-muted-foreground/30">Deck</span>
+          </h1>
+          <p className="admin-subtitle">Hero Narrative Orchestration protocol</p>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-12">
+        {/* Core Metadata */}
+        <div className="admin-table-form p-8 md:p-12 space-y-10">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">
+              <Layers size={20} className="text-indigo-600" />
+            </div>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Core Deck Meta</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-1">Campaign Identity *</label>
+              <Input 
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="e.g. Winter Protocol 2024"
                 required
-                className="w-full bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 font-black text-zinc-900 dark:text-white outline-none focus:border-zinc-900 dark:focus:border-white transition-all shadow-sm"
+                className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 text-[11px] font-black uppercase tracking-widest focus:ring-2 focus:ring-indigo-600/20"
               />
             </div>
-            <div>
-              <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block mb-3">
-                Description
-              </label>
-              <textarea
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-1">Deck Narrative</label>
+              <textarea 
                 value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                rows="1"
-                className="w-full bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 font-medium text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-900 dark:focus:border-white transition-all shadow-sm resize-none"
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Brief tactical overview..."
+                className="w-full h-16 bg-muted/30 border border-border/10 rounded-2xl px-6 py-4 text-[11px] font-bold uppercase tracking-widest focus:ring-2 focus:ring-indigo-600/20 outline-none resize-none"
               />
             </div>
           </div>
-          <div className="flex items-center gap-4 bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl w-fit">
+
+          <div className="flex items-center gap-6 bg-muted/20 p-6 rounded-[2rem] border border-border/5 w-fit">
             <input
               type="checkbox"
               checked={formData.isActive}
-              onChange={(e) =>
-                setFormData({ ...formData, isActive: e.target.checked })
-              }
-              className="w-5 h-5 rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white cursor-pointer"
+              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+              className="w-6 h-6 rounded-lg border-border/20 text-indigo-600 focus:ring-0 cursor-pointer"
             />
-            <p className="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-widest leading-none">
-              Set as Active Campaign
-            </p>
+            <div className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-widest">Master Deployment Status</p>
+              <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Set as live homepage narrative deck</p>
+            </div>
           </div>
         </div>
 
-        {/* Slide Deck */}
-        <div className="bg-white dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] p-8 md:p-12 shadow-sm">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 pb-6 border-b border-zinc-100 dark:border-zinc-800">
+        {/* Slide Orchestration */}
+        <div className="space-y-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-4">
             <div>
-              <h3 className="text-2xl font-black text-zinc-900 dark:text-white uppercase tracking-tighter">
-                Slide Deck
+              <h3 className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3">
+                <FileImage size={18} className="text-muted-foreground" /> Visual Sequence
               </h3>
-              <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
-                Configure individual banners
-              </p>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Configure individual slide artifacts</p>
             </div>
-            <button
+            <Button
               type="button"
               onClick={addSlide}
-              className="mt-4 md:mt-0 bg-zinc-900 dark:bg-white text-white dark:text-black px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all"
+              className="h-12 bg-foreground text-background hover:bg-indigo-600 hover:text-white rounded-full px-8 font-black text-[10px] uppercase tracking-widest transition-all"
             >
-              + Add Slide
-            </button>
+              <Plus size={16} className="mr-2" /> Add Slide Artifact
+            </Button>
           </div>
 
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-10">
             {formData.slides.map((slide, index) => {
               const slideId = slide._id || slide.tempId;
               return (
                 <div
                   key={slideId}
-                  className="border border-zinc-200 dark:border-zinc-800 rounded-[2rem] p-8 bg-zinc-50 dark:bg-[#111] relative group transition-all hover:border-zinc-400 dark:hover:border-zinc-600 shadow-sm"
+                  className="admin-table-form group hover:border-indigo-600/20 transition-all"
                 >
-                  <div className="absolute top-6 right-6 flex items-center gap-3 z-10">
-                    <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest bg-white dark:bg-zinc-900 px-4 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                      Slide {index + 1}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => removeSlide(slideId)}
-                      className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-500/10 text-rose-500 flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all shadow-sm border border-rose-100 dark:border-rose-500/20"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
-                    {/* Image Upload */}
-                    <div className="col-span-1">
-                      <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest block mb-3">
-                        Background Media
-                      </label>
-                      <div className="relative aspect-video lg:aspect-square rounded-2xl overflow-hidden border-2 border-dashed border-zinc-300 dark:border-zinc-700 bg-white dark:bg-[#0a0a0a] group/upload hover:border-zinc-900 dark:hover:border-white transition-all cursor-pointer flex flex-col items-center justify-center">
-                        {slide.image ? (
-                          <>
-                            <img
-                              src={
-                                slide.image.startsWith("blob:")
-                                  ? slide.image
-                                  : getImageUrl(slide.image)
-                              }
-                              alt="preview"
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/upload:opacity-100 transition-opacity">
-                              <span className="text-[10px] font-black text-white uppercase tracking-widest bg-white/20 backdrop-blur-md px-4 py-2 rounded-full">
-                                Change Media
-                              </span>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-4xl mb-3 grayscale opacity-30">
-                              🖼️
-                            </span>
-                            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest bg-zinc-100 dark:bg-zinc-900 px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800">
-                              Upload Image
-                            </span>
-                          </>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) =>
-                            e.target.files[0] &&
-                            handleSlideImage(slideId, e.target.files[0])
-                          }
-                          className="absolute inset-0 opacity-0 cursor-pointer"
-                        />
-                      </div>
+                  <div className="p-8 md:p-10 space-y-10">
+                    <div className="flex justify-between items-center pb-8 border-b border-border/5">
+                      <Badge variant="outline" className="h-8 px-4 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border-indigo-600/30 text-indigo-600 bg-indigo-600/5">
+                        Slot 0{index + 1}
+                      </Badge>
+                      <button
+                        type="button"
+                        onClick={() => removeSlide(slideId)}
+                        className="w-10 h-10 rounded-full bg-rose-600/5 text-rose-600 flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all shadow-sm border border-rose-600/10"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
 
-                    {/* Text Content */}
-                    <div className="col-span-1 lg:col-span-2 space-y-5">
-                      <div>
-                        <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest block mb-2">
-                          Headline
-                        </label>
-                        <input
-                          type="text"
-                          value={slide.title || ""}
-                          onChange={(e) =>
-                            updateSlide(slideId, "title", e.target.value)
-                          }
-                          className="w-full bg-white dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-sm font-black text-zinc-900 dark:text-white outline-none focus:border-zinc-900 transition-all shadow-inner"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest block mb-2">
-                          Subheadline
-                        </label>
-                        <input
-                          type="text"
-                          value={slide.subtitle || ""}
-                          onChange={(e) =>
-                            updateSlide(slideId, "subtitle", e.target.value)
-                          }
-                          className="w-full bg-white dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-sm font-medium text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-900 transition-all shadow-inner"
-                        />
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                          <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest block mb-2">
-                            Button Link
-                          </label>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                      {/* Media Hub */}
+                      <div className="lg:col-span-4">
+                        <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] block mb-4">Background Media</label>
+                        <div className="relative aspect-[16/9] lg:aspect-square rounded-[2rem] overflow-hidden border-2 border-dashed border-border/10 bg-muted/20 group/upload hover:border-indigo-600/30 transition-all cursor-pointer flex flex-col items-center justify-center overflow-hidden">
+                          {slide.image ? (
+                            <>
+                              <img
+                                src={slide.image.startsWith("blob:") ? slide.image : getImageUrl(slide.image)}
+                                className="w-full h-full object-cover grayscale group-hover/upload:grayscale-0 transition-all duration-700"
+                              />
+                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/upload:opacity-100 transition-all">
+                                <span className="text-[9px] font-black text-white uppercase tracking-widest bg-white/10 backdrop-blur-md px-6 py-3 rounded-full border border-white/20">Replace Protocol</span>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex flex-col items-center gap-4 opacity-30 group-hover/upload:opacity-100 transition-all">
+                              <ImageIcon size={40} strokeWidth={1} />
+                              <span className="text-[9px] font-black uppercase tracking-widest">Inject Asset</span>
+                            </div>
+                          )}
                           <input
-                            type="text"
-                            value={slide.link || ""}
-                            onChange={(e) =>
-                              updateSlide(slideId, "link", e.target.value)
-                            }
-                            className="w-full bg-white dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-xs font-bold text-indigo-500 outline-none focus:border-zinc-900 transition-all shadow-inner"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => e.target.files[0] && handleSlideImage(slideId, e.target.files[0])}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
                           />
                         </div>
-                        <div>
-                          <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest block mb-2">
-                            Sort Order
-                          </label>
-                          <input
-                            type="number"
-                            value={slide.order !== undefined ? slide.order : 0}
-                            onChange={(e) =>
-                              updateSlide(
-                                slideId,
-                                "order",
-                                parseInt(e.target.value) || 0,
-                              )
-                            }
-                            className="w-full bg-white dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-xs font-bold text-zinc-900 dark:text-white outline-none focus:border-zinc-900 transition-all shadow-inner"
-                          />
+                      </div>
+
+                      {/* Logical Meta */}
+                      <div className="lg:col-span-8 space-y-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="space-y-3">
+                            <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Headline Text</label>
+                            <Input 
+                              value={slide.title || ""}
+                              onChange={(e) => updateSlide(slideId, "title", e.target.value)}
+                              className="h-14 bg-muted/30 border-border/5 rounded-xl px-5 text-[11px] font-black uppercase tracking-widest"
+                            />
+                          </div>
+                          <div className="space-y-3">
+                            <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Subheadline</label>
+                            <Input 
+                              value={slide.subtitle || ""}
+                              onChange={(e) => updateSlide(slideId, "subtitle", e.target.value)}
+                              className="h-14 bg-muted/30 border-border/5 rounded-xl px-5 text-[10px] font-bold"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                          <div className="md:col-span-2 space-y-3">
+                            <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Action Link (URL)</label>
+                            <Input 
+                              value={slide.link || ""}
+                              onChange={(e) => updateSlide(slideId, "link", e.target.value)}
+                              placeholder="/collection/winter"
+                              className="h-14 bg-muted/30 border-border/5 rounded-xl px-5 text-[11px] font-bold text-indigo-600"
+                            />
+                          </div>
+                          <div className="space-y-3">
+                            <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Sequence Sort</label>
+                            <Input 
+                              type="number"
+                              value={slide.order !== undefined ? slide.order : 0}
+                              onChange={(e) => updateSlide(slideId, "order", parseInt(e.target.value) || 0)}
+                              className="h-14 bg-muted/30 border-border/5 rounded-xl px-5 text-[11px] font-black text-center"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -381,33 +360,32 @@ export default function BannerCampaignForm() {
             })}
 
             {formData.slides.length === 0 && (
-              <div className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] p-16 text-center bg-zinc-50 dark:bg-[#111]">
-                <span className="text-5xl block mb-4 grayscale opacity-30">
-                  🎴
-                </span>
-                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-                  Deck is empty. Add a slide to begin.
-                </p>
+              <div className="admin-table-form py-32 flex flex-col items-center justify-center text-center opacity-30 grayscale">
+                <Sparkles size={48} strokeWidth={1} className="mb-6" />
+                <h4 className="text-[10px] font-black uppercase tracking-[0.4em]">Empty Narrative Deck</h4>
+                <p className="text-[8px] font-bold uppercase tracking-widest mt-2">Initialize at least one slide artifact to proceed</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Submit Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 pt-4">
-          <button
+        {/* 🚀 Submit Protocol */}
+        <div className="flex flex-col sm:flex-row gap-6 pt-10 border-t border-border/5">
+          <Button
             type="submit"
-            className="flex-1 bg-zinc-900 dark:bg-white text-white dark:text-black py-5 rounded-full font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl hover:scale-105 active:scale-95 transition-all"
+            className="flex-1 h-20 bg-foreground text-background hover:bg-indigo-600 hover:text-white rounded-[2rem] font-black uppercase tracking-[0.4em] text-[11px] shadow-2xl transition-all active:scale-95 group"
           >
-            {isEdit ? "Sync Campaign Data" : "Launch Campaign Protocol"}
-          </button>
-          <button
+            {isEdit ? "Synchronize Configuration" : "Launch Narrative Protocol"}
+            <ArrowRight size={18} className="ml-3 group-hover:translate-x-2 transition-transform" />
+          </Button>
+          <Button
             type="button"
+            variant="outline"
             onClick={() => router.push("/admin/banner-campaigns")}
-            className="flex-1 bg-zinc-100 dark:bg-[#111] text-zinc-500 py-5 rounded-full font-black uppercase tracking-[0.2em] text-[10px] hover:text-zinc-900 dark:hover:text-white transition-all border border-zinc-200 dark:border-zinc-800"
+            className="flex-1 h-20 rounded-[2rem] border-border/10 text-[10px] font-black uppercase tracking-[0.4em] hover:bg-rose-600 hover:text-white transition-all"
           >
-            Discard
-          </button>
+            Discard & Abort
+          </Button>
         </div>
       </form>
     </div>

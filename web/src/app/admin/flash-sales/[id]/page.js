@@ -11,6 +11,22 @@ import { getImageUrl } from "@/utils/imageUtils";
 import Link from "next/link";
 import { swalToast, swalError } from "@/utils/swal";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { 
+  ChevronLeft, 
+  Search, 
+  Trash2, 
+  Zap, 
+  Calendar, 
+  ShoppingBag, 
+  ArrowRight,
+  Package,
+  Plus
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
 export default function FlashSaleForm() {
   const { id } = useParams();
   const router = useRouter();
@@ -83,7 +99,6 @@ export default function FlashSaleForm() {
     let start = new Date(data.startDate);
     const end = new Date(data.endDate);
 
-    // If "Start Immediately" is checked, override startDate to current time
     if (data.startImmediately) {
       start = new Date();
     }
@@ -122,275 +137,232 @@ export default function FlashSaleForm() {
 
   if (loading)
     return (
-      <div className="p-20">
+      <div className="admin-page-container">
         <Loader />
       </div>
     );
 
   return (
-    <div className="max-w-7xl mx-auto pb-20 space-y-10 animate-in fade-in duration-500">
-      {/* Header (unchanged) */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase mb-2">
-            {isEdit ? "Campaign Config" : "Initialize Protocol"}
-          </h1>
-          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-            Flash Sale Setup Wizard
-          </p>
-        </div>
-        <Link
-          href="/admin/flash-sales"
-          className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
+    <div className="admin-page-container">
+      {/* 🔙 Navigation */}
+      <div className="mb-4">
+        <Button 
+          variant="ghost" 
+          onClick={() => router.back()}
+          className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground transition-all p-0 hover:bg-transparent"
         >
-          ← Cancel & Return
-        </Link>
+          <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
+            <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+          </div>
+          <span>Return to Pulse</span>
+        </Button>
       </div>
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="grid grid-cols-1 lg:grid-cols-12 gap-10"
-      >
-        {/* Left: Meta */}
-        <div className="lg:col-span-5 space-y-8 bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 shadow-sm h-fit">
-          <h2 className="text-xs font-black text-zinc-400 uppercase tracking-[0.3em] mb-8">
-            Campaign Meta
-          </h2>
-
-          <div>
-            <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-3">
-              Campaign Title *
-            </label>
-            <input
-              type="text"
-              {...register("name", { required: true })}
-              className="w-full bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-2xl px-5 py-4 outline-none font-bold text-zinc-900 dark:text-zinc-100 focus:border-zinc-900 dark:focus:border-white transition-all"
-            />
-          </div>
-
-          <div>
-            <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-3">
-              Narrative Description
-            </label>
-            <textarea
-              rows="3"
-              {...register("description")}
-              className="w-full bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-2xl px-5 py-4 outline-none font-medium text-zinc-900 dark:text-zinc-100 focus:border-zinc-900 dark:focus:border-white transition-all resize-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-[10px] font-black text-rose-500 uppercase tracking-[0.2em] mb-3">
-              Global Discount % *
-            </label>
-            <input
-              type="number"
-              step="1"
-              min="0"
-              max="100"
-              {...register("discount", { required: true })}
-              className="w-full bg-rose-500/5 border border-rose-500/20 rounded-2xl px-5 py-4 outline-none font-black text-2xl text-center text-rose-600 dark:text-rose-400 focus:border-rose-500 transition-all"
-            />
-          </div>
-
-          {/* Start Immediately Checkbox */}
-          <div className="flex items-center gap-4 bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl">
-            <input
-              type="checkbox"
-              {...register("startImmediately")}
-              className="w-5 h-5 rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white cursor-pointer"
-            />
-            <div>
-              <p className="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-widest">
-                Start Immediately
-              </p>
-              <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mt-1">
-                The sale will begin right after creation/update (overrides
-                manual start date).
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-3">
-                Start *
-              </label>
-              <input
-                type="datetime-local"
-                {...register("startDate", { required: !watchStartImmediately })}
-                disabled={watchStartImmediately}
-                className={`w-full bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none text-xs font-bold text-zinc-700 dark:text-zinc-300 ${
-                  watchStartImmediately ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              />
-            </div>
-            <div>
-              <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-3">
-                End *
-              </label>
-              <input
-                type="datetime-local"
-                {...register("endDate", { required: true })}
-                className="w-full bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none text-xs font-bold text-zinc-700 dark:text-zinc-300"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl">
-            <input
-              type="checkbox"
-              {...register("isActive")}
-              className="w-5 h-5 rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white cursor-pointer"
-            />
-            <div>
-              <p className="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-widest">
-                Active Campaign
-              </p>
-              <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mt-1">
-                Immediately visible to customers.
-              </p>
-            </div>
-          </div>
+      <div className="admin-section-header">
+        <div>
+          <h1 className="admin-title">
+            {isEdit ? "Configure" : "Initialize"} <span className="text-rose-500">Pulse</span>
+          </h1>
+          <p className="admin-subtitle">High-Velocity Liquidation Protocol</p>
         </div>
+      </div>
 
-        {/* Right: Product Picker (unchanged) */}
-        <div className="lg:col-span-7 flex flex-col bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 shadow-sm">
-          {/* ... existing product picker UI ... */}
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-xs font-black text-zinc-400 uppercase tracking-[0.3em]">
-              Vault Linkage
-            </h2>
-            <span className="bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-zinc-200 dark:border-zinc-800">
-              Selected: {selectedProducts.length}
-            </span>
-          </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        {/* 📑 Campaign Parameters */}
+        <div className="lg:col-span-5 space-y-10">
+          <div className="admin-table-form p-8 md:p-10 space-y-8">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-2xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
+                <Zap size={20} className="text-rose-500" />
+              </div>
+              <h3 className="text-sm font-black uppercase tracking-[0.2em]">Operational Meta</h3>
+            </div>
 
-          <div className="relative mb-6">
-            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400">
-              🔍
-            </span>
-            <input
-              type="text"
-              placeholder="Search databanks..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-6 py-4 bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-2xl outline-none font-bold text-zinc-900 dark:text-zinc-100 focus:border-zinc-900 transition-all text-xs uppercase tracking-widest"
-            />
-          </div>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-1">Campaign Title *</label>
+                <Input 
+                  {...register("name", { required: true })}
+                  placeholder="e.g. Midnight Surge 2.0"
+                  className="h-14 bg-muted/30 border-border/10 rounded-2xl px-6 text-[11px] font-black uppercase tracking-widest focus:ring-2 focus:ring-rose-500/20"
+                />
+              </div>
 
-          {searchTerm.trim().length > 1 && (
-            <div className="bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-[2rem] p-4 mb-8">
-              <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-4 px-2">
-                Matches
-              </p>
-              {isFetching ? (
-                <div className="p-4 text-center text-[10px] font-black text-zinc-400 uppercase tracking-widest animate-pulse">
-                  Scanning...
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-1">Narrative Context</label>
+                <textarea 
+                  rows="3"
+                  {...register("description")}
+                  placeholder="Marketing narrative for this drop..."
+                  className="w-full bg-muted/30 border border-border/10 rounded-2xl px-6 py-4 text-[11px] font-bold outline-none focus:ring-2 focus:ring-rose-500/20 transition-all resize-none"
+                />
+              </div>
+
+              <div className="p-6 bg-rose-600/5 rounded-3xl border border-rose-600/10 text-center space-y-3">
+                <label className="text-[9px] font-black text-rose-500 uppercase tracking-[0.3em]">Global Discount Magnitude (%)</label>
+                <input 
+                  type="number"
+                  {...register("discount", { required: true })}
+                  className="w-full bg-transparent text-5xl font-black text-center tracking-tighter text-rose-600 outline-none"
+                />
+              </div>
+
+              <div className="flex items-center gap-4 bg-muted/20 p-6 rounded-[2rem] border border-border/5">
+                <input
+                  type="checkbox"
+                  {...register("startImmediately")}
+                  className="w-6 h-6 rounded-lg border-border/20 text-rose-600 focus:ring-0 cursor-pointer"
+                />
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black uppercase tracking-widest">Instant Ignition</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Sale begins immediately upon commit</p>
                 </div>
-              ) : searchResults?.length > 0 ? (
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  {searchResults.map((p) => {
-                    const isSelected = selectedProducts.some(
-                      (sel) => sel._id === p._id,
-                    );
-                    return (
-                      <div
-                        key={p._id}
-                        onClick={() => toggleProductSelection(p)}
-                        className={`flex items-center justify-between p-3 rounded-2xl cursor-pointer transition-all border ${isSelected ? "bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white" : "bg-white dark:bg-[#0a0a0a] border-zinc-200 dark:border-zinc-800"}`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <img
-                            src={getImageUrl(p.images?.[0])}
-                            className="h-10 w-10 rounded-lg object-cover grayscale"
-                          />
-                          <div>
-                            <p
-                              className={`text-xs font-black truncate leading-none ${isSelected ? "text-white dark:text-black" : "text-zinc-900 dark:text-white"}`}
-                            >
-                              {p.name}
-                            </p>
-                            <p
-                              className={`text-[9px] font-bold uppercase tracking-widest mt-1 ${isSelected ? "text-zinc-300" : "text-zinc-500"}`}
-                            >
-                              ৳{p.price}
-                            </p>
-                          </div>
-                        </div>
-                        {isSelected && (
-                          <span className="bg-white dark:bg-black text-black dark:text-white text-[8px] px-2 py-1 rounded-full font-black uppercase tracking-widest">
-                            Added
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
+                  <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Temporal Start</label>
+                  <input 
+                    type="datetime-local"
+                    {...register("startDate", { required: !watchStartImmediately })}
+                    disabled={watchStartImmediately}
+                    className="w-full h-12 bg-muted/30 border border-border/10 rounded-xl px-4 text-[10px] font-black uppercase tracking-widest outline-none disabled:opacity-30"
+                  />
                 </div>
-              ) : (
-                <div className="p-4 text-center text-[10px] font-black text-zinc-400 uppercase">
-                  No Data Found
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Temporal End</label>
+                  <input 
+                    type="datetime-local"
+                    {...register("endDate", { required: true })}
+                    className="w-full h-12 bg-muted/30 border border-border/10 rounded-xl px-4 text-[10px] font-black uppercase tracking-widest outline-none"
+                  />
                 </div>
-              )}
-            </div>
-          )}
+              </div>
 
-          <div className="flex-1 flex flex-col bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-[2rem] p-6 overflow-hidden min-h-[300px]">
-            <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-4 px-2">
-              Campaign Payload
-            </p>
-            <div className="flex-1 overflow-y-auto no-scrollbar space-y-3">
-              {selectedProducts.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center opacity-30 grayscale">
-                  <span className="text-4xl mb-4">📭</span>
-                  <span className="text-[10px] font-black uppercase text-zinc-500">
-                    Payload Empty
-                  </span>
+              <div className="flex items-center gap-4 bg-muted/20 p-6 rounded-[2rem] border border-border/5">
+                <input
+                  type="checkbox"
+                  {...register("isActive")}
+                  className="w-6 h-6 rounded-lg border-border/20 text-rose-600 focus:ring-0 cursor-pointer"
+                />
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black uppercase tracking-widest">Master Deployment Status</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Toggle visibility across all storefront nodes</p>
                 </div>
-              ) : (
-                selectedProducts.map((p) => (
-                  <div
-                    key={p._id}
-                    className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800 shadow-sm group"
-                  >
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={getImageUrl(p.images?.[0])}
-                        className="h-10 w-10 rounded-lg object-cover grayscale group-hover:grayscale-0 transition-all"
-                      />
-                      <div>
-                        <p className="text-xs font-black text-zinc-900 dark:text-white truncate leading-none">
-                          {p.name}
-                        </p>
-                        <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mt-1">
-                          ৳{p.price}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => toggleProductSelection(p)}
-                      className="w-8 h-8 rounded-full bg-rose-50 dark:bg-rose-500/10 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shrink-0"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))
-              )}
+              </div>
             </div>
-          </div>
-
-          <div className="mt-8 pt-8 border-t border-zinc-200 dark:border-zinc-800">
-            <button
-              type="submit"
-              className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black py-5 rounded-full font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all"
-            >
-              {isEdit
-                ? "Sync Campaign Configuration"
-                : "Launch Campaign Protocol"}
-            </button>
           </div>
         </div>
+
+        {/* 📦 Product Vault Linkage */}
+        <div className="lg:col-span-7 space-y-10">
+          <div className="admin-table-form p-8 md:p-10 space-y-8 flex flex-col min-h-[600px]">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">
+                  <Package size={20} className="text-indigo-600" />
+                </div>
+                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Vault Linkage</h3>
+              </div>
+              <Badge variant="outline" className="h-8 px-4 rounded-full text-[9px] font-black border-indigo-600/20 text-indigo-600 uppercase tracking-widest bg-indigo-600/5">
+                Targeted Assets: {selectedProducts.length}
+              </Badge>
+            </div>
+
+            <div className="relative">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground opacity-40" size={18} />
+              <Input 
+                placeholder="Scan global inventory..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-16 pl-14 bg-muted/20 border-border/10 rounded-2xl text-[11px] font-black uppercase tracking-widest"
+              />
+            </div>
+
+            {/* Search Results */}
+            {searchTerm.trim().length > 1 && (
+              <div className="bg-muted/10 border border-border/5 rounded-[2rem] p-4 animate-in slide-in-from-top-2 duration-300">
+                {isFetching ? (
+                  <div className="p-8 text-center text-[10px] font-black uppercase tracking-[0.3em] opacity-40 animate-pulse italic">Scanning Vaults...</div>
+                ) : searchResults?.length > 0 ? (
+                  <div className="space-y-2">
+                    {searchResults.map((p) => {
+                      const isSelected = selectedProducts.some(sel => sel._id === p._id);
+                      return (
+                        <div
+                          key={p._id}
+                          onClick={() => toggleProductSelection(p)}
+                          className={cn(
+                            "flex items-center justify-between p-3 rounded-2xl cursor-pointer transition-all border group",
+                            isSelected 
+                              ? "bg-foreground border-transparent" 
+                              : "bg-background/40 border-border/5 hover:bg-muted/40"
+                          )}
+                        >
+                          <div className="flex items-center gap-4">
+                            <img src={getImageUrl(p.images?.[0])} className="h-10 w-10 rounded-lg object-cover grayscale group-hover:grayscale-0 transition-all" />
+                            <div>
+                              <p className={cn("text-[10px] font-black uppercase tracking-tight leading-none", isSelected ? "text-background" : "text-foreground")}>{p.name}</p>
+                              <p className={cn("text-[8px] font-bold uppercase tracking-widest mt-1", isSelected ? "text-background/50" : "text-muted-foreground")}>৳{p.price}</p>
+                            </div>
+                          </div>
+                          {isSelected && <Badge className="bg-background text-foreground text-[8px] px-2 py-0.5 rounded-md">Linked</Badge>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center text-[10px] font-black uppercase tracking-[0.3em] opacity-40 italic">Zero Matches Found</div>
+                )}
+              </div>
+            )}
+
+            {/* Selected Matrix */}
+            <div className="flex-1 bg-muted/20 rounded-[2.5rem] border border-border/5 p-6 overflow-hidden flex flex-col">
+               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] mb-6 px-2 italic">Linked Payload Matrix</p>
+               <div className="flex-1 overflow-y-auto no-scrollbar space-y-3">
+                 {selectedProducts.length === 0 ? (
+                   <div className="h-full flex flex-col items-center justify-center opacity-20 grayscale gap-4">
+                     <Package size={48} strokeWidth={1} />
+                     <p className="text-[10px] font-black uppercase tracking-[0.4em]">Payload Static</p>
+                   </div>
+                 ) : (
+                   selectedProducts.map((p) => (
+                    <div key={p._id} className="flex items-center justify-between p-4 rounded-2xl bg-background shadow-xl border border-border/5 group">
+                      <div className="flex items-center gap-4">
+                        <img src={getImageUrl(p.images?.[0])} className="h-12 w-12 rounded-xl object-cover grayscale group-hover:grayscale-0 transition-all" />
+                        <div>
+                          <p className="text-[11px] font-black uppercase tracking-tight leading-none">{p.name}</p>
+                          <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1">৳{p.price}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => toggleProductSelection(p)}
+                        className="w-10 h-10 rounded-full bg-rose-600/5 text-rose-600 flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all shadow-sm border border-rose-600/10"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                   ))
+                 )}
+               </div>
+            </div>
+
+            <div className="pt-6">
+              <Button
+                type="submit"
+                disabled={selectedProducts.length === 0}
+                className="w-full h-20 bg-foreground text-background hover:bg-rose-600 hover:text-white rounded-[2rem] font-black uppercase tracking-[0.4em] text-[11px] shadow-2xl transition-all active:scale-95 group"
+              >
+                {isEdit ? "Sync Configuration" : "Launch Protocol"}
+                <ArrowRight size={18} className="ml-3 group-hover:translate-x-2 transition-transform" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
       </form>
     </div>
   );

@@ -73,13 +73,16 @@ export const useOrders = (params = {}, orderId = null) => {
 
   // 5. Admin: Update Status
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }) => api.put(`/orders/${id}/status`, { status }),
+    mutationFn: ({ id, status }) => api.put(`/orders/${id}/status`, { orderStatus: status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allOrders"] });
       if (orderId)
         queryClient.invalidateQueries({ queryKey: ["order", orderId] });
       swalSuccess("Status Updated", "Order logistics status synchronized.");
     },
+    onError: (err) => {
+      swalError("Update Failed", err.response?.data?.message || "Protocol rejection.");
+    }
   });
 
   // 6. Admin: Sync to Pathao
@@ -103,6 +106,28 @@ export const useOrders = (params = {}, orderId = null) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allOrders"] });
       if (orderId) queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      swalSuccess("Manifest Updated", "Order deployment data synchronized.");
+    },
+    onError: (err) => {
+      swalError("Update Failed", err.response?.data?.message || "Logic conflict.");
+    }
+  });
+
+  // 8. Admin: Create Order
+  const createAdminOrderMutation = useMutation({
+    mutationFn: async (orderData) => {
+      const { data } = await api.post("/orders/admin/create", orderData);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allOrders"] });
+      swalSuccess("Order Created", "The administrative order has been finalized.");
+    },
+    onError: (err) => {
+      swalError(
+        "Creation Failed",
+        err.response?.data?.message || "Internal system error during order creation."
+      );
     },
   });
 
@@ -121,5 +146,7 @@ export const useOrders = (params = {}, orderId = null) => {
     isSyncingPathao: syncToPathaoMutation.isPending,
     updateOrder: updateOrderMutation.mutateAsync,
     isUpdatingOrder: updateOrderMutation.isPending,
+    createAdminOrder: createAdminOrderMutation.mutateAsync,
+    isCreatingAdminOrder: createAdminOrderMutation.isPending,
   };
 };

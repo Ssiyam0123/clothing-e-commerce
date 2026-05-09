@@ -96,14 +96,14 @@ export default function ProductCard({ product, className }) {
           </Link>
 
           {/* Rating */}
-          {product.averageRating > 0 ? (
+          {(product.showReviews !== false) && product.averageRating > 0 ? (
             <div className="flex items-center gap-1 mb-4">
               <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
               <span className="text-xs font-medium">
                 {product.averageRating.toFixed(1)}
               </span>
               <span className="text-xs text-muted-foreground">
-                ({product.reviewCount || 0})
+                ({product.totalReviews || product.reviewCount || 0})
               </span>
             </div>
           ) : (

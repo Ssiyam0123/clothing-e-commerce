@@ -21,7 +21,7 @@ export const useAdminBanners = () => {
   const createBanner = useMutation({
     mutationFn: (newBanner) => api.post("/banners", newBanner),
     onSuccess: () => {
-      queryClient.invalidateQueries(["admin-banners"]);
+      queryClient.invalidateQueries({ queryKey: ["admin-banners"] });
     },
   });
 
@@ -29,7 +29,7 @@ export const useAdminBanners = () => {
   const updateBanner = useMutation({
     mutationFn: ({ id, data }) => api.put(`/banners/${id}`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries(["admin-banners"]);
+      queryClient.invalidateQueries({ queryKey: ["admin-banners"] });
     },
   });
 

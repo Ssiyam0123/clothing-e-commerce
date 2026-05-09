@@ -28,7 +28,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import OrderEditModal from "@/components/admin/OrderEditModal";
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
@@ -40,7 +39,6 @@ export default function OrderDetailsPage() {
     updateOrder,
   } = useOrders({}, id);
   const [syncing, setSyncing] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const customerName = useMemo(
     () => order?.user?.name || order?.shippingAddress?.name || "Unknown Guest",
@@ -135,17 +133,18 @@ export default function OrderDetailsPage() {
 
         <div className="flex flex-wrap gap-3">
           <Button
+            asChild
             variant="outline"
-            onClick={() => setIsEditModalOpen(true)}
             className="h-14 border-border bg-muted/30 hover:bg-foreground hover:text-background rounded-2xl px-8 text-[10px] font-black uppercase tracking-widest transition-all"
           >
-            Edit Protocol
+            <Link href={`/admin/orders/${id}/edit`}>
+              Edit Protocol
+            </Link>
           </Button>
 
           <Select
             value={order.orderStatus}
             onValueChange={handleStatusUpdate}
-            disabled={["Delivered", "Cancelled"].includes(order.orderStatus)}
           >
             <SelectTrigger className="w-[180px] h-14 bg-muted/50 border-border rounded-2xl px-6 text-[10px] font-black uppercase tracking-widest outline-none transition-all focus:ring-2 focus:ring-primary/20">
               <SelectValue placeholder="Update Status" />
@@ -384,13 +383,6 @@ export default function OrderDetailsPage() {
           </Card>
         </div>
       </div>
-      
-      <OrderEditModal
-        order={order}
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        onUpdate={(id, data) => updateOrder({ id, data })}
-      />
     </div>
   );
 }

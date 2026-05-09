@@ -9,12 +9,12 @@ import { StatsCards } from "@/components/admin/dashboard/StatsCards";
 // Dynamically import heavy components for better first load performance
 const RevenueChart = dynamic(() => import("@/components/admin/dashboard/RevenueChart").then(mod => mod.RevenueChart), {
   ssr: false,
-  loading: () => <div className="h-[480px] w-full bg-card animate-pulse rounded-[3rem] border border-border" />
+  loading: () => <div className="min-h-[300px] md:min-h-[480px] w-full bg-card animate-pulse rounded-[3rem] border border-border" />
 });
 
 const CategoryPie = dynamic(() => import("@/components/admin/dashboard/CategoryPie").then(mod => mod.CategoryPie), {
   ssr: false,
-  loading: () => <div className="h-[400px] w-full bg-card animate-pulse rounded-[3rem] border border-border" />
+  loading: () => <div className="min-h-[300px] md:min-h-[400px] w-full bg-card animate-pulse rounded-[3rem] border border-border" />
 });
 
 const RecentOrders = dynamic(() => import("@/components/admin/dashboard/RecentOrders").then(mod => mod.RecentOrders), {
@@ -42,7 +42,7 @@ export default function Dashboard() {
   const recentOrders = data?.recentOrders || [];
 
   return (
-    <div className="space-y-10 pb-20 max-w-[1600px] mx-auto px-4 sm:px-10 pt-10 animate-in fade-in duration-700">
+    <div className="admin-page-container">
       {/* 1. HEADER */}
       <AdminHeader isFetching={isFetching} todayRevenue={revenue.today} isLoading={isLoading} />
 
@@ -57,20 +57,24 @@ export default function Dashboard() {
 
       {/* 3. ANALYTICS BLOCK */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <RevenueChart 
-          revenue={revenue}
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-          selectedMonth={selectedMonth}
-          setSelectedMonth={setSelectedMonth}
-          isFetching={isFetching}
-          isLoading={isLoading}
-        />
-        <CategoryPie 
-          categories={categories} 
-          isFetching={isFetching} 
-          isLoading={isLoading}
-        />
+        <div className="lg:col-span-2 min-h-[300px] md:min-h-[480px]">
+          <RevenueChart 
+            revenue={revenue}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
+            selectedMonth={selectedMonth}
+            setSelectedMonth={setSelectedMonth}
+            isFetching={isFetching}
+            isLoading={isLoading}
+          />
+        </div>
+        <div className="min-h-[300px] md:min-h-[400px]">
+          <CategoryPie 
+            categories={categories} 
+            isFetching={isFetching} 
+            isLoading={isLoading}
+          />
+        </div>
       </div>
 
       {/* 4. ACTIVITY & INVENTORY ALERTS */}

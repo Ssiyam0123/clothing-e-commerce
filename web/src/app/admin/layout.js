@@ -21,8 +21,7 @@ export default function AdminLayout({ children }) {
   const { theme, toggleTheme, isMounted } = useAppStore();
 
   const isChatRoute = pathname?.startsWith("/admin/chat");
-  const isSettingsRoute = pathname === "/admin/settings";
-  const isFullPage = isChatRoute || isSettingsRoute;
+  const isFullPage = isChatRoute;
 
   // 🛡️ Redirect non-admins
   useEffect(() => {
@@ -90,21 +89,21 @@ export default function AdminLayout({ children }) {
   if (!user || user.role !== "admin") return null;
 
   return (
-    <div className="flex h-screen bg-background text-foreground transition-colors duration-700">
+    <div className="flex h-screen bg-background text-foreground transition-colors duration-700 overflow-hidden">
       {/* 🖥️ Desktop Sidebar */}
-      {!isFullPage && <Sidebar className="hidden lg:flex w-72" />}
+      {!isFullPage && <Sidebar className="hidden lg:flex w-72 shrink-0" />}
 
-      <div className="flex-1 flex flex-col overflow-hidden relative">
+      <div className="flex-1 flex flex-col min-w-0 relative h-full">
         {/* 🛰️ Top Header Bar */}
         {!isFullPage && (
-          <header className="bg-background/70 backdrop-blur-2xl border-b border-border z-40 transition-all">
-            <div className="flex justify-between items-center px-4 md:px-10 py-4 md:py-6">
-              <div className="flex items-center gap-5">
+          <header className="bg-background/70 backdrop-blur-2xl border-b border-border z-40 shrink-0">
+            <div className="flex justify-between items-center px-4 md:px-10 py-3 md:py-6">
+              <div className="flex items-center gap-3 md:gap-5">
                 {/* 🍔 Mobile Hamburger (Sheet) */}
                 <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
                   <SheetTrigger asChild>
-                    <button className="lg:hidden p-3 text-foreground bg-muted rounded-2xl active:scale-90 transition-all">
-                      <Menu size={20} />
+                    <button className="lg:hidden p-2.5 text-foreground bg-muted rounded-xl active:scale-90 transition-all">
+                      <Menu size={18} />
                     </button>
                   </SheetTrigger>
                   <SheetContent side="left" className="p-0 w-72 bg-sidebar border-r border-sidebar-border [&>button]:hidden">
@@ -115,34 +114,34 @@ export default function AdminLayout({ children }) {
                 <div className="hidden sm:flex items-center gap-3 bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-500/20 shadow-sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
-                    Terminal_Active
+                    Active
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 md:gap-8">
+              <div className="flex items-center gap-3 md:gap-8">
                 {/* Theme & Store Protocol */}
-                <div className="flex items-center gap-4 md:gap-6 border-r border-border pr-4 md:pr-8">
+                <div className="flex items-center gap-3 md:gap-6 border-r border-border pr-3 md:pr-8">
                   <Link
                     href="/"
                     className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors group"
                   >
                     <Globe size={14} className="opacity-50 group-hover:text-accent-secondary" />
-                    <span className="hidden md:inline">Live Portal</span>
+                    <span className="hidden sm:inline">Live Portal</span>
                   </Link>
 
                   <button
                     onClick={toggleTheme}
-                    className="p-2.5 rounded-xl bg-muted text-muted-foreground hover:text-foreground transition-all shadow-inner"
+                    className="p-2 rounded-xl bg-muted text-muted-foreground hover:text-foreground transition-all shadow-inner"
                   >
-                    {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+                    {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
                   </button>
                 </div>
 
                 {/* Identity Hub */}
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-2xl overflow-hidden bg-foreground text-background border border-border shadow-xl p-[2px]">
-                     <div className="w-full h-full rounded-[0.9rem] overflow-hidden">
+                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-xl md:rounded-2xl overflow-hidden bg-foreground text-background border border-border shadow-xl p-[1.5px] md:p-[2px]">
+                     <div className="w-full h-full rounded-[0.5rem] md:rounded-[0.9rem] overflow-hidden">
                         {user?.avatar ? (
                           <img
                             src={getImageUrl(user.avatar)}
@@ -151,7 +150,7 @@ export default function AdminLayout({ children }) {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-muted">
-                            <span className="text-xs font-black">
+                            <span className="text-[10px] font-black">
                               {user?.name?.charAt(0)}
                             </span>
                           </div>
@@ -163,25 +162,25 @@ export default function AdminLayout({ children }) {
                       {user?.name}
                     </p>
                     <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
-                      Authorized_Admin
+                      Admin
                     </p>
                   </div>
                 </div>
 
                 <button
                   onClick={handleLogout}
-                  className="ml-2 md:ml-4 text-muted-foreground hover:text-destructive transition-all hover:rotate-12"
+                  className="text-muted-foreground hover:text-destructive transition-all hover:rotate-12"
                   title="Disconnect Session"
                 >
-                  <LogOut size={18} />
+                  <LogOut size={16} />
                 </button>
               </div>
             </div>
           </header>
         )}
 
-        <main className={cn("flex-1 no-scrollbar bg-background/50", !isFullPage ? "px-4 pt-4 pb-10 md:px-10 md:pt-6 md:pb-12 overflow-y-auto" : "p-0 overflow-hidden")}>
-          <div className={cn("mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700", !isFullPage ? "max-w-[1400px]" : "max-w-none h-full overflow-y-auto")}>
+        <main className={cn("flex-1 overflow-y-auto no-scrollbar bg-background/50", !isFullPage ? "h-full" : "p-0 overflow-hidden")}>
+          <div className={cn("mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700", !isFullPage ? "max-w-none" : "max-w-none h-full")}>
             {children}
           </div>
         </main>

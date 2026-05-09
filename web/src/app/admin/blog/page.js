@@ -74,46 +74,45 @@ export default function AdminBlogDashboard() {
     );
 
   return (
-    <div className="space-y-10 pb-20 px-4 sm:px-6">
+    <div className="admin-page-container">
       {/* 🚀 System Header */}
-      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 bg-card/30 p-8 rounded-[2.5rem] border border-border/10 backdrop-blur-md">
-        <div className="space-y-4">
+      <div className="admin-section-header">
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-rose-600/30 text-rose-600 bg-rose-600/5 px-3 py-1">Vanguard Core</Badge>
-             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-40">// ARCHIVE_MANAGEMENT_v1.0</span>
+             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-rose-600/30 text-rose-600 bg-rose-600/5 px-3 py-1">Vanguard Core</Badge>
           </div>
-          <h1 className="text-5xl sm:text-6xl font-black uppercase tracking-tighter dark:text-white italic leading-none">
+          <h1 className="admin-title">
             Journal <span className="text-rose-600">Archives</span>
           </h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-3">
-            <TrendingUp size={12} className="text-rose-600" /> System Status: Operational • Total Logs: {blogs?.length || 0}
+          <p className="admin-subtitle">
+            Operational • Total Logs: {blogs?.length || 0}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="relative group">
+        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+          <div className="relative group w-full md:w-auto">
             <Search
               className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-rose-600 transition-colors"
               size={16}
             />
             <Input
               type="text"
-              placeholder="SEARCH PROTOCOLS..."
+              placeholder="SEARCH..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-background/50 border-border/10 pl-14 pr-6 h-16 rounded-2xl outline-none text-[10px] font-black uppercase tracking-widest w-full sm:w-80 focus-visible:ring-rose-600/20 focus:border-rose-600 transition-all shadow-inner"
+              className="bg-background/50 border-border/10 pl-12 pr-6 h-12 md:h-16 rounded-xl md:rounded-2xl outline-none text-[10px] font-black uppercase tracking-widest w-full md:w-64 lg:w-80 focus-visible:ring-rose-600/20 focus:border-rose-600 transition-all shadow-inner"
             />
           </div>
           <Button
             asChild
-            className="bg-foreground text-background hover:bg-rose-600 hover:text-white h-16 px-10 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group"
+            className="bg-foreground text-background hover:bg-rose-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group w-full md:w-auto"
           >
             <Link href="/admin/blog/create">
               <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Initialize Sequence
             </Link>
           </Button>
         </div>
-      </header>
+      </div>
 
       {/* 📊 Intelligence Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -148,8 +147,8 @@ export default function AdminBlogDashboard() {
       </div>
 
       {/* 📁 Central Data Foundry */}
-      <Card className="rounded-[2.5rem] border-border/10 bg-card/30 backdrop-blur-xl shadow-2xl overflow-hidden">
-        <CardHeader className="p-8 border-b border-border/5">
+      <div className="admin-table-form">
+        <div className="p-8 border-b border-border/10 bg-background/20">
            <div className="flex items-center justify-between">
               <CardTitle className="text-xs font-black uppercase tracking-[0.3em] flex items-center gap-3">
                  <FileText size={16} className="text-rose-600" /> Narrative Ledger
@@ -163,8 +162,8 @@ export default function AdminBlogDashboard() {
                  </Button>
               </div>
            </div>
-        </CardHeader>
-        <CardContent className="p-0">
+        </div>
+        <div className="admin-table-container border-none rounded-none">
           <Table>
             <TableHeader className="bg-muted/30">
               <TableRow className="hover:bg-transparent border-border/5">
@@ -221,13 +220,13 @@ export default function AdminBlogDashboard() {
                        </div>
                     </TableCell>
                     <TableCell className="pr-10 text-right">
-                      <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                        <Button asChild variant="outline" size="icon" className="h-10 w-10 rounded-xl border-border/10 hover:border-indigo-500/50 hover:text-indigo-500 bg-background/50">
+                      <div className="flex items-center justify-end gap-3">
+                        <Button asChild variant="outline" size="icon" className="h-10 w-10 rounded-xl border-border/10 hover:border-indigo-500/50 hover:text-indigo-500 bg-background/50 transition-all active:scale-95">
                           <Link href={`/blog/${post.slug}`} target="_blank">
                             <Eye size={16} />
                           </Link>
                         </Button>
-                        <Button asChild variant="outline" size="icon" className="h-10 w-10 rounded-xl border-border/10 hover:border-foreground/50 hover:bg-foreground hover:text-background bg-background/50">
+                        <Button asChild variant="outline" size="icon" className="h-10 w-10 rounded-xl border-border/10 hover:border-foreground/50 hover:bg-foreground hover:text-background bg-background/50 transition-all active:scale-95">
                           <Link href={`/admin/blog/${post._id}`}>
                             <Edit3 size={16} />
                           </Link>
@@ -236,14 +235,10 @@ export default function AdminBlogDashboard() {
                           variant="outline" 
                           size="icon" 
                           onClick={() => handleDelete(post._id)}
-                          className="h-10 w-10 rounded-xl border-border/10 hover:border-rose-600/50 hover:bg-rose-600 hover:text-white bg-background/50"
+                          className="h-10 w-10 rounded-xl border-border/10 hover:border-rose-600/50 hover:bg-rose-600 hover:text-white bg-background/50 transition-all active:scale-95"
                         >
                           <Trash2 size={16} />
                         </Button>
-                      </div>
-                      
-                      <div className="group-hover:hidden">
-                         <MoreHorizontal className="ml-auto text-muted-foreground/30" size={20} />
                       </div>
                     </TableCell>
                   </TableRow>
@@ -260,8 +255,8 @@ export default function AdminBlogDashboard() {
               )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

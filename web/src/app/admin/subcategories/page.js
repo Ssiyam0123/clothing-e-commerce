@@ -3,15 +3,25 @@
 import Link from "next/link";
 import { useSubcategories } from "@/hooks/useSubcategories";
 import DataTable from "@/components/admin/DataTable";
-import ActionButtons from "@/components/admin/ActionButtons";
-import Loader from "@/components/common/Loader";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  Plus, 
+  Trash2, 
+  Edit3
+} from "lucide-react";
+import { swalConfirm, swalToast } from "@/utils/swal";
+import { cn } from "@/lib/utils";
 
 export default function Subcategories() {
   const { subcategories, isLoading, deleteSubcategory } = useSubcategories();
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this subcategory?")) {
+    const isConfirmed = await swalConfirm("Purge Branch?", "This sub-cluster will be permanently removed.");
+    if (isConfirmed) {
       await deleteSubcategory.mutateAsync(id);
+      swalToast("Branch Purged", "success");
     }
   };
 
@@ -19,36 +29,76 @@ export default function Subcategories() {
     { label: "Name", key: "name" },
     { label: "Slug", key: "slug" },
     {
-      label: "Category",
+      label: "Category Cluster",
       key: "category",
-      render: (item) => item.category?.name,
+      render: (item) => (
+        <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg border-border/10 bg-background/50">
+          {item.category?.name}
+        </Badge>
+      ),
     },
   ];
 
-  if (isLoading) return <Loader />;
+  if (isLoading) {
+    return (
+      <div className="admin-page-container">
+        <Skeleton className="h-40 w-full rounded-[2rem]" />
+        <Skeleton className="h-[400px] w-full rounded-[2rem]" />
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Subcategories</h1>
-        <Link
-          href="/admin/subcategories/new"
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+    <div className="admin-page-container">
+      {/* 🛰️ System Header */}
+      <div className="admin-section-header">
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+             <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-emerald-600/30 text-emerald-600 bg-emerald-600/5 px-3 py-1">Structure Ops</Badge>
+          </div>
+          <h1 className="admin-title">
+            Node <span className="text-emerald-600">Sub-Clusters</span>
+          </h1>
+          <p className="admin-subtitle">
+            Subcategory Orchestration • Total: {subcategories?.length || 0}
+          </p>
+        </div>
+
+        <Button
+          asChild
+          className="bg-foreground text-background hover:bg-emerald-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group w-full md:w-auto"
         >
-          Add Subcategory
-        </Link>
+          <Link href="/admin/subcategories/new">
+            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> New Branch
+          </Link>
+        </Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={subcategories}
-        actions={(item) => (
-          <ActionButtons
-            editUrl={`/admin/subcategories/${item._id}`}
-            onDelete={() => handleDelete(item._id)}
+      <div className="admin-table-form">
+        <div className="admin-table-container border-none rounded-none pt-0">
+          <DataTable
+            columns={columns}
+            data={subcategories}
+            actions={(item) => (
+              <div className="flex items-center gap-3 justify-end">
+                <Button asChild variant="outline" size="icon" className="h-10 w-10 rounded-xl border-border/10 hover:border-foreground/50 hover:bg-foreground hover:text-background bg-background/50 transition-all active:scale-95">
+                  <Link href={`/admin/subcategories/${item._id}`}>
+                    <Edit3 size={16} />
+                  </Link>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={() => handleDelete(item._id)}
+                  className="h-10 w-10 rounded-xl border-border/10 hover:border-rose-600/50 hover:bg-rose-600 hover:text-white bg-background/50 transition-all active:scale-95"
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
+            )}
           />
-        )}
-      />
+        </div>
+      </div>
     </div>
   );
 }

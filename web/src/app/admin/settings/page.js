@@ -142,35 +142,18 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-12 pb-24 px-4 sm:px-6 max-w-[1600px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* 🔙 Back Navigation */}
-      <div className="flex items-center justify-between">
-        <Button 
-          variant="ghost" 
-          onClick={() => router.push("/admin")}
-          className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground transition-all p-0 hover:bg-transparent"
-        >
-          <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
-            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-          </div>
-          Back to Dashboard
-        </Button>
-
-        <div className="flex items-center gap-4">
-           <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-border/20 text-muted-foreground bg-accent/5 px-3 py-1">Secure Protocol</Badge>
-           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-        </div>
-      </div>
+    <div className="admin-page-container">
+      <div className="mb-8" />
 
       {/* 🛰️ Tactical Header */}
-      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 bg-card/30 p-10 rounded-[3rem] border border-border/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden group">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 bg-card/30 p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] border border-border/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-zinc-600/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-zinc-600/10 transition-colors duration-1000" />
         
-        <div className="space-y-4 relative z-10">
-          <h1 className="text-5xl sm:text-6xl font-black uppercase tracking-tighter dark:text-white italic leading-none">
+        <div className="space-y-3 md:space-y-4 relative z-10">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter dark:text-white italic leading-none">
             Global <span className="text-muted-foreground">Parameters</span>
           </h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-3">
+          <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-3">
             <Cpu size={12} className="text-foreground" /> Config Core • Identity & Aesthetics
           </p>
         </div>
@@ -178,51 +161,53 @@ export default function SettingsPage() {
         <Button
           onClick={handleSubmit}
           disabled={loading}
-          className="bg-foreground text-background hover:bg-rose-600 hover:text-white h-16 px-10 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group relative z-10"
+          className="bg-foreground text-background hover:bg-rose-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group relative z-10 w-full md:w-auto"
         >
           <Save size={18} className={cn("mr-3", loading && "animate-pulse")} />
           {loading ? "Syncing..." : "Apply Changes"}
         </Button>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        {/* 📟 Navigation Sidebar */}
-        <aside className="lg:col-span-3 space-y-3">
-          <div className="p-6 mb-4">
+      <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 md:gap-12">
+        {/* 📟 Navigation Tabs (Responsive) */}
+        <aside className="lg:col-span-3">
+          <div className="hidden lg:block p-6 mb-4">
             <p className="text-[8px] font-black uppercase tracking-[0.5em] text-muted-foreground opacity-50">Configuration Matrix</p>
           </div>
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "settings-sidebar-item",
-                activeTab === tab.id
-                  ? "settings-sidebar-item-active"
-                  : "settings-sidebar-item-inactive"
-              )}
-            >
-              <div className="flex items-center gap-4 relative z-10 mb-1">
-                <tab.icon size={18} className={cn(activeTab === tab.id ? "text-background" : "text-foreground/50")} />
-                <span className="font-black uppercase text-[11px] tracking-[0.2em]">{tab.label}</span>
-              </div>
-              <p className={cn(
-                "text-[9px] uppercase tracking-widest opacity-60 ml-8",
-                activeTab === tab.id ? "text-background/70" : "text-muted-foreground"
-              )}>
-                {tab.desc}
-              </p>
-              {activeTab === tab.id && (
-                <motion.div layoutId="tab-indicator" className="absolute inset-0 bg-gradient-to-r from-rose-600/0 via-rose-600/20 to-rose-600/0 opacity-50" />
-              )}
-            </button>
-          ))}
+          <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar gap-2 pb-4 lg:pb-0">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "settings-sidebar-item shrink-0 lg:shrink",
+                  activeTab === tab.id
+                    ? "settings-sidebar-item-active"
+                    : "settings-sidebar-item-inactive"
+                )}
+              >
+                <div className="flex items-center gap-4 relative z-10 mb-1">
+                  <tab.icon size={16} className={cn(activeTab === tab.id ? "text-background" : "text-foreground/50")} />
+                  <span className="font-black uppercase text-[10px] md:text-[11px] tracking-[0.2em] whitespace-nowrap">{tab.label}</span>
+                </div>
+                <p className={cn(
+                  "hidden lg:block text-[9px] uppercase tracking-widest opacity-60 ml-8",
+                  activeTab === tab.id ? "text-background/70" : "text-muted-foreground"
+                )}>
+                  {tab.desc}
+                </p>
+                {activeTab === tab.id && (
+                  <motion.div layoutId="tab-indicator" className="absolute inset-0 bg-gradient-to-r from-rose-600/0 via-rose-600/20 to-rose-600/0 opacity-50" />
+                )}
+              </button>
+            ))}
+          </div>
         </aside>
 
         {/* 🖥️ Command Console */}
         <main className="lg:col-span-9">
-          <Card className="rounded-[3rem] border-border/10 bg-card/30 backdrop-blur-2xl shadow-2xl overflow-hidden min-h-[600px]">
-            <CardContent className="p-10 md:p-16">
+          <Card className="rounded-[2rem] md:rounded-[3rem] border-border/10 bg-card/30 backdrop-blur-2xl shadow-2xl overflow-hidden min-h-[400px] md:min-h-[600px]">
+            <CardContent className="p-6 md:p-16">
               <AnimatePresence mode="wait">
                 {activeTab === "branding" && (
                   <motion.div

@@ -34,7 +34,7 @@ const ImageCell = ({ src, alt }) => {
 
 export default function DataTable({ columns, data, actions, className }) {
   return (
-    <div className={cn("bg-card text-card-foreground rounded-[2.5rem] border border-border overflow-hidden shadow-2xl", className)}>
+    <div className={cn("admin-table-container", className)}>
       <Table>
         <TableHeader className="bg-muted/50">
           <TableRow className="hover:bg-transparent border-border">

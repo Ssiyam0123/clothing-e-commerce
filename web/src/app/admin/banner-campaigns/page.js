@@ -53,39 +53,36 @@ export default function AdminBannerCampaigns() {
   };
 
   return (
-    <div className="space-y-12 pb-24 px-4 sm:px-6 max-w-[1600px] mx-auto">
+    <div className="admin-page-container">
       {/* 🛰️ System Header */}
-      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 bg-card/30 p-10 rounded-[3rem] border border-border/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-indigo-600/10 transition-colors duration-1000" />
-        
-        <div className="space-y-4 relative z-10">
+      <div className="admin-section-header">
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-indigo-600/30 text-indigo-600 bg-indigo-600/5 px-3 py-1">Visual Ops</Badge>
-             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-40">// CAMPAIGN_FOUNDRY_v1.2</span>
+             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-indigo-600/30 text-indigo-600 bg-indigo-600/5 px-3 py-1">Visual Ops</Badge>
           </div>
-          <h1 className="text-5xl sm:text-6xl font-black uppercase tracking-tighter dark:text-white italic leading-none">
+          <h1 className="admin-title">
             Hero <span className="text-indigo-600">Archives</span>
           </h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-3">
-            <Layers size={12} className="text-indigo-600 animate-pulse" /> Media Deck Orchestration • Active: {campaigns?.filter(c => c.isActive).length || 0}
+          <p className="admin-subtitle">
+            Media Deck Orchestration • Active: {campaigns?.filter(c => c.isActive).length || 0}
           </p>
         </div>
 
         <Button
           asChild
-          className="bg-foreground text-background hover:bg-indigo-600 hover:text-white h-16 px-10 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group relative z-10"
+          className="bg-foreground text-background hover:bg-indigo-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group w-full md:w-auto"
         >
           <Link href="/admin/banner-campaigns/new">
             <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Initialize Deck
           </Link>
         </Button>
-      </header>
+      </div>
 
       {/* 📁 Visual Deck Foundry */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {isLoading ? (
           [1, 2, 3].map((n) => (
-            <Card key={n} className="rounded-[2.5rem] border-border/10 bg-card/20 h-[400px] animate-pulse overflow-hidden">
+            <Card key={n} className="rounded-[2.5rem] border-border/10 bg-card/20 min-h-[300px] md:min-h-[400px] animate-pulse overflow-hidden">
                <CardContent className="p-10 space-y-8">
                   <div className="flex justify-between">
                      <Skeleton className="h-10 w-2/3" />

@@ -18,19 +18,34 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { name: "Command Center", href: "/admin", icon: <LayoutDashboard size={18} /> },
-  { name: "Orders", href: "/admin/orders", icon: <ShoppingBag size={18} /> },
-  { name: "Products", href: "/admin/products", icon: <Shirt size={18} /> },
-  { name: "Categories", href: "/admin/categories", icon: <FolderTree size={18} /> },
-  { name: "Live Chat", href: "/admin/chat", icon: <MessageCircle size={18} /> },
-  { name: "Flash Drops", href: "/admin/flash-sales", icon: <Zap size={18} /> },
-  { name: "Campaigns", href: "/admin/banner-campaigns", icon: <Sparkles size={18} /> },
-  { name: "Coupons", href: "/admin/coupons", icon: <Ticket size={18} /> },
-  { name: "Users", href: "/admin/users", icon: <Users size={18} /> },
-  { name: "Blog", href: "/admin/blog", icon: <Bold size={18} /> },
-  { name: "My Profile", href: "/profile", icon: <User size={18} /> },
-  { name: "Setting", href: "/admin/settings", icon: <Settings size={18} /> },
+const navGroups = [
+  {
+    label: "Core Protocol",
+    items: [
+      { name: "Command Center", href: "/admin", icon: <LayoutDashboard size={18} /> },
+      { name: "Orders", href: "/admin/orders", icon: <ShoppingBag size={18} /> },
+      { name: "Products", href: "/admin/products", icon: <Shirt size={18} /> },
+      { name: "Categories", href: "/admin/categories", icon: <FolderTree size={18} /> },
+      { name: "Live Chat", href: "/admin/chat", icon: <MessageCircle size={18} /> },
+    ]
+  },
+  {
+    label: "Narrative & Ops",
+    items: [
+      { name: "Campaigns", href: "/admin/banner-campaigns", icon: <Sparkles size={18} /> },
+      { name: "Flash Drops", href: "/admin/flash-sales", icon: <Zap size={18} /> },
+      { name: "Coupons", href: "/admin/coupons", icon: <Ticket size={18} /> },
+      { name: "Blog Ledger", href: "/admin/blog", icon: <Bold size={18} /> },
+    ]
+  },
+  {
+    label: "System Matrix",
+    items: [
+      { name: "Users", href: "/admin/users", icon: <Users size={18} /> },
+      { name: "My Identity", href: "/admin/profile", icon: <User size={18} /> },
+      { name: "Parameters", href: "/admin/settings", icon: <Settings size={18} /> },
+    ]
+  }
 ];
 
 export default function Sidebar({ className, onItemClick }) {
@@ -56,33 +71,37 @@ export default function Sidebar({ className, onItemClick }) {
       </div>
 
       {/* 🧭 Navigation */}
-      <nav className="flex-1 overflow-y-auto no-scrollbar px-6 py-4">
-        <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.5em] mb-8 pl-4">
-          Core Protocol
-        </p>
-        <ul className="space-y-1.5">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(`${item.href}/`));
+      <nav className="flex-1 overflow-y-auto no-scrollbar px-6 py-4 space-y-10">
+        {navGroups.map((group, groupIdx) => (
+          <div key={groupIdx}>
+            <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.5em] mb-6 pl-4">
+              {group.label}
+            </p>
+            <ul className="space-y-1.5">
+              {group.items.map((item) => {
+                const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(`${item.href}/`));
 
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={onItemClick}
-                  className={cn(
-                    "sidebar-nav-item",
-                    isActive ? "sidebar-nav-item-active" : "sidebar-nav-item-inactive"
-                  )}
-                >
-                  <span className={cn("transition-transform duration-300", isActive ? "scale-110" : "opacity-70 group-hover:opacity-100")}>
-                    {item.icon}
-                  </span>
-                  <span>{item.name}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={onItemClick}
+                      className={cn(
+                        "sidebar-nav-item",
+                        isActive ? "sidebar-nav-item-active" : "sidebar-nav-item-inactive"
+                      )}
+                    >
+                      <span className={cn("transition-transform duration-300", isActive ? "scale-110" : "opacity-70 group-hover:opacity-100")}>
+                        {item.icon}
+                      </span>
+                      <span>{item.name}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
       </nav>
 
       {/* 🔐 Footer Info */}

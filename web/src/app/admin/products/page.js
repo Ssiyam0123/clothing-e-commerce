@@ -144,6 +144,28 @@ function AdminProductsContent() {
       ),
     },
     {
+      label: "Ratings",
+      render: (item) => (
+        <button
+          onClick={async () => {
+             try {
+               await updateProduct({ id: item._id, data: { showReviews: !item.showReviews } });
+               swalToast(item.showReviews ? "Reviews Suppressed" : "Reviews Authorized", "success");
+             } catch (err) {
+               swalError("Protocol Error", err.message);
+             }
+          }}
+          className={`inline-flex items-center px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-full border transition-all hover:scale-105 active:scale-95 cursor-pointer ${
+            item.showReviews !== false
+              ? "bg-indigo-500/10 text-indigo-600 border-indigo-500/20 hover:bg-indigo-500/20"
+              : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+          }`}
+        >
+          {item.showReviews !== false ? "★ Active" : "☆ Off"}
+        </button>
+      ),
+    },
+    {
       label: "Actions",
       render: (item) => (
         <div className="flex items-center gap-2 justify-end">
@@ -174,49 +196,55 @@ function AdminProductsContent() {
   ];
 
   return (
-    <div className="space-y-10 pb-20 max-w-[1600px] mx-auto overflow-x-hidden animate-in fade-in duration-700">
+    <div className="admin-page-container">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card p-8 rounded-[2.5rem] border border-border shadow-sm">
+      <div className="admin-section-header">
         <div>
-          <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tighter uppercase mb-2 italic">
+          <h1 className="admin-title">
             Product <span className="text-muted-foreground/50">Catalog</span>
           </h1>
-          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">
+          <p className="admin-subtitle">
             Manage Store Inventory (Items: {pagination?.total || 0})
           </p>
         </div>
         <Link
           href="/admin/products/new"
-          className="bg-foreground text-background px-10 py-4 rounded-full font-black uppercase tracking-widest text-[10px] hover:scale-105 active:scale-95 transition-all shadow-xl flex items-center gap-2"
+          className="bg-foreground text-background px-8 md:px-10 py-3 md:py-4 rounded-full font-black uppercase tracking-widest text-[9px] md:text-[10px] hover:scale-105 active:scale-95 transition-all shadow-xl flex items-center justify-center gap-2 w-full md:w-auto"
         >
           <Plus size={16} strokeWidth={3} />
           Initialize Product
         </Link>
       </div>
 
-      <AdminProductFilter />
+      <div className="admin-table-form">
+        <div className="p-6 md:p-8 border-b border-border/10 bg-background/20">
+          <AdminProductFilter />
+        </div>
 
-      <div className="pt-4">
-        {isLoading ? (
-          <TableSkeleton rowCount={10} colCount={6} />
-        ) : (
-          <div
-            className={`animate-in fade-in slide-in-from-bottom-4 duration-700 transition-opacity ${
-              isFetching ? "opacity-50 pointer-events-none" : "opacity-100"
-            }`}
-          >
-            <DataTable columns={columns} data={products || []} />
-            {pagination?.pages > 1 && (
-              <div className="mt-12 flex justify-center">
-                <Pagination
-                  page={pagination?.page}
-                  totalPages={pagination?.pages}
-                  onPageChange={setPage}
-                />
-              </div>
-            )}
-          </div>
-        )}
+        <div className="pt-0">
+          {isLoading ? (
+            <div className="p-8">
+              <TableSkeleton rowCount={10} colCount={6} />
+            </div>
+          ) : (
+            <div
+              className={`animate-in fade-in slide-in-from-bottom-4 duration-700 transition-opacity ${
+                isFetching ? "opacity-50 pointer-events-none" : "opacity-100"
+              }`}
+            >
+              <DataTable columns={columns} data={products || []} className="border-none rounded-none" />
+              {pagination?.pages > 1 && (
+                <div className="p-8 border-t border-border/10 bg-background/10">
+                  <Pagination
+                    page={pagination?.page}
+                    totalPages={pagination?.pages}
+                    onPageChange={setPage}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -226,13 +254,13 @@ export default function AdminProductsPage() {
   return (
     <Suspense
       fallback={
-        <div className="p-10 space-y-10">
-          <Skeleton className="h-[120px] rounded-[2.5rem]" />
-          <Skeleton className="h-24 rounded-full" />
-          <div className="flex gap-4">
-             {[1,2,3,4].map(i => <Skeleton key={i} className="h-12 w-32 rounded-full" />)}
+        <div className="admin-page-container">
+          <Skeleton className="min-h-[120px] w-full rounded-[2.5rem]" />
+          <Skeleton className="min-h-[80px] w-full rounded-full" />
+          <div className="flex flex-wrap gap-4">
+             {[1,2,3,4,5].map(i => <Skeleton key={i} className="h-10 w-24 md:w-32 rounded-full" />)}
           </div>
-          <Skeleton className="h-[600px] rounded-[2.5rem]" />
+          <Skeleton className="min-h-[500px] w-full rounded-[2.5rem]" />
         </div>
       }
     >

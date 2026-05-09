@@ -23,6 +23,7 @@ export const createProductSchema = z.object({
   tags: z.array(z.string()).optional(),
   isActive: z.boolean().optional().default(true),
   isFeatured: z.boolean().optional().default(false),
+  showReviews: z.boolean().optional().default(true),
   featuredOrder: z.number().int().min(0).optional().default(0),
 });
 

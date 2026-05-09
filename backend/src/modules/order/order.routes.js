@@ -11,6 +11,7 @@ import {
   bkashSuccess,
   getOrders,
   updateOrder,
+  createOrderAdmin
 } from "./order.controller.js";
 import { requireAuth, admin, optionalAuth } from "../../middleware/auth.js";
 import { validateObjectId } from "../../middleware/validate.js";
@@ -32,6 +33,7 @@ router.get("/bkash/success/:orderId", bkashSuccess);
 
 // 🛡️ Admin: Get all orders (static route)
 router.get("/", requireAuth, admin, getOrders);
+router.post("/admin/create", requireAuth, admin, createOrderAdmin);
 
 // 🛡️ Admin: Dynamic routes for specific order (must come after all static routes)
 

@@ -18,6 +18,7 @@ const parseProductData = (req) => {
     if (body.featuredOrder !== undefined) parsedData.featuredOrder = parseInt(body.featuredOrder);
     if (body.isActive !== undefined) parsedData.isActive = body.isActive === 'true' || body.isActive === true;
     if (body.isFeatured !== undefined) parsedData.isFeatured = body.isFeatured === 'true' || body.isFeatured === true;
+    if (body.showReviews !== undefined) parsedData.showReviews = body.showReviews === 'true' || body.showReviews === true;
     if (body.category !== undefined) parsedData.category = body.category;
     if (body.subcategory !== undefined) {
         parsedData.subcategory = (body.subcategory === 'undefined' || body.subcategory === 'null' || !body.subcategory) ? null : body.subcategory;

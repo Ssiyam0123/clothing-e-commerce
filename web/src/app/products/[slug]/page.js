@@ -159,12 +159,14 @@ export default async function ProductPage({ params }) {
                       {t.featuredArtifact}
                     </Badge>
                   )}
-                  <div className="flex items-center gap-2 glass px-3 py-1 rounded-xl">
-                    <StarRating rating={product.averageRating || 5} size="small" />
-                    <span className="text-[9px] font-black text-foreground">
-                      {product.totalReviews || 0} {t.reviews}
-                    </span>
-                  </div>
+                  {product.showReviews !== false && (
+                    <div className="flex items-center gap-2 glass px-3 py-1 rounded-xl">
+                      <StarRating rating={product.averageRating || 5} size="small" />
+                      <span className="text-[9px] font-black text-foreground">
+                        {product.totalReviews || 0} {t.reviews}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <WishlistButtonClient product={product} />
@@ -252,9 +254,11 @@ export default async function ProductPage({ params }) {
 
       <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-12 mt-20 lg:mt-32 pb-24 lg:pb-32 space-y-20 lg:space-y-32">
         {/* Reviews */}
-        <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
-           <ReviewSectionWrapper productId={product._id} />
-        </div>
+        {product.showReviews !== false && (
+          <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
+             <ReviewSectionWrapper productId={product._id} />
+          </div>
+        )}
 
         {/* Related Products */}
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">

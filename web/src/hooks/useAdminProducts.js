@@ -98,8 +98,9 @@ export const useAdminProducts = (initialFilters = {}) => {
       });
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
+      queryClient.invalidateQueries({ queryKey: ["product", variables.id] });
     },
   });
 

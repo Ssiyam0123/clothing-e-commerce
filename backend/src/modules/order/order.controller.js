@@ -512,6 +512,47 @@ export const syncOrderToPathao = asyncHandler(async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+export const createOrderAdmin = asyncHandler(async (req, res) => {
+  const {
+    user: customerId,
+    orderItems,
+    shippingAddress,
+    couponCode,
+    paymentMethod = "COD",
+    orderStatus = "Processing",
+    paymentStatus = "Pending"
+  } = req.body;
+
+  const orderData = await calculateValidatedOrder(
+    orderItems,
+    couponCode,
+    shippingAddress.pathao_city_id
+  );
+
+  const order = new Order({
+    user: customerId || undefined,
+    isGuest: !customerId,
+    orderItems: orderData.validatedItems,
+    shippingAddress: normalizeShippingAddress(shippingAddress),
+    itemsPrice: orderData.itemsPrice,
+    discountAmount: orderData.discountAmount,
+    shippingPrice: orderData.shippingPrice,
+    totalPrice: orderData.totalPrice,
+    couponCode: orderData.couponCode,
+    paymentMethod,
+    orderStatus,
+    paymentResult: {
+      transactionId: `ADMIN-${new mongoose.Types.ObjectId().toString()}`,
+      status: paymentStatus,
+    },
+  });
+
+  const createdOrder = await order.save();
+  await finalizeOrderProcessing(createdOrder);
+
+  res.status(201).json(createdOrder);
+});
+
 export const updateOrder = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
   if (!order) return res.status(404).json({ message: "Order not found." });

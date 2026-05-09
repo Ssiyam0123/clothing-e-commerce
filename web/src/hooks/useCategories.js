@@ -19,18 +19,24 @@ export const useCategories = (initialData = undefined) => {
   });
 
   const createCategory = useMutation({
-    mutationFn: (formData) => api.post("/categories", formData),
-    onSuccess: () => queryClient.invalidateQueries(["categories"]),
+    mutationFn: (formData) =>
+      api.post("/categories", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["categories"] }),
   });
 
   const updateCategory = useMutation({
-    mutationFn: ({ id, data }) => api.put(`/categories/${id}`, data),
-    onSuccess: () => queryClient.invalidateQueries(["categories"]),
+    mutationFn: ({ id, data }) =>
+      api.put(`/categories/${id}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["categories"] }),
   });
 
   const deleteCategory = useMutation({
     mutationFn: (id) => api.delete(`/categories/${id}`),
-    onSuccess: () => queryClient.invalidateQueries(["categories"]),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["categories"] }),
   });
 
   return {

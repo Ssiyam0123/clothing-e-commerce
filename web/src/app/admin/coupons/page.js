@@ -173,48 +173,47 @@ export default function CouponArchive() {
   ];
 
   return (
-    <div className="space-y-12 pb-24 px-4 sm:px-6 max-w-[1600px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="admin-page-container">
       {/* 🛰️ Tactical Header */}
-      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 bg-card/30 p-10 rounded-[3rem] border border-border/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-emerald-600/10 transition-colors duration-1000" />
-        
-        <div className="space-y-4 relative z-10">
+      <div className="admin-section-header">
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-emerald-600/30 text-emerald-600 bg-emerald-600/5 px-3 py-1">Settlement Hub</Badge>
-             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-40">// VOUCHER_PROTOCOLS_v1.2</span>
+             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-emerald-600/30 text-emerald-600 bg-emerald-600/5 px-3 py-1">Settlement Hub</Badge>
           </div>
-          <h1 className="text-5xl sm:text-6xl font-black uppercase tracking-tighter dark:text-white italic leading-none">
+          <h1 className="admin-title">
             Voucher <span className="text-emerald-600">Hub</span>
           </h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-3">
-            <ShieldCheck size={12} className="text-emerald-600 animate-pulse" /> Logic Orchestration • Total Logs: {coupons?.length || 0}
+          <p className="admin-subtitle">
+            Logic Orchestration • Total Logs: {coupons?.length || 0}
           </p>
         </div>
 
         <Button
           asChild
-          className="bg-foreground text-background hover:bg-emerald-600 hover:text-white h-16 px-10 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group relative z-10"
+          className="bg-foreground text-background hover:bg-emerald-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group w-full md:w-auto"
         >
           <Link href="/admin/coupons/new">
             <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Initialize Voucher
           </Link>
         </Button>
-      </header>
+      </div>
 
       {/* 📊 Intelligence Ledger */}
-      <Card className="rounded-[3rem] border-border/10 bg-card/30 backdrop-blur-2xl shadow-2xl overflow-hidden relative">
-        <CardContent className="p-0">
+      <div className="admin-table-form">
+        <div className="pt-0">
           {isLoading ? (
-            <TableSkeleton rowCount={6} />
+            <div className="p-8">
+              <TableSkeleton rowCount={6} />
+            </div>
           ) : (
             <DataTable 
               columns={columns} 
               data={coupons} 
-              className="bg-transparent" 
+              className="bg-transparent border-none rounded-none" 
             />
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

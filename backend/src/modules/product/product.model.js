@@ -82,6 +82,10 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  showReviews: {
+    type: Boolean,
+    default: true,
+  },
 }, { timestamps: true });
 
 // Text index for search

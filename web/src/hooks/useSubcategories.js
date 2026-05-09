@@ -18,12 +18,12 @@ export const useSubcategories = () => {
 
   const createSubcategory = useMutation({
     mutationFn: (formData) => api.post("/subcategories", formData),
-    onSuccess: () => queryClient.invalidateQueries(["subcategories"]),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["subcategories"] }),
   });
 
   const updateSubcategory = useMutation({
     mutationFn: ({ id, data }) => api.put(`/subcategories/${id}`, data),
-    onSuccess: () => queryClient.invalidateQueries(["subcategories"]),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["subcategories"] }),
   });
 
   const deleteSubcategory = useMutation({

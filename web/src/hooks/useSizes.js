@@ -19,12 +19,12 @@ export const useSizes = (categoryId = null) => {
 
   const createSize = useMutation({
     mutationFn: (newSize) => api.post("/sizes", newSize),
-    onSuccess: () => queryClient.invalidateQueries(["sizes"]),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["sizes"] }),
   });
 
   const updateSize = useMutation({
     mutationFn: ({ id, ...data }) => api.put(`/sizes/${id}`, data),
-    onSuccess: () => queryClient.invalidateQueries(["sizes"]),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["sizes"] }),
   });
 
   const deleteSize = useMutation({

@@ -10,10 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, Upload, Save, Trash2, Image as ImageIcon } from "lucide-react";
+import { ChevronLeft, Upload, Save, Trash2, Image as ImageIcon, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Loader from "@/components/common/Loader";
 
 export default function CategoryForm() {
   const { id } = useParams();
@@ -23,6 +22,7 @@ export default function CategoryForm() {
   const { categories, createCategory, updateCategory } = useCategories();
   const [loading, setLoading] = useState(isEdit);
   const [imagePreview, setImagePreview] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -52,6 +52,7 @@ export default function CategoryForm() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setImagePreview(reader.result);
       reader.readAsDataURL(file);
@@ -64,8 +65,10 @@ export default function CategoryForm() {
     formData.append("name", data.name.trim());
     formData.append("slug", data.slug.trim());
     if (data.description) formData.append("description", data.description);
-    if (data.imageFile && data.imageFile[0]) {
-      formData.append("image", data.imageFile[0]);
+    
+    // Explicitly append the selected file
+    if (selectedFile) {
+      formData.append("image", selectedFile);
     }
 
     try {
@@ -78,8 +81,7 @@ export default function CategoryForm() {
       }
       setTimeout(() => router.push("/admin/categories"), 1500);
     } catch (err) {
-      const msg = err.response?.data?.message || err.message || "Error processing request.";
-      swalError("Action Failed", msg);
+      swalError("Action Failed", err.response?.data?.message || "Sync error.");
     } finally {
       setIsSubmitting(false);
     }
@@ -87,146 +89,104 @@ export default function CategoryForm() {
 
   if (loading)
     return (
-      <div className="max-w-4xl mx-auto p-10 space-y-10">
-        <Skeleton className="h-32 w-full rounded-[2.5rem]" />
-        <Skeleton className="h-[500px] w-full rounded-[2.5rem]" />
+      <div className="admin-page-container flex items-center justify-center min-h-[40vh]">
+        <Loader />
       </div>
     );
 
   return (
-    <div className="max-w-4xl mx-auto pb-20 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Header */}
-      <Card className="p-8 rounded-[2.5rem] border-border bg-card shadow-xl backdrop-blur-md">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tighter uppercase italic leading-none">
-              {isEdit ? "Configuration" : "Initialize Category"}
-            </h1>
-            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] ml-1">
-              Taxonomy Configuration Protocol
-            </p>
+    <div className="admin-page-container max-w-4xl">
+      {/* 🔙 Navigation */}
+      <div className="mb-4">
+        <Button 
+          variant="ghost" 
+          onClick={() => router.back()}
+          className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground transition-all p-0 hover:bg-transparent"
+        >
+          <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
+            <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           </div>
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground rounded-full h-12 px-6"
-          >
-            <ChevronLeft className="mr-2" size={16} /> Cancel & Return
-          </Button>
+          <span>Return to Vault</span>
+        </Button>
+      </div>
+
+      <div className="admin-section-header">
+        <div>
+          <h1 className="admin-title">
+            {isEdit ? "Refine" : "Initialize"} <span className="text-muted-foreground/30">Taxonomy</span>
+          </h1>
+          <p className="admin-subtitle">Structural Configuration Protocol</p>
         </div>
-      </Card>
+      </div>
 
-      {/* Main Form Card */}
-      <Card className="rounded-[3rem] border-border bg-card shadow-2xl overflow-hidden">
-        <CardContent className="p-10 md:p-14">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
-            <div className="grid md:grid-cols-2 gap-10">
-              <div className="space-y-3">
-                <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1">
-                  Category Name *
-                </Label>
-                <Input
-                  {...register("name", { required: true })}
-                  className="h-14 bg-muted/30 border-border rounded-2xl px-6 text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all"
-                  placeholder="e.g. Outerwear"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1">
-                  URL Extension (Slug) *
-                </Label>
-                <Input
-                  {...register("slug", { required: true, pattern: /^[a-z0-9-]+$/ })}
-                  className="h-14 bg-muted/30 border-border rounded-2xl px-6 text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all"
-                  placeholder="e.g. outerwear"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1">
-                Narrative Description
-              </Label>
-              <Textarea
-                {...register("description")}
-                rows={5}
-                className="bg-muted/30 border-border rounded-3xl px-6 py-5 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition-all resize-none shadow-inner"
-                placeholder="Describe the aesthetic and functional scope of this department..."
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
+        <div className="admin-table-form p-8 md:p-14 space-y-12">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="space-y-4">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Category Designation *</Label>
+              <Input 
+                {...register("name", { required: true })}
+                className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-primary/20 transition-all"
+                placeholder="e.g. OUTERWEAR"
               />
             </div>
-
-            <div className="space-y-6">
-              <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1">
-                Cover Visual Asset
-              </Label>
-              <div className="grid sm:grid-cols-2 gap-8">
-                <div className="relative group">
-                  <div className="h-64 border-2 border-dashed border-border bg-muted/20 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 transition-all group-hover:border-primary/50 group-hover:bg-muted/30 cursor-pointer overflow-hidden">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      {...register("imageFile")}
-                      onChange={handleImageChange}
-                      className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="bg-background/80 p-4 rounded-2xl shadow-xl transition-transform group-hover:scale-110">
-                      <Upload className="text-muted-foreground" size={24} />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-foreground">Select Archive</p>
-                      <p className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mt-1">PNG, JPG up to 10MB</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="h-64 rounded-[2.5rem] bg-muted/20 border border-border overflow-hidden flex items-center justify-center relative shadow-inner">
-                  {imagePreview ? (
-                    <img
-                      src={imagePreview}
-                      className="w-full h-full object-cover grayscale transition-all duration-700 hover:grayscale-0"
-                      alt="Preview"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 opacity-20">
-                      <ImageIcon size={48} />
-                      <p className="text-[8px] font-black uppercase tracking-widest">No Asset Loaded</p>
-                    </div>
-                  )}
-                </div>
-              </div>
+            <div className="space-y-4">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Unique Path (Slug) *</Label>
+              <Input 
+                {...register("slug", { required: true, pattern: /^[a-z0-9-]+$/ })}
+                className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-primary/20 transition-all text-primary"
+                placeholder="e.g. outerwear"
+              />
             </div>
+            <div className="md:col-span-2 space-y-4">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Structural Narrative</Label>
+              <Textarea 
+                {...register("description")}
+                rows={4}
+                className="bg-muted/30 border-border/10 rounded-3xl px-6 py-5 font-medium focus:ring-2 focus:ring-primary/20 resize-none"
+                placeholder="Describe the aesthetic scope..."
+              />
+            </div>
+          </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-10 border-t border-border mt-10">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex-[2] h-14 bg-foreground text-background hover:bg-primary hover:text-primary-foreground rounded-full font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl transition-all active:scale-95 disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
-                    Processing...
-                  </div>
+          <div className="space-y-6 pt-6 border-t border-border/5">
+            <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Department Cover Asset</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <label className="relative h-64 rounded-3xl border-2 border-dashed border-border/20 flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all group overflow-hidden">
+                <Upload size={32} className="mb-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-primary">Inject Asset</span>
+                <input
+                   type="file"
+                   accept="image/*"
+                   className="hidden"
+                   onChange={handleImageChange}
+                />
+              </label>
+
+              <div className="h-64 rounded-3xl bg-muted/20 border border-border/5 overflow-hidden flex items-center justify-center relative group">
+                {imagePreview ? (
+                  <img src={imagePreview} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <Save size={16} />
-                    {isEdit ? "Sync Architecture" : "Initialize Category"}
+                  <div className="flex flex-col items-center gap-2 opacity-10">
+                    <ImageIcon size={48} strokeWidth={1} />
+                    <p className="text-[8px] font-black uppercase tracking-widest italic">Awaiting Asset...</p>
                   </div>
                 )}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.push("/admin/categories")}
-                className="flex-1 h-14 rounded-full border-border bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground font-black uppercase tracking-[0.2em] text-[10px] transition-all"
-              >
-                Discard Changes
-              </Button>
+              </div>
             </div>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full h-24 bg-foreground text-background hover:bg-primary hover:text-white rounded-[2.5rem] font-black uppercase tracking-[0.5em] text-[12px] shadow-2xl transition-all active:scale-95 group"
+        >
+          {isSubmitting ? "Processing Node..." : (isEdit ? "Synchronize Structural Data" : "Initialize Architecture")}
+          <ArrowRight size={20} className="ml-4 group-hover:translate-x-2 transition-transform" />
+        </Button>
+      </form>
     </div>
   );
 }

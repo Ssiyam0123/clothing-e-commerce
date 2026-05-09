@@ -224,4 +224,42 @@
   .settings-sidebar-item-inactive:hover {
     background-color: color-mix(in srgb, var(--card) 50%, transparent);
   }
+
+  /* 📱 Responsive Admin Utilities */
+  .admin-page-container {
+    @apply flex flex-col gap-8 p-4 md:p-8 lg:p-10 w-full mx-auto max-w-[1600px];
+  }
+
+  .admin-card {
+    @apply bg-card border border-border shadow-sm rounded-[2rem] transition-all hover:shadow-md;
+  }
+
+  .admin-table-form {
+    @apply bg-card/40 backdrop-blur-2xl border border-border/10 rounded-[2rem] md:rounded-[3rem] shadow-2xl overflow-hidden p-1 md:p-2;
+  }
+
+  .admin-table-container {
+    @apply w-full overflow-x-auto rounded-[1.5rem] md:rounded-[2.5rem] border border-border/5 bg-background/30;
+  }
+
+  .admin-section-header {
+    @apply flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8;
+  }
+
+  .admin-title {
+    @apply text-2xl md:text-3xl font-black tracking-tighter text-foreground italic uppercase;
+  }
+
+  .admin-subtitle {
+    @apply text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-70;
+  }
+
+  /* 🚀 Optimization: Remove fixed heights, use aspect ratios or flex */
+  .responsive-aspect-video {
+    @apply w-full aspect-video;
+  }
+
+  .responsive-grid-auto {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+  }
 }

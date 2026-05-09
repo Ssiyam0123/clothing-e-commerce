@@ -92,17 +92,17 @@ export default function CategoryMasterControl() {
 
   if (catLoading || subLoading || sizeLoading) {
     return (
-      <div className="space-y-10 pb-20 max-w-[1600px] mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 p-10 rounded-[2.5rem] bg-card border border-border shadow-sm">
+      <div className="admin-page-container">
+        <div className="admin-section-header">
           <div className="space-y-2">
-            <Skeleton className="h-10 w-[300px] rounded-xl" />
-            <Skeleton className="h-4 w-48" />
+            <Skeleton className="h-10 w-[200px] md:w-[300px] rounded-xl" />
+            <Skeleton className="h-4 w-32 md:w-48" />
           </div>
-          <Skeleton className="h-14 w-56 rounded-full" />
+          <Skeleton className="h-12 md:h-14 w-full md:w-56 rounded-full" />
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-[600px] rounded-[3rem]" />
+          {[1, 2].map((i) => (
+            <Skeleton key={i} className="min-h-[400px] md:min-h-[600px] rounded-[3rem]" />
           ))}
         </div>
       </div>
@@ -110,19 +110,19 @@ export default function CategoryMasterControl() {
   }
 
   return (
-    <div className="space-y-10 pb-20 max-w-[1600px] mx-auto px-6">
+    <div className="admin-page-container">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card p-10 rounded-[2.5rem] border border-border shadow-xl backdrop-blur-md">
+      <div className="admin-section-header">
         <div>
-          <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tighter uppercase leading-none italic mb-3">
+          <h1 className="admin-title">
             Architecture
           </h1>
-          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] ml-1">
+          <p className="admin-subtitle">
             Taxonomy & Store Hierarchy
           </p>
         </div>
-        <Link href="/admin/categories/new">
-          <Button className="bg-foreground text-background hover:bg-primary hover:text-primary-foreground h-14 px-10 rounded-full font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-2xl active:scale-95">
+        <Link href="/admin/categories/new" className="w-full md:w-auto">
+          <Button className="bg-foreground text-background hover:bg-primary hover:text-primary-foreground h-12 md:h-14 px-8 md:px-10 rounded-full font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] transition-all shadow-2xl active:scale-95 w-full">
             <Plus className="mr-2" size={16} /> Initialize Category
           </Button>
         </Link>

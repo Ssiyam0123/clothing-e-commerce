@@ -166,72 +166,71 @@ function UsersContent() {
   ];
 
   return (
-    <div className="space-y-10 pb-24 px-4 sm:px-6 max-w-[1600px] mx-auto">
+    <div className="admin-page-container">
       {/* 🛰️ Tactical Header */}
-      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 bg-card/30 p-10 rounded-[3rem] border border-border/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-zinc-600/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-zinc-600/10 transition-colors duration-1000" />
-        
-        <div className="space-y-4 relative z-10">
+      <div className="admin-section-header">
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-border/20 text-muted-foreground bg-accent/5 px-3 py-1">Identity Ops</Badge>
-             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-40">// DIRECTORY_v4.2</span>
+             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-border/20 text-muted-foreground bg-accent/5 px-3 py-1">Identity Ops</Badge>
           </div>
-          <h1 className="text-5xl sm:text-6xl font-black uppercase tracking-tighter dark:text-white italic leading-none">
+          <h1 className="admin-title">
             User <span className="text-muted-foreground">Directory</span>
           </h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-3">
-            <UserCheck size={12} className="text-foreground animate-pulse" /> Personnel Management • Global Search Enabled
+          <p className="admin-subtitle">
+            Personnel Management • Global Search Enabled
           </p>
         </div>
 
-        <div className="bg-accent/5 px-8 py-5 rounded-[2rem] border border-border/10 flex items-center gap-6 shadow-inner relative z-10 group/stat">
+        <div className="bg-accent/5 px-6 md:px-8 py-3 md:py-5 rounded-2xl md:rounded-[2rem] border border-border/10 flex items-center justify-between md:justify-start gap-4 md:gap-6 shadow-inner w-full md:w-auto group/stat">
            <div className="flex flex-col">
-              <span className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em] mb-1">Sector Live</span>
-              <span className="text-3xl font-black text-foreground italic leading-none group-hover/stat:text-rose-600 transition-colors">
+              <span className="text-[8px] md:text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em] mb-1">Sector Live</span>
+              <span className="text-xl md:text-3xl font-black text-foreground italic leading-none group-hover/stat:text-rose-600 transition-colors">
                 {total || 0}
               </span>
            </div>
-           <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-muted-foreground">
-              <Activity size={20} className="animate-pulse" />
+           <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-background flex items-center justify-center text-muted-foreground">
+              <Activity size={16} className="md:size-5 animate-pulse" />
            </div>
         </div>
-      </header>
+      </div>
 
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <FilterBar
-          search={search}
-          onSearchSubmit={handleSearch}
-          onSearchChange={handleSearch}
-          sort={sort}
-          onSortChange={setSort}
-          suggestionEndpoint="/users"
-          suggestionKey="users"
-          entityType="user"
-          sortOptions={[
-            { label: "🌟 Default Sequence", value: "-createdAt" },
-            { label: "Newest Joined", value: "-createdAt" },
-            { label: "Oldest Joined", value: "createdAt" },
-            { label: "Alphabetical (A-Z)", value: "name" },
-            { label: "Clearance Level", value: "-role" },
-          ]}
-          searchPlaceholder="Search by Name or Email..."
-        />
+      <div className="admin-table-form animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="p-6 md:p-8 border-b border-border/10 bg-background/20">
+          <FilterBar
+            search={search}
+            onSearchSubmit={handleSearch}
+            onSearchChange={handleSearch}
+            sort={sort}
+            onSortChange={setSort}
+            suggestionEndpoint="/users"
+            suggestionKey="users"
+            entityType="user"
+            sortOptions={[
+              { label: "🌟 Default Sequence", value: "-createdAt" },
+              { label: "Newest Joined", value: "-createdAt" },
+              { label: "Oldest Joined", value: "createdAt" },
+              { label: "Alphabetical (A-Z)", value: "name" },
+              { label: "Clearance Level", value: "-role" },
+            ]}
+            searchPlaceholder="Search by Name or Email..."
+          />
+        </div>
 
-        <Card className="rounded-[3rem] border-border/10 bg-card/30 backdrop-blur-2xl shadow-2xl overflow-hidden relative">
-          <CardContent className="p-0">
-            {isLoading ? (
+        <div className="pt-0">
+          {isLoading ? (
+            <div className="p-8">
               <TableSkeleton rowCount={10} colCount={4} />
-            ) : (
-              <div className={cn("transition-all duration-300", isFetching && "opacity-50 blur-[2px] pointer-events-none")}>
-                 <DataTable columns={columns} data={users || []} />
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          ) : (
+            <div className={cn("transition-all duration-300", isFetching && "opacity-50 blur-[2px] pointer-events-none")}>
+               <DataTable columns={columns} data={users || []} className="border-none rounded-none" />
+            </div>
+          )}
+        </div>
 
         {/* 🚀 Sector Navigation (Pagination) */}
         {!isLoading && totalPages > 1 && (
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8 pt-4 px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8 p-6 md:p-8 border-t border-border/10 bg-background/10">
             <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.5em] italic">
               Navigating Sector {currentPage} <span className="mx-3 opacity-20">/</span> {totalPages}
             </div>
@@ -242,12 +241,12 @@ function UsersContent() {
                 size="icon"
                 onClick={() => setPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="h-12 w-12 rounded-2xl bg-card/50 border-border/10 hover:bg-foreground hover:text-background transition-all"
+                className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-card/50 border-border/10 hover:bg-foreground hover:text-background transition-all"
               >
                 <ChevronLeft size={20} strokeWidth={3} />
               </Button>
 
-              <div className="flex items-center gap-2 px-2">
+              <div className="flex items-center gap-2 px-1 md:px-2">
                 {[...Array(totalPages)].map((_, i) => {
                   const pageNum = i + 1;
                   if (pageNum === 1 || pageNum === totalPages || (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)) {
@@ -257,7 +256,7 @@ function UsersContent() {
                         onClick={() => setPage(pageNum)}
                         variant={currentPage === pageNum ? "default" : "outline"}
                         className={cn(
-                          "w-12 h-12 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all",
+                          "w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all",
                           currentPage === pageNum 
                             ? "bg-rose-600 text-white shadow-xl shadow-rose-600/20 scale-110 border-transparent" 
                             : "bg-card/50 border-border/10 text-muted-foreground hover:text-foreground"
@@ -279,7 +278,7 @@ function UsersContent() {
                 size="icon"
                 onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="h-12 w-12 rounded-2xl bg-card/50 border-border/10 hover:bg-foreground hover:text-background transition-all"
+                className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-card/50 border-border/10 hover:bg-foreground hover:text-background transition-all"
               >
                 <ChevronRight size={20} strokeWidth={3} />
               </Button>
@@ -295,10 +294,10 @@ export default function Users() {
   return (
     <Suspense
       fallback={
-        <div className="p-10 space-y-10">
-          <Skeleton className="h-[120px] rounded-[3rem]" />
-          <Skeleton className="h-20 rounded-full" />
-          <Skeleton className="h-[600px] rounded-[3rem]" />
+        <div className="admin-page-container">
+          <Skeleton className="min-h-[120px] w-full rounded-[3rem]" />
+          <Skeleton className="h-20 w-full rounded-full" />
+          <Skeleton className="min-h-[500px] w-full rounded-[3rem]" />
         </div>
       }
     >

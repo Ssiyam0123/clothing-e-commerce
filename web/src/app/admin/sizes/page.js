@@ -5,8 +5,17 @@ import Link from "next/link";
 import { useSizes } from "@/hooks/useSizes";
 import { useCategories } from "@/hooks/useCategories";
 import DataTable from "@/components/admin/DataTable";
-import ActionButtons from "@/components/admin/ActionButtons";
-import Loader from "@/components/common/Loader";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  Plus, 
+  Trash2, 
+  Edit3, 
+  Filter
+} from "lucide-react";
+import { swalConfirm, swalToast } from "@/utils/swal";
+import { cn } from "@/lib/utils";
 
 export default function Sizes() {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -14,8 +23,10 @@ export default function Sizes() {
   const { sizes, isLoading, deleteSize } = useSizes(selectedCategory);
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this size?")) {
+    const isConfirmed = await swalConfirm("Purge Dimension?", "This size definition will be permanently removed.");
+    if (isConfirmed) {
       await deleteSize.mutateAsync(id);
+      swalToast("Dimension Purged", "success");
     }
   };
 
@@ -25,53 +36,95 @@ export default function Sizes() {
     {
       label: "Category",
       key: "category",
-      render: (item) => item.category?.name,
+      render: (item) => (
+        <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg border-border/10 bg-background/50">
+          {item.category?.name}
+        </Badge>
+      ),
     },
   ];
 
-  if (isLoading || categoriesLoading) return <Loader />;
+  if (isLoading || categoriesLoading) {
+    return (
+      <div className="admin-page-container">
+        <Skeleton className="h-40 w-full rounded-[2rem]" />
+        <Skeleton className="h-20 w-full rounded-full" />
+        <Skeleton className="h-[400px] w-full rounded-[2rem]" />
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Sizes</h1>
-        <Link
-          href="/admin/sizes/new"
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+    <div className="admin-page-container">
+      {/* 🛰️ System Header */}
+      <div className="admin-section-header">
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+             <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-indigo-600/30 text-indigo-600 bg-indigo-600/5 px-3 py-1">Asset Ops</Badge>
+          </div>
+          <h1 className="admin-title">
+            Size <span className="text-indigo-600">Matrix</span>
+          </h1>
+          <p className="admin-subtitle">
+            Dimensional Definitions • Total: {sizes?.length || 0}
+          </p>
+        </div>
+
+        <Button
+          asChild
+          className="bg-foreground text-background hover:bg-indigo-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group w-full md:w-auto"
         >
-          Add Size
-        </Link>
+          <Link href="/admin/sizes/new">
+            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> New Dimension
+          </Link>
+        </Button>
       </div>
 
-      {/* Category Filter */}
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Filter by Category
-        </label>
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="w-full md:w-64 border border-gray-300 rounded-md shadow-sm p-2 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
-        >
-          <option value="">All Categories</option>
-          {categories?.map((cat) => (
-            <option key={cat._id} value={cat._id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* 📟 Tactical Filter & Data */}
+      <div className="admin-table-form">
+        <div className="flex flex-col md:flex-row items-center gap-6 p-6 md:p-8 border-b border-border/10 bg-background/20 backdrop-blur-xl">
+          <div className="flex items-center gap-4 text-muted-foreground">
+            <Filter size={18} />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Filter Protocol</span>
+          </div>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="bg-background/50 border border-border/10 rounded-xl h-12 md:h-14 px-6 text-[10px] font-black uppercase tracking-widest w-full md:w-64 focus:border-indigo-600 transition-all outline-none"
+          >
+            <option value="">All Category Clusters</option>
+            {categories?.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <DataTable
-        columns={columns}
-        data={sizes}
-        actions={(item) => (
-          <ActionButtons
-            editUrl={`/admin/sizes/${item._id}`}
-            onDelete={() => handleDelete(item._id)}
+        <div className="admin-table-container border-none rounded-none pt-0">
+          <DataTable
+            columns={columns}
+            data={sizes}
+            actions={(item) => (
+              <div className="flex items-center gap-3 justify-end">
+                <Button asChild variant="outline" size="icon" className="h-10 w-10 rounded-xl border-border/10 hover:border-foreground/50 hover:bg-foreground hover:text-background bg-background/50 transition-all active:scale-95">
+                  <Link href={`/admin/sizes/${item._id}`}>
+                    <Edit3 size={16} />
+                  </Link>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={() => handleDelete(item._id)}
+                  className="h-10 w-10 rounded-xl border-border/10 hover:border-rose-600/50 hover:bg-rose-600 hover:text-white bg-background/50 transition-all active:scale-95"
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
+            )}
           />
-        )}
-      />
+        </div>
+      </div>
     </div>
   );
 }

@@ -9,6 +9,17 @@ import Loader from "@/components/common/Loader";
 import ProtectedRoute from "@/components/admin/ProtectedRoute";
 import AdminLayout from "../layout";
 import { useAuthStore } from "@/store/authStore";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { 
+  Camera, 
+  Upload, 
+  User, 
+  Mail, 
+  Phone, 
+  ShieldCheck 
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function AdminProfile() {
   const { user, isLoading: authLoading } = useAuthStore();
@@ -74,161 +85,191 @@ export default function AdminProfile() {
 
   return (
     <ProtectedRoute>
-      <AdminLayout>
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-              <h1 className="text-2xl font-bold text-gray-800">My Profile</h1>
-              <p className="text-sm text-gray-600 mt-1">
-                Manage your account information
+        <div className="admin-page-container">
+          {/* 🛰️ System Header */}
+          <div className="admin-section-header">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                 <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-border/20 text-muted-foreground bg-accent/5 px-3 py-1">Identity Core</Badge>
+              </div>
+              <h1 className="admin-title">
+                Personal <span className="text-muted-foreground">Identity</span>
+              </h1>
+              <p className="admin-subtitle">
+                Personnel Credentials & Neural Profile
               </p>
             </div>
+          </div>
 
-            <div className="p-6">
-              {error && (
-                <Alert
-                  type="error"
-                  message={error}
-                  onClose={() => setError("")}
-                />
-              )}
-              {success && (
-                <Alert
-                  type="success"
-                  message={success}
-                  onClose={() => setSuccess("")}
-                />
-              )}
+          <div className="max-w-4xl">
+            <Card className="rounded-[2rem] md:rounded-[3rem] border-border/10 bg-card/30 backdrop-blur-2xl shadow-2xl overflow-hidden">
+              <CardContent className="p-6 md:p-12">
+                {error && (
+                  <div className="mb-8">
+                    <Alert
+                      type="error"
+                      message={error}
+                      onClose={() => setError("")}
+                    />
+                  </div>
+                )}
+                {success && (
+                  <div className="mb-8">
+                    <Alert
+                      type="success"
+                      message={success}
+                      onClose={() => setSuccess("")}
+                    />
+                  </div>
+                )}
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Avatar Upload */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Profile Picture
-                  </label>
-                  <div className="flex items-center space-x-6">
-                    <div className="relative h-24 w-24 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200">
-                      {avatarPreview ? (
-                        <img
-                          src={avatarPreview}
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-3xl font-bold text-gray-400">
-                          {user.name?.charAt(0).toUpperCase()}
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 md:space-y-12">
+                  {/* Avatar Upload */}
+                  <div className="space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">
+                      Neural Identifier (Avatar)
+                    </label>
+                    <div className="flex flex-col md:flex-row md:items-center gap-8">
+                      <div className="relative h-24 w-24 md:h-32 md:w-32 rounded-3xl md:rounded-[2.5rem] overflow-hidden bg-accent/5 border border-border/10 group/avatar shrink-0">
+                        {avatarPreview ? (
+                          <img
+                            src={avatarPreview}
+                            alt="Profile"
+                            className="w-full h-full object-cover grayscale group-hover/avatar:grayscale-0 transition-all duration-700"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full text-3xl font-black text-muted-foreground italic uppercase">
+                            {user.name?.charAt(0)}
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity">
+                           <Camera size={24} className="text-white" />
                         </div>
-                      )}
-                    </div>
-                    <div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        {...register("avatar")}
-                        onChange={handleAvatarChange}
-                        className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        JPEG, PNG, GIF up to 5MB
-                      </p>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="relative">
+                          <input
+                            type="file"
+                            id="avatar-upload"
+                            accept="image/*"
+                            {...register("avatar")}
+                            onChange={handleAvatarChange}
+                            className="hidden"
+                          />
+                          <label 
+                            htmlFor="avatar-upload"
+                            className="inline-flex items-center gap-3 bg-foreground text-background hover:bg-rose-600 hover:text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest cursor-pointer transition-all active:scale-95 shadow-xl"
+                          >
+                            <Upload size={14} /> Synchronize Media
+                          </label>
+                        </div>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest italic opacity-50">
+                          Format: JPEG, PNG, WEBP • Max: 5MB
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Name */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    {...register("name", { required: "Name is required" })}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                  {errors.name && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.name.message}
-                    </p>
-                  )}
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                    {/* Name */}
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">
+                        Designation Name *
+                      </label>
+                      <div className="relative">
+                        <User className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                        <input
+                          type="text"
+                          {...register("name", { required: "Name is required" })}
+                          placeholder="Personnel Name"
+                          className="w-full bg-background/50 border border-border/10 rounded-xl h-14 md:h-16 pl-14 pr-6 text-[11px] font-black uppercase tracking-widest focus:border-rose-600 transition-all outline-none"
+                        />
+                      </div>
+                      {errors.name && (
+                        <p className="text-rose-600 text-[10px] font-black uppercase italic tracking-widest">
+                          {errors.name.message}
+                        </p>
+                      )}
+                    </div>
 
-                {/* Email */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    value={user.email}
-                    disabled
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50 text-gray-500"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Email cannot be changed
-                  </p>
-                </div>
+                    {/* Phone */}
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">
+                        Comm Channel (Phone)
+                      </label>
+                      <div className="relative">
+                        <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                        <input
+                          type="tel"
+                          {...register("phone")}
+                          placeholder="+880 XXX XXX XXXX"
+                          className="w-full bg-background/50 border border-border/10 rounded-xl h-14 md:h-16 pl-14 pr-6 text-[11px] font-black uppercase tracking-widest focus:border-rose-600 transition-all outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-                {/* Phone */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    {...register("phone")}
-                    placeholder="+1 234 567 8900"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
+                  {/* Email */}
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">
+                      Neural Key (Email) • <span className="text-rose-600/50">Immutable</span>
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground/30" size={16} />
+                      <input
+                        type="email"
+                        value={user.email}
+                        disabled
+                        className="w-full bg-accent/5 border border-border/5 rounded-xl h-14 md:h-16 pl-14 pr-6 text-[11px] font-black uppercase tracking-widest text-muted-foreground/50 cursor-not-allowed"
+                      />
+                    </div>
+                  </div>
 
-                {/* Bio */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Bio
-                  </label>
-                  <textarea
-                    {...register("bio")}
-                    rows="4"
-                    placeholder="Tell us about yourself..."
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
+                  {/* Bio */}
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">
+                      Neural Dossier (Bio)
+                    </label>
+                    <textarea
+                      {...register("bio")}
+                      rows="4"
+                      placeholder="Brief personnel description..."
+                      className="w-full bg-background/50 border border-border/10 rounded-2xl p-6 text-[11px] font-black uppercase tracking-widest focus:border-rose-600 transition-all outline-none resize-none"
+                    />
+                  </div>
 
-                {/* Role */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Role
-                  </label>
-                  <input
-                    type="text"
-                    value={user.role === "admin" ? "Administrator" : "Customer"}
-                    disabled
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50 text-gray-500"
-                  />
-                </div>
-
-                {/* Buttons */}
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
-                  >
-                    {loading ? "Saving..." : "Save Changes"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => window.location.reload()}
-                    className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
+                  {/* Buttons */}
+                  <div className="flex flex-col md:flex-row gap-4 pt-6">
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="bg-foreground text-background hover:bg-rose-600 hover:text-white h-14 md:h-16 px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group flex-1"
+                    >
+                      {loading ? (
+                         <div className="flex items-center gap-3">
+                            <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
+                            Syncing...
+                         </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                           <ShieldCheck size={18} /> Apply Synchronizations
+                        </div>
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => window.location.reload()}
+                      className="h-14 md:h-16 px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] border-border/10 hover:bg-accent transition-all flex-1"
+                    >
+                      Discard Latency
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </AdminLayout>
     </ProtectedRoute>
   );
 }
