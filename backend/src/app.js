@@ -47,9 +47,14 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || origin === 'null' || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.warn(`⚠️ CORS blocked for origin: ${origin}`);
+        // In development, we can be a bit more permissive if needed
+        if (process.env.NODE_ENV === 'development') {
+           return callback(null, true);
+        }
         callback(new Error("Not allowed by CORS"));
       }
     },

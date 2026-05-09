@@ -9,10 +9,14 @@ import { Button } from "@/components/ui/button";
 import { getImageUrl } from "@/utils/imageUtils";
 import { cn } from "@/lib/utils";
 import WishlistButtonClient from "@/components/products/WishlistButtonClient";
-import SizeSelectionModal from "@/components/products/SizeSelectionModal";
+import dynamic from "next/dynamic";
 import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { getTranslation } from "@/utils/typography/handler";
+
+const SizeSelectionModal = dynamic(() => import("@/components/products/SizeSelectionModal"), {
+  ssr: false
+});
 
 export default function ProductCard({ product, className }) {
   const { isAuthenticated } = useAuthStore();
@@ -46,7 +50,7 @@ export default function ProductCard({ product, className }) {
         <div className="relative aspect-square w-full overflow-hidden bg-accent/5">
           <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10">
             <Image
-              src={getImageUrl(product.images?.[0], 600, 80)}
+              src={getImageUrl(product.images?.[0], 600, 75)}
               alt={product.name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -148,12 +152,14 @@ export default function ProductCard({ product, className }) {
         </div>
       </div>
 
-      <SizeSelectionModal 
-        product={product}
-        isOpen={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        mode={modalMode}
-      />
+      {isModalOpen && (
+        <SizeSelectionModal 
+          product={product}
+          isOpen={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          mode={modalMode}
+        />
+      )}
     </>
   );
 }

@@ -58,9 +58,9 @@ export default function CategoryGrid({ categories }) {
                       src={getImageUrl(cat.image, 800, 80)}
                       alt={cat.name}
                       fill
-                      sizes="(max-width: 768px) 80vw, 33vw"
+                      sizes="(max-width: 768px) 55vw, 25vw"
                       className="object-cover grayscale-[100%] contrast-125 transition-all duration-700 group-hover:grayscale-0 group-hover:contrast-100"
-                      loading="lazy"
+                      priority={idx < 2}
                     />
                   )}
                 </div>

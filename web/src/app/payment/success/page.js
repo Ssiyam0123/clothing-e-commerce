@@ -8,10 +8,11 @@ import { motion } from "framer-motion";
 import {
   CheckCircle2,
   Package,
-  Truck,
   ArrowRight,
   ShoppingBag,
-  ShieldCheck,
+  Clock,
+  MapPin,
+  FileText
 } from "lucide-react";
 import Loader from "@/components/common/Loader";
 import { useProductStore } from "@/store/productStore";
@@ -36,7 +37,7 @@ function SuccessContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-[#050505]">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader />
       </div>
     );
@@ -44,135 +45,143 @@ function SuccessContent() {
 
   if (!order)
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center  font-black uppercase tracking-widest">
-        <ShieldCheck size={48} className="mb-4 text-muted" />
-        Order Protocol Not Found
+      <div className="min-h-screen flex flex-col items-center justify-center font-sans tracking-tight">
+        <Package size={48} className="mb-4 text-muted-foreground opacity-20" />
+        <h2 className="text-xl font-bold">Order Not Found</h2>
+        <p className="text-sm text-muted-foreground mt-2">We couldn't retrieve your order details.</p>
+        <button 
+          onClick={() => router.push("/")}
+          className="mt-6 px-8 py-3 bg-foreground text-background rounded-full text-xs font-bold uppercase tracking-widest"
+        >
+          Return Home
+        </button>
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-[#fcfcfc] dark:bg-[#050505] py-20 px-4 md:px-10">
-      <div className="max-w-[1200px] mx-auto">
-        {/* Cinematic Header */}
-        <header className="text-center mb-20">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#080808] py-16 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Success Banner */}
+        <div className="text-center mb-16">
           <motion.div
-            initial={{ scale: 0, rotate: -20 }}
-            animate={{ scale: 1, rotate: 0 }}
-            className="w-28 h-28 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 shadow-2xl shadow-emerald-500/20"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="inline-flex items-center justify-center w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full mb-8"
           >
-            <CheckCircle2 size={56} className="text-primary" />
+            <CheckCircle2 size={40} />
           </motion.div>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase italic mb-4  leading-none">
-            Verified.
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+            Thank You for Your Order
           </h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.6em] text-muted">
-            Settlement Protocol Synchronized Successfully
+          <p className="text-muted-foreground text-sm max-w-md mx-auto leading-relaxed">
+            Your acquisition sequence is confirmed. We are now preparing your artifacts for delivery.
           </p>
-        </header>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          {/* Manifest Summary */}
-          <div className="lg:col-span-7 space-y-8">
-            <div className="bg-surface dark:bg-accent-primary/40 p-8 md:p-12 rounded-[3.5rem] border shadow-sm">
-              <div className="flex justify-between items-end mb-10 border-b pb-6">
-                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary text-left">
-                  01. Artifact Manifest
-                </h2>
-                <span className="text-[9px] font-black  opacity-40">
-                  ID: {order._id?.slice(-8).toUpperCase()}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Order Details */}
+          <div className="md:col-span-2 space-y-6">
+            <div className="bg-white dark:bg-[#111] rounded-3xl p-8 shadow-sm border border-border/40">
+              <div className="flex items-center justify-between mb-8 pb-6 border-b">
+                <div className="flex items-center gap-3">
+                  <FileText size={18} className="text-muted-foreground" />
+                  <span className="text-xs font-bold uppercase tracking-widest">Order Summary</span>
+                </div>
+                <span className="text-[10px] font-mono bg-accent/10 px-3 py-1 rounded-full">
+                  #{order._id?.slice(-8).toUpperCase()}
                 </span>
               </div>
 
-              <div className="space-y-8">
+              <div className="space-y-6">
                 {order.orderItems?.map((item, idx) => (
-                  <div key={idx} className="flex gap-6 items-center group">
-                    <div className="w-20 h-24 bg-elevated dark:bg-elevated rounded-2xl overflow-hidden shrink-0 shadow-lg group-hover:scale-105 transition-transform duration-500">
+                  <div key={idx} className="flex gap-4 items-center">
+                    <div className="w-16 h-20 rounded-xl overflow-hidden bg-accent/5 border shrink-0">
                       <img
-                        src={getImageUrl(item.product?.images?.[0])}
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                        src={getImageUrl(item.image)}
+                        className="w-full h-full object-cover"
                         alt=""
                       />
                     </div>
-                    <div className="flex-1">
-                      <p className="text-xs font-black uppercase text-primary leading-tight">
-                        {item.product?.name}
-                      </p>
-                      <p className="text-[9px] text-muted font-bold mt-1.5 uppercase tracking-widest">
-                        Architecture: {item.size?.name || "Standard"}
-                      </p>
-                      <p className="text-[9px] text-muted font-bold uppercase tracking-widest">
-                        Sequence: {item.quantity}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold uppercase truncate">{item.name}</p>
+                      <p className="text-[10px] text-muted-foreground font-medium mt-1 uppercase">
+                        Size: {item.size?.name || item.size || "Standard"} • Qty: {item.quantity}
                       </p>
                     </div>
-                    <p className="text-lg font-black tracking-tighter ">
+                    <p className="text-sm font-bold">
                       ৳{(item.price * item.quantity).toFixed(0)}
                     </p>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-12 pt-10 border-t space-y-4">
-                <div className="flex justify-between text-[10px] font-black text-muted uppercase tracking-widest">
+              <div className="mt-8 pt-6 border-t space-y-3">
+                <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Subtotal</span>
                   <span>৳{order.itemsPrice}</span>
                 </div>
                 {order.discountAmount > 0 && (
-                  <div className="flex justify-between text-[10px] font-black text-rose-500 uppercase tracking-widest">
-                    <span>Discount Protocol</span>
-                    <span>- ৳{order.discountAmount}</span>
+                  <div className="flex justify-between text-xs text-emerald-500">
+                    <span>Discount Applied</span>
+                    <span>-৳{order.discountAmount}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-[10px] font-black text-muted uppercase tracking-widest">
-                  <span>Logistics Fee</span>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Shipping</span>
                   <span>৳{order.shippingPrice}</span>
                 </div>
-                <div className="flex justify-between items-end pt-6">
-                  <span className="text-xs font-black text-primary uppercase tracking-[0.4em]">
-                    Investment Paid
-                  </span>
-                  <span className="text-5xl font-black tracking-tighter  italic leading-none">
-                    ৳{order.totalPrice}
-                  </span>
+                <div className="flex justify-between items-center pt-4 text-lg font-black uppercase tracking-tighter">
+                  <span>Total Investment</span>
+                  <span className="text-2xl">৳{order.totalPrice}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Logistics & Action Hub */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="bg-accent-primary text-primary p-10 rounded-[3.5rem] shadow-2xl relative overflow-hidden group">
-              <Truck className="absolute -right-8 -bottom-8 w-40 h-40 opacity-5 group-hover:rotate-12 transition-transform duration-1000" />
-              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary mb-8 flex items-center gap-3">
-                02. Logistics Hub
-              </h3>
-              <div className="space-y-4 relative z-10">
-                <p className="text-sm font-black uppercase tracking-tight italic">
-                  {order.shippingAddress?.name}
-                </p>
-                <p className="text-[10px] text-muted uppercase leading-relaxed font-medium tracking-widest">
+          {/* Logistics Summary */}
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-[#111] rounded-3xl p-8 shadow-sm border border-border/40">
+              <div className="flex items-center gap-3 mb-6">
+                <MapPin size={18} className="text-muted-foreground" />
+                <span className="text-xs font-bold uppercase tracking-widest">Shipping</span>
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs font-bold uppercase">{order.shippingAddress?.name}</p>
+                <p className="text-[10px] text-muted-foreground leading-relaxed uppercase">
                   {order.shippingAddress?.street},<br />
                   {order.shippingAddress?.city}
                 </p>
-                <div className="pt-4">
-                  <span className="px-4 py-2 bg-surface rounded-full text-[10px] font-black text-indigo-400 tracking-widest border border-white/5">
-                    {order.shippingAddress?.phone}
-                  </span>
-                </div>
+                <p className="text-[10px] font-bold mt-4 text-primary">
+                  {order.shippingAddress?.phone}
+                </p>
               </div>
             </div>
 
-            <div className="grid gap-4">
+            <div className="bg-white dark:bg-[#111] rounded-3xl p-8 shadow-sm border border-border/40">
+              <div className="flex items-center gap-3 mb-6">
+                <Clock size={18} className="text-muted-foreground" />
+                <span className="text-xs font-bold uppercase tracking-widest">Payment</span>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-bold uppercase">{order.paymentMethod}</p>
+                <p className="text-[10px] text-muted-foreground uppercase">
+                  Status: {order.paymentResult?.status || "Processing"}
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-4 space-y-4">
               <button
                 onClick={() => router.push("/profile/order")}
-                className="w-full bg-accent-primary text-primary  py-7 rounded-[2rem] font-black uppercase text-[10px] tracking-[0.3em] flex items-center justify-center gap-3 hover:bg-accent-secondary hover:text-primary transition-all shadow-xl"
+                className="w-full py-4 bg-foreground text-background rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
               >
-                <Package size={18} /> Track Sequence <ArrowRight size={14} />
+                Track Order <ArrowRight size={14} />
               </button>
               <button
                 onClick={() => router.push("/products")}
-                className="w-full bg-elevated dark:bg-accent-primary/50 text-secondary py-7 rounded-[2rem] font-black uppercase text-[10px] tracking-[0.3em] flex items-center justify-center gap-3 hover:text-primary dark:hover:text-primary transition-all"
+                className="w-full py-4 bg-accent/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-accent/20 transition-all"
               >
-                <ShoppingBag size={18} /> Continue Acquisition
+                <ShoppingBag size={14} /> Continue Shopping
               </button>
             </div>
           </div>
@@ -186,7 +195,7 @@ export default function PaymentSuccessPage() {
   return (
     <Suspense
       fallback={
-        <div className="h-screen flex items-center justify-center bg-surface dark:bg-[#050505]">
+        <div className="h-screen flex items-center justify-center bg-background">
           <Loader />
         </div>
       }

@@ -8,8 +8,24 @@ export const calculateValidatedOrder = async (orderItems, couponCode, cityId) =>
     for (const item of orderItems) {
         const product = await Product.findById(item.product);
         if (!product || !product.isActive) throw new Error(`Product unavailable`);
-        const sizeStock = product.sizes.find(s => s.size.toString() === item.size.toString());
-        if (!sizeStock || sizeStock.stock < item.quantity) throw new Error(`Insufficient stock for ${product.name}`);
+        
+        // Handle both string IDs and objects from frontend
+        const requestedSizeId = item.size?._id || item.size;
+        
+        // Only enforce size check if the product has variants defined
+        if (product.sizes && product.sizes.length > 0) {
+            if (!requestedSizeId) {
+                throw new Error(`Size specification required for ${product.name}`);
+            }
+
+            const sizeStock = product.sizes.find(s => 
+                s.size.toString() === requestedSizeId.toString()
+            );
+            
+            if (!sizeStock || sizeStock.stock < item.quantity) {
+                throw new Error(`Insufficient stock for ${product.name} (Requested size: ${requestedSizeId})`);
+            }
+        }
         const unitPrice = product.discount > 0 ? product.price * (1 - product.discount / 100) : product.price;
         itemsPrice += unitPrice * item.quantity;
         validatedItems.push({

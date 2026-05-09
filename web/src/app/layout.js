@@ -138,7 +138,6 @@ export const viewport = {
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ClientInitialization from "@/components/layout/ClientInitialization";
-import SupportChat from "@/components/chat/SupportChat";
 import ThemeProvider from "./ThemeProvider";
 
 import LayoutResolver from "@/components/layout/LayoutResolver";
@@ -197,19 +196,9 @@ export default async function RootLayout({ children }) {
       suppressHydrationWarning
     >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Archivo:wght@400;500;600;700;800&family=Urbanist:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Geist:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href={process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

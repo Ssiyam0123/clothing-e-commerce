@@ -31,7 +31,7 @@ export default function SubcategoryForm() {
 
   const { subcategories, createSubcategory, updateSubcategory } = useSubcategories();
   const { categories, isLoading: categoriesLoading } = useAdminCategories();
-  const [loading, setLoading] = useState(isEdit);
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -39,34 +39,46 @@ export default function SubcategoryForm() {
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      category: presetCategory || "",
+      name: "",
+      slug: "",
+      description: ""
+    }
+  });
 
+  const [loading, setLoading] = useState(true);
   const selectedCategory = watch("category");
 
   useEffect(() => {
-    const initialize = async () => {
-      if (isEdit && subcategories) {
-        const sub = subcategories.find((s) => s._id === id);
-        if (sub) {
-          setValue("name", sub.name);
-          setValue("slug", sub.slug);
-          setValue("category", sub.category?._id || sub.category);
-          setValue("description", sub.description || "");
-          setLoading(false);
-        } else if (subcategories) {
-          setLoading(false);
-        }
-      } else {
-        if (presetCategory && categories && categories.length > 0) {
-          setValue("category", presetCategory);
-        }
+    if (isEdit && subcategories?.length > 0) {
+      const sub = subcategories.find((s) => s._id === id);
+      if (sub) {
+        reset({
+          name: sub.name,
+          slug: sub.slug,
+          category: sub.category?._id || sub.category,
+          description: sub.description || ""
+        });
         setLoading(false);
       }
-    };
+    } else if (!isEdit) {
+      // For new subcategories, just wait for categories to load if needed
+      if (!categoriesLoading) {
+        setLoading(false);
+      }
+    }
+  }, [isEdit, id, subcategories, categoriesLoading, reset]);
 
-    initialize();
-  }, [isEdit, id, subcategories, categories, presetCategory, setValue]);
+  // Sync presetCategory if it changes or categories load
+  useEffect(() => {
+    if (!isEdit && presetCategory && !selectedCategory) {
+      setValue("category", presetCategory);
+    }
+  }, [isEdit, presetCategory, selectedCategory, setValue]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);

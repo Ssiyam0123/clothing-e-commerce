@@ -31,7 +31,6 @@ export default function SizeForm() {
 
   const { sizes, createSize, updateSize } = useSizes();
   const { categories, isLoading: categoriesLoading } = useAdminCategories();
-  const [loading, setLoading] = useState(isEdit);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -39,33 +38,43 @@ export default function SizeForm() {
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      category: presetCategory || "",
+      name: "",
+      description: ""
+    }
+  });
 
+  const [loading, setLoading] = useState(true);
   const selectedCategory = watch("category");
 
   useEffect(() => {
-    const initialize = async () => {
-      if (isEdit && sizes) {
-        const size = sizes.find((s) => s._id === id);
-        if (size) {
-          setValue("name", size.name);
-          setValue("description", size.description || "");
-          setValue("category", size.category?._id || size.category);
-          setLoading(false);
-        } else if (sizes) {
-          setLoading(false);
-        }
-      } else {
-        if (presetCategory && categories && categories.length > 0) {
-          setValue("category", presetCategory);
-        }
+    if (isEdit && sizes?.length > 0) {
+      const size = sizes.find((s) => s._id === id);
+      if (size) {
+        reset({
+          name: size.name,
+          description: size.description || "",
+          category: size.category?._id || size.category,
+        });
         setLoading(false);
       }
-    };
+    } else if (!isEdit) {
+      if (!categoriesLoading) {
+        setLoading(false);
+      }
+    }
+  }, [isEdit, id, sizes, categoriesLoading, reset]);
 
-    initialize();
-  }, [isEdit, id, sizes, categories, presetCategory, setValue]);
+  // Sync presetCategory if it changes
+  useEffect(() => {
+    if (!isEdit && presetCategory && !selectedCategory) {
+      setValue("category", presetCategory);
+    }
+  }, [isEdit, presetCategory, selectedCategory, setValue]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);

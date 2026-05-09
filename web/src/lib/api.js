@@ -12,12 +12,12 @@ api.interceptors.request.use((config) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-  } else {
-    // Guest user: send persistent guest ID
-    const guestId = getGuestId();
-    if (guestId) {
-      config.headers['x-guest-id'] = guestId;
-    }
+  }
+
+  // Always send guest ID if available as a secondary identity/context
+  const guestId = getGuestId();
+  if (guestId) {
+    config.headers['x-guest-id'] = guestId;
   }
 
   // Add Multi-Tenant Context Headers

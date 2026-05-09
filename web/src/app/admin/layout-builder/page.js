@@ -6,7 +6,7 @@ import {
   DndContext, 
   closestCenter, 
   KeyboardSensor, 
-  PointerSensor, 
+  MouseSensor, 
   TouchSensor,
   useSensor, 
   useSensors 
@@ -278,15 +278,15 @@ export default function LayoutBuilderPage() {
   }, [remoteLayout]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 10,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 250,
-        tolerance: 5,
+        delay: 300,
+        tolerance: 8,
       },
     }),
     useSensor(KeyboardSensor, {

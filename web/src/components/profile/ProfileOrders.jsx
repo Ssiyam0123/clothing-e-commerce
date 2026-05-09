@@ -102,7 +102,7 @@ export default function ProfileOrders({ orders, ui, loading, onOpenDetails }) {
                         <div className="flex flex-col justify-center gap-1">
                            <h4 className="text-sm font-black uppercase tracking-tight line-clamp-1 group-hover/item:text-accent-secondary transition-colors">{product.name}</h4>
                            <div className="flex items-center gap-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                              <span>Size: {product.size || 'N/A'}</span>
+                              <span>Size: {product.size?.name || product.size || 'N/A'}</span>
                               <span className="w-1 h-1 rounded-full bg-border" />
                               <span>Qty: {product.quantity}</span>
                            </div>

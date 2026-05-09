@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { X, Minus, Plus, ShoppingCart, Zap, PackageCheck } from "lucide-react";
@@ -8,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { getImageUrl } from "@/utils/imageUtils";
 import { useAppStore } from "@/store/appStore";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function QuickSelectModal({ isOpen, onClose, product, lang }) {
   const { settings } = useAppStore();
@@ -22,7 +24,6 @@ export default function QuickSelectModal({ isOpen, onClose, product, lang }) {
 
   const isBn = lang === "bn";
 
-  // Reset state and auto-select first available size when modal opens
   useEffect(() => {
     if (isOpen && product) {
       const availableSize = product.sizes?.find((s) => s.stock > 0);
@@ -82,155 +83,205 @@ export default function QuickSelectModal({ isOpen, onClose, product, lang }) {
   return (
     <>
       {isOpen && (
-        <div className="fixed inset-0 z-[999] flex items-end sm:items-center justify-center">
+        <div className="fixed inset-0 z-[999] flex items-end sm:items-center justify-center p-2 sm:p-4">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-surface backdrop-blur-sm animate-in fade-in duration-200"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={onClose}
           />
 
-          {/* Modal */}
-          <div className="relative w-full max-w-xl bg-surface dark:bg-[#0a0a0a] rounded-t-[2.5rem] sm:rounded-[3.5rem] shadow-2xl border-t flex flex-col max-h-[90vh] sm:max-h-auto animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300">
+          {/* Modal Container */}
+          <div
+            className="relative w-full max-w-[95%] sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl 
+                        bg-background dark:bg-[#0a0a0a] rounded-2xl sm:rounded-3xl md:rounded-[3rem] 
+                        shadow-2xl border border-border/10 flex flex-col 
+                        h-[85vh] sm:max-h-[85vh]    /* Fixed height on mobile, flexible on desktop */
+                        animate-in slide-in-from-bottom-8 sm:zoom-in-95 duration-500 overflow-hidden"
+          >
             {/* Mobile Drag Indicator */}
-            <div className="w-12 h-1 bg-elevated dark:bg-elevated rounded-full mx-auto mt-4 mb-2 sm:hidden" />
+            <div className="w-12 h-1.5 bg-muted/30 rounded-full mx-auto mt-3 mb-1 sm:hidden shrink-0" />
 
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-6 right-6 p-2 text-muted hover:text-rose-500 transition-all bg-elevated rounded-full z-20"
+              className="absolute top-3 right-3 sm:top-5 sm:right-5 p-2 sm:p-2.5 text-muted-foreground hover:text-foreground transition-all bg-accent/70 hover:bg-accent/90 rounded-full z-30 backdrop-blur-md shadow-md"
               aria-label="Close modal"
             >
-              <X size={20} />
+              <X size={18} className="sm:w-5 sm:h-5" />
             </button>
 
-            <div className="p-6 sm:p-10 md:p-12 overflow-y-auto no-scrollbar">
-              {/* Header Info */}
-              <div className="flex gap-6 sm:gap-8 mb-8">
-                <div className="relative w-20 h-28 sm:w-28 sm:h-36 rounded-2xl overflow-hidden bg-elevated dark:bg-accent-primary border shrink-0 shadow-lg">
+            {/* Header Info */}
+            <div className="p-5 pb-3 sm:p-6 md:p-8 lg:p-10 lg:pb-6 shrink-0 border-b border-border/5 bg-gradient-to-b from-accent/5 to-transparent">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8 items-start">
+                <div className="relative w-24 h-32 xs:w-28 xs:h-36 sm:w-32 sm:h-44 md:w-36 md:h-48 rounded-2xl sm:rounded-3xl overflow-hidden bg-accent/10 border border-border/10 shrink-0 shadow-xl rotate-[-2deg] hover:rotate-0 transition-transform duration-500 mx-auto sm:mx-0">
                   <Image
-                    src={getImageUrl(product.images?.[0], 200, 80)}
+                    src={getImageUrl(product.images?.[0], 300, 120)}
                     alt={product.name}
                     fill
-                    sizes="(max-width: 768px) 80px, 112px"
-                    className="object-cover"
+                    className="object-cover scale-110"
+                    sizes="(max-width: 640px) 96px, (max-width: 768px) 128px, 144px"
                   />
+                  <div className="absolute inset-0 bg-black/5" />
                 </div>
-                <div className="flex flex-col justify-center gap-1 sm:gap-2">
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-rose-600">
-                    {product.category?.name || "Premium Collection"}
+
+                <div className="flex flex-col gap-1 sm:gap-2 flex-1 w-full text-center sm:text-left">
+                  <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-accent-secondary inline-block">
+                    {product.category?.name || "Artifact Selection"}
                   </span>
-                  <h4 className="font-black text-xl sm:text-3xl uppercase tracking-tighter  leading-none">
+                  <h4 className="font-black text-xl sm:text-2xl md:text-3xl lg:text-4xl uppercase tracking-tighter leading-[1.1] italic break-words">
                     {product.name}
                   </h4>
-                  <div className="flex items-center gap-3 mt-1">
-                    <p className="text-primary font-black text-2xl sm:text-3xl tracking-tighter">
+                  <div className="flex items-center justify-center sm:justify-start gap-3 sm:gap-4 mt-1 flex-wrap">
+                    <p className="text-foreground font-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tighter">
                       ৳{discountedPrice.toFixed(0)}
                     </p>
                     {product.discount > 0 && (
-                      <p className="text-muted font-bold text-xs sm:text-sm line-through">
+                      <p className="text-muted-foreground font-bold text-sm sm:text-base line-through opacity-50">
                         ৳{product.price}
                       </p>
                     )}
                   </div>
                 </div>
               </div>
-
-              {/* Size Matrix */}
-              <div className="mb-8">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted mb-4 ml-1">
-                  {isBn ? "সাইজ নির্বাচন করুন" : "Template Configuration"}
-                </p>
-                <div className="grid grid-cols-3 xs:grid-cols-4 gap-2.5">
-                  {product.sizes?.map((item, index) => {
-                    const isPopulated =
-                      item.size && typeof item.size === "object";
-                    const sizeName = isPopulated
-                      ? item.size.name
-                      : item.name || "N/A";
-                    const sizeId = isPopulated ? item.size._id : item.size;
-                    const outOfStock = item.stock <= 0;
-
-                    return (
-                      <button
-                        key={sizeId || index}
-                        disabled={outOfStock}
-                        onClick={() =>
-                          setSelectedSize({ _id: sizeId, name: sizeName })
-                        }
-                        className={`relative py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border-2 ${
-                          selectedSize?._id === sizeId
-                            ? "bg-accent-primary text-primary  border-black  shadow-xl scale-[1.03]"
-                            : outOfStock
-                              ? "bg-surface-alt dark:bg-[#0d0d0d] text-muted dark:text-primary border-transparent opacity-50 cursor-not-allowed"
-                              : "bg-surface-alt dark:bg-[#0d0d0d] text-secondary border-transparent hover:border-medium"
-                        }`}
-                        aria-label={`Size ${sizeName}${outOfStock ? " out of stock" : ""}`}
-                      >
-                        {sizeName}
-                        {outOfStock && (
-                          <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-2xl">
-                            <div className="w-full h-px bg-zinc-300  -rotate-45"></div>
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Quantity Selector */}
-              <div className="flex items-center justify-between mb-10 bg-surface-alt p-5 rounded-[2rem] border shadow-inner">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted">
-                  {isBn ? "পরিমাণ" : "Qty Sync"}
-                </p>
-                <div className="flex items-center gap-6">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-10 h-10 flex items-center justify-center bg-surface dark:bg-elevated text-primary rounded-xl shadow-sm border active:scale-90 transition-transform"
-                    aria-label="Decrease quantity"
-                  >
-                    <Minus size={16} />
-                  </button>
-                  <span className="font-black text-xl w-6 text-center  tabular-nums">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="w-10 h-10 flex items-center justify-center bg-surface dark:bg-elevated text-primary rounded-xl shadow-sm border active:scale-90 transition-transform"
-                    aria-label="Increase quantity"
-                  >
-                    <Plus size={16} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button
-                  onClick={() => handleAction("cart")}
-                  className="group bg-elevated dark:bg-accent-primary text-primary font-black text-[11px] uppercase tracking-[0.2em] py-5 rounded-[1.5rem] flex items-center justify-center gap-3 hover:bg-elevated transition-all"
-                  aria-label="Add to bag"
-                >
-                  <ShoppingCart size={16} />{" "}
-                  {isBn ? "ব্যাগে নিন" : "Authorize Bag"}
-                </button>
-                <button
-                  onClick={() => handleAction("buy")}
-                  className="bg-accent-primary text-primary  font-black text-[11px] uppercase tracking-[0.2em] py-5 rounded-[1.5rem] flex items-center justify-center gap-3 hover:bg-accent-secondary hover:text-primary dark:hover:bg-accent-secondary dark:hover:text-primary shadow-2xl transition-all"
-                  aria-label="Buy now"
-                >
-                  <Zap size={16} fill="currentColor" />{" "}
-                  {isBn ? "অর্ডার দিন" : "Secure Checkout"}
-                </button>
-              </div>
-
-              <div className="mt-8 flex items-center justify-center gap-3 opacity-30">
-                <PackageCheck size={14} className="" />
-                <p className="text-[8px] font-black uppercase tracking-[0.4em]  text-center">
-                  {settings?.branding?.siteName || "Vanguard"} Secure Settlement Protocol Active
-                </p>
-              </div>
             </div>
+
+            {/* Scrollable Content with Horizontal Scroll for Sizes on Mobile */}
+            <ScrollArea className="flex-1 overflow-y-auto">
+              <div className="p-5 sm:p-6 md:p-8 lg:p-10 pt-3 sm:pt-4">
+                {/* Size Section */}
+                <div className="mb-8 sm:mb-10">
+                  <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-4 sm:mb-6 flex items-center gap-3">
+                    <span className="w-6 sm:w-8 h-px bg-muted-foreground/20" />
+                    {isBn ? "সাইজ নির্বাচন করুন" : "Dimensional Mapping"}
+                  </p>
+
+                  {/* Horizontal scroll on mobile (<640px) – Grid on larger screens */}
+                  <div className="sm:hidden overflow-x-auto pb-2 -mx-1 px-1">
+                    <div className="flex flex-nowrap gap-2">
+                      {product.sizes?.map((item, index) => {
+                        const isPopulated = item.size && typeof item.size === "object";
+                        const sizeName = isPopulated ? item.size.name : item.name || "N/A";
+                        const sizeId = isPopulated ? item.size._id : item.size;
+                        const outOfStock = item.stock <= 0;
+                        const isSelected = selectedSize?._id === sizeId;
+
+                        return (
+                          <button
+                            key={sizeId || index}
+                            disabled={outOfStock}
+                            onClick={() => setSelectedSize({ _id: sizeId, name: sizeName })}
+                            className={`relative px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all duration-300 border-2 whitespace-nowrap flex-shrink-0 ${
+                              isSelected
+                                ? "bg-foreground text-background border-foreground shadow-md scale-[1.02]"
+                                : outOfStock
+                                ? "bg-accent/5 text-muted-foreground border-transparent opacity-40 cursor-not-allowed"
+                                : "bg-accent/5 text-foreground border-transparent hover:border-accent-secondary/50"
+                            }`}
+                          >
+                            {sizeName}
+                            {outOfStock && (
+                              <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-xl">
+                                <div className="w-full h-px bg-muted-foreground/30 -rotate-45"></div>
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Desktop/tablet grid (>=640px) */}
+                  <div className="hidden sm:grid grid-cols-3 md:grid-cols-4 gap-3">
+                    {product.sizes?.map((item, index) => {
+                      const isPopulated = item.size && typeof item.size === "object";
+                      const sizeName = isPopulated ? item.size.name : item.name || "N/A";
+                      const sizeId = isPopulated ? item.size._id : item.size;
+                      const outOfStock = item.stock <= 0;
+                      const isSelected = selectedSize?._id === sizeId;
+
+                      return (
+                        <button
+                          key={sizeId || index}
+                          disabled={outOfStock}
+                          onClick={() => setSelectedSize({ _id: sizeId, name: sizeName })}
+                          className={`relative py-3 sm:py-4 rounded-xl sm:rounded-[1.2rem] text-[10px] sm:text-[11px] font-black uppercase tracking-wider transition-all duration-300 border-2 ${
+                            isSelected
+                              ? "bg-foreground text-background border-foreground shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] scale-[1.02] sm:scale-[1.05]"
+                              : outOfStock
+                              ? "bg-accent/5 text-muted-foreground border-transparent opacity-40 cursor-not-allowed"
+                              : "bg-accent/5 text-foreground border-transparent hover:border-accent-secondary/50 hover:bg-accent/10"
+                          }`}
+                        >
+                          {sizeName}
+                          {outOfStock && (
+                            <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-xl sm:rounded-[1.2rem]">
+                              <div className="w-full h-px bg-muted-foreground/30 -rotate-45"></div>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Quantity Selector */}
+                <div className="flex flex-col xs:flex-row items-center justify-between gap-4 xs:gap-6 mb-8 sm:mb-10 bg-accent/5 p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-border/10 shadow-inner">
+                  <div className="space-y-1 text-center xs:text-left">
+                    <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">
+                      {isBn ? "পরিমাণ" : "Supply Volume"}
+                    </p>
+                    <p className="text-[7px] sm:text-[8px] font-bold text-accent-secondary uppercase tracking-wider italic">
+                      Inventory Verified
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4 sm:gap-8">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-background text-foreground rounded-xl sm:rounded-2xl shadow-xl border border-border/10 active:scale-90 transition-all hover:bg-foreground hover:text-background"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus size={16} className="sm:w-[18px] sm:h-[18px]" />
+                    </button>
+                    <span className="font-black text-xl sm:text-2xl w-6 sm:w-8 text-center tabular-nums">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-background text-foreground rounded-xl sm:rounded-2xl shadow-xl border border-border/10 active:scale-90 transition-all hover:bg-foreground hover:text-background"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus size={16} className="sm:w-[18px] sm:h-[18px]" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5 mb-6 sm:mb-8">
+                  <button
+                    onClick={() => handleAction("cart")}
+                    className="group bg-accent/10 text-foreground font-black text-[10px] sm:text-[11px] uppercase tracking-[0.25em] sm:tracking-[0.3em] py-4 sm:py-6 rounded-xl sm:rounded-[2rem] flex items-center justify-center gap-2 sm:gap-3 hover:bg-foreground hover:text-background transition-all duration-500 shadow-md"
+                  >
+                    <ShoppingCart size={16} className="sm:w-[18px] sm:h-[18px]" />{" "}
+                    {isBn ? "ব্যাগে নিন" : "Append to Cart"}
+                  </button>
+                  <button
+                    onClick={() => handleAction("buy")}
+                    className="bg-accent-secondary text-white font-black text-[10px] sm:text-[11px] uppercase tracking-[0.25em] sm:tracking-[0.3em] py-4 sm:py-6 rounded-xl sm:rounded-[2rem] flex items-center justify-center gap-2 sm:gap-3 hover:bg-foreground hover:text-background shadow-[0_20px_40px_-10px_rgba(var(--accent-secondary),0.4)] transition-all duration-500"
+                  >
+                    <Zap size={16} className="sm:w-[18px] sm:h-[18px]" fill="currentColor" />{" "}
+                    {isBn ? "অর্ডার দিন" : "Secure Buyout"}
+                  </button>
+                </div>
+
+                {/* Footer */}
+                <div className="pt-2 pb-1 flex items-center justify-center gap-2 sm:gap-4 opacity-40">
+                  <PackageCheck size={12} className="sm:w-4 sm:h-4 text-accent-secondary" />
+                  <p className="text-[7px] sm:text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] sm:tracking-[0.5em] text-center italic">
+                    {siteName} Protocol Terminal Active
+                  </p>
+                </div>
+              </div>
+            </ScrollArea>
           </div>
         </div>
       )}

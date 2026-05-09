@@ -16,7 +16,7 @@ const shippingAddressSchema = z.object({
 
 const orderItemSchema = z.object({
     product: z.string().regex(objectIdRegex, "Invalid product ID"),
-    size: z.string().regex(objectIdRegex, "Invalid size ID"),
+    size: z.string().nullable().optional(), // More flexible for products without sizes
     quantity: z.number().int().min(1, "Quantity must be at least 1"),
 });
 

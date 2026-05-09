@@ -3,6 +3,11 @@
 import { useEffect } from "react";
 import { useAppStore } from "@/store/appStore";
 import { useAuthStore } from "@/store/authStore";
+import dynamic from "next/dynamic";
+
+const SupportChat = dynamic(() => import("@/components/chat/SupportChat"), {
+  ssr: false
+});
 
 export default function ClientInitialization({ initialSettings }) {
   const setSettings = useAppStore((state) => state.setSettings);
@@ -18,5 +23,5 @@ export default function ClientInitialization({ initialSettings }) {
     checkSession();
   }, [initialSettings, setSettings, initApp, checkSession]);
 
-  return null;
+  return <SupportChat />;
 }

@@ -7,7 +7,7 @@ import { useAuthStore } from "@/store/authStore";
 
 export const useOrders = (orderId = null) => {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuthStore();
   const guestId = getGuestId();
   const userId = user?._id || guestId;
 
@@ -17,17 +17,17 @@ export const useOrders = (orderId = null) => {
       const { data } = await api.get("/orders/myorders");
       return data;
     },
-    enabled: !!userId,
+    enabled: !!userId && !authLoading,
     staleTime: 1000 * 60 * 5,
   });
 
   const { data: orderDetails, isLoading: orderDetailsLoading } = useQuery({
-    queryKey: ["order", orderId],
+    queryKey: ["order", orderId, userId],
     queryFn: async () => {
       const { data } = await api.get(`/orders/${orderId}`);
       return data;
     },
-    enabled: !!orderId,
+    enabled: !!orderId && !authLoading,
   });
 
   const initOrder = useMutation({

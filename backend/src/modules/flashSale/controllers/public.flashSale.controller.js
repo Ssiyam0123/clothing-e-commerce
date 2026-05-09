@@ -16,11 +16,19 @@ export const getActiveFlashSales = asyncHandler(async (req, res) => {
     endDate: { $gte: now } 
   })
   .sort('startDate')
-  .populate(populatedProductsConfig);
+  .populate({
+    path: 'products',
+    model: 'Product',
+    populate: {
+      path: 'sizes.size',
+      model: 'Size',
+      select: 'name'
+    }
+  })
+  .lean();
 
   const salesWithCalculatedPrices = sales.map(sale => {
-    const saleObj = sale.toObject();
-    saleObj.products = saleObj.products.map(product => {
+    const products = (sale.products || []).map(product => {
       const basePrice = product.price;
       const flashDiscount = sale.discount;
       return {
@@ -32,7 +40,7 @@ export const getActiveFlashSales = asyncHandler(async (req, res) => {
         isLive: new Date(sale.startDate) <= now
       };
     });
-    return saleObj;
+    return { ...sale, products };
   });
 
   res.json(salesWithCalculatedPrices);
@@ -44,16 +52,25 @@ export const getFlashSaleProducts = asyncHandler(async (req, res) => {
     isActive: true,
     startDate: { $lte: now },
     endDate: { $gte: now },
-  }).populate(populatedProductsConfig);
+  })
+  .populate({
+    path: 'products',
+    model: 'Product',
+    populate: {
+      path: 'sizes.size',
+      model: 'Size',
+      select: 'name'
+    }
+  })
+  .lean();
   
   if (!sale) return res.json({ flashSale: null, products: [] });
   
-  const productsWithDiscount = sale.products.map(product => {
-    const p = product.toObject();
-    const basePrice = p.price; 
+  const productsWithDiscount = (sale.products || []).map(product => {
+    const basePrice = product.price; 
     const flashDiscount = sale.discount;
     return {
-      ...p,
+      ...product,
       originalPrice: basePrice,
       discountedPrice: basePrice - (basePrice * flashDiscount / 100),
       discountPercentage: flashDiscount,
@@ -67,15 +84,23 @@ export const getFlashSaleProducts = asyncHandler(async (req, res) => {
 export const getPublicFlashSaleBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;
   const sale = await FlashSale.findOne({ slug })
-    .populate(populatedProductsConfig);
+    .populate({
+      path: 'products',
+      model: 'Product',
+      populate: {
+        path: 'sizes.size',
+        model: 'Size',
+        select: 'name'
+      }
+    })
+    .lean();
 
   if (!sale) return res.status(404).json({ message: 'Sequence not found in archives.' });
 
-  const productsWithDiscount = sale.products.map(p => {
-    const productObj = p.toObject();
-    const basePrice = productObj.price;
+  const productsWithDiscount = (sale.products || []).map(p => {
+    const basePrice = p.price;
     return {
-      ...productObj,
+      ...p,
       originalPrice: basePrice,
       discountedPrice: basePrice - (basePrice * sale.discount / 100),
       discountPercentage: sale.discount,
@@ -83,7 +108,6 @@ export const getPublicFlashSaleBySlug = asyncHandler(async (req, res) => {
     };
   });
 
-  const response = sale.toObject();
-  response.products = productsWithDiscount;
+  const response = { ...sale, products: productsWithDiscount };
   res.json(response);
 });

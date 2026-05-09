@@ -81,11 +81,69 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
             discount: 1,
             images: { $slice: ['$images', 1] }, // Only 1st image for card
             category: { name: 1, slug: 1 },
+            sizes: 1,
             totalStock: 1,
             isFeatured: 1,
             showReviews: 1
         }
     });
+
+    // 🚀 POPULATE SIZES IN AGGREGATION
+    pipeline.push(
+        { $unwind: { path: '$sizes', preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: 'sizes',
+                let: { sizeId: '$sizes.size' },
+                pipeline: [
+                    { 
+                        $match: { 
+                            $expr: { 
+                                $and: [
+                                    { $ne: ['$$sizeId', null] },
+                                    { $ne: ['$$sizeId', ''] },
+                                    { $eq: ['$_id', { $toObjectId: '$$sizeId' }] }
+                                ]
+                            } 
+                        } 
+                    },
+                    { $project: { name: 1 } }
+                ],
+                as: 'sizes.size'
+            }
+        },
+        { $unwind: { path: '$sizes.size', preserveNullAndEmptyArrays: true } },
+        {
+            $group: {
+                _id: '$_id',
+                root: { $first: '$$ROOT' },
+                sizes: { $push: '$sizes' }
+            }
+        },
+        {
+            $replaceRoot: {
+                newRoot: {
+                    $mergeObjects: [
+                        '$root',
+                        {
+                            sizes: {
+                                $filter: {
+                                    input: '$sizes',
+                                    as: 's',
+                                    cond: { 
+                                        $and: [
+                                            { $ne: ['$$s', {}] },
+                                            { $ne: ['$$s.size', null] }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    );
 
     const products = await Product.aggregate(pipeline);
 

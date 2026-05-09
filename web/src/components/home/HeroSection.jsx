@@ -16,23 +16,7 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
     setMounted(true);
   }, []);
 
-  // Use the first slide only as per user request
   const slide = slides[0];
-
-  if (!mounted || !slide) {
-    return (
-      <section
-        className="relative h-[35vh] min-h-[250px] md:h-[85vh] md:min-h-[700px] bg-background flex items-center justify-center overflow-hidden"
-        aria-label="Loading hero section"
-      >
-        <div className="relative z-10 w-full max-w-4xl px-8 md:px-16 flex flex-col items-center gap-6">
-          <Skeleton className="h-12 w-3/4 rounded-theme opacity-20" />
-          <Skeleton className="h-4 w-1/2 rounded-theme opacity-20" />
-          <Skeleton className="h-10 w-32 rounded-theme opacity-20 mt-2" />
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section
@@ -40,17 +24,27 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
       aria-label="Hero section"
     >
       <div className="relative h-full w-full group">
-        <Image
-          src={getImageUrl(slide.image, 1200, 85)}
-          alt={slide.title || "Campaign banner"}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center transition-transform duration-[15s] ease-out group-hover:scale-105"
-          quality={85}
-        />
-        {showHeader && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent z-[5] transition-opacity duration-700" />
+        {!slide ? (
+          <div className="relative z-10 w-full max-w-4xl px-8 md:px-16 flex flex-col items-center gap-6 h-full justify-center">
+            <Skeleton className="h-12 w-3/4 rounded-theme opacity-20" />
+            <Skeleton className="h-4 w-1/2 rounded-theme opacity-20" />
+            <Skeleton className="h-10 w-32 rounded-theme opacity-20 mt-2" />
+          </div>
+        ) : (
+          <>
+            <Image
+              src={getImageUrl(slide.image, 1200, 80)}
+              alt={slide.title || "Campaign banner"}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center transition-transform duration-[15s] ease-out group-hover:scale-105"
+              quality={80}
+            />
+            {showHeader && (
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 z-[5] transition-opacity duration-700" />
+            )}
+          </>
         )}
 
         {showHeader && (

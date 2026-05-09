@@ -12,7 +12,10 @@ export const validate = (schema) => (req, res, next) => {
         field: err.path.join('.'),
         message: err.message,
       }));
-      return res.status(400).json({ errors: formattedErrors });
+      return res.status(400).json({ 
+        message: formattedErrors[0].message, // Provide first error as primary message
+        errors: formattedErrors 
+      });
     }
     next(error);
   }

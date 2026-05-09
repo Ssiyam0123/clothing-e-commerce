@@ -17,13 +17,17 @@ import PageSetting from "../../settings/settings.model.js";
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
 const getUserIdFromReq = (req) => {
-  if (req.user && (req.user._id || req.user.id)) {
-    return req.user._id || req.user.id;
-  }
-  return req.headers["x-guest-id"] || null;
+  const id = req.user?._id || req.user?.id || req.headers["x-guest-id"];
+  return id ? id.toString() : null;
 };
 
 export const initPayment = asyncHandler(async (req, res) => {
+  console.log("🚀 ORDER INITIATION PROTOCOL STARTED", {
+    userId: getUserIdFromReq(req),
+    itemsCount: req.body.orderItems?.length,
+    paymentMethod: req.body.paymentMethod
+  });
+
   const {
     orderItems,
     shippingAddress,
@@ -44,6 +48,11 @@ export const initPayment = asyncHandler(async (req, res) => {
   const isRegisteredUser = mongoose.Types.ObjectId.isValid(userId);
   const settings = await PageSetting.findOne();
   
+  if (!settings) {
+     console.error("❌ SETTINGS NOT INITIALIZED");
+     throw new Error("Settings not initialized.");
+  }
+
   const sslCreds = {
     storeId: process.env.SSL_STORE_ID,
     storePassword: process.env.SSL_STORE_PASSWORD
@@ -54,48 +63,54 @@ export const initPayment = asyncHandler(async (req, res) => {
     appSecret: process.env.BKASH_APP_SECRET
   };
 
-  if (!settings) throw new Error("Settings not initialized.");
+  try {
+    const orderData = await calculateValidatedOrder(
+      orderItems,
+      couponCode,
+      shippingAddress.pathao_city_id
+    );
 
-  const orderData = await calculateValidatedOrder(
-    orderItems,
-    couponCode,
-    shippingAddress.pathao_city_id
-  );
+    const order = new Order({
+      user: isRegisteredUser ? userId : undefined, 
+      isGuest: !isRegisteredUser,
+      orderItems: orderData.validatedItems,
+      shippingAddress: normalizeShippingAddress(shippingAddress),
+      itemsPrice: orderData.itemsPrice,
+      discountAmount: orderData.discountAmount,
+      shippingPrice: orderData.shippingPrice,
+      totalPrice: orderData.totalPrice,
+      couponCode: orderData.couponCode,
+      isDirectBuy: !!isDirectBuy,
+      paymentMethod: paymentMethod === "cod" ? "COD" : paymentMethod === "bkash" ? "bKash" : "SSLCommerz",
+      paymentResult: {
+        transactionId: new mongoose.Types.ObjectId().toString(),
+        status: "Pending",
+      },
+    });
 
-  const order = new Order({
-    user: isRegisteredUser ? userId : undefined, 
-    isGuest: !isRegisteredUser,
-    orderItems: orderData.validatedItems,
-    shippingAddress: normalizeShippingAddress(shippingAddress),
-    itemsPrice: orderData.itemsPrice,
-    discountAmount: orderData.discountAmount,
-    shippingPrice: orderData.shippingPrice,
-    totalPrice: orderData.totalPrice,
-    couponCode: orderData.couponCode,
-    isDirectBuy: !!isDirectBuy,
-    paymentMethod: paymentMethod === "cod" ? "COD" : paymentMethod === "bkash" ? "bKash" : "SSLCommerz",
-    paymentResult: {
-      transactionId: new mongoose.Types.ObjectId().toString(),
-      status: "Pending",
-    },
-  });
-
-  if (paymentMethod === "cod") {
-    order.paymentResult.status = "COD";
-    order.orderStatus = "Processing";
-    await order.save();
-    await finalizeOrderProcessing(order);
-    res.json(await handleCODGateway(order));
-  } else if (paymentMethod === "bkash") {
-    await order.save();
-    const bkashData = await initiateBkash(order, bkashCreds);
-    order.paymentResult.bkashPaymentID = bkashData.paymentID;
-    await order.save();
-    res.json({ url: bkashData.url });
-  } else {
-    await order.save();
-    const sslUrl = await initiateSSLCommerz(order, sslCreds);
-    res.json({ url: sslUrl });
+    if (paymentMethod === "cod") {
+      order.paymentResult.status = "COD";
+      order.orderStatus = "Processing";
+      await order.save();
+      await finalizeOrderProcessing(order);
+      res.json(await handleCODGateway(order));
+    } else if (paymentMethod === "bkash") {
+      await order.save();
+      const bkashData = await initiateBkash(order, bkashCreds);
+      order.paymentResult.bkashPaymentID = bkashData.paymentID;
+      await order.save();
+      res.json({ url: bkashData.url });
+    } else {
+      await order.save();
+      const sslUrl = await initiateSSLCommerz(order, sslCreds);
+      res.json({ url: sslUrl });
+    }
+  } catch (err) {
+    console.error("❌ ORDER PROCESSING ERROR:", err);
+    res.status(400).json({ 
+        success: false, 
+        message: err.message || "Order protocol failure." 
+    });
   }
 });
 
@@ -176,21 +191,45 @@ export const getMyOrders = asyncHandler(async (req, res) => {
     if (!req.user?.phone && !mongoose.Types.ObjectId.isValid(userId)) return res.json([]); 
   }
 
-  const orders = await Order.find(query).sort("-createdAt");
+  const orders = await Order.find(query)
+    .sort("-createdAt")
+    .populate("orderItems.product", "name images slug")
+    .populate("orderItems.size", "name");
   res.json(orders);
 });
 
 export const getOrderById = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  console.log("🔍 FETCHING ORDER DETAILS", { orderId: id });
+
   if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid Order ID protocol." });
 
-  const order = await Order.findById(id).populate("orderItems.product", "name images slug");
-  if (!order) return res.status(404).json({ message: "Protocol not found." });
+  const order = await Order.findById(id)
+    .populate("orderItems.product", "name images slug")
+    .populate("orderItems.size", "name");
+
+  if (!order) {
+    console.warn("❌ ORDER NOT FOUND IN DB:", id);
+    return res.status(404).json({ message: "Protocol not found." });
+  }
 
   const currentUserId = getUserIdFromReq(req); 
-  const isOwner = (order.user && order.user.toString() === currentUserId) || (order.isGuest && !order.user); 
+  const orderUserId = order.user?.toString();
+  
+  console.log("👤 IDENTITY AUDIT", {
+    requestUserId: currentUserId,
+    orderOwnerId: orderUserId,
+    isGuestOrder: order.isGuest,
+    hasToken: !!req.headers.authorization
+  });
+
+  const isOwner = (order.user && orderUserId === currentUserId) || (order.isGuest && !order.user); 
 
   if (!isOwner && req.user?.role !== 'admin') {
+    console.error("🚫 ACCESS DENIED: Identity mismatch", {
+        expected: orderUserId,
+        received: currentUserId
+    });
     return res.status(401).json({ message: "Access Denied. Unauthorized Protocol." });
   }
 
