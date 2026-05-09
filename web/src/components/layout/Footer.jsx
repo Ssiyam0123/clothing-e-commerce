@@ -86,7 +86,7 @@ export default function Footer() {
                  </div>
                )}
             </Link>
-            <p className="text-sm md:text-base font-medium text-muted-foreground leading-relaxed max-w-md opacity-80">
+            <p className="text-sm md:text-base font-medium text-foreground/80 leading-relaxed max-w-md">
               {t.description}
             </p>
             <div className="flex items-center gap-4">
@@ -125,7 +125,7 @@ export default function Footer() {
                       <li key={link.label}>
                         <Link 
                           href={link.href}
-                          className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all flex items-center gap-2 group"
+                          className="text-[11px] font-bold uppercase tracking-widest text-foreground/70 hover:text-foreground transition-all flex items-center gap-2 group"
                         >
                           <span className="h-px w-0 bg-accent-secondary group-hover:w-2 transition-all duration-300" />
                           {link.label}
@@ -169,12 +169,12 @@ export default function Footer() {
         <div className="mt-12 flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-border/5">
            <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50" />
-              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Systems Active Vanguard v4.2</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-foreground/60">Systems Active Vanguard v4.2</p>
            </div>
            <div className="flex items-center gap-6 md:gap-10">
-              <Link href="/terms" className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground opacity-60 transition-colors">{t.legal}</Link>
-              <Link href="/privacy" className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground opacity-60 transition-colors">{t.privacy}</Link>
-               <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-40">© 2026 {branding.siteName || "Vanguard"}</p>
+              <Link href="/terms" className="text-[9px] font-bold uppercase tracking-widest text-foreground/60 hover:text-foreground transition-colors">{t.legal}</Link>
+              <Link href="/privacy" className="text-[9px] font-bold uppercase tracking-widest text-foreground/60 hover:text-foreground transition-colors">{t.privacy}</Link>
+               <p className="text-[9px] font-bold uppercase tracking-widest text-foreground/60">© 2026 {branding.siteName || "Vanguard"}</p>
            </div>
         </div>
       </div>

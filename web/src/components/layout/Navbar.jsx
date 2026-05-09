@@ -163,13 +163,13 @@ export default function Navbar() {
           </Button>
 
           <Link href="/products?search=open" className="hidden md:inline-flex flex-shrink-0">
-             <Button variant="ghost" size="icon" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30">
+             <Button variant="ghost" size="icon" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30" aria-label="Search">
                <Search size={16} className="sm:size-[18px]" />
              </Button>
           </Link>
 
           <Link href="/wishlist" className="hidden md:inline-flex relative flex-shrink-0">
-            <Button variant="ghost" size="icon" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30">
+            <Button variant="ghost" size="icon" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30" aria-label="Wishlist">
               <Heart size={16} className="sm:size-[18px]" />
             </Button>
             {wishlistCount > 0 && (
@@ -180,7 +180,7 @@ export default function Navbar() {
           </Link>
 
           <Link href="/cart" className="hidden md:inline-flex relative flex-shrink-0">
-            <Button variant="ghost" size="icon" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30">
+            <Button variant="ghost" size="icon" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30" aria-label="Shopping Cart">
               <ShoppingBag size={16} className="sm:size-[18px]" />
             </Button>
             {cartCount > 0 && (
