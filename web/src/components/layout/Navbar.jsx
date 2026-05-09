@@ -80,7 +80,7 @@ export default function Navbar() {
 
   const isHome = pathname === "/" || pathname === "/en" || pathname === "/bn";
   const isBlogDetails = pathname.startsWith("/blog/") && pathname !== "/blog";
-  const isTransparentPage = isHome || isBlogDetails;
+  const isTransparentPage = isBlogDetails;
 
   return (
     <header

@@ -85,7 +85,7 @@ export default function CategoryGrid({ categories }) {
                     <div className="inline-flex items-center gap-2 mb-3">
                       <span className={cn("w-8 h-[1px]", cat.slug === 'on-sale' ? "bg-rose-500" : "bg-accent-secondary")} />
                       <span className={cn(
-                        "text-[8px] md:text-[10px] font-black tracking-[0.4em] uppercase",
+                        "text-[8px] md:text-[10px] font-black tracking-[0.4em]",
                         cat.slug === 'on-sale' ? "text-rose-500" : "text-accent-secondary"
                       )}>
                         {cat.slug === 'on-sale' ? "Limited Offer" : "Syndicate"}
@@ -93,13 +93,13 @@ export default function CategoryGrid({ categories }) {
                     </div>
                     
                     <div className="relative">
-                      <h3 className="text-2xl md:text-5xl font-black text-white uppercase tracking-tighter leading-[0.85] italic mb-4 drop-shadow-2xl">
+                      <h3 className="text-2xl md:text-5xl font-black text-white tracking-tighter leading-[0.85] italic mb-4 drop-shadow-2xl">
                         {cat.name}
                       </h3>
                       
                       {/* Interactive Button-like text */}
                       <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 translate-x--4 group-hover:translate-x-0 transition-all duration-500 delay-100">
-                        <span className="text-[10px] font-black text-white uppercase tracking-widest bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+                        <span className="text-[10px] font-black text-white tracking-widest bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
                           View Collection
                         </span>
                       </div>

@@ -26,7 +26,7 @@ export default function ProductSection({
         <div className="mt-20 md:mt-24 text-center">
           <Link
             href="/products"
-            className="relative inline-flex items-center gap-3 overflow-hidden bg-accent-primary text-primary  px-12 py-5 rounded-theme text-[11px] font-black uppercase tracking-[0.25em] hover:scale-105 active:scale-95 transition-all group shadow-2xl"
+            className="relative inline-flex items-center gap-3 overflow-hidden bg-accent-primary text-primary  px-12 py-5 rounded-theme text-[11px] font-black tracking-[0.25em] hover:scale-105 active:scale-95 transition-all group shadow-2xl"
             aria-label={
               ui?.loadMore ||
               (lang === "bn" ? "আরও দেখুন" : "Load more products")

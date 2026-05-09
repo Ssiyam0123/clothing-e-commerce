@@ -48,7 +48,7 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
       limit: filters.limit,
       search: filters.search,
       sort: filters.sort,
-      ...(filters.category !== "all" && { category: filters.category }),
+      ...(filters.category !== "all" && filters.category !== "isFeatured" && { category: filters.category }),
       ...(filters.category === "isFeatured" && { isFeatured: "true" }),
     }),
     [filters],

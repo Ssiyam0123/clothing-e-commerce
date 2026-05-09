@@ -66,7 +66,7 @@ export const getFlashSaleProducts = asyncHandler(async (req, res) => {
 
 export const getPublicFlashSaleBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;
-  const sale = await FlashSale.findOne({ slug, isActive: true })
+  const sale = await FlashSale.findOne({ slug })
     .populate(populatedProductsConfig);
 
   if (!sale) return res.status(404).json({ message: 'Sequence not found in archives.' });

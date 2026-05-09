@@ -17,7 +17,7 @@ export const StandardLayout = ({ children, settings }) => {
       {!isFullPageChat && <Navbar settings={settings} />}
       <main className={cn(
         "min-h-screen",
-        isFullPageChat || isHome || isBlogDetails ? "pt-0" : "pt-16 md:pt-20"
+        isFullPageChat || isBlogDetails ? "pt-0" : "pt-16 md:pt-20"
       )}>
         {children}
       </main>

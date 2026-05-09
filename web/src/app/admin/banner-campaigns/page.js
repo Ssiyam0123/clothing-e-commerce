@@ -144,36 +144,31 @@ export default function AdminBannerCampaigns() {
                 <div className="bg-accent/5 border border-border/5 rounded-[1.5rem] p-6 relative">
                   <div className="flex items-center justify-between mb-4">
                      <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] flex items-center gap-2">
-                        <FileImage size={12} /> Narrative Deck
+                        <FileImage size={12} /> Campaign Asset
                      </span>
-                     <span className="text-[10px] font-black text-indigo-600 bg-indigo-600/10 px-3 py-0.5 rounded-full">
-                        {campaign.slides.length} Slides
+                     <span className="text-[10px] font-black text-indigo-600 bg-indigo-600/10 px-3 py-0.5 rounded-full uppercase tracking-widest">
+                        Single Plate
                      </span>
                   </div>
-                  <div className="flex -space-x-4 overflow-hidden">
-                    {campaign.slides.slice(0, 4).map((slide, idx) => (
+                  <div className="flex overflow-hidden">
+                    {campaign.slides.slice(0, 1).map((slide, idx) => (
                       <div
                         key={idx}
-                        className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-background shadow-lg shrink-0 relative group/img z-[calc(10-idx)]"
+                        className="w-full h-32 rounded-2xl overflow-hidden border border-border/10 shadow-lg shrink-0 relative group/img"
                       >
                         {slide.image ? (
                           <img
                             src={getImageUrl(slide.image)}
-                            alt="slide"
+                            alt="campaign preview"
                             className="w-full h-full object-cover grayscale group-hover/img:grayscale-0 transition-all duration-700"
                           />
                         ) : (
                           <div className="w-full h-full bg-accent/10 flex items-center justify-center">
-                            <ImageIcon size={16} className="text-muted-foreground/30" />
+                            <FileImage size={24} className="text-muted-foreground/30" />
                           </div>
                         )}
                       </div>
                     ))}
-                    {campaign.slides.length > 4 && (
-                      <div className="w-16 h-16 rounded-2xl bg-accent text-[10px] font-black text-foreground flex items-center justify-center border-2 border-background z-0 shadow-lg">
-                        +{campaign.slides.length - 4}
-                      </div>
-                    )}
                   </div>
                 </div>
 

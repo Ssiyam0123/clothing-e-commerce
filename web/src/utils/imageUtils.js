@@ -1,6 +1,6 @@
 export const getImageUrl = (path, width = 800, quality = 80) => {
   if (!path) return '/images/placeholder.png';
-  if (path.startsWith('http') && !path.includes('cloudinary.com')) return path;
+  if (path.startsWith('http')) return path;
   if (path.startsWith('blob:') || path.startsWith('data:')) return path;
   
   // If it's a Cloudinary URL, extract public ID

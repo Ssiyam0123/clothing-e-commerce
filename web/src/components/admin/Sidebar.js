@@ -15,6 +15,7 @@ import {
   Bold,
   MessageCircle,
   Sparkles,
+  Layout,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ const navGroups = [
       { name: "Orders", href: "/admin/orders", icon: <ShoppingBag size={18} /> },
       { name: "Products", href: "/admin/products", icon: <Shirt size={18} /> },
       { name: "Categories", href: "/admin/categories", icon: <FolderTree size={18} /> },
+      { name: "Architect", href: "/admin/layout-builder", icon: <Layout size={18} /> },
       { name: "Live Chat", href: "/admin/chat", icon: <MessageCircle size={18} /> },
     ]
   },

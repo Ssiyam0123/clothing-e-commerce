@@ -104,8 +104,14 @@ export default function SettingsPage() {
       const payload = new FormData();
       
       // Append JSON strings for nested objects
+      // Clean social links: Only keep recognized platforms and valid URLs
+      const allowedPlatforms = ["facebook", "instagram", "twitter", "linkedin", "tiktok"];
+      const cleanedSocialLinks = (formData.socialLinks || []).filter(link => 
+        allowedPlatforms.includes(link.platform?.toLowerCase()) && link.url?.trim() !== ""
+      );
+
       payload.append("branding", JSON.stringify(formData.branding));
-      payload.append("socialLinks", JSON.stringify(formData.socialLinks));
+      payload.append("socialLinks", JSON.stringify(cleanedSocialLinks));
       payload.append("contact", JSON.stringify(formData.contact));
       payload.append("paymentOptions", JSON.stringify(formData.paymentOptions));
 

@@ -12,7 +12,6 @@ export const createCategory = asyncHandler(async (req, res) => {
         slug: req.body.slug,
         description: req.body.description,
         image: imageUrl,
-        isFeatured: req.body.isFeatured === 'true' || req.body.isFeatured === true,
     });
     res.status(201).json(category);
 });
@@ -31,9 +30,6 @@ export const updateCategory = asyncHandler(async (req, res) => {
         slug: req.body.slug || existingCategory.slug,
         description: req.body.description || existingCategory.description,
         image: imageUrl,
-        isFeatured: req.body.isFeatured !== undefined ? 
-            (req.body.isFeatured === 'true' || req.body.isFeatured === true) : 
-            existingCategory.isFeatured
     };
 
     const updated = await Category.findByIdAndUpdate(

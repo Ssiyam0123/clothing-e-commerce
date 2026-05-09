@@ -31,7 +31,7 @@ export default async function CategoriesPage() {
   const categories = await getCategories();
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-20 px-6 md:px-12">
+    <div className="min-h-screen bg-background  px-6 pt-5">
       <div className="max-w-screen-2xl mx-auto">
         
         {/* 📟 Header Section */}

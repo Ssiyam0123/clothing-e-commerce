@@ -12,7 +12,7 @@ export async function generateMetadata({ params }) {
   const { slug } = await params;
   try {
     const [res, settings] = await Promise.all([
-      fetch(`${API_URL}/flash-sales/details/${slug}`, { next: { revalidate: 3600 } }),
+      fetch(`${API_URL}/flash-sales/slug/${slug}`, { next: { revalidate: 3600 } }),
       getSettings()
     ]);
 
@@ -60,7 +60,7 @@ export default async function FlashSalePage({ params }) {
   let sale = null;
 
   try {
-    const res = await fetch(`${API_URL}/flash-sales/details/${slug}`, {
+    const res = await fetch(`${API_URL}/flash-sales/slug/${slug}`, {
       next: { revalidate: 60 },
     });
     if (!res.ok) {

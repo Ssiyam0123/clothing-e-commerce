@@ -26,6 +26,7 @@ import authRoutes from "./modules/auth/auth.routes.js";
 import blogRoutes from "./modules/blog/blog.route.js";
 import blogImageRoutes from './modules/blog/blog-image.route.js';
 import chatRoutes from "./modules/chat/chat.routes.js";
+import homeLayoutRoutes from "./modules/homeLayout/homeLayout.routes.js";
 // 🛡️ Middleware Imports
 import { errorHandler } from "./middleware/errorHandler.js";
 import { handleFileError } from "./middleware/cleanup.js";
@@ -111,6 +112,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/blogs",blogRoutes)
 app.use('/api', blogImageRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/home-layouts", homeLayoutRoutes);
 
 app.use(handleFileError);
 app.use(errorHandler);

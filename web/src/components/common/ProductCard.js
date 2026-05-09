@@ -83,7 +83,7 @@ export default function ProductCard({ product, className }) {
         <div className="p-3 sm:p-4 flex flex-col flex-1">
           {/* Category */}
           {product.category?.name && (
-            <span className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider truncate mb-1">
+            <span className="text-[10px] sm:text-xs text-muted-foreground tracking-wider truncate mb-1">
               {product.category.name}
             </span>
           )}
@@ -128,7 +128,7 @@ export default function ProductCard({ product, className }) {
                 onClick={(e) => triggerModal(e, "buy-now")}
                 variant="outline"
                 size="sm"
-                className="h-8 px-2 sm:px-3 text-[10px] font-bold uppercase tracking-tight gap-1 rounded-md border-foreground/10 hover:bg-foreground hover:text-background"
+                className="h-8 px-2 sm:px-3 text-[10px] font-bold tracking-tight gap-1 rounded-md border-foreground/10 hover:bg-foreground hover:text-background"
                 aria-label={`Buy ${product.name} now`}
               >
                 <Zap size={12} className="fill-current" />
@@ -137,7 +137,7 @@ export default function ProductCard({ product, className }) {
               <Button
                 onClick={(e) => triggerModal(e, "cart")}
                 size="sm"
-                className="h-8 px-2 sm:px-3 text-[10px] font-bold uppercase tracking-tight gap-1 rounded-md"
+                className="h-8 px-2 sm:px-3 text-[10px] font-bold tracking-tight gap-1 rounded-md"
                 aria-label={`Add ${product.name} to cart`}
               >
                 <ShoppingCart size={12} />

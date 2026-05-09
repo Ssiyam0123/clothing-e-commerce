@@ -18,7 +18,6 @@ const categorySchema = new mongoose.Schema({
   },
   description: String,
   image: String,
-  isFeatured: { type: Boolean, default: false },
 }, { timestamps: true });
 
 // Cascade delete: Remove all related subcategories, sizes, and products

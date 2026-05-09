@@ -41,10 +41,10 @@ export default function UspSection({ ui }) {
                   {item.icon}
                 </span>
               </div>
-              <h2 className="text-sm font-black uppercase tracking-widest text-primary  mb-2 bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text text-transparent">
+              <h2 className="text-sm font-black tracking-widest text-primary  mb-2 bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text text-transparent">
                 {item.title}
               </h2>
-              <p className="text-[10px] font-bold text-muted uppercase tracking-tighter">
+              <p className="text-[10px] font-bold text-muted tracking-tighter">
                 {item.desc}
               </p>
             </article>

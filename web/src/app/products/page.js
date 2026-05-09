@@ -70,7 +70,11 @@ async function getInitialProducts(searchParams) {
   if (params.get("search")) apiParams.set("search", params.get("search"));
   if (params.get("sort")) apiParams.set("sort", params.get("sort"));
   if (params.get("category") && params.get("category") !== "all") {
-    apiParams.set("category", params.get("category"));
+    if (params.get("category") === "isFeatured") {
+      apiParams.set("isFeatured", "true");
+    } else {
+      apiParams.set("category", params.get("category"));
+    }
   }
 
   // Optimize data transfer

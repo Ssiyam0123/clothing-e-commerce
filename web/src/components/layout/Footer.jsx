@@ -17,6 +17,7 @@ const PLATFORM_ICONS = {
   twitter: Send,
   x: Send,
   linkedin: Globe,
+  tiktok: Activity,
   youtube: Globe,
   globe: Globe,
 };
@@ -31,6 +32,8 @@ export default function Footer() {
     socialLinks.filter(link => link.isActive), 
     [socialLinks]
   );
+
+  const contact = settings?.contact || {};
 
   const footerSections = useMemo(() => [
     {
@@ -52,37 +55,38 @@ export default function Footer() {
       ],
     },
     {
-      title: t.legal,
+      title: t.contact,
       links: [
-        { label: t.privacy, href: "/privacy" },
-        { label: t.terms, href: "/terms" },
-        { label: t.shipping, href: "/shipping" },
+        { label: `${t.phone}: ${contact.phone || "N/A"}`, href: `tel:${contact.phone}`, isStatic: true },
+        { label: `${t.email}: ${contact.email || "N/A"}`, href: `mailto:${contact.email}`, isStatic: true },
+        { label: `${t.whatsapp || "WhatsApp"}: ${contact.whatsapp || "N/A"}`, href: `https://wa.me/${contact.whatsapp?.replace(/\D/g, '')}`, isStatic: true },
+        { label: `${t.address}: ${contact.address || "N/A"}`, href: "#", isStatic: true },
       ],
     },
-  ], [t]);
+  ], [t, contact]);
 
   return (
-    <footer className="bg-background text-foreground border-t border-border/10 pt-24 pb-12 px-6 lg:px-12 overflow-hidden relative">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[400px] bg-accent-secondary/5 blur-[120px] rounded-full -z-10" />
+    <footer className="bg-background text-foreground border-t border-border/5 pt-16 pb-12 px-6 lg:px-12 overflow-hidden relative w-full">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[300px] bg-accent-secondary/5 blur-[100px] rounded-full -z-10" />
       
-      <div className="max-w-screen-2xl mx-auto">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-24">
+      <div className="max-w-screen-2xl mx-auto w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-20">
           {/* Brand Engine */}
-          <div className="lg:col-span-5 space-y-10">
+          <div className="lg:col-span-5 space-y-8">
             <Link href="/" className="flex items-center gap-3 group">
                {branding.footerLogoLight || branding.footerLogoDark ? (
                  <img 
                    src={getImageUrl(theme === 'dark' ? (branding.footerLogoDark || branding.footerLogoLight) : (branding.footerLogoLight || branding.footerLogoDark))} 
                    alt={branding.siteName} 
-                   className="h-9 w-auto object-contain transition-transform group-hover:scale-110 duration-500" 
+                   className="h-8 md:h-10 w-auto object-contain transition-transform group-hover:scale-105 duration-500" 
                  />
                ) : (
-                 <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background group-hover:scale-110 transition-transform duration-500 shadow-2xl">
+                 <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background shadow-2xl">
                     <Sparkles size={20} />
                  </div>
                )}
             </Link>
-            <p className="text-base md:text-lg font-medium text-muted-foreground leading-relaxed max-w-md italic opacity-80">
+            <p className="text-sm md:text-base font-medium text-muted-foreground leading-relaxed max-w-md opacity-80">
               {t.description}
             </p>
             <div className="flex items-center gap-4">
@@ -95,7 +99,7 @@ export default function Footer() {
                       href={link.url || "#"} 
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-xl glass flex items-center justify-center text-foreground hover:text-accent-secondary hover:scale-110 hover:rotate-6 transition-all duration-500 shadow-sm border-border/10"
+                      className="w-10 h-10 rounded-xl glass flex items-center justify-center text-foreground hover:bg-foreground hover:text-background transition-all duration-300 shadow-sm border-border/10"
                       aria-label={link.platform}
                     >
                       <Icon size={18} />
@@ -103,27 +107,27 @@ export default function Footer() {
                   );
                 })
               ) : (
-                <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40">Connecting to Network...</p>
+                <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40">Connecting...</p>
               )}
             </div>
           </div>
 
           {/* Link Matrix */}
-          <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-10">
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-10">
             {footerSections.map((section) => (
               <div key={section.title} className="space-y-6">
-                <h4 className="text-[9px] font-black uppercase tracking-[0.4em] text-accent-secondary">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/80">
                   {section.title}
                 </h4>
                 <nav aria-label={`${section.title} navigation`}>
-                  <ul className="space-y-4">
+                  <ul className="space-y-3">
                     {section.links.map((link) => (
                       <li key={link.label}>
                         <Link 
                           href={link.href}
-                          className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all flex items-center gap-2 group"
+                          className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all flex items-center gap-2 group"
                         >
-                          <span className="h-px w-0 bg-accent-secondary group-hover:w-3 transition-all duration-500" />
+                          <span className="h-px w-0 bg-accent-secondary group-hover:w-2 transition-all duration-300" />
                           {link.label}
                         </Link>
                       </li>
@@ -136,35 +140,25 @@ export default function Footer() {
         </div>
 
         {/* Newsletter Terminal */}
-        <div className="mt-24 p-8 sm:p-12 lg:p-16 rounded-[2.5rem] sm:rounded-[3.5rem] glass border-accent-secondary/10 relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-accent-secondary/5 to-transparent" />
-          <div className="relative flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-20">
-             <div className="space-y-3 text-center lg:text-left shrink-0">
-                <h3 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter italic leading-none">{t.newsletter}</h3>
-                <p className="text-muted-foreground font-medium uppercase tracking-[0.2em] text-[9px] max-w-sm">{t.newsletterSub}</p>
+        <div className="mt-16 p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] bg-muted/20 border border-border/5 relative overflow-hidden group">
+          <div className="relative flex flex-col lg:flex-row items-center justify-between gap-8">
+             <div className="space-y-2 text-center lg:text-left">
+                <h3 className="text-2xl md:text-4xl font-black uppercase tracking-tighter leading-none">{t.newsletter}</h3>
+                <p className="text-muted-foreground font-bold uppercase tracking-[0.1em] text-[10px]">{t.newsletterSub}</p>
              </div>
-             <div className="flex-1 w-full max-w-xl relative group/input">
-                <div className="flex flex-col sm:flex-row items-center relative gap-4 sm:gap-0">
+             <div className="w-full max-w-md">
+                <div className="flex flex-col sm:flex-row items-center gap-3">
                   <Input 
                     placeholder={t.emailPlaceholder} 
-                    className="h-14 lg:h-16 rounded-full bg-background/50 border-none px-8 lg:px-10 font-black text-[10px] uppercase tracking-widest shadow-2xl focus-visible:ring-2 focus-visible:ring-accent-secondary/30 transition-all placeholder:text-muted-foreground/30 w-full sm:pr-[160px]"
-                    aria-label="Newsletter email address"
+                    className="h-12 rounded-2xl bg-background/50 border-border/50 px-6 font-bold text-[11px] uppercase tracking-widest focus-visible:ring-1 focus-visible:ring-foreground transition-all w-full"
+                    aria-label="Email for newsletter"
                   />
-                  <div className="hidden sm:block absolute right-2 top-1/2 -translate-y-1/2">
-                    <Button 
-                      className="h-10 lg:h-12 rounded-full bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-6 lg:px-8 shadow-xl"
-                      aria-label="Subscribe to newsletter"
-                    >
-                      <Mail size={14} className="mr-2" />
-                      <span className="font-black uppercase text-[9px] tracking-widest">{t.subscribe}</span>
-                    </Button>
-                  </div>
                   <Button 
-                    className="sm:hidden h-14 rounded-full bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-8 shadow-xl w-full"
-                    aria-label="Subscribe to newsletter"
+                    className="h-12 w-full sm:w-auto rounded-2xl bg-foreground text-background hover:bg-accent-secondary hover:text-white transition-all px-8 shadow-xl"
+                    aria-label="Subscribe"
                   >
-                     <Mail size={16} className="mr-2" />
-                     <span className="font-black uppercase text-[9px] tracking-widest">{t.subscribe}</span>
+                    <Mail size={14} className="mr-2" />
+                    <span className="font-black uppercase text-[10px] tracking-widest">{t.subscribe}</span>
                   </Button>
                 </div>
              </div>
@@ -172,15 +166,15 @@ export default function Footer() {
         </div>
 
         {/* Bottom Banner */}
-        <div className="mt-24 flex flex-col md:flex-row items-center justify-between gap-6 pt-10 border-t border-border/10">
+        <div className="mt-12 flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-border/5">
            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-60">Systems Online • Vanguard Node v4.2.0</p>
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50" />
+              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Systems Active Vanguard v4.2</p>
            </div>
-           <div className="flex items-center gap-6 sm:gap-10">
-              <Link href="/terms" className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground opacity-60 hover:opacity-100">{t.legal}</Link>
-              <Link href="/privacy" className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground opacity-60 hover:opacity-100">{t.privacy}</Link>
-               <p className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">© 2026 All Rights Reserved • {branding.siteName || "Vanguard"}</p>
+           <div className="flex items-center gap-6 md:gap-10">
+              <Link href="/terms" className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground opacity-60 transition-colors">{t.legal}</Link>
+              <Link href="/privacy" className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground opacity-60 transition-colors">{t.privacy}</Link>
+               <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-40">© 2026 {branding.siteName || "Vanguard"}</p>
            </div>
         </div>
       </div>

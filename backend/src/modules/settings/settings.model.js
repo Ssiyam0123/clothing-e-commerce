@@ -25,12 +25,6 @@ const pageSettingSchema = new mongoose.Schema({
         storageMethod: { type: String, enum: ['cloudinary', 'server'], default: 'cloudinary' },
         maintenanceMode: { type: Boolean, default: false }
     },
-    navigation: [{
-        label: { type: String },
-        url: { type: String },
-        order: { type: Number, default: 0 },
-        isActive: { type: Boolean, default: true }
-    }],
     contact: {
         phone: String,
         email: String,

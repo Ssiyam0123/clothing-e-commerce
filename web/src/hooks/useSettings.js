@@ -18,6 +18,11 @@ export const useSettings = () => {
     gcTime: 1000 * 60 * 60 * 24, // Keep in garbage collection for 24 hours
   });
 
+  //  DEBUG: Console log settings for the user
+  if (typeof window !== 'undefined' && settings) {
+    console.log("⚙️ [PROTOCOL SETTINGS]:", settings);
+  }
+
   const updateSettings = useMutation({
     mutationFn: async (updatedData) => {
       const isFormData = updatedData instanceof FormData;

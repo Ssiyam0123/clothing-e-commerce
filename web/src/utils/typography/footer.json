@@ -19,7 +19,11 @@
     "newsletterSub": "Subscribe for exclusive offers and new arrivals.",
     "emailPlaceholder": "your@email.com",
     "subscribe": "Subscribe",
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "contact": "Contact",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address"
   },
   "bn": {
     "description": "স্পেক্টাকুলার প্রতিদিনের জন্য আরামদায়ক, সহজ ও স্টাইলিশ পোশাক তৈরি করে — সবার জন্য।",
@@ -41,6 +45,10 @@
     "newsletterSub": "এক্সক্লুসিভ অফার ও নতুন পণ্যের খবর পেতে সাবস্ক্রাইব করুন।",
     "emailPlaceholder": "আপনার ইমেইল",
     "subscribe": "সাবস্ক্রাইব",
-    "rights": "সকল স্বত্ব সংরক্ষিত।"
+    "rights": "সকল স্বত্ব সংরক্ষিত।",
+    "contact": "যোগাযোগ",
+    "phone": "ফোন",
+    "email": "ইমেইল",
+    "address": "ঠিকানা"
   }
 }

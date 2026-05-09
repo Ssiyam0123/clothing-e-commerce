@@ -181,13 +181,6 @@ export default function CategoryMasterControl() {
                     >
                       Infrastructure Node
                     </Badge>
-                    {cat.isFeatured && (
-                      <Badge
-                        className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 text-[8px] font-black uppercase tracking-[0.2em] px-4 py-1 animate-pulse"
-                      >
-                        Featured Hub
-                      </Badge>
-                    )}
                     <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-[0.3em] opacity-40">
                       ID: {cat.slug}
                     </span>
@@ -227,22 +220,6 @@ export default function CategoryMasterControl() {
                 </div>
 
                 <div className="flex gap-3 lg:flex-col justify-center lg:justify-end w-full lg:w-auto pt-4 lg:pt-0 border-t lg:border-none border-border/20">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    disabled={togglingId === cat._id}
-                    onClick={() => handleToggleFeatured(cat._id, cat.isFeatured)}
-                    className={cn(
-                      "h-12 w-full lg:h-14 lg:w-14 rounded-2xl border-border transition-all shadow-lg active:scale-95 flex-1 lg:flex-none",
-                      cat.isFeatured ? "bg-yellow-500/10 border-yellow-500 text-yellow-500" : "bg-background hover:border-yellow-500 hover:text-yellow-500"
-                    )}
-                  >
-                    {togglingId === cat._id ? (
-                      <div className="w-5 h-5 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <Star size={20} fill={cat.isFeatured ? "currentColor" : "none"} />
-                    )}
-                  </Button>
                   <Link href={`/admin/categories/${cat._id}`} className="flex-1 lg:flex-none">
                     <Button
                       variant="outline"

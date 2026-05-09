@@ -1,21 +1,25 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination, EffectFade, A11y } from "swiper/modules";
 import { getImageUrl } from "@/utils/imageUtils";
-import { useSettings } from "@/hooks/useSettings";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
-export default function HeroSection({ slides = [], ui = {}, lang = "en" }) {
+export default function HeroSection({ slides = [], ui = {}, lang = "en", showHeader = true }) {
+  const [mounted, setMounted] = useState(false);
   const isBn = lang === "bn";
-  const { settings } = useSettings();
-  const siteName = settings?.branding?.siteName || "VANGUARD";
 
-  if (!slides || slides.length === 0) {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Use the first slide only as per user request
+  const slide = slides[0];
+
+  if (!mounted || !slide) {
     return (
       <section
         className="relative h-[75vh] min-h-[500px] md:h-[85vh] md:min-h-[700px] bg-background flex items-center justify-center overflow-hidden"
@@ -33,81 +37,63 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en" }) {
   return (
     <section
       className="relative h-[75vh] min-h-[500px] md:h-[85vh] md:min-h-[700px] overflow-hidden bg-background"
-      aria-label="Hero carousel"
+      aria-label="Hero section"
     >
-      <Swiper
-        modules={[Autoplay, Pagination, EffectFade, A11y]}
-        effect="fade"
-        autoplay={{ delay: 5000, disableOnInteraction: false }}
-        pagination={{ clickable: true, dynamicBullets: true }}
-        loop={slides.length > 1}
-        className="h-full w-full"
-        a11y={{
-          enabled: true,
-          prevSlideMessage: "Previous slide",
-          nextSlideMessage: "Next slide",
-          firstSlideMessage: "This is the first slide",
-          lastSlideMessage: "This is the last slide",
-          paginationBulletMessage: "Go to slide {{index}}",
-        }}
-      >
-        {slides.map((slide, idx) => (
-          <SwiperSlide key={slide._id || idx}>
-            <div className="relative h-full w-full group">
-              <Image
-                src={getImageUrl(slide.image, 1920, 85)}
-                alt={slide.title || "Campaign banner"}
-                fill
-                priority={idx === 0}
-                fetchPriority={idx === 0 ? "high" : "auto"}
-                sizes="100vw"
-                className="object-cover object-center transition-transform duration-[15s] ease-out group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent h-full" />
+      <div className="relative h-full w-full group">
+        <img
+          src={getImageUrl(slide.image, 1920, 85)}
+          alt={slide.title || "Campaign banner"}
+          className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[15s] ease-out group-hover:scale-105"
+          loading="eager"
+        />
+        {showHeader && (
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent z-[5] transition-opacity duration-700" />
+        )}
 
-              <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-16 lg:px-24 pb-20 md:pb-28 z-10">
-                <div className="max-w-4xl space-y-6">
-                  <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    <Badge className="bg-accent-secondary text-white border-none rounded-full px-4 py-1 text-[10px] uppercase font-black tracking-widest shadow-xl">
-                      {isBn ? "নতুন কালেকশন" : "New Collection"}
-                    </Badge>
-                  </div>
-                  
-                  {slide.title && (
-                    <h1 className="text-4xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white uppercase leading-[0.9] animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
-                      {slide.title}
-                    </h1>
-                  )}
-                  
-                  {slide.subtitle && (
-                    <p className="text-sm md:text-xl text-zinc-200 font-medium tracking-wide animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 max-w-2xl">
-                      {slide.subtitle}
-                    </p>
-                  )}
-                  
-                  {slide.link && (
-                    <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 pt-4">
-                      <Button
-                        asChild
-                        className={`inline-flex items-center justify-center bg-white text-black px-10 py-6 md:px-12 md:py-8 rounded-theme font-black text-[10px] md:text-xs uppercase tracking-[0.2em] hover:bg-zinc-100 hover:scale-105 transition-all active:scale-95 shadow-2xl border-none h-auto ${
-                          isBn ? "font-sans font-bold" : ""
-                        }`}
-                      >
-                        <Link
-                          href={slide.link}
-                          aria-label={ui.heroBtn || "Explore Collection"}
-                        >
-                          {ui.heroBtn || "Explore Collection"}
-                        </Link>
-                      </Button>
-                    </div>
-                  )}
+        {showHeader && (
+          <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-16 lg:px-24 pb-20 md:pb-28 z-10">
+            <div className="max-w-4xl space-y-6">
+              
+              {slide.title && (
+                <h1 className={cn(
+                  "text-4xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[0.9]",
+                  mounted && "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100"
+                )}>
+                  {slide.title}
+                </h1>
+              )}
+              
+              {slide.subtitle && (
+                <p className={cn(
+                  "text-sm md:text-xl text-zinc-200 font-medium tracking-wide max-w-2xl",
+                  mounted && "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200"
+                )}>
+                  {slide.subtitle}
+                </p>
+              )}
+              
+              {slide.link && ui.heroBtn && (
+                <div className={cn(mounted && "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 pt-4")}>
+                  <Button
+                    asChild
+                    className={cn(
+                      "inline-flex items-center justify-center bg-white text-black px-10 py-6 md:px-12 md:py-8 rounded-theme font-black text-[10px] md:text-xs tracking-[0.2em] hover:bg-zinc-100 hover:scale-105 transition-all active:scale-95 shadow-2xl border-none h-auto",
+                      isBn && "font-sans font-bold"
+                    )}
+                  >
+                    <Link
+                      href={slide.link}
+                      aria-label={ui.heroBtn}
+                    >
+                      {ui.heroBtn}
+                    </Link>
+                  </Button>
                 </div>
-              </div>
+              )}
             </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+          </div>
+        )}
+      </div>
     </section>
   );
 }

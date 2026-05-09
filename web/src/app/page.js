@@ -10,37 +10,54 @@ import ProductSection from "@/components/home/ProductSection";
 import Newsletter from "@/components/home/Newsletter";
 import { GridSkeleton, HeroSkeleton } from "@/components/common/Skeletons";
 import SectionHeader from "@/components/common/SectionHeader";
+import { ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+ 
+export const revalidate = 60;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 // 🚀 Request-level Memoization + Edge Caching
 const getHomeData = cache(async () => {
   try {
-    const [productsRes, categoriesRes, flashSalesRes, bannerRes, featuredCatRes] =
+    const [productsRes, categoriesRes, flashSalesRes, bannerRes, allProductsRes, layoutRes] =
       await Promise.all([
         fetch(`${API_URL}/products?limit=24`, {
-          next: { revalidate: 60, tags: ["products", "home-data"] },
+          cache: "no-store",
         }),
         fetch(`${API_URL}/categories`, {
-          next: { revalidate: 60, tags: ["categories", "home-data"] },
+          cache: "no-store",
         }),
         fetch(`${API_URL}/flash-sales/active`, {
-          next: { revalidate: 60, tags: ["flash-sale", "home-data"] }, 
+          cache: "no-store",
         }),
-        fetch(`${API_URL}/banner-campaigns/active`, {
-          next: { revalidate: 60, tags: ["banners", "home-data"] },
+        fetch(`${API_URL}/banner-campaigns`, {
+          cache: "no-store",
         }),
-        fetch(`${API_URL}/products?category=featured&limit=100`, {
-          next: { revalidate: 60, tags: ["products", "categories", "home-data"] },
+        // Fetch products for category sections (increased limit to cover multiple sections)
+        fetch(`${API_URL}/products?limit=200`, {
+          cache: "no-store",
+        }),
+        fetch(`${API_URL}/home-layouts/active`, {
+          cache: "no-store",
         }),
       ]);
 
+    const layoutData = layoutRes.ok ? await layoutRes.json() : null;
+    const campaigns = bannerRes.ok ? await bannerRes.json() : [];
+    const productData = productsRes.ok ? await productsRes.json() : { products: [] };
+    const categoryData = categoriesRes.ok ? await categoriesRes.json() : [];
+    const flashSaleData = flashSalesRes.ok ? await flashSalesRes.json() : null;
+    const allProductsData = allProductsRes.ok ? await allProductsRes.json() : { products: [] };
+
     return {
-      products: productsRes.ok ? (await productsRes.json()).products : [],
-      categories: categoriesRes.ok ? await categoriesRes.json() : [],
-      flashSales: flashSalesRes.ok ? await flashSalesRes.json() : null,
-      activeCampaign: bannerRes.ok ? await bannerRes.json() : null,
-      featuredCategoryProducts: featuredCatRes.ok ? (await featuredCatRes.json()).products : [],
+      products: productData.products || [],
+      categories: categoryData,
+      flashSales: flashSaleData,
+      activeCampaign: campaigns.find(c => c.isActive) || null,
+      allCampaigns: campaigns,
+      allProducts: allProductsData.products || [],
+      layout: layoutData?.sections || [],
     };
   } catch (e) {
     console.error("Home data fetch failed:", e);
@@ -49,6 +66,8 @@ const getHomeData = cache(async () => {
       categories: [],
       flashSales: null,
       activeCampaign: null,
+      allCampaigns: [],
+      layout: [],
     };
   }
 });
@@ -58,150 +77,268 @@ export default async function HomePage() {
   const lang = cookieStore.get("vanguard-lang")?.value || "en";
   const t = getTranslation('home', lang);
   const dataPromise = getHomeData();
+  const data = await dataPromise;
 
   return (
     <main className="w-full bg-surface transition-colors duration-700">
-      <Suspense fallback={<HeroSkeleton />}>
-        <HeroSectionWrapper dataPromise={dataPromise} lang={lang} t={t} />
-      </Suspense>
+      <div className="flex flex-col">
+        {data.layout.map((section, idx) => {
+          if (!section.isVisible) return null;
 
-      <div className="space-y-20 md:space-y-28 pb-36 mt-10 md:mt-16">
-        <Suspense fallback={<GridSkeleton count={4} />}>
-          <FlashSaleWrapper dataPromise={dataPromise} lang={lang} t={t} />
-        </Suspense>
+          const sectionProps = {
+            dataPromise,
+            lang,
+            t,
+            section
+          };
 
-        <Suspense fallback={<GridSkeleton count={6} />}>
-          <CategoryWrapper dataPromise={dataPromise} t={t} />
-        </Suspense>
+          const standardMargin = "mt-12 md:mt-16";
 
-        <Suspense fallback={<GridSkeleton count={4} />}>
-          <FeaturedWrapper dataPromise={dataPromise} lang={lang} t={t} />
-        </Suspense>
+          switch (section.type) {
+            case 'USP':
+              return (
+                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                  <UspSection />
+                </div>
+              );
+            case 'HEADER':
+              return (
+                <div key={section.id} className={cn("px-6 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto w-full", idx > 0 && standardMargin)}>
+                   <SectionHeader 
+                     title={section.title || ""} 
+                     subtitle={section.subtitle || ""} 
+                     className="mb-2 md:mb-4" 
+                     casing={section.config?.casing}
+                     subtitleCasing={section.config?.subtitleCasing}
+                   />
+                </div>
+              );
+            case 'FLASH_SALE':
+              return (
+                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                  <Suspense fallback={<GridSkeleton count={4} />}>
+                    <FlashSaleWrapper {...sectionProps} />
+                  </Suspense>
+                </div>
+              );
+            case 'CATEGORY_GRID':
+              return (
+                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                  <Suspense fallback={<GridSkeleton count={6} />}>
+                    <CategoryWrapper {...sectionProps} />
+                  </Suspense>
+                </div>
+              );
+            case 'FEATURED_PRODUCTS':
+              return (
+                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                  <Suspense fallback={<GridSkeleton count={4} />}>
+                    <FeaturedWrapper {...sectionProps} />
+                  </Suspense>
+                </div>
+              );
+            case 'NEW_ARRIVALS':
+              return (
+                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                  <Suspense fallback={<GridSkeleton count={8} />}>
+                    <NewArrivalsWrapper {...sectionProps} />
+                  </Suspense>
+                </div>
+              );
+            case 'SALE_PRODUCTS':
+              return (
+                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                  <Suspense fallback={<GridSkeleton count={4} />}>
+                    <SaleWrapper {...sectionProps} />
+                  </Suspense>
+                </div>
+              );
+            case 'CATEGORY_COLLECTION':
+              return (
+                <div key={section.id} className={cn("w-full", idx > 0 && standardMargin)}>
+                  <Suspense fallback={<GridSkeleton count={8} />}>
+                    <CategoryCollectionWrapper {...sectionProps} />
+                  </Suspense>
+                </div>
+              );
+            case "PROMO_BANNER": {
+              const campaign = data.allCampaigns.find(c => String(c._id) === String(section.config?.campaignId)) || data.activeCampaign;
+              
+              const bannerSlides = section.imageUrl 
+                ? [{ 
+                    image: section.imageUrl, 
+                    title: "", 
+                    subtitle: "",
+                    link: section.actionLink || "#"
+                  }]
+                : (campaign?.slides?.map(slide => ({
+                    ...slide,
+                    title: "",
+                    subtitle: ""
+                  })) || []);
 
-        <Suspense fallback={<GridSkeleton count={8} />}>
-          <NewArrivalsWrapper dataPromise={dataPromise} lang={lang} t={t} />
-        </Suspense>
-
-        <Suspense fallback={<GridSkeleton count={4} />}>
-          <SaleWrapper dataPromise={dataPromise} lang={lang} t={t} />
-        </Suspense>
-
-        <Suspense fallback={<GridSkeleton count={4} />}>
-          <FeaturedCategoryWrapper dataPromise={dataPromise} lang={lang} t={t} />
-        </Suspense>
+              return (
+                <div className={cn("w-full", idx > 0 && standardMargin)} key={section.id}>
+                   <HeroSectionServer 
+                     campaign={{ slides: bannerSlides }} 
+                     lang={lang} 
+                     ui={{ ...t, heroBtn: section.buttonText }} 
+                     showHeader={section.config?.showHeader === true}
+                   />
+                </div>
+              );
+            }
+            default:
+              return null;
+          }
+        })}
       </div>
     </main>
   );
 }
 
-async function HeroSectionWrapper({ dataPromise, lang, t }) {
+async function FlashSaleWrapper({ dataPromise, lang, t, section }) {
   const data = await dataPromise;
-  return <HeroSectionServer campaign={data.activeCampaign} lang={lang} ui={t} />;
-}
+  const config = section.config;
+  
+  let allSales = [];
+  if (Array.isArray(data.flashSales)) {
+    allSales = data.flashSales;
+  } else if (data.flashSales?.flashSale) {
+    allSales = [data.flashSales.flashSale];
+  }
 
-async function FlashSaleWrapper({ dataPromise, lang, t }) {
-  const data = await dataPromise;
-  if (!data.flashSales?.flashSale) return null;
+  let activeSale = null;
+  if (config?.saleId) {
+    activeSale = allSales.find(s => String(s._id) === String(config.saleId));
+  } 
+  
+  if (!activeSale) {
+    activeSale = allSales.find(s => s.isActive);
+  }
+
+  if (!activeSale) return null;
+  
+  const flashProducts = { 
+    products: activeSale.products || (data.flashSales?.products || []) 
+  };
+
   return (
-    <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 md:mb-24">
-        <SectionHeader title={t.flashSale || "Flash Sale"} subtitle={t.flashSub || "Live Drops"} className="mb-0" />
-        <Link href="/flash-sale" className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-elevated px-8 py-4 rounded-full border border-light hover:bg-accent-secondary hover:text-white transition-all duration-500">
-          {t.seeMore || "See More"}
+    <section className="px-6 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto py-6 md:py-10 w-full">
+      <FlashSaleTeaserServer activeSale={activeSale} products={flashProducts} lang={lang} ui={t} />
+      <div className="flex justify-center mt-12">
+        <Link href={`/flash-sale/${activeSale.slug}`} className="group flex items-center gap-4 px-10 py-5 rounded-full bg-foreground text-background font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500 shadow-xl hover:shadow-primary/20">
+          {t.seeMore || "Explore Full Campaign"} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
-      <FlashSaleTeaserServer activeSale={data.flashSales.flashSale} products={data.flashSales} lang={lang} ui={t} />
     </section>
   );
 }
 
-async function CategoryWrapper({ dataPromise, t }) {
+async function CategoryWrapper({ dataPromise, t, section }) {
   const data = await dataPromise;
   return (
-    <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-      <SectionHeader title={t.catTitle} subtitle={t.catSub} className="mb-16 md:mb-24" />
+    <section className="px-6 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto py-6 md:py-10 w-full">
       <CategoryGrid categories={data.categories} />
     </section>
   );
 }
 
-async function FeaturedWrapper({ dataPromise, lang, t }) {
+async function FeaturedWrapper({ dataPromise, lang, t, section }) {
   const data = await dataPromise;
   const featuredProducts = data.products.filter((p) => p.isFeatured).slice(0, 4);
+
   return (
-    <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 md:mb-24">
-        <SectionHeader title={t.featTitle} subtitle={t.featSub} className="mb-0" />
-        <Link href="/products?category=isFeatured" className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-elevated px-8 py-4 rounded-full border border-light hover:bg-accent-secondary hover:text-white transition-all duration-500">
-          {t.viewMore || "View More"}
+    <section className="px-6 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto py-6 md:py-10 w-full">
+      <ProductSection products={featuredProducts} lang={lang} />
+      <div className="flex justify-center mt-12">
+        <Link href="/products?category=isFeatured" className="group flex items-center gap-4 px-10 py-5 rounded-full bg-foreground text-background font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500 shadow-xl hover:shadow-primary/20">
+          {t.viewMore || "View Collection"} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
-      <ProductSection products={featuredProducts} lang={lang} />
     </section>
   );
 }
 
-async function NewArrivalsWrapper({ dataPromise, lang, t }) {
+async function NewArrivalsWrapper({ dataPromise, lang, t, section }) {
   const data = await dataPromise;
-  const newArrivals = data.products.slice(0, 8);
+  const newArrivals = data.products.slice(0, 12);
+
   return (
-    <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-      <SectionHeader title={t.newTitle} subtitle={t.newSub} className="mb-16 md:mb-24" />
-      <ProductSection products={newArrivals} showLoadMore={true} lang={lang} ui={t} />
+    <section className="px-6 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto py-6 md:py-10 w-full">
+      <ProductSection products={newArrivals} showLoadMore={false} lang={lang} ui={t} />
+      <div className="flex justify-center mt-12">
+        <Link href="/products" className="group flex items-center gap-4 px-10 py-5 rounded-full bg-foreground text-background font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500 shadow-xl hover:shadow-primary/20">
+          {t.viewMore || "View All New Arrivals"} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+        </Link>
+      </div>
     </section>
   );
 }
 
-async function SaleWrapper({ dataPromise, lang, t }) {
+async function SaleWrapper({ dataPromise, lang, t, section }) {
   const data = await dataPromise;
-  const saleProducts = data.products.filter((p) => p.discount > 0).slice(0, 4);
+  const saleProducts = data.products.filter((p) => p.discount > 0).slice(0, 12);
+
   if (saleProducts.length === 0) return null;
   return (
-    <section className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-      <SectionHeader title={t.saleTitle} subtitle={t.saleSub} className="mb-16 md:mb-24" />
+    <section className="px-6 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto py-6 md:py-10 w-full">
       <ProductSection products={saleProducts} lang={lang} />
+      <div className="flex justify-center mt-12">
+        <Link href="/products?onSale=true" className="group flex items-center gap-4 px-10 py-5 rounded-full bg-foreground text-background font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500 shadow-xl hover:shadow-primary/20">
+          {t.viewMore || "View All Sale Items"} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+        </Link>
+      </div>
     </section>
   );
 }
 
-async function FeaturedCategoryWrapper({ dataPromise, lang, t }) {
+async function PromoBannerWrapper({ dataPromise, lang, t, section }) {
   const data = await dataPromise;
-  const featuredCategories = data.categories.filter(c => c.isFeatured);
-  const allFeaturedProducts = data.featuredCategoryProducts || [];
+  const config = section.config;
+  
+  // Find campaign by ID with string safety
+  let campaign = data.allCampaigns?.find(c => 
+    String(c._id) === String(config?.campaignId)
+  );
 
-  if (featuredCategories.length === 0 || allFeaturedProducts.length === 0) return null;
+  // Fallback to active campaign if specific one not found (to avoid empty space)
+  if (!campaign) campaign = data.activeCampaign;
+  
+  if (!campaign) return null;
+  return <HeroSectionServer campaign={campaign} lang={lang} ui={t} showHeader={config?.showHeader === true} />;
+}
+
+async function CategoryCollectionWrapper({ dataPromise, lang, t, section }) {
+  const data = await dataPromise;
+  const config = section.config;
+  
+  if (!config?.categoryId && !config?.slug) return null;
+
+  // Find the target category
+  const cat = data.categories.find(c => c._id === config.categoryId || c.slug === config.slug);
+  if (!cat) return null;
+
+  // Filter products for this specific category
+  const catProducts = data.allProducts.filter(p => 
+    p.category?.slug === cat.slug || 
+    p.category?._id === cat._id || 
+    p.category === cat._id
+  ).slice(0, 12);
+
+  if (catProducts.length === 0) return null;
 
   return (
-    <>
-      {featuredCategories.map((cat) => {
-        // Filter products for THIS specific category
-        const catProducts = allFeaturedProducts.filter(p => 
-          p.category?.slug === cat.slug || 
-          p.category?._id === cat._id || 
-          p.category === cat._id
-        ).slice(0, 4);
-
-        if (catProducts.length === 0) return null;
-
-        return (
-          <section key={cat._id} className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 md:mb-24">
-              <SectionHeader 
-                title={cat.name} 
-                subtitle={t.featuredCatSub} 
-                className="mb-0" 
-              />
-              <Link 
-                href={`/products?category=${cat.slug}&page=1`} 
-                className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-elevated px-8 py-4 rounded-full border border-light hover:bg-accent-secondary hover:text-white transition-all duration-500"
-              >
-                {t.viewMore || "View More"}
-              </Link>
-            </div>
-            <ProductSection products={catProducts} lang={lang} />
-          </section>
-        );
-      })}
-    </>
+    <section key={cat._id} className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto py-16">
+      <ProductSection products={catProducts} lang={lang} />
+      <div className="flex justify-center mt-12">
+        <Link 
+          href={`/products?category=${cat.slug}`} 
+          className="group flex items-center gap-4 px-8 py-4 md:px-10 md:py-5 rounded-full bg-foreground text-background font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500 shadow-xl hover:shadow-primary/20"
+        >
+          {t.viewMore || `Explore ${cat.name}`} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+        </Link>
+      </div>
+    </section>
   );
 }
