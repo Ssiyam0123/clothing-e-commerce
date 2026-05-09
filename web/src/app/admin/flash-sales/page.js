@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useFlashSales } from "@/hooks/useFlashSale";
+import { useAdminFlashSales } from "@/hooks/admin/useAdminFlashSales";
 import Link from "next/link";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import CountdownTimer from "@/components/store/CountdownTimer";
@@ -43,7 +43,7 @@ const TacticalStatusBadge = ({ status }) => {
 };
 
 export default function AdminFlashSales() {
-  const { allFlashSales, allLoading, updateFlashSale, deleteFlashSale } = useFlashSales(true);
+  const { flashSales, isLoading, updateFlashSale, deleteFlashSale } = useAdminFlashSales();
 
   const handleToggleActive = async (saleId, currentActive) => {
     try {
@@ -81,7 +81,7 @@ export default function AdminFlashSales() {
             Flash <span className="text-rose-600">Drops</span>
           </h1>
           <p className="admin-subtitle">
-            Foundry • Active: {allFlashSales?.filter(s => s.isActive).length || 0}
+            Foundry • Active: {flashSales?.filter(s => s.isActive).length || 0}
           </p>
         </div>
 
@@ -97,7 +97,7 @@ export default function AdminFlashSales() {
 
       {/* 📊 High-Performance Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-        {allLoading ? (
+        {isLoading ? (
           [1, 2, 3].map((n) => (
             <Card key={n} className="rounded-[2.5rem] border-border/10 bg-card/20 min-h-[350px] md:min-h-[450px] overflow-hidden">
                <CardContent className="p-10 space-y-8">
@@ -113,7 +113,7 @@ export default function AdminFlashSales() {
                </CardContent>
             </Card>
           ))
-        ) : allFlashSales?.length === 0 ? (
+        ) : flashSales?.length === 0 ? (
           <Card className="col-span-full border-dashed border-border/20 bg-accent/5 rounded-[3rem] py-32 flex flex-col items-center justify-center text-center">
             <div className="w-24 h-24 rounded-full bg-accent/10 flex items-center justify-center mb-8 opacity-20">
                <Zap size={48} className="text-rose-600" />
@@ -122,7 +122,7 @@ export default function AdminFlashSales() {
             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground italic">Launch a new campaign sequence to drive neural engagement</p>
           </Card>
         ) : (
-          allFlashSales.map((sale) => {
+          flashSales.map((sale) => {
             const now = new Date();
             const start = new Date(sale.startDate);
             const end = new Date(sale.endDate);

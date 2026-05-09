@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useOrders } from "@/hooks/useOrders";
+import { useOrders } from "@/hooks/client/useOrders";
 import { useSearchParams } from "next/navigation";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
@@ -27,7 +27,7 @@ const DICTIONARY = {
 
 export default function OrdersPage() {
   const searchParams = useSearchParams();
-  const { myOrders, myOrdersLoading } = useOrders();
+  const { myOrders, isLoading: myOrdersLoading } = useOrders();
   const { lang } = useAppStore();
   
   // Order Details Modal State

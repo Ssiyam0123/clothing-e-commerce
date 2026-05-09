@@ -59,6 +59,7 @@ export default function Navbar() {
   const dynamicNavLinks = useMemo(() => {
     const links = [
       { label: t.home, href: "/" },
+      { label: t.categories, href: "/categories" },
       { label: t.products, href: "/products" },
       { label: t.flashSale, href: "/flash-sale" },
       { label: t.blog, href: "/blog" },
@@ -85,7 +86,7 @@ export default function Navbar() {
     <header
       className={cn(
         "fixed !top-0 left-0 right-0 !mt-0 z-[120] transition-all duration-700 px-4 sm:px-6 lg:px-12 py-4",
-        (scrolled || !isTransparentPage) ? "bg-background/95 backdrop-blur-3xl border-b border-border/10 py-3 shadow-xl shadow-black/5" : "bg-transparent"
+        (scrolled || !isTransparentPage) ? "bg-background/95 backdrop-blur-3xl  border-border/10 py-3 shadow-xl shadow-black/5" : "bg-transparent"
       )}
     >
       <div className="w-full mx-auto flex items-center justify-between gap-2">

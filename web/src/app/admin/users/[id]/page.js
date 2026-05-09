@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useUsers } from "@/hooks/useUsers";
-import { useOrders } from "@/hooks/useOrders";
+import { useAdminOrders } from "@/hooks/admin/useAdminOrders";
 import { useMemo } from "react";
 import Loader from "@/components/common/Loader";
 import Link from "next/link";
@@ -31,8 +31,7 @@ export default function UserAuditPage() {
   const { useUser } = useUsers();
   const { data: userData, isLoading: isUserLoading } = useUser(id);
   
-  const { allOrdersData, allOrdersLoading } = useOrders({ user: id });
-  const orders = allOrdersData?.orders || [];
+  const { orders, isLoading: allOrdersLoading } = useAdminOrders({ user: id });
 
   const stats = useMemo(() => {
     if (!orders) return { totalSpent: 0, totalOrders: 0 };

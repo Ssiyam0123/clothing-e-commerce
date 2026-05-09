@@ -3,8 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { useAdminProducts } from "@/hooks/useAdminProducts";
-import { useCategories } from "@/hooks/useCategories";
+import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
+import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
 import { useSubcategories } from "@/hooks/useSubcategories";
 import { useSizes } from "@/hooks/useSizes";
 import Loader from "@/components/common/Loader";
@@ -40,7 +40,7 @@ export default function ProductForm() {
   const isEdit = id !== "new";
 
   const { products, createProduct, updateProduct } = useAdminProducts();
-  const { categories } = useCategories();
+  const { categories, isLoading: categoriesLoading } = useAdminCategories();
   const { subcategories } = useSubcategories();
   const { sizes } = useSizes();
 

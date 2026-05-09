@@ -1,14 +1,14 @@
 "use client";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useOrders } from "@/hooks/useOrders";
+import { useOrders } from "@/hooks/client/useOrders";
 import { getImageUrl } from "@/utils/imageUtils";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Package, MapPin, CreditCard, Calendar, Truck } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui }) {
-  const { orderDetails: order, orderDetailsLoading: loading } = useOrders({}, orderId);
+  const { orderDetails: order, orderDetailsLoading: loading } = useOrders(orderId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -3,8 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { useFlashSales } from "@/hooks/useFlashSale";
-import { useProducts } from "@/hooks/useProducts";
+import { useAdminFlashSales } from "@/hooks/admin/useAdminFlashSales";
+import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
 import { useDebounce } from "@/hooks/useDebounce";
 import Loader from "@/components/common/Loader";
 import { getImageUrl } from "@/utils/imageUtils";
@@ -32,13 +32,12 @@ export default function FlashSaleForm() {
   const router = useRouter();
   const isEdit = id !== "new";
 
-  const { allFlashSales, createFlashSale, updateFlashSale } =
-    useFlashSales(true);
+  const { flashSales, createFlashSale, updateFlashSale } = useAdminFlashSales();
 
   const [loading, setLoading] = useState(isEdit);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
-  const { products: searchResults, isFetching } = useProducts({
+  const { products: searchResults, isFetching } = useAdminProducts({
     search: debouncedSearch,
     limit: 5,
   });
@@ -61,8 +60,8 @@ export default function FlashSaleForm() {
   };
 
   useEffect(() => {
-    if (isEdit && allFlashSales) {
-      const sale = allFlashSales.find((s) => s._id === id);
+    if (isEdit && flashSales) {
+      const sale = flashSales.find((s) => s._id === id);
       if (sale) {
         setValue("name", sale.name);
         setValue("description", sale.description || "");
@@ -73,11 +72,11 @@ export default function FlashSaleForm() {
         setValue("startImmediately", sale.startImmediately || false);
         if (sale.products) setSelectedProducts(sale.products);
         setLoading(false);
-      } else if (allFlashSales) setLoading(false);
+      } else if (flashSales) setLoading(false);
     } else {
       setLoading(false);
     }
-  }, [isEdit, id, allFlashSales, setValue]);
+  }, [isEdit, id, flashSales, setValue]);
 
   const toggleProductSelection = (product) => {
     const exists = selectedProducts.find((p) => p._id === product._id);

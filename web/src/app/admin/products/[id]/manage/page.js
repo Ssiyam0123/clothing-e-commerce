@@ -8,7 +8,7 @@ import api from "@/lib/api";
 import { getImageUrl } from "@/utils/imageUtils";
 import Loader from "@/components/common/Loader";
 import StarRating from "@/components/store/StarRating";
-import { useAdminProducts } from "@/hooks/useAdminProducts";
+import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

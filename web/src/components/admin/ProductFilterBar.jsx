@@ -2,8 +2,8 @@
 
 import { useCallback, Suspense, useState, useMemo } from "react";
 import Link from "next/link";
-import { useProducts } from "@/hooks/useProducts";
-import { useCategories } from "@/hooks/useCategories";
+import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
+import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
 import { useFilters } from "@/hooks/useFilters";
 import DataTable from "@/components/admin/DataTable";
 import Loader from "@/components/common/Loader";
@@ -46,8 +46,8 @@ function AdminProductsContent() {
     isFetching,
     deleteProduct,
     updateProduct,
-  } = useProducts(adminQueryParams);
-  const { categories, isLoading: categoriesLoading } = useCategories();
+  } = useAdminProducts(adminQueryParams);
+  const { categories, isLoading: categoriesLoading } = useAdminCategories();
 
   // Delete product with confirmation
   const handleDelete = async (id) => {

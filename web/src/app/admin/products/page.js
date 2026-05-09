@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import Link from "next/link";
-import { useAdminProducts } from "@/hooks/useAdminProducts";
+import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
 import DataTable from "@/components/admin/DataTable";
 import TableSkeleton from "@/components/common/TableSkeleton";
 import Pagination from "@/components/common/Pagination";

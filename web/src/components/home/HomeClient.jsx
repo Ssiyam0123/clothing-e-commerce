@@ -3,9 +3,9 @@
 import { useMemo } from "react";
 import { useAppStore } from "@/store/appStore";
 import { DICTIONARY } from "@/app/homeDictionary";
-import { useProducts } from "@/hooks/useProducts";
-import { useCategories } from "@/hooks/useCategories";
-import { useFlashSales } from "@/hooks/useFlashSale";
+import { useProducts } from "@/hooks/client/useProducts";
+import { useCategories } from "@/hooks/client/useCategories";
+import { useFlashSales } from "@/hooks/client/useFlashSale";
 import { useActiveBannerCampaign } from "@/hooks/useActiveBannerCampaign";
 import { motion } from "framer-motion";
 

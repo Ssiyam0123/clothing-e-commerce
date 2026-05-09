@@ -1,8 +1,7 @@
-import Product from './product.model.js';
-import Category from '../category/category.model.js';
-import { asyncHandler } from '../../middleware/asyncHandler.js';
-import { uploadMultipleImages, deleteImage } from '../../services/imageUploadService.js';
-import { createProductSchema, updateProductSchema } from './validators/product.validator.js';
+import Product from '../product.model.js';
+import { asyncHandler } from '../../../middleware/asyncHandler.js';
+import { uploadMultipleImages, deleteImage } from '../../../services/imageUploadService.js';
+import { createProductSchema, updateProductSchema } from '../validators/product.validator.js';
 import { ZodError } from 'zod';
 
 // Helper to parse product data
@@ -69,8 +68,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     }
 });
 
-
-export const getProducts = asyncHandler(async (req, res) => {
+export const getAdminProducts = asyncHandler(async (req, res) => {
     const {
         category,
         search,
@@ -82,28 +80,18 @@ export const getProducts = asyncHandler(async (req, res) => {
         isActive,
         stockStatus,
         isFeatured,
-        fields,
     } = req.query;
 
     const matchStage = {};
 
-    // 1. Filtering Logic
-    if (isActive === 'all') {
-        // Show both
-    } else if (isActive === 'false') {
-        matchStage.isActive = false;
-    } else {
-        matchStage.isActive = true;
-    }
+    // Admin filtering: show all by default unless specified
+    if (isActive === 'false') matchStage.isActive = false;
+    else if (isActive === 'true') matchStage.isActive = true;
 
-    if (category === 'isFeatured' || isFeatured === 'true') {
-        matchStage.isFeatured = true;
-    }
+    if (isFeatured === 'true') matchStage.isFeatured = true;
 
-    if (category && category !== 'all' && category !== 'isFeatured') {
-        const catDoc = await Category.findOne({ slug: category }).select('_id');
-        if (catDoc) matchStage.category = catDoc._id;
-        else return res.json({ success: true, total: 0, pages: 0, products: [] });
+    if (category && category !== 'all') {
+        matchStage.category = category; // Admin uses IDs usually, or we can resolve slug if needed
     }
 
     if (search) {
@@ -111,52 +99,32 @@ export const getProducts = asyncHandler(async (req, res) => {
         matchStage.name = { $regex: safeSearch, $options: 'i' };
     }
 
-    if (minPrice || maxPrice) {
-        matchStage.price = {};
-        if (minPrice) matchStage.price.$gte = Number(minPrice);
-        if (maxPrice) matchStage.price.$lte = Number(maxPrice);
-    }
-
-    // 2. Base Pipeline
-    const pipeline = [];
-    pipeline.push({ $match: matchStage });
+    const pipeline = [{ $match: matchStage }];
     
-    // Calculate totalStock for filtering
     pipeline.push({
-        $addFields: {
-            totalStock: { $sum: '$sizes.stock' }
-        }
+        $addFields: { totalStock: { $sum: '$sizes.stock' } }
     });
 
     if (stockStatus) {
-        if (stockStatus === 'lowStock') {
-            pipeline.push({ $match: { totalStock: { $lt: 10, $gt: 0 } } });
-        } else if (stockStatus === 'outOfStock') {
-            pipeline.push({ $match: { totalStock: 0 } });
-        }
+        if (stockStatus === 'lowStock') pipeline.push({ $match: { totalStock: { $lt: 10, $gt: 0 } } });
+        else if (stockStatus === 'outOfStock') pipeline.push({ $match: { totalStock: 0 } });
     }
 
-    // 3. Count total items for pagination
     const countPipeline = [...pipeline, { $count: 'total' }];
     const countResult = await Product.aggregate(countPipeline);
     const total = countResult.length > 0 ? countResult[0].total : 0;
 
-    // 4. Sorting & Pagination
     let sortObj = { createdAt: -1 };
     if (sort === 'price') sortObj = { price: 1 };
     else if (sort === '-price') sortObj = { price: -1 };
-    else if (sort === 'oldest') sortObj = { createdAt: 1 };
     else if (sort === 'stockHigh') sortObj = { totalStock: -1 };
     else if (sort === 'stockLow') sortObj = { totalStock: 1 };
 
     pipeline.push({ $sort: sortObj });
-    
-    const currentPage = Math.max(1, Number(page));
-    const itemsLimit = Math.max(1, Number(limit));
-    const skip = (currentPage - 1) * itemsLimit;
-    pipeline.push({ $skip: skip }, { $limit: itemsLimit });
+    const skip = (Math.max(1, Number(page)) - 1) * Math.max(1, Number(limit));
+    pipeline.push({ $skip: skip }, { $limit: Math.max(1, Number(limit)) });
 
-    // 🚀 5. Populate Sizes (The Fix)
+    // Populate full details for Admin
     pipeline.push(
         {
             $lookup: {
@@ -173,84 +141,37 @@ export const getProducts = asyncHandler(async (req, res) => {
                         input: '$sizes',
                         as: 's',
                         in: {
-                            size: {
-                                $arrayElemAt: [
-                                    {
-                                        $filter: {
-                                            input: '$sizeDetails',
-                                            as: 'sd',
-                                            cond: { $eq: [{ $toString: '$$sd._id' }, { $toString: '$$s.size' }] }
-                                        }
-                                    },
-                                    0
-                                ]
-                            },
+                            size: { $arrayElemAt: [{ $filter: { input: '$sizeDetails', as: 'sd', cond: { $eq: [{ $toString: '$$sd._id' }, { $toString: '$$s.size' }] } } }, 0] },
                             stock: '$$s.stock'
                         }
                     }
                 }
             }
         },
-        { $project: { sizeDetails: 0 } }
-    );
-
-    // 6. Populate Category & Subcategory
-    pipeline.push(
+        { $project: { sizeDetails: 0 } },
         {
-            $lookup: {
-                from: 'categories',
-                localField: 'category',
-                foreignField: '_id',
-                as: 'category'
-            }
+            $lookup: { from: 'categories', localField: 'category', foreignField: '_id', as: 'category' }
         },
         { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
         {
-            $lookup: {
-                from: 'subcategories',
-                localField: 'subcategory',
-                foreignField: '_id',
-                as: 'subcategory'
-            }
+            $lookup: { from: 'subcategories', localField: 'subcategory', foreignField: '_id', as: 'subcategory' }
         },
         { $unwind: { path: '$subcategory', preserveNullAndEmptyArrays: true } }
     );
 
-    // Final Sort (Grouping মাঝে মাঝে সর্ট নষ্ট করে দেয়)
-    pipeline.push({ $sort: sortObj });
-
-    // 7. Field Selection
-    if (fields) {
-        const projection = fields.split(',').reduce((acc, f) => {
-            acc[f.trim()] = 1;
-            return acc;
-        }, {});
-        pipeline.push({ $project: projection });
-    }
-
     const products = await Product.aggregate(pipeline);
 
-    res.json({
-        success: true,
-        total,
-        pages: Math.ceil(total / itemsLimit),
-        currentPage,
-        pageSize: products.length,
-        products
-    });
+    res.json({ success: true, total, products });
 });
 
-export const getProductById = asyncHandler(async (req, res) => {
+export const getAdminProductById = asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id)
-        .populate('category', 'name slug')
-        .populate('subcategory', 'name slug')
-        .populate('sizes.size', 'name')
+        .populate('category')
+        .populate('subcategory')
+        .populate('sizes.size')
         .lean();
 
-    if (!product) {
-        res.status(404);
-        throw new Error('Product not found');
-    }
+    if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
 });
 
@@ -261,7 +182,6 @@ export const updateProduct = asyncHandler(async (req, res) => {
     const updateFields = parseProductData(req);
     let finalImages = [...existingProduct.images];
 
-    // Image management
     if (req.body.images !== undefined) {
         try {
             const updatedImagesList = typeof req.body.images === 'string' ? JSON.parse(req.body.images) : req.body.images;
@@ -296,28 +216,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
 
-    if (product.images?.length) {
-        await Promise.all(product.images.map(img => deleteImage(img)));
-    }
+    if (product.images?.length) await Promise.all(product.images.map(img => deleteImage(img)));
     await product.deleteOne();
-    res.json({ message: 'Product and associated assets purged.' });
-});
-
-
-
-
-export const getProductBySlug = asyncHandler(async (req, res) => {
-    const { slug } = req.params;
-
-    const product = await Product.findOne({ slug, isActive: true })
-        .populate('category', 'name slug')
-        .populate('subcategory', 'name slug')
-        .populate('sizes.size', 'name')
-        .lean();
-
-    if (!product) {
-        return res.status(404).json({ message: 'Artifact not found in archives' });
-    }
-
-    res.json(product);
+    res.json({ message: 'Product purged.' });
 });

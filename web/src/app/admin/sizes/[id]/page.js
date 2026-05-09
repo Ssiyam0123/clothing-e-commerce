@@ -4,7 +4,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useSizes } from "@/hooks/useSizes";
-import { useCategories } from "@/hooks/useCategories";
+import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -30,7 +30,7 @@ export default function SizeForm() {
   const isEdit = id !== "new";
 
   const { sizes, createSize, updateSize } = useSizes();
-  const { categories } = useCategories();
+  const { categories, isLoading: categoriesLoading } = useAdminCategories();
   const [loading, setLoading] = useState(isEdit);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

@@ -2,9 +2,9 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { useProducts } from "@/hooks/useProducts";
-import { useCategories } from "@/hooks/useCategories";
-import { useFlashSales } from "@/hooks/useFlashSale";
+import { useProducts } from "@/hooks/client/useProducts";
+import { useCategories } from "@/hooks/client/useCategories";
+import { useFlashSales } from "@/hooks/client/useFlashSale";
 import { useAppStore } from "@/store/appStore";
 
 import FlashSaleTeaser from "@/components/home/FlashSaleTeaser";

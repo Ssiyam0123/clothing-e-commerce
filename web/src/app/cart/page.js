@@ -24,7 +24,7 @@ import {
 
 // Stores & Hooks
 import { useAuthStore } from "@/store/authStore";
-import { useOrders } from "@/hooks/useOrders";
+import { useOrders } from "@/hooks/client/useOrders";
 import { useCoupons } from "@/hooks/useCoupons";
 import { useSettings } from "@/hooks/useSettings";
 import { useAppStore } from "@/store/appStore";
@@ -286,7 +286,7 @@ function UnifiedSettlementContent() {
 
     setIsProcessing(true);
     try {
-      const result = await initOrder.mutateAsync({
+      const result = await initOrder({
         orderItems: items.map((i) => ({
           product: i.product._id,
           size: i.size?._id || i.size,

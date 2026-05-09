@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useOrders } from "@/hooks/useOrders";
+import { useOrders } from "@/hooks/client/useOrders";
 import { getImageUrl } from "@/utils/imageUtils";
 import { motion } from "framer-motion";
 import {
@@ -21,10 +21,7 @@ function SuccessContent() {
   const router = useRouter();
   const orderId = searchParams.get("orderId");
 
-  const { orderDetails: order, orderDetailsLoading: isLoading } = useOrders(
-    {},
-    orderId,
-  );
+  const { orderDetails: order, orderDetailsLoading: isLoading } = useOrders(orderId);
   const { clearCart } = useProductStore();
 
   useEffect(() => {

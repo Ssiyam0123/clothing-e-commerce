@@ -1,5 +1,6 @@
 import Product from "../product/product.model.js";
 import Coupon from "../coupon/coupon.model.js";
+import Cart from "../cart/cart.model.js";
 
 export const calculateValidatedOrder = async (orderItems, couponCode, cityId) => {
     let itemsPrice = 0;
@@ -48,3 +49,25 @@ export const normalizeShippingAddress = (addr) => ({
     zip: addr.zip || "1000", country: addr.country || "Bangladesh",
     pathao_city_id: addr.pathao_city_id, pathao_zone_id: addr.pathao_zone_id, pathao_area_id: addr.pathao_area_id,
 });
+
+export const finalizeOrderProcessing = async (order) => {
+    const bulkOps = order.orderItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product, "sizes.size": item.size },
+        update: { $inc: { "sizes.$.stock": -item.quantity } },
+      },
+    }));
+    
+    if (bulkOps.length > 0) await Product.bulkWrite(bulkOps);
+    
+    if (order.couponCode) {
+      await Coupon.findOneAndUpdate(
+        { code: order.couponCode },
+        { $inc: { usedCount: 1 } }
+      );
+    }
+  
+    if (!order.isDirectBuy && order.user) {
+      await Cart.findOneAndUpdate({ user: order.user }, { $set: { items: [] } });
+    }
+};

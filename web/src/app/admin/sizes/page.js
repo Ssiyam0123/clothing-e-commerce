@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSizes } from "@/hooks/useSizes";
-import { useCategories } from "@/hooks/useCategories";
+import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
 import DataTable from "@/components/admin/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 
 export default function Sizes() {
   const [selectedCategory, setSelectedCategory] = useState("");
-  const { categories, isLoading: categoriesLoading } = useCategories();
+  const { categories, isLoading: categoriesLoading } = useAdminCategories();
   const { sizes, isLoading, deleteSize } = useSizes(selectedCategory);
 
   const handleDelete = async (id) => {

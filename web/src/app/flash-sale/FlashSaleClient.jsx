@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useAppStore } from "@/store/appStore";
-import { useFlashSales } from "@/hooks/useFlashSale";
+import { useFlashSales, useSingleFlashSale } from "@/hooks/client/useFlashSale";
 import FlashSaleBanner from "@/components/store/FlashSaleBanner";
 import CountdownTimer from "@/components/store/CountdownTimer";
 import ProductCard from "@/components/common/ProductCard";

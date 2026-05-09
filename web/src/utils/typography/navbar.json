@@ -15,11 +15,13 @@
     "accountControl": "Account Settings",
     "authorization": "Sign In",
     "initLogin": "Get Started",
+    "categories": "Collections",
     "version": "Spectacular v1.0"
   },
   "bn": {
     "home": "হোম",
     "products": "পণ্যসমূহ",
+    "categories": "ক্যাটাগরি",
     "flashSale": "ফ্ল্যাশ সেল",
     "blog": "জার্নাল",
     "admin": "অ্যাডমিন",

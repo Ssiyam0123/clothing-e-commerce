@@ -2,8 +2,8 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useOrders } from "@/hooks/useOrders";
-import { useProducts } from "@/hooks/useProducts";
+import { useAdminOrders } from "@/hooks/admin/useAdminOrders";
+import { useProducts } from "@/hooks/client/useProducts";
 import { useUsers } from "@/hooks/useUsers";
 import { usePathao } from "@/hooks/usePathao";
 import { useCoupons } from "@/hooks/useCoupons";
@@ -27,7 +27,7 @@ import api from "@/lib/api";
 
 export default function CreateAdminOrder() {
   const router = useRouter();
-  const { createAdminOrder, isCreatingAdminOrder } = useOrders();
+  const { createAdminOrder, isCreating: isCreatingAdminOrder } = useAdminOrders();
   
   // 🛒 Items State
   const [items, setItems] = useState([]);
@@ -74,7 +74,7 @@ export default function CreateAdminOrder() {
       }
       setIsSearchingProducts(true);
       try {
-        const { data } = await api.get("/products", { 
+        const { data } = await api.get("/admin/products", { 
           params: { search: productSearch, limit: 5, isActive: "all" } 
         });
         setProducts(data.products);

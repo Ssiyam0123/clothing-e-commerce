@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { swalToast, swalError } from "@/utils/swal";
 import { Search, Plus, Minus, Trash2, Package, X } from "lucide-react";
-import { useAdminProducts } from "@/hooks/useAdminProducts";
+import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
 import { getImageUrl } from "@/utils/imageUtils";
 import { cn } from "@/lib/utils";
 

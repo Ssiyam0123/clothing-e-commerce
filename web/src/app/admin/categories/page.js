@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useCategories } from "@/hooks/useCategories";
+import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
 import { useSubcategories } from "@/hooks/useSubcategories";
 import { useSizes } from "@/hooks/useSizes";
 import { getImageUrl } from "@/utils/imageUtils";
@@ -15,7 +15,7 @@ import { Plus, Edit2, Trash2, Layers, Maximize2, Hash } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function CategoryMasterControl() {
-  const { categories, isLoading: catLoading, deleteCategory } = useCategories();
+  const { categories, isLoading: catLoading, deleteCategory } = useAdminCategories();
   const {
     subcategories,
     isLoading: subLoading,

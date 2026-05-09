@@ -6,16 +6,16 @@ import { fileURLToPath } from "url";
 
 // 📦 Route Imports
 import userRoutes from "./modules/user/user.routes.js";
-import categoryRoutes from "./modules/category/category.routes.js";
+import publicCategoryRoutes from "./modules/category/routes/public.category.routes.js";
 import subcategoryRoutes from "./modules/subcategory/subcategory.routes.js";
 import sizeRoutes from "./modules/size/size.routes.js";
-import productRoutes from "./modules/product/product.routes.js";
+import publicProductRoutes from "./modules/product/routes/public.product.routes.js";
 import cartRoutes from "./modules/cart/cart.routes.js";
 import wishlistRoutes from "./modules/wishlist/wishlist.routes.js"; // ✅ fixed import
-import orderRoutes from "./modules/order/order.routes.js";
+import publicOrderRoutes from "./modules/order/routes/public.order.routes.js";
 import pathaoRoutes from "./modules/pathao/pathao.routes.js";
 import reviewRoutes from "./modules/review/review.routes.js";
-import flashSaleRoutes from "./modules/flashSale/flashSale.routes.js";
+import publicFlashSaleRoutes from "./modules/flashSale/routes/public.flashSale.routes.js";
 import bannerCampaignRoutes from "./modules/bannerCampaign/bannerCampaign.routes.js";
 import adminRoutes from "./modules/admin/admin.routes.js";
 import couponRoutes from "./modules/coupon/coupon.routes.js";
@@ -91,16 +91,16 @@ app.get("/", (req, res) => {
 
 // API routes
 app.use("/api/users", userRoutes);
-app.use("/api/categories", categoryRoutes);
+app.use("/api/categories", publicCategoryRoutes);
 app.use("/api/subcategories", subcategoryRoutes);
 app.use("/api/sizes", sizeRoutes);
-app.use("/api/products", productRoutes);
+app.use("/api/products", publicProductRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/wishlist", wishlistRoutes);
-app.use("/api/orders", orderRoutes);
+app.use("/api/orders", publicOrderRoutes);
 app.use("/api/pathao", pathaoRoutes);
 app.use("/api/reviews", reviewRoutes);
-app.use("/api/flash-sales", flashSaleRoutes);
+app.use("/api/flash-sales", publicFlashSaleRoutes);
 app.use("/api/banner-campaigns", bannerCampaignRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/coupons", couponRoutes);

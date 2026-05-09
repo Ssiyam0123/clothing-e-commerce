@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { useCategories } from "@/hooks/useCategories";
+import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
 import { getImageUrl } from "@/utils/imageUtils";
 import { swalToast, swalError } from "@/utils/swal";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ export default function CategoryForm() {
   const router = useRouter();
   const isEdit = id !== "new";
 
-  const { categories, createCategory, updateCategory } = useCategories();
+  const { categories, isLoading, createCategory, updateCategory } = useAdminCategories();
   const [loading, setLoading] = useState(isEdit);
   const [imagePreview, setImagePreview] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);

@@ -1,4 +1,4 @@
-// src/hooks/useProducts.js
+// src/hooks/client/useProducts.js
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useMemo } from "react";
@@ -9,24 +9,20 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Read filter values from URL
   const filters = useMemo(
     () => ({
       search: searchParams.get("search") || initialFilters.search || "",
       sort: searchParams.get("sort") || initialFilters.sort || "",
-      category:
-        searchParams.get("category") || initialFilters.category || "all",
+      category: searchParams.get("category") || initialFilters.category || "all",
       page: Number(searchParams.get("page")) || initialFilters.page || 1,
       limit: initialFilters.limit || 30,
     }),
     [searchParams, initialFilters],
   );
 
-  // Helper to update URL and refetch
   const updateFilters = useCallback(
     (newFilters) => {
       const params = new URLSearchParams(searchParams.toString());
-
       Object.entries(newFilters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== "" && value !== "all") {
           params.set(key, value.toString());
@@ -34,39 +30,18 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
           params.delete(key);
         }
       });
-
-      // Reset page to 1 when any filter except page changes
-      if (newFilters.page === undefined) {
-        params.set("page", "1");
-      }
-
+      if (newFilters.page === undefined) params.set("page", "1");
       const queryString = params.toString();
-      router.push(`${pathname}${queryString ? `?${queryString}` : ""}`, {
-        scroll: false,
-      });
+      router.push(`${pathname}${queryString ? `?${queryString}` : ""}`, { scroll: false });
     },
     [searchParams, pathname, router],
   );
 
-  // Individual setters
-  const setSearch = useCallback(
-    (search) => updateFilters({ search }),
-    [updateFilters],
-  );
-  const setSort = useCallback(
-    (sort) => updateFilters({ sort }),
-    [updateFilters],
-  );
-  const setCategory = useCallback(
-    (category) => updateFilters({ category }),
-    [updateFilters],
-  );
-  const setPage = useCallback(
-    (page) => updateFilters({ page: page.toString() }),
-    [updateFilters],
-  );
+  const setSearch = useCallback((search) => updateFilters({ search }), [updateFilters]);
+  const setSort = useCallback((sort) => updateFilters({ sort }), [updateFilters]);
+  const setCategory = useCallback((category) => updateFilters({ category }), [updateFilters]);
+  const setPage = useCallback((page) => updateFilters({ page: page.toString() }), [updateFilters]);
 
-  // Prepare query parameters for API (exclude 'all' category)
   const apiParams = useMemo(
     () => ({
       page: filters.page,
@@ -79,10 +54,10 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
     [filters],
   );
 
-  // TanStack Query
   const { data, isLoading, isFetching, error } = useQuery({
     queryKey: ["products", apiParams],
     queryFn: async () => {
+      // 🚀 Interfaces with the Public Storefront API
       const response = await api.get("/products", { params: apiParams });
       return response.data;
     },
@@ -93,7 +68,6 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
   });
 
   return {
-    // Data
     products: data?.products || [],
     pagination: {
       total: data?.total || 0,
@@ -103,9 +77,7 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
     isLoading,
     isFetching,
     error,
-    // Current filter values
     filters,
-    // Setters to update URL
     setSearch,
     setSort,
     setCategory,

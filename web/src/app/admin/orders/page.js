@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, Suspense, useMemo } from "react";
-import { useOrders } from "@/hooks/useOrders";
+import { useAdminOrders } from "@/hooks/admin/useAdminOrders";
 import { useFilters } from "@/hooks/useFilters";
 import DataTable from "@/components/admin/DataTable";
 import TableSkeleton from "@/components/common/TableSkeleton";
@@ -31,12 +31,12 @@ function AdminOrdersContent() {
     [queryParams, status],
   );
 
-  const { allOrdersData, allOrdersLoading, isAllFetching, updateStatus } =
-    useOrders(finalQueryParams);
+  const { orders, total, pages, isLoading, isAllFetching, updateOrder } =
+    useAdminOrders(finalQueryParams);
 
   const handleQuickStatusUpdate = async (id, newStatus) => {
     try {
-      await updateStatus({ id, status: newStatus });
+      await updateOrder({ id, data: { orderStatus: newStatus } });
       // Toast is already handled in hook
     } catch (err) {
       // Error is already handled in hook
@@ -176,7 +176,7 @@ function AdminOrdersContent() {
               Total Orders
             </span>
             <span className="text-xl md:text-2xl font-black text-foreground leading-none">
-              {allOrdersData?.total || 0}
+              {total || 0}
             </span>
           </div>
           <Button asChild className="bg-foreground text-background hover:bg-primary hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group">
@@ -230,7 +230,7 @@ function AdminOrdersContent() {
         </div>
 
         <div className="relative pt-0">
-          {allOrdersLoading ? (
+          {isLoading ? (
             <div className="p-8">
               <TableSkeleton rowCount={10} colCount={6} />
             </div>
@@ -238,13 +238,13 @@ function AdminOrdersContent() {
             <div
               className={`transition-opacity duration-300 ${isAllFetching ? "opacity-50 pointer-events-none" : "opacity-100"}`}
             >
-              <DataTable columns={columns} data={allOrdersData?.orders || []} className="border-none rounded-none" />
+              <DataTable columns={columns} data={orders || []} className="border-none rounded-none" />
 
-              {allOrdersData?.pages > 1 && (
+              {pages > 1 && (
                 <div className="p-8 border-t border-border/10 bg-background/10">
                   <Pagination
-                    page={allOrdersData?.page}
-                    totalPages={allOrdersData?.pages}
+                    page={queryParams.page}
+                    totalPages={pages}
                     onPageChange={setPage}
                   />
                 </div>

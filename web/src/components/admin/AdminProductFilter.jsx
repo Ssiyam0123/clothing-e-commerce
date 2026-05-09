@@ -2,15 +2,15 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useAdminProducts } from "@/hooks/useAdminProducts";
-import { useCategories } from "@/hooks/useCategories";
+import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
+import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
 import { getImageUrl } from "@/utils/imageUtils";
 import FilterBar from "@/components/common/FilterBar";
 import { cn } from "@/lib/utils";
 
 export default function AdminProductFilter() {
   const { filters, setSearch, setSort, setCategory } = useAdminProducts();
-  const { categories } = useCategories();
+  const { categories } = useAdminCategories();
 
   // Drag-to-scroll for category buttons
   const sliderRef = useRef(null);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useProducts } from "@/hooks/useProducts";
+import { useProducts } from "@/hooks/client/useProducts";
 import { ProductCardSkeleton } from "@/components/common/Skeletons";
 import ProductCard from "../common/ProductCard";
 import Pagination from "@/components/common/Pagination";

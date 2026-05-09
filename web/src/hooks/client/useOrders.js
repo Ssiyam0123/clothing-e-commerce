@@ -1,0 +1,57 @@
+// src/hooks/client/useOrders.js
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/api";
+import { getGuestId } from "@/utils/guestId";
+import { swalError } from "@/utils/swal";
+import { useAuthStore } from "@/store/authStore";
+
+export const useOrders = (orderId = null) => {
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+  const guestId = getGuestId();
+  const userId = user?._id || guestId;
+
+  const { data: myOrders, isLoading: myOrdersLoading } = useQuery({
+    queryKey: ["myOrders", userId],
+    queryFn: async () => {
+      const { data } = await api.get("/orders/myorders");
+      return data;
+    },
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: orderDetails, isLoading: orderDetailsLoading } = useQuery({
+    queryKey: ["order", orderId],
+    queryFn: async () => {
+      const { data } = await api.get(`/orders/${orderId}`);
+      return data;
+    },
+    enabled: !!orderId,
+  });
+
+  const initOrder = useMutation({
+    mutationFn: async (orderData) => {
+      const { data } = await api.post("/orders/init", orderData);
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      if (data.url || data.redirectUrl) {
+        window.location.href = data.url || data.redirectUrl;
+      }
+    },
+    onError: (err) => {
+      swalError("Order Failed", err.response?.data?.message || "Protocol execution interrupted.");
+    },
+  });
+
+  return {
+    myOrders: myOrders || [],
+    isLoading: myOrdersLoading,
+    orderDetails,
+    orderDetailsLoading,
+    initOrder: initOrder.mutateAsync,
+    isInitializing: initOrder.isPending,
+  };
+};

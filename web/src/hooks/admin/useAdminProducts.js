@@ -1,4 +1,4 @@
-// src/hooks/useAdminProducts.js
+// src/hooks/admin/useAdminProducts.js
 import {
   useQuery,
   useMutation,
@@ -38,22 +38,10 @@ export const useAdminProducts = (initialFilters = {}) => {
     [searchParams, pathname, router],
   );
 
-  const setSearch = useCallback(
-    (search) => updateFilters({ search }),
-    [updateFilters],
-  );
-  const setSort = useCallback(
-    (sort) => updateFilters({ sort }),
-    [updateFilters],
-  );
-  const setCategory = useCallback(
-    (category) => updateFilters({ category }),
-    [updateFilters],
-  );
-  const setPage = useCallback(
-    (page) => updateFilters({ page: page.toString() }),
-    [updateFilters],
-  );
+  const setSearch = useCallback((search) => updateFilters({ search }), [updateFilters]);
+  const setSort = useCallback((sort) => updateFilters({ sort }), [updateFilters]);
+  const setCategory = useCallback((category) => updateFilters({ category }), [updateFilters]);
+  const setPage = useCallback((page) => updateFilters({ page: page.toString() }), [updateFilters]);
 
   const apiParams = useMemo(
     () => ({
@@ -61,7 +49,7 @@ export const useAdminProducts = (initialFilters = {}) => {
       limit: filters.limit,
       search: filters.search,
       sort: filters.sort,
-      isActive: "all", // admin sees all
+      isActive: "all",
       ...(filters.category !== "all" && { category: filters.category }),
     }),
     [filters],
@@ -72,7 +60,8 @@ export const useAdminProducts = (initialFilters = {}) => {
   const { data, isLoading, isFetching, error } = useQuery({
     queryKey: ["adminProducts", apiParams],
     queryFn: async () => {
-      const response = await api.get("/products", { params: apiParams });
+      // 🚀 Pointing to the new Admin-specific namespace
+      const response = await api.get("/admin/products", { params: apiParams });
       return response.data;
     },
     placeholderData: keepPreviousData,
@@ -82,7 +71,7 @@ export const useAdminProducts = (initialFilters = {}) => {
 
   const deleteProduct = useMutation({
     mutationFn: async (id) => {
-      const response = await api.delete(`/products/${id}`);
+      const response = await api.delete(`/admin/products/${id}`);
       return response.data;
     },
     onSuccess: () => {
@@ -93,7 +82,7 @@ export const useAdminProducts = (initialFilters = {}) => {
   const updateProduct = useMutation({
     mutationFn: async ({ id, data }) => {
       const isFormData = data instanceof FormData;
-      const response = await api.put(`/products/${id}`, data, {
+      const response = await api.put(`/admin/products/${id}`, data, {
         headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
       });
       return response.data;
@@ -106,7 +95,7 @@ export const useAdminProducts = (initialFilters = {}) => {
 
   const createProduct = useMutation({
     mutationFn: async (data) => {
-      const response = await api.post("/products", data, {
+      const response = await api.post("/admin/products", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return response.data;

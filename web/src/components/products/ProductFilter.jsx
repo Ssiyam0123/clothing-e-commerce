@@ -2,8 +2,8 @@
 
 import { useRef, useCallback } from "react";
 import Image from "next/image";
-import { useProducts } from "@/hooks/useProducts";
-import { useCategories } from "@/hooks/useCategories";
+import { useProducts } from "@/hooks/client/useProducts";
+import { useCategories } from "@/hooks/client/useCategories";
 import { getImageUrl } from "@/utils/imageUtils";
 import FilterBar from "@/components/common/FilterBar";
 import { useTrackingStore } from "@/store/trackingStore";

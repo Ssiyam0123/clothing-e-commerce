@@ -3,8 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { useOrders } from "@/hooks/useOrders";
-import { useAdminProducts } from "@/hooks/useAdminProducts";
+import { useAdminOrders } from "@/hooks/admin/useAdminOrders";
+import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
 import { getImageUrl } from "@/utils/imageUtils";
 import { swalToast, swalError } from "@/utils/swal";
 import Loader from "@/components/common/Loader";
@@ -32,7 +32,7 @@ export default function EditOrderPage() {
   const { id } = useParams();
   const router = useRouter();
   
-  const { orderDetails: order, orderDetailsLoading, updateOrder } = useOrders({}, id);
+  const { orderDetails: order, orderDetailsLoading, updateOrder } = useAdminOrders({}, id);
   const [searchTerm, setSearchTerm] = useState("");
   const { products: allProducts } = useAdminProducts({ search: searchTerm, limit: 5 });
   

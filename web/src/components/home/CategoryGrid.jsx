@@ -11,6 +11,7 @@ import "swiper/css";
 import "swiper/css/free-mode";
 
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export default function CategoryGrid({ categories }) {
   if (!categories || categories.length === 0) return null;
@@ -48,31 +49,46 @@ export default function CategoryGrid({ categories }) {
               >
                 {/* Background Image with advanced hover */}
                 <div className="absolute inset-0 transition-all duration-[1.5s] cubic-bezier(0.4, 0, 0.2, 1) group-hover:scale-110 group-hover:rotate-1">
-                  <Image
-                    src={getImageUrl(
-                      cat.image || "/placeholder-cat.jpg",
-                      800,
-                      80,
-                    )}
-                    alt={cat.name}
-                    fill
-                    sizes="(max-width: 768px) 80vw, 33vw"
-                    className="object-cover grayscale-[100%] contrast-125 transition-all duration-700 group-hover:grayscale-0 group-hover:contrast-100"
-                    loading="lazy"
-                  />
+                  {cat.slug === 'on-sale' ? (
+                    <div className="absolute inset-0 bg-rose-600/20">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-rose-500/30 via-transparent to-transparent opacity-60" />
+                    </div>
+                  ) : (
+                    <Image
+                      src={getImageUrl(
+                        cat.image || "/placeholder-cat.jpg",
+                        800,
+                        80,
+                      )}
+                      alt={cat.name}
+                      fill
+                      sizes="(max-width: 768px) 80vw, 33vw"
+                      className="object-cover grayscale-[100%] contrast-125 transition-all duration-700 group-hover:grayscale-0 group-hover:contrast-100"
+                      loading="lazy"
+                    />
+                  )}
                 </div>
 
                 {/* Multi-layered Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-700" />
-                <div className="absolute inset-0 bg-accent-primary/10 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className={cn(
+                  "absolute inset-0 transition-opacity duration-700",
+                  cat.slug === 'on-sale' ? "bg-gradient-to-t from-rose-950/90 via-rose-900/20 to-transparent opacity-80" : "bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-40"
+                )} />
+                <div className={cn(
+                  "absolute inset-0 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-700",
+                  cat.slug === 'on-sale' ? "bg-rose-500/20" : "bg-accent-primary/10"
+                )} />
 
                 {/* Content Container */}
                 <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 z-10">
                   <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out">
                     <div className="inline-flex items-center gap-2 mb-3">
-                      <span className="w-8 h-[1px] bg-accent-secondary" />
-                      <span className="text-accent-secondary text-[8px] md:text-[10px] font-black tracking-[0.4em] uppercase">
-                        Syndicate
+                      <span className={cn("w-8 h-[1px]", cat.slug === 'on-sale' ? "bg-rose-500" : "bg-accent-secondary")} />
+                      <span className={cn(
+                        "text-[8px] md:text-[10px] font-black tracking-[0.4em] uppercase",
+                        cat.slug === 'on-sale' ? "text-rose-500" : "text-accent-secondary"
+                      )}>
+                        {cat.slug === 'on-sale' ? "Limited Offer" : "Syndicate"}
                       </span>
                     </div>
                     

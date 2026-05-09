@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { useOrders } from "@/hooks/useOrders";
+import { useAdminOrders } from "@/hooks/admin/useAdminOrders";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import Loader from "@/components/common/Loader";
 import { getImageUrl } from "@/utils/imageUtils";
@@ -34,10 +34,9 @@ export default function OrderDetailsPage() {
   const {
     orderDetails: order,
     orderDetailsLoading,
-    updateStatus,
-    syncToPathao,
     updateOrder,
-  } = useOrders({}, id);
+    syncToPathao,
+  } = useAdminOrders({}, id);
   const [syncing, setSyncing] = useState(false);
 
   const customerName = useMemo(
@@ -57,7 +56,7 @@ export default function OrderDetailsPage() {
     );
     if (confirmed) {
       try {
-        await updateStatus({ id: order._id, status: newStatus });
+        await updateOrder({ id: order._id, data: { orderStatus: newStatus } });
         swalToast(`Order updated to ${newStatus}`);
       } catch (err) {
         swalError("Update Failed", err.response?.data?.message);

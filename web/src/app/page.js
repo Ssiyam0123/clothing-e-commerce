@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, cache } from "react";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { getTranslation } from "@/utils/typography/handler";
@@ -13,21 +13,22 @@ import SectionHeader from "@/components/common/SectionHeader";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-async function getHomeData() {
+// 🚀 Request-level Memoization + Edge Caching
+const getHomeData = cache(async () => {
   try {
     const [productsRes, categoriesRes, flashSalesRes, bannerRes] =
       await Promise.all([
         fetch(`${API_URL}/products?limit=24`, {
-          next: { revalidate: 60, tags: ["products", "home-data"] },
+          next: { revalidate: 3600, tags: ["products", "home-data"] },
         }),
         fetch(`${API_URL}/categories`, {
           next: { revalidate: 3600, tags: ["categories", "home-data"] },
         }),
         fetch(`${API_URL}/flash-sales/active`, {
-          next: { revalidate: 30, tags: ["flash-sale", "home-data"] },
+          next: { revalidate: 300, tags: ["flash-sale", "home-data"] }, // Flash sale is more dynamic
         }),
         fetch(`${API_URL}/banner-campaigns/active`, {
-          next: { revalidate: 60, tags: ["banners", "home-data"] },
+          next: { revalidate: 3600, tags: ["banners", "home-data"] },
         }),
       ]);
 
@@ -46,7 +47,7 @@ async function getHomeData() {
       activeCampaign: null,
     };
   }
-}
+});
 
 export default async function HomePage() {
   const cookieStore = await cookies();
