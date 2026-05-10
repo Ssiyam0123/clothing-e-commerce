@@ -307,7 +307,7 @@ export default function ReviewSection({ productId, onReviewChange }) {
                 <Button
                   variant="ghost"
                   onClick={handleDelete}
-                  className="flex-1 md:flex-none h-14 rounded-2xl text-rose-500 hover:bg-rose-500 hover:text-white font-black uppercase text-[10px] tracking-widest"
+                  className="flex-1 md:flex-none h-14 rounded-2xl text-accent-secondary hover:bg-accent-secondary hover:text-white font-black uppercase text-[10px] tracking-widest"
                 >
                   <Trash2 size={16} className="mr-3" />
                   {ui.deleteBtn}
@@ -333,7 +333,7 @@ export default function ReviewSection({ productId, onReviewChange }) {
                <h3 className="text-3xl font-black uppercase tracking-tighter text-foreground italic">
                 {userReview && isEditing ? ui.editTitle : ui.writeTitle}
               </h3>
-              <Button variant="ghost" size="icon" onClick={handleCancel} className="rounded-full hover:bg-rose-500 hover:text-white transition-all">
+              <Button variant="ghost" size="icon" onClick={handleCancel} className="rounded-full hover:bg-accent-secondary hover:text-white transition-all">
                 <X size={24} />
               </Button>
             </div>
@@ -396,7 +396,7 @@ export default function ReviewSection({ productId, onReviewChange }) {
                             <button
                               type="button"
                               onClick={() => removeImage(idx, isExistingImage, existingUrl)}
-                              className="absolute inset-0 bg-rose-600/90 flex items-center justify-center text-white opacity-0 group-hover/preview:opacity-100 transition-all"
+                              className="absolute inset-0 bg-accent-secondary/90 flex items-center justify-center text-white opacity-0 group-hover/preview:opacity-100 transition-all"
                             >
                               <X size={24} />
                             </button>
@@ -426,7 +426,7 @@ export default function ReviewSection({ productId, onReviewChange }) {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-[2] h-16 rounded-full bg-accent-secondary hover:bg-rose-700 text-white font-black uppercase tracking-[0.3em] text-[11px] shadow-2xl shadow-rose-600/20 disabled:opacity-50"
+                className="flex-[2] h-16 rounded-full bg-accent-secondary hover:brightness-110 text-white font-black uppercase tracking-[0.3em] text-[11px] shadow-2xl shadow-accent-secondary/20 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <Loader size="small" />

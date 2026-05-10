@@ -127,7 +127,7 @@ export default function ProductActionsClient({ product }) {
               <Label
                 htmlFor={s.size._id}
                 className={cn(
-                  "flex h-16 items-center justify-center rounded-2xl border-2 border-accent/50 bg-background text-xs font-black uppercase transition-all duration-300 cursor-pointer peer-data-[state=checked]:border-accent-secondary peer-data-[state=checked]:bg-accent-secondary peer-data-[state=checked]:text-white peer-data-[state=checked]:shadow-lg peer-data-[state=checked]:shadow-rose-600/20 peer-disabled:opacity-20 peer-disabled:grayscale hover:border-accent-secondary/50",
+                  "flex h-16 items-center justify-center rounded-2xl border-2 border-accent/50 bg-background text-xs font-black uppercase transition-all duration-300 cursor-pointer peer-data-[state=checked]:border-accent-secondary peer-data-[state=checked]:bg-accent-secondary peer-data-[state=checked]:text-white peer-data-[state=checked]:shadow-lg peer-data-[state=checked]:shadow-accent-secondary/20 peer-disabled:opacity-20 peer-disabled:grayscale hover:border-accent-secondary/50",
                   s.stock <= 0 && "cursor-not-allowed"
                 )}
               >
@@ -176,9 +176,7 @@ export default function ProductActionsClient({ product }) {
             )}
           </Button>
         </div>
-        <Button
-          onClick={handleInstantBuy}
-          className="w-full h-16 bg-accent-secondary hover:bg-rose-700 text-white rounded-full font-black uppercase text-[11px] tracking-[0.4em] shadow-2xl shadow-rose-600/20 transition-all active:scale-[0.98]"
+          className="w-full h-16 bg-accent-secondary hover:brightness-110 text-white rounded-full font-black uppercase text-[11px] tracking-[0.4em] shadow-2xl shadow-accent-secondary/20 transition-all active:scale-[0.98]"
         >
           <CreditCard size={18} className="mr-4" />
           {ui.buy}
@@ -227,7 +225,7 @@ export default function ProductActionsClient({ product }) {
         </Button>
         <Button
           onClick={handleInstantBuy}
-          className="flex-[2] h-14 bg-accent-secondary text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-rose-600/20"
+          className="flex-[2] h-14 bg-accent-secondary text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-accent-secondary/20"
         >
           {lang === "bn" ? "অর্ডার" : "Checkout"}
         </Button>

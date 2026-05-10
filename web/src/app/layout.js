@@ -209,7 +209,11 @@ export default async function RootLayout({ children }) {
       <body suppressHydrationWarning>
         <QueryProvider>
           <TooltipProvider>
-            <ClientInitialization initialSettings={settings} />
+            <ClientInitialization 
+              initialSettings={settings} 
+              initialLang={lang}
+              initialTheme={colorMode}
+            />
             <ThemeProvider>
               {isMaintenance ? (
                 <div className="min-h-screen bg-page flex flex-col items-center justify-center text-center p-6">

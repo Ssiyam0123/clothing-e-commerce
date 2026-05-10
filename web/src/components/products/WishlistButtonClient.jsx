@@ -19,7 +19,7 @@ export default function WishlistButtonClient({ product }) {
   return (
     <button
       onClick={() => toggleWishlist(product, isAuthenticated)}
-      className={`p-3 rounded-full transition-all ${inWishlist ? "text-rose-500 scale-110" : "text-muted dark:text-secondary"}`}
+      className={`p-3 rounded-full transition-all ${inWishlist ? "text-accent-secondary scale-110" : "text-muted dark:text-secondary"}`}
       aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
     >
       <Heart size={24} fill={inWishlist ? "currentColor" : "none"} />

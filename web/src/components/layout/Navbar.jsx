@@ -117,7 +117,7 @@ export default function Navbar() {
                 className={cn(
                   "text-[11px] font-black uppercase tracking-[0.4em] transition-all hover:text-accent-secondary relative group flex items-center gap-2 whitespace-nowrap",
                   pathname === link.href ? "text-accent-secondary" : "text-foreground",
-                  link.isSpecial && "text-rose-500 hover:text-rose-600"
+                  link.isSpecial && "text-accent-secondary hover:brightness-125"
                 )}
               >
                 {link.isSpecial && <Shield size={12} className="animate-pulse" />}
@@ -125,7 +125,7 @@ export default function Navbar() {
                 <span className={cn(
                   "absolute -bottom-2 left-0 h-0.5 bg-accent-secondary transition-all duration-500",
                   pathname === link.href ? "w-full" : "w-0 group-hover:w-full",
-                  link.isSpecial && "bg-rose-500"
+                  link.isSpecial && "bg-accent-secondary"
                 )} />
               </Link>
             );
@@ -228,10 +228,10 @@ export default function Navbar() {
                 
                 <DropdownMenuItem 
                   onClick={logout}
-                  className="flex items-center gap-3 rounded-2xl p-4 font-black text-[11px] uppercase tracking-widest cursor-pointer text-rose-500 hover:bg-rose-500/10 focus:bg-rose-500/10 group transition-all"
+                  className="flex items-center gap-3 rounded-2xl p-4 font-black text-[11px] uppercase tracking-widest cursor-pointer text-accent-secondary hover:bg-accent-secondary/10 focus:bg-accent-secondary/10 group transition-all"
                 >
                   <LogOut size={16} className="group-hover:translate-x-1 transition-transform" />
-                  {mounted ? t.logout : "Logout"}
+                  {mounted ? t.logout : "LOGOUT"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -321,7 +321,7 @@ export default function Navbar() {
                             onClick={() => setIsMenuOpen(false)}
                             className={cn(
                               "text-2xl sm:text-3xl font-black uppercase tracking-tighter hover:text-accent-secondary transition-colors italic block break-words",
-                              link.isSpecial ? "text-rose-500" : "text-foreground"
+                              link.isSpecial ? "text-accent-secondary" : "text-foreground"
                             )}
                           >
                             {label}
@@ -350,9 +350,9 @@ export default function Navbar() {
                       <Button 
                         variant="ghost" 
                         onClick={() => { logout(); setIsMenuOpen(false); }}
-                        className="w-full h-12 rounded-2xl border border-rose-500/20 text-rose-500 font-black uppercase tracking-widest text-[9px] hover:bg-rose-500 hover:text-white transition-all mt-4"
+                        className="w-full h-12 rounded-2xl border border-accent-secondary/20 text-accent-secondary font-black uppercase tracking-widest text-[9px] hover:bg-accent-secondary hover:text-white transition-all mt-4"
                       >
-                        {mounted ? t.logout : "Logout"}
+                        {mounted ? t.logout : "LOGOUT"}
                       </Button>
                     </div>
                   ) : (

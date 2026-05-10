@@ -16,6 +16,8 @@ import {
 import { toast } from "sonner";
 import api from "@/lib/api";
 import { useAppStore } from "@/store/appStore";
+import { useTheme } from "@/hooks/useTheme";
+import { revalidateSettings } from "@/app/actions/revalidate";
 
 // Vanguard UI Components
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -28,6 +30,7 @@ import { cn } from "@/lib/utils";
 export default function SettingsPage() {
   const router = useRouter();
   const { initApp } = useAppStore();
+  useTheme();
   const [activeTab, setActiveTab] = useState("branding");
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
@@ -128,8 +131,9 @@ export default function SettingsPage() {
 
       toast.success("Identity Matrix Updated Successfully");
       
-      // 🚀 Sync Global Store
+      // 🚀 Sync Global Store & Revalidate SSR Cache
       await initApp();
+      await revalidateSettings();
       
     } catch (error) {
       console.error("Update Error:", error);
@@ -167,7 +171,7 @@ export default function SettingsPage() {
         <Button
           onClick={handleSubmit}
           disabled={loading}
-          className="bg-foreground text-background hover:bg-rose-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group relative z-10 w-full md:w-auto"
+          className="bg-foreground text-background hover:bg-accent-secondary hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group relative z-10 w-full md:w-auto"
         >
           <Save size={18} className={cn("mr-3", loading && "animate-pulse")} />
           {loading ? "Syncing..." : "Apply Changes"}
@@ -203,7 +207,7 @@ export default function SettingsPage() {
                   {tab.desc}
                 </p>
                 {activeTab === tab.id && (
-                  <motion.div layoutId="tab-indicator" className="absolute inset-0 bg-gradient-to-r from-rose-600/0 via-rose-600/20 to-rose-600/0 opacity-50" />
+                  <motion.div layoutId="tab-indicator" className="absolute inset-0 bg-gradient-to-r from-accent-secondary/0 via-accent-secondary/20 to-accent-secondary/0 opacity-50" />
                 )}
               </button>
             ))}
@@ -365,9 +369,9 @@ export default function SettingsPage() {
                             })}
                             className={cn(
                               "group relative p-6 rounded-3xl border-2 transition-all duration-500 text-left",
-                              formData.branding?.defaultThemeFont === font
-                                ? "border-rose-600 bg-rose-600/5 shadow-2xl"
-                                : "border-border/5 hover:border-border/20 bg-muted/20"
+                               formData.branding?.defaultThemeFont === font
+                                 ? "border-accent-secondary bg-accent-secondary/5 shadow-2xl"
+                                 : "border-border/5 hover:border-border/20 bg-muted/20"
                             )}
                           >
                              <div className="flex flex-col gap-4">
@@ -375,7 +379,7 @@ export default function SettingsPage() {
                                 <span className="text-[10px] font-black uppercase tracking-widest opacity-60">{font}</span>
                              </div>
                              {formData.branding?.defaultThemeFont === font && (
-                               <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-rose-600 animate-pulse" />
+                               <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-accent-secondary animate-pulse" />
                              )}
                           </button>
                         ))}
@@ -405,16 +409,16 @@ export default function SettingsPage() {
                             })}
                             className={cn(
                               "group relative p-6 rounded-3xl border-2 transition-all duration-500",
-                              formData.branding?.activeTheme === theme
-                                ? "border-rose-600 bg-rose-600/5 shadow-2xl"
-                                : "border-border/5 hover:border-border/20 bg-muted/20"
+                               formData.branding?.activeTheme === theme
+                                 ? "border-accent-secondary bg-accent-secondary/5 shadow-2xl"
+                                 : "border-border/5 hover:border-border/20 bg-muted/20"
                             )}
                           >
                              <span className="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">
                                {theme}
                              </span>
                              {formData.branding?.activeTheme === theme && (
-                               <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-rose-600 animate-pulse" />
+                               <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-accent-secondary animate-pulse" />
                              )}
                           </button>
                         ))}

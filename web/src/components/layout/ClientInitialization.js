@@ -9,14 +9,14 @@ const SupportChat = dynamic(() => import("@/components/chat/SupportChat"), {
   ssr: false
 });
 
-export default function ClientInitialization({ initialSettings }) {
+export default function ClientInitialization({ initialSettings, initialLang, initialTheme }) {
   const setSettings = useAppStore((state) => state.setSettings);
   const initApp = useAppStore((state) => state.initApp);
   const checkSession = useAuthStore((state) => state.checkSession);
 
   useEffect(() => {
     if (initialSettings) {
-      setSettings(initialSettings);
+      setSettings(initialSettings, { lang: initialLang, theme: initialTheme });
     } else {
       initApp();
     }

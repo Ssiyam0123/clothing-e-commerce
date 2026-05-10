@@ -10,8 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/store/appStore";
 import { useAuthStore } from "@/store/authStore";
 import { Menu, Globe, Sun, Moon, LogOut } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function AdminLayout({ children }) {
   const { user, isLoading: authLoading, logout } = useAuthStore();
@@ -19,6 +20,7 @@ export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { theme, toggleTheme, isMounted } = useAppStore();
+  useTheme();
 
   const isChatRoute = pathname?.startsWith("/admin/chat");
   const isFullPage = isChatRoute;
@@ -107,6 +109,10 @@ export default function AdminLayout({ children }) {
                     </button>
                   </SheetTrigger>
                   <SheetContent side="left" className="p-0 w-72 bg-sidebar border-r border-sidebar-border [&>button]:hidden">
+                    <SheetHeader className="sr-only">
+                      <SheetTitle>Admin Navigation</SheetTitle>
+                      <SheetDescription>Access administrative control panels and settings.</SheetDescription>
+                    </SheetHeader>
                     <Sidebar className="border-none" onItemClick={() => setIsSidebarOpen(false)} />
                   </SheetContent>
                 </Sheet>

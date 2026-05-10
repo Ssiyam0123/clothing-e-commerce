@@ -84,7 +84,7 @@ export default function ProfileSecurity({ ui, onUpdate, loading }) {
           <Button 
             type="submit" 
             disabled={loading}
-            className="h-16 px-12 rounded-full bg-accent-secondary text-white font-black uppercase tracking-widest text-[11px] hover:bg-rose-700 transition-all shadow-2xl disabled:opacity-50"
+            className="h-16 px-12 rounded-full bg-accent-secondary text-white font-black uppercase tracking-widest text-[11px] hover:brightness-110 transition-all shadow-2xl disabled:opacity-50"
           >
             {loading ? (
               <>

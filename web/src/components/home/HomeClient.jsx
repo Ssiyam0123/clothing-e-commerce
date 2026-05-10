@@ -33,7 +33,7 @@ const sectionVariants = {
 const SectionHeader = ({ title, subtitle, badge }) => (
   <div className="flex flex-col gap-1.5 md:gap-2">
     {badge && (
-      <div className="flex items-center gap-2 text-rose-500 font-black text-[9px] md:text-[10px] uppercase tracking-[0.4em] mb-0.5">
+      <div className="flex items-center gap-2 text-accent-secondary font-black text-[9px] md:text-[10px] uppercase tracking-[0.4em] mb-0.5">
         <Sparkles size={10} className="animate-pulse" />
         {badge}
       </div>
@@ -144,9 +144,8 @@ export default function HomeClient() {
               title={ui.featTitle}
               subtitle="Masterpieces Crafted within the Foundry"
             />
-            <Link
               href="/products"
-              className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-secondary hover:text-rose-600 transition-all pb-1 border-b-2 border-transparent hover:border-rose-600"
+              className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-secondary hover:text-accent-secondary transition-all pb-1 border-b-2 border-transparent hover:border-accent-secondary"
             >
               {lang === "bn" ? "সব দেখুন" : "Explore All"}
               <ArrowRight

@@ -50,7 +50,7 @@ const WishlistButton = memo(({ product, lang }) => {
       onClick={handleToggle}
       className={`absolute top-4 right-4 z-20 p-2.5 rounded-full backdrop-blur-md transition-all duration-200 ${
         inWishlist
-          ? "bg-accent-secondary text-primary shadow-lg shadow-rose-500/40"
+          ? "bg-accent-secondary text-primary shadow-lg shadow-accent-secondary/40"
           : "bg-surface text-primary "
       }`}
     >

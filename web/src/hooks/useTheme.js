@@ -32,8 +32,10 @@ export function useTheme() {
         ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
         : targetTheme;
 
-      root.classList.add(resolvedMode);
-      root.setAttribute("data-color-mode", resolvedMode);
+      if (resolvedMode) {
+        root.classList.add(resolvedMode);
+        root.setAttribute("data-color-mode", resolvedMode);
+      }
 
       // ✅ Apply Global Color Theme (Zinc, Rose, etc.)
       setGlobalColorTheme(resolvedMode, targetColor);

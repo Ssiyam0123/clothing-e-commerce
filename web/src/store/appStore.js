@@ -44,7 +44,7 @@ export const useAppStore = create((set, get) => ({
     setCookie("vanguard-lang", lang);
   },
 
-  setSettings: (data) => {
+  setSettings: (data, serverValues = {}) => {
     if (!data) return;
     const branding = data.branding || {};
     
@@ -56,20 +56,20 @@ export const useAppStore = create((set, get) => ({
 
     set({ 
       settings: data,
-      theme: getCookie("vanguard-theme-mode") || defaultTheme, 
-      themeColor: getCookie("vanguard-theme-color") || defaultThemeColor,
-      themeFont: getCookie("vanguard-theme-font") || defaultThemeFont,
-      identityTheme: getCookie("vanguard-identity-theme") || identityTheme,
-      lang: getCookie("vanguard-lang") || defaultLang,
+      theme: serverValues.theme || getCookie("vanguard-theme-mode") || defaultTheme, 
+      themeColor: defaultThemeColor, // Priority: DB Settings (Identity)
+      themeFont: defaultThemeFont,   // Priority: DB Settings (Identity)
+      identityTheme: identityTheme,   // Priority: DB Settings (Identity)
+      lang: serverValues.lang || getCookie("vanguard-lang") || defaultLang,
       isMounted: true 
     });
 
-    // Sync cookies if not present
-    if (!getCookie("vanguard-theme-mode")) setCookie("vanguard-theme-mode", defaultTheme);
-    if (!getCookie("vanguard-theme-color")) setCookie("vanguard-theme-color", defaultThemeColor);
-    if (!getCookie("vanguard-theme-font")) setCookie("vanguard-theme-font", defaultThemeFont);
-    if (!getCookie("vanguard-identity-theme")) setCookie("vanguard-identity-theme", identityTheme);
-    if (!getCookie("vanguard-lang")) setCookie("vanguard-lang", defaultLang);
+    // Sync cookies
+    setCookie("vanguard-theme-mode", serverValues.theme || getCookie("vanguard-theme-mode") || defaultTheme);
+    setCookie("vanguard-theme-color", defaultThemeColor);
+    setCookie("vanguard-theme-font", defaultThemeFont);
+    setCookie("vanguard-identity-theme", identityTheme);
+    setCookie("vanguard-lang", serverValues.lang || getCookie("vanguard-lang") || defaultLang);
   },
 
   initApp: async () => {
