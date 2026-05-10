@@ -185,3 +185,22 @@ export const getPublicProductBySlug = asyncHandler(async (req, res) => {
     const { isActive, featuredOrder, ...publicData } = product;
     res.json(publicData);
 });
+
+export const getPublicProductById = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: 'Invalid product identity protocol' });
+    }
+
+    const product = await Product.findOne({ _id: id, isActive: true })
+        .populate('category', 'name slug')
+        .populate('subcategory', 'name slug')
+        .populate('sizes.size', 'name')
+        .lean();
+
+    if (!product) return res.status(404).json({ message: 'Artifact not found' });
+
+    const { isActive, featuredOrder, ...publicData } = product;
+    res.json(publicData);
+});

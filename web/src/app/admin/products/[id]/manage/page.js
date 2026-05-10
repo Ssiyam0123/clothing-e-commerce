@@ -49,8 +49,8 @@ export default function ProductManagement() {
     isLoading: pLoading,
     refetch,
   } = useQuery({
-    queryKey: ["product", id],
-    queryFn: async () => (await api.get(`/products/${id}`)).data,
+    queryKey: ["adminProduct", id],
+    queryFn: async () => (await api.get(`/admin/products/${id}`)).data,
   });
 
   const { data: reviewsData, refetch: refetchReviews } = useQuery({

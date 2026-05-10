@@ -161,29 +161,41 @@ export const getAdminProducts = asyncHandler(async (req, res) => {
 
     // Populate full details for Admin
     pipeline.push(
+        { $unwind: { path: '$sizes', preserveNullAndEmptyArrays: true } },
         {
             $lookup: {
                 from: 'sizes',
                 localField: 'sizes.size',
                 foreignField: '_id',
-                as: 'sizeDetails'
+                as: 'sizes.size'
+            }
+        },
+        { $unwind: { path: '$sizes.size', preserveNullAndEmptyArrays: true } },
+        {
+            $group: {
+                _id: '$_id',
+                root: { $first: '$$ROOT' },
+                sizes: { $push: '$sizes' }
             }
         },
         {
-            $addFields: {
-                sizes: {
-                    $map: {
-                        input: '$sizes',
-                        as: 's',
-                        in: {
-                            size: { $arrayElemAt: [{ $filter: { input: '$sizeDetails', as: 'sd', cond: { $eq: [{ $toString: '$$sd._id' }, { $toString: '$$s.size' }] } } }, 0] },
-                            stock: '$$s.stock'
+            $replaceRoot: {
+                newRoot: {
+                    $mergeObjects: [
+                        '$root',
+                        {
+                            sizes: {
+                                $filter: {
+                                    input: '$sizes',
+                                    as: 's',
+                                    cond: { $ne: ['$$s', {}] }
+                                }
+                            }
                         }
-                    }
+                    ]
                 }
             }
         },
-        { $project: { sizeDetails: 0 } },
         {
             $lookup: { from: 'categories', localField: 'category', foreignField: '_id', as: 'category' }
         },
