@@ -18,7 +18,7 @@ export const createProductSchema = z.object({
   discount: z.number().min(0).max(100).optional().default(0),
   images: z.array(z.string()).optional(),
   category: z.string().regex(objectIdRegex),
-  subcategory: z.string().regex(objectIdRegex).optional(),
+  subcategory: z.string().regex(objectIdRegex).optional().nullable(),
   sizes: z.array(sizeItemSchema).optional(),
   tags: z.array(z.string()).optional(),
   isActive: z.boolean().optional().default(true),

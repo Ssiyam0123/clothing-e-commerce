@@ -176,6 +176,8 @@ export default function ProductActionsClient({ product }) {
             )}
           </Button>
         </div>
+        <Button
+          onClick={handleInstantBuy}
           className="w-full h-16 bg-accent-secondary hover:brightness-110 text-white rounded-full font-black uppercase text-[11px] tracking-[0.4em] shadow-2xl shadow-accent-secondary/20 transition-all active:scale-[0.98]"
         >
           <CreditCard size={18} className="mr-4" />

@@ -355,7 +355,7 @@ async function CategoryCollectionWrapper({ dataPromise, lang, t, section }) {
       <ProductSection products={catProducts} showLoadMore={false} lang={lang} ui={t} />
       <div className="flex justify-center mt-12">
         <Link 
-          href={config.subcategoryId ? `/products?subcategory=${config.subcategoryId}` : `/products?category=${config.slug}`}
+          href={config.subcategoryId ? `/products?subcategory=${config.slug}` : `/products?category=${config.slug}`}
           className="group flex items-center gap-4 px-10 py-5 rounded-full bg-foreground text-background font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500 shadow-xl hover:shadow-primary/20"
         >
           {t.viewMore || "View Collection"} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />

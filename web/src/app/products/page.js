@@ -77,10 +77,14 @@ async function getInitialProducts(searchParams) {
     }
   }
 
+  if (params.get("subcategory") && params.get("subcategory") !== "all") {
+    apiParams.set("subcategory", params.get("subcategory"));
+  }
+
   // Optimize data transfer
   apiParams.set(
     "fields",
-    "name,slug,price,discount,images,category,averageRating,sizes,isFeatured,isNew",
+    "name,slug,price,discount,images,category,subcategory,averageRating,sizes,isFeatured,isNew",
   );
 
   try {

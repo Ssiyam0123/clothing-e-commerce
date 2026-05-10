@@ -61,6 +61,20 @@ export default function ProductForm() {
   } = useForm();
   
   const watchedCategory = watch("category");
+  const watchedName = watch("name");
+
+  // 🧬 Automated Slug Generation Protocol
+  useEffect(() => {
+    if (watchedName && !isEdit) {
+      const generatedSlug = watchedName
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "") // Remove special chars
+        .replace(/[\s_-]+/g, "-") // Replace spaces/underscores with -
+        .replace(/^-+|-+$/g, ""); // Trim dashes
+      setValue("slug", generatedSlug);
+    }
+  }, [watchedName, setValue, isEdit]);
 
   useEffect(() => {
     if (watchedCategory && sizes) {
@@ -261,19 +275,15 @@ export default function ProductForm() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="space-y-4">
+            <div className="space-y-4 md:col-span-2">
               <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Artifact Name *</Label>
               <Input 
                 {...register("name", { required: true })}
+                placeholder="e.g. Minimalist Vanguard Oversized Tee"
                 className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
               />
-            </div>
-            <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Unique Slug Identifier *</Label>
-              <Input 
-                {...register("slug", { required: true, pattern: /^[a-z0-9-]+$/ })}
-                className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20 text-indigo-600"
-              />
+              {/* Hidden Slug for Form Integrity */}
+              <input type="hidden" {...register("slug")} />
             </div>
             <div className="md:col-span-2 space-y-4">
               <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Descriptive Narrative</Label>

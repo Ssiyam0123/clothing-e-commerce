@@ -12,7 +12,8 @@ import { getImageUrl } from "@/utils/imageUtils";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Settings, Plus, History } from "lucide-react";
+import { Edit, Trash2, Settings, Plus, History, Eye, EyeOff, Star, MessageSquare } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function AdminProductsContent() {
   const {
@@ -107,68 +108,66 @@ function AdminProductsContent() {
       },
     },
     {
-      label: "Featured",
-      render: (item) => (
-        <button
-          onClick={async () => {
-             try {
-               await updateProduct({ id: item._id, data: { isFeatured: !item.isFeatured } });
-               swalToast(item.isFeatured ? "Removed from Featured" : "Marked as Featured", "success");
-             } catch (err) {
-               swalError("Update Error", err.message);
-             }
-          }}
-          className={`inline-flex items-center px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-full border transition-all hover:scale-105 active:scale-95 cursor-pointer ${
-            item.isFeatured
-              ? "bg-amber-500/10 text-amber-600 border-amber-500/20 hover:bg-amber-500/20"
-              : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
-          }`}
-        >
-          {item.isFeatured ? "★ Featured" : "☆ Standard"}
-        </button>
-      ),
-    },
-    {
-      label: "Visibility",
-      render: (item) => (
-        <button
-          onClick={() => handleToggleActive(item._id, item.isActive)}
-          className={`inline-flex items-center px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-full border transition-all hover:scale-105 active:scale-95 cursor-pointer ${
-            item.isActive
-              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20"
-              : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
-          }`}
-        >
-          {item.isActive ? "● Public" : "○ Hidden"}
-        </button>
-      ),
-    },
-    {
-      label: "Ratings",
-      render: (item) => (
-        <button
-          onClick={async () => {
-             try {
-               await updateProduct({ id: item._id, data: { showReviews: !item.showReviews } });
-               swalToast(item.showReviews ? "Reviews Suppressed" : "Reviews Authorized", "success");
-             } catch (err) {
-               swalError("Protocol Error", err.message);
-             }
-          }}
-          className={`inline-flex items-center px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-full border transition-all hover:scale-105 active:scale-95 cursor-pointer ${
-            item.showReviews !== false
-              ? "bg-indigo-500/10 text-indigo-600 border-indigo-500/20 hover:bg-indigo-500/20"
-              : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
-          }`}
-        >
-          {item.showReviews !== false ? "★ Active" : "☆ Off"}
-        </button>
-      ),
-    },
-    {
       label: "Actions",
       render: (item) => (
         <div className="flex items-center gap-2 justify-end">
+          {/* Status Toggles */}
+          <button
+            onClick={() => handleToggleActive(item._id, item.isActive)}
+            className={cn(
+              "p-2.5 rounded-xl transition-all shadow-sm border",
+              item.isActive 
+                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500 hover:text-white" 
+                : "bg-muted text-muted-foreground border-border hover:bg-foreground hover:text-background"
+            )}
+            title={item.isActive ? "Hide Product" : "Publish Product"}
+          >
+            {item.isActive ? <Eye size={16} strokeWidth={2.5} /> : <EyeOff size={16} strokeWidth={2.5} />}
+          </button>
+
+          <button
+            onClick={async () => {
+              try {
+                await updateProduct({ id: item._id, data: { isFeatured: !item.isFeatured } });
+                swalToast(item.isFeatured ? "Removed from Featured" : "Marked as Featured", "success");
+              } catch (err) {
+                swalError("Update Error", err.message);
+              }
+            }}
+            className={cn(
+              "p-2.5 rounded-xl transition-all shadow-sm border",
+              item.isFeatured 
+                ? "bg-amber-500/10 text-amber-600 border-amber-500/20 hover:bg-amber-500 hover:text-white" 
+                : "bg-muted text-muted-foreground border-border hover:bg-foreground hover:text-background"
+            )}
+            title={item.isFeatured ? "Unfeature" : "Feature on Homepage"}
+          >
+            <Star size={16} strokeWidth={2.5} fill={item.isFeatured ? "currentColor" : "none"} />
+          </button>
+
+          <button
+            onClick={async () => {
+              try {
+                await updateProduct({ id: item._id, data: { showReviews: !item.showReviews } });
+                swalToast(item.showReviews ? "Reviews Suppressed" : "Reviews Authorized", "success");
+              } catch (err) {
+                swalError("Protocol Error", err.message);
+              }
+            }}
+            className={cn(
+              "p-2.5 rounded-xl transition-all shadow-sm border",
+              item.showReviews !== false 
+                ? "bg-indigo-500/10 text-indigo-600 border-indigo-500/20 hover:bg-indigo-500 hover:text-white" 
+                : "bg-muted text-muted-foreground border-border hover:bg-foreground hover:text-background"
+            )}
+            title={item.showReviews !== false ? "Disable Reviews" : "Enable Reviews"}
+          >
+            <MessageSquare size={16} strokeWidth={2.5} />
+          </button>
+
+          <div className="w-px h-6 bg-border/20 mx-1" />
+
+          {/* Core Actions */}
           <Link
             href={`/admin/products/${item._id}/history`}
             className="p-2.5 bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500 hover:text-white rounded-xl transition-all shadow-sm"

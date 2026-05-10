@@ -4,17 +4,19 @@ import { useRef, useCallback } from "react";
 import Image from "next/image";
 import { useProducts } from "@/hooks/client/useProducts";
 import { useCategories } from "@/hooks/client/useCategories";
+import { useSubcategories } from "@/hooks/useSubcategories";
 import { getImageUrl } from "@/utils/imageUtils";
 import FilterBar from "@/components/common/FilterBar";
 import { useTrackingStore } from "@/store/trackingStore";
 import { cn } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, LayoutGrid, ChevronRight } from "lucide-react";
+import { Sparkles, LayoutGrid, ChevronRight, Hash } from "lucide-react";
 
 export default function ProductFilter({ initialCategories, t }) {
-  const { filters, setSearch, setSort, setCategory } = useProducts();
+  const { filters, setSearch, setSort, setCategory, setSubcategory } = useProducts();
   const { categories } = useCategories(initialCategories);
+  const { subcategories } = useSubcategories();
   const trackSearch = useTrackingStore((state) => state.trackSearch);
 
   const handleSearchSubmit = useCallback(
@@ -38,6 +40,14 @@ export default function ProductFilter({ initialCategories, t }) {
     },
     [setCategory, trackSearch],
   );
+
+  // 🧬 Taxonomy Logic: Filter subcategories by selected category
+  const selectedCategory = categories?.find(c => c.slug === filters.category);
+  const filteredSubcategories = subcategories?.filter(sub => {
+    if (!selectedCategory) return true; // Show all if "All Collections" or "Featured"
+    const catId = sub.category?._id || sub.category;
+    return String(catId) === String(selectedCategory._id);
+  }) || [];
 
   return (
     <div className="mb-16 space-y-12" aria-label="Product filters">
@@ -70,12 +80,15 @@ export default function ProductFilter({ initialCategories, t }) {
            <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-accent-secondary animate-pulse" />
               <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground">
-                {t.category}
+                {t.category || "Collections"}
               </h3>
            </div>
-           {filters.category !== 'all' && (
+           {(filters.category !== 'all' || filters.subcategory) && (
              <button 
-              onClick={() => handleCategoryUpdate('all', 'All')}
+              onClick={() => {
+                setCategory('all');
+                setSubcategory(null);
+              }}
               className="text-[9px] font-black uppercase tracking-widest text-accent-secondary hover:underline underline-offset-4 transition-all"
              >
                 {t.clearFilters}
@@ -115,6 +128,38 @@ export default function ProductFilter({ initialCategories, t }) {
           <ScrollBar orientation="horizontal" className="h-1.5 bg-accent/20" />
         </ScrollArea>
       </div>
+
+      {/* 🔗 Tertiary Interface: Sub-Collections */}
+      {filteredSubcategories.length > 0 && (
+        <div className="space-y-5">
+           <div className="flex items-center gap-3 px-2">
+              <div className="w-1 h-1 rounded-full bg-primary" />
+              <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/60">
+                Sub-Collections
+              </h3>
+           </div>
+           
+           <ScrollArea className="w-full whitespace-nowrap pb-2">
+             <div className="flex w-max gap-3 px-2">
+                {filteredSubcategories.map((sub) => (
+                  <button
+                    key={sub._id}
+                    onClick={() => setSubcategory(filters.subcategory === sub.slug ? null : sub.slug)}
+                    className={cn(
+                      "px-5 py-2 rounded-full border text-[9px] font-black uppercase tracking-widest transition-all duration-300",
+                      filters.subcategory === sub.slug
+                        ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
+                        : "bg-background border-border/50 text-muted-foreground hover:border-primary/50 hover:text-primary"
+                    )}
+                  >
+                    {sub.name}
+                  </button>
+                ))}
+             </div>
+             <ScrollBar orientation="horizontal" className="h-1" />
+           </ScrollArea>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,10 +1,13 @@
+import mongoose from 'mongoose';
 import Product from '../product.model.js';
 import Category from '../../category/category.model.js';
+import Subcategory from '../../subcategory/subcategory.model.js';
 import { asyncHandler } from '../../../middleware/asyncHandler.js';
 
 export const getPublicProducts = asyncHandler(async (req, res) => {
     const {
         category,
+        subcategory,
         search,
         minPrice,
         maxPrice,
@@ -24,13 +27,19 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
         } else if (category === 'featured') {
             const featCats = await Category.find({ isFeatured: true }).select('_id');
             if (featCats.length > 0) {
-                matchStage.category = { $in: featCats.map(c => c._id) };
+                matchStage.category = { $in: featCats.map(c => new mongoose.Types.ObjectId(c._id)) };
             } else return res.json({ success: true, total: 0, pages: 0, products: [] });
         } else {
             const catDoc = await Category.findOne({ slug: category }).select('_id');
-            if (catDoc) matchStage.category = catDoc._id;
+            if (catDoc) matchStage.category = new mongoose.Types.ObjectId(catDoc._id);
             else return res.json({ success: true, total: 0, pages: 0, products: [] });
         }
+    }
+
+    if (subcategory && subcategory !== 'all') {
+        const subDoc = await Subcategory.findOne({ slug: subcategory }).select('_id');
+        if (subDoc) matchStage.subcategory = new mongoose.Types.ObjectId(subDoc._id);
+        else return res.json({ success: true, total: 0, pages: 0, products: [] });
     }
 
     if (search) {

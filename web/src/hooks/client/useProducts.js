@@ -14,6 +14,7 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
       search: searchParams.get("search") || initialFilters.search || "",
       sort: searchParams.get("sort") || initialFilters.sort || "",
       category: searchParams.get("category") || initialFilters.category || "all",
+      subcategory: searchParams.get("subcategory") || initialFilters.subcategory || "",
       page: Number(searchParams.get("page")) || initialFilters.page || 1,
       limit: initialFilters.limit || 30,
     }),
@@ -39,7 +40,8 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
 
   const setSearch = useCallback((search) => updateFilters({ search }), [updateFilters]);
   const setSort = useCallback((sort) => updateFilters({ sort }), [updateFilters]);
-  const setCategory = useCallback((category) => updateFilters({ category }), [updateFilters]);
+  const setCategory = useCallback((category) => updateFilters({ category, subcategory: null }), [updateFilters]);
+  const setSubcategory = useCallback((subcategory) => updateFilters({ subcategory }), [updateFilters]);
   const setPage = useCallback((page) => updateFilters({ page: page.toString() }), [updateFilters]);
 
   const apiParams = useMemo(
@@ -50,6 +52,7 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
       sort: filters.sort,
       ...(filters.category !== "all" && filters.category !== "isFeatured" && { category: filters.category }),
       ...(filters.category === "isFeatured" && { isFeatured: "true" }),
+      ...(filters.subcategory && { subcategory: filters.subcategory }),
     }),
     [filters],
   );
@@ -81,6 +84,7 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
     setSearch,
     setSort,
     setCategory,
+    setSubcategory,
     setPage,
   };
 };

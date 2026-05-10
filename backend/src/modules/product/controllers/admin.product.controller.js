@@ -12,8 +12,13 @@ const parseProductData = (req) => {
     const body = req.body;
     const parsedData = {};
 
-    if (body.name !== undefined) parsedData.name = body.name;
-    if (body.slug !== undefined) parsedData.slug = body.slug;
+    if (body.name !== undefined) {
+        parsedData.name = body.name;
+        if (!body.slug || body.slug === 'undefined') {
+            parsedData.slug = body.name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+        }
+    }
+    if (body.slug !== undefined && body.slug !== 'undefined') parsedData.slug = body.slug;
     if (body.description !== undefined) parsedData.description = body.description;
     if (body.price !== undefined) parsedData.price = parseFloat(body.price);
     if (body.discount !== undefined) parsedData.discount = parseFloat(body.discount);
