@@ -18,9 +18,12 @@ import {
   List,
   ArrowRight,
   TrendingUp,
-  FileText
+  FileText,
+  Zap,
+  EyeOff
 } from "lucide-react";
 import { getImageUrl } from "@/utils/imageUtils";
+import { cn } from "@/lib/utils";
 import Loader from "@/components/common/Loader";
 import { swalConfirm, swalToast } from "@/utils/swal";
 
@@ -48,7 +51,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 export default function AdminBlogDashboard() {
-  const { blogs, isLoading, deleteBlog } = useBlogs();
+  const { blogs, isLoading, deleteBlog, toggleStatus, toggleFeatured } = useBlogs(null, false, true);
   const [searchQuery, setSearchQuery] = useState("");
 
   // 🕵️ Tactical Filter Logic
@@ -220,24 +223,54 @@ export default function AdminBlogDashboard() {
                        </div>
                     </TableCell>
                     <TableCell className="pr-10 text-right">
-                      <div className="flex items-center justify-end gap-3">
-                        <Button asChild variant="outline" size="icon" className="h-10 w-10 rounded-xl border-border/10 hover:border-indigo-500/50 hover:text-indigo-500 bg-background/50 transition-all active:scale-95">
-                          <Link href={`/blog/${post.slug}`} target="_blank">
-                            <Eye size={16} />
-                          </Link>
+                      <div className="flex items-center justify-end gap-2">
+                        {/* ⚡ Toggle Featured */}
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => toggleFeatured(post._id, post.isFeatured)}
+                          className={cn(
+                            "h-9 w-9 rounded-xl border-border/10 transition-all active:scale-95",
+                            post.isFeatured 
+                              ? "bg-rose-600/10 border-rose-600/30 text-rose-600 hover:bg-rose-600 hover:text-white" 
+                              : "bg-background/50 hover:border-rose-600/50 hover:text-rose-600"
+                          )}
+                          title={post.isFeatured ? "Demote from Featured" : "Promote to Featured"}
+                        >
+                          <Zap size={14} fill={post.isFeatured ? "currentColor" : "none"} />
                         </Button>
-                        <Button asChild variant="outline" size="icon" className="h-10 w-10 rounded-xl border-border/10 hover:border-foreground/50 hover:bg-foreground hover:text-background bg-background/50 transition-all active:scale-95">
+
+                        {/* 👁️ Toggle Status */}
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => toggleStatus(post._id, post.status)}
+                          className={cn(
+                            "h-9 w-9 rounded-xl border-border/10 transition-all active:scale-95",
+                            post.status === "PUBLISHED"
+                              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500 hover:text-white"
+                              : "bg-amber-500/10 border-amber-500/30 text-amber-500 hover:bg-amber-500 hover:text-white"
+                          )}
+                          title={post.status === "PUBLISHED" ? "Hide (Draft)" : "Show (Publish)"}
+                        >
+                          {post.status === "PUBLISHED" ? <Eye size={14} /> : <EyeOff size={14} />}
+                        </Button>
+
+                        <Separator orientation="vertical" className="h-6 mx-1 opacity-20" />
+
+                        <Button asChild variant="outline" size="icon" className="h-9 w-9 rounded-xl border-border/10 hover:border-foreground/50 hover:bg-foreground hover:text-background bg-background/50 transition-all active:scale-95">
                           <Link href={`/admin/blog/${post._id}`}>
-                            <Edit3 size={16} />
+                            <Edit3 size={14} />
                           </Link>
                         </Button>
+
                         <Button 
                           variant="outline" 
                           size="icon" 
                           onClick={() => handleDelete(post._id)}
-                          className="h-10 w-10 rounded-xl border-border/10 hover:border-rose-600/50 hover:bg-rose-600 hover:text-white bg-background/50 transition-all active:scale-95"
+                          className="h-9 w-9 rounded-xl border-border/10 hover:border-rose-600/50 hover:bg-rose-600 hover:text-white bg-background/50 transition-all active:scale-95"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={14} />
                         </Button>
                       </div>
                     </TableCell>

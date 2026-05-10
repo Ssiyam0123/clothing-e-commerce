@@ -15,10 +15,7 @@ export const StandardLayout = ({ children, settings }) => {
   return (
     <div className="identity-standard bg-background text-foreground transition-colors duration-500">
       {!isFullPageChat && <Navbar settings={settings} />}
-      <main className={cn(
-        "min-h-screen",
-        isFullPageChat || isBlogDetails || isHome ? "pt-0" : "pt-16 md:pt-20"
-      )}>
+      <main className="min-h-screen pt-0">
         {children}
       </main>
       {!isFullPageChat && <Footer settings={settings} />}

@@ -105,11 +105,10 @@ export default async function HomePage() {
               return (
                 <section key={section.id} className={cn("px-6 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto w-full", idx > 0 && "mt-12 md:mt-20 lg:mt-24")} aria-label={section.title}>
                    <SectionHeader 
-                     title={section.title || ""} 
-                     subtitle={section.subtitle || ""} 
+                     title={lang === 'bn' && section.titleBn ? section.titleBn : section.title} 
+                     subtitle={lang === 'bn' && section.subtitleBn ? section.subtitleBn : section.subtitle} 
                      className="mb-1 md:mb-2" 
-                     casing={section.config?.casing}
-                     subtitleCasing={section.config?.subtitleCasing}
+                     isBangla={lang === 'bn' || section.config?.isBangla}
                    />
                 </section>
               );
@@ -220,7 +219,11 @@ async function FlashSaleWrapper({ dataPromise, lang, t, section }) {
   if (!activeSale) return null;
   
   const flashProducts = { 
-    products: activeSale.products || (data.flashSales?.products || []) 
+    products: (activeSale.products || (data.flashSales?.products || [])).filter(p => {
+      if (!config?.subcategoryId) return true;
+      const subId = p.subcategory?._id || p.subcategory;
+      return String(subId) === String(config.subcategoryId);
+    })
   };
 
   return (
@@ -321,30 +324,41 @@ async function CategoryCollectionWrapper({ dataPromise, lang, t, section }) {
   const data = await dataPromise;
   const config = section.config;
   
-  if (!config?.categoryId && !config?.slug) return null;
+  if (!config?.categoryId && !config?.slug && !config?.subcategoryId) return null;
 
-  // Find the target category
-  const cat = data.categories.find(c => c._id === config.categoryId || c.slug === config.slug);
-  if (!cat) return null;
+  // 🕵️ Strategic Filter Resolution
+  let filteredProducts = [];
 
-  // Filter products for this specific category
-  const catProducts = data.allProducts.filter(p => 
-    p.category?.slug === cat.slug || 
-    p.category?._id === cat._id || 
-    p.category === cat._id
-  ).slice(0, 12);
+  if (config.subcategoryId) {
+    // Priority: Subcategory Match
+    filteredProducts = data.allProducts.filter(p => 
+      String(p.subcategory?._id || p.subcategory) === String(config.subcategoryId)
+    );
+  } else {
+    // Fallback: Category Match
+    const cat = data.categories.find(c => c._id === config.categoryId || c.slug === config.slug);
+    if (cat) {
+      filteredProducts = data.allProducts.filter(p => 
+        p.category?.slug === cat.slug || 
+        p.category?._id === cat._id || 
+        p.category === cat._id
+      );
+    }
+  }
+
+  const catProducts = filteredProducts.slice(0, 12);
 
   if (catProducts.length === 0) return null;
 
   return (
-    <section key={cat._id} className="px-4 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto py-16">
-      <ProductSection products={catProducts} lang={lang} />
+    <section className="px-6 sm:px-8 lg:px-12 max-w-screen-2xl mx-auto py-6 md:py-10 w-full">
+      <ProductSection products={catProducts} showLoadMore={false} lang={lang} ui={t} />
       <div className="flex justify-center mt-12">
         <Link 
-          href={`/products?category=${cat.slug}`} 
-          className="group flex items-center gap-4 px-8 py-4 md:px-10 md:py-5 rounded-full bg-foreground text-background font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500 shadow-xl hover:shadow-primary/20"
+          href={config.subcategoryId ? `/products?subcategory=${config.subcategoryId}` : `/products?category=${config.slug}`}
+          className="group flex items-center gap-4 px-10 py-5 rounded-full bg-foreground text-background font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500 shadow-xl hover:shadow-primary/20"
         >
-          {t.viewMore || `Explore ${cat.name}`} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+          {t.viewMore || "View Collection"} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
     </section>

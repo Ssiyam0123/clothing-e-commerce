@@ -3,6 +3,7 @@ import {
     createProduct,
     getAdminProducts,
     getAdminProductById,
+    getProductHistory,
     updateProduct,
     deleteProduct
 } from '../controllers/admin.product.controller.js';
@@ -17,6 +18,9 @@ router.use(protect, admin);
 router.route('/')
     .get(getAdminProducts)
     .post(upload.array('images', 5), createProduct);
+
+router.route('/:id/history')
+    .get(getProductHistory);
 
 router.route('/:id')
     .get(getAdminProductById)

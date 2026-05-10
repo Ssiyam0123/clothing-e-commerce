@@ -10,6 +10,7 @@ const blogSchema = new mongoose.Schema({
   readingTime: { type: String }, // e.g., "5 min read"
   tags: [{ type: String }],
   status: { type: String, enum: ['DRAFT', 'PUBLISHED'], default: 'DRAFT' },
+  isFeatured: { type: Boolean, default: false },
   
   // 🔍 SEO Core
   seo: {

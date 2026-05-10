@@ -21,6 +21,8 @@ const sectionSchema = new mongoose.Schema({
   },
   title: { type: String, default: '' },
   subtitle: { type: String, default: '' },
+  titleBn: { type: String, default: '' },
+  subtitleBn: { type: String, default: '' },
   imageUrl: { type: String, default: '' },
   actionLink: { type: String, default: '' },
   isVisible: { type: Boolean, default: true },

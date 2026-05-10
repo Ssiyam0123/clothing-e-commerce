@@ -78,15 +78,20 @@ export default function Navbar() {
     router.refresh();
   };
 
+  const handleThemeToggle = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+  };
+
   const isHome = pathname === "/" || pathname === "/en" || pathname === "/bn";
   const isBlogDetails = pathname.startsWith("/blog/") && pathname !== "/blog";
-  const isTransparentPage = isBlogDetails || isHome;
+  const isTransparentPage = false; // Always solid now as content is offset below navbar
 
   return (
     <header
       className={cn(
-        "fixed !top-0 left-0 right-0 !mt-0 z-[120] transition-all duration-700 px-4 sm:px-6 lg:px-12 py-4",
-        (scrolled || !isTransparentPage) ? "bg-background/95 backdrop-blur-3xl  border-border/10 py-3 shadow-xl shadow-black/5" : "bg-transparent"
+        "sticky top-0 left-0 right-0 z-[120] px-4 sm:px-6 lg:px-12 py-4 transition-all duration-300",
+        (scrolled || !isTransparentPage) ? "bg-background/95 backdrop-blur-3xl border-b border-border/10 py-3 shadow-xl shadow-black/5" : "bg-transparent"
       )}
     >
       <div className="w-full mx-auto flex items-center justify-between gap-2">
@@ -151,7 +156,7 @@ export default function Navbar() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            onClick={handleThemeToggle}
             className="hidden md:inline-flex w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30 flex-shrink-0"
             aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           >
@@ -270,7 +275,7 @@ export default function Navbar() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  onClick={handleThemeToggle}
                   className="w-10 h-10 rounded-full hover:bg-accent/30"
                   aria-label="Toggle Theme"
                 >

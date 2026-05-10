@@ -7,13 +7,13 @@ export default function SectionHeader({
   subtitle, 
   align = "center", 
   className,
-  casing = "uppercase",
-  subtitleCasing = "uppercase"
+  isBangla = false
 }) {
   return (
     <div className={cn(
       "space-y-3 relative overflow-hidden",
       align === "center" ? "text-center" : "text-left",
+      isBangla && "font-bn",
       className
     )}>
       {align === "center" && (
@@ -23,14 +23,14 @@ export default function SectionHeader({
       <div className={cn("space-y-2", align === "center" ? "mx-auto" : "")}>
         <h2 className={cn(
           "text-[10vw] md:text-6xl lg:text-7xl font-black italic tracking-tighter leading-[0.8] text-gradient",
-          casing
+          isBangla ? "font-bn" : "uppercase"
         )}>
           {title}
         </h2>
         {subtitle && (
           <p className={cn(
             "text-[10px] md:text-xs font-black tracking-[0.4em] text-muted-foreground max-w-2xl mx-auto italic",
-            subtitleCasing
+            isBangla ? "font-bn" : "uppercase"
           )}>
             {subtitle}
           </p>

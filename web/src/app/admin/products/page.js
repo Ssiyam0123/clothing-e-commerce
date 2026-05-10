@@ -12,7 +12,7 @@ import { getImageUrl } from "@/utils/imageUtils";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Settings, Plus } from "lucide-react";
+import { Edit, Trash2, Settings, Plus, History } from "lucide-react";
 
 function AdminProductsContent() {
   const {
@@ -169,6 +169,13 @@ function AdminProductsContent() {
       label: "Actions",
       render: (item) => (
         <div className="flex items-center gap-2 justify-end">
+          <Link
+            href={`/admin/products/${item._id}/history`}
+            className="p-2.5 bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500 hover:text-white rounded-xl transition-all shadow-sm"
+            title="Sales History & Audit"
+          >
+            <History className="w-4 h-4" strokeWidth={2.5} />
+          </Link>
           <Link
             href={`/admin/products/${item._id}/manage`}
             className="p-2.5 bg-muted text-muted-foreground hover:bg-foreground hover:text-background rounded-xl transition-all shadow-sm"

@@ -3,13 +3,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { swalToast, swalError } from "@/utils/swal";
 
-export const useBlogs = (id = null, isId = false) => {
+export const useBlogs = (id = null, isId = false, adminView = false) => {
   const queryClient = useQueryClient();
 
   // 📰 Fetch all blogs (public or admin)
   const { data: blogs, isLoading: blogsLoading } = useQuery({
-    queryKey: ["blogs"],
-    queryFn: async () => (await api.get("/blogs")).data,
+    queryKey: ["blogs", adminView],
+    queryFn: async () => {
+      const endpoint = adminView ? "/blogs?status=all" : "/blogs";
+      return (await api.get(endpoint)).data;
+    },
   });
 
   // 📖 Fetch single blog (Admin by ID or Public by Slug)
@@ -84,5 +87,12 @@ export const useBlogs = (id = null, isId = false) => {
     createBlog,
     updateBlog,
     deleteBlog,
+    toggleStatus: async (id, currentStatus) => {
+      const newStatus = currentStatus === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
+      return updateBlog.mutateAsync({ id, formData: { status: newStatus } });
+    },
+    toggleFeatured: async (id, currentFeatured) => {
+      return updateBlog.mutateAsync({ id, formData: { isFeatured: !currentFeatured } });
+    }
   };
 };

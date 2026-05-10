@@ -67,13 +67,15 @@ export default function BlogDetails({ blog }) {
           {/* 📝 Main Content */}
           <div className="max-w-3xl mx-auto">
             <div 
-              className="prose prose-invert prose-lg max-w-none 
+              className="prose prose-invert prose-lg max-w-none break-words overflow-hidden
                 prose-headings:font-black prose-headings:uppercase prose-headings:italic prose-headings:tracking-tighter
                 prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:text-lg
                 prose-strong:text-foreground prose-strong:font-black
                 prose-blockquote:border-l-rose-500 prose-blockquote:bg-rose-500/5 prose-blockquote:rounded-2xl prose-blockquote:p-8 prose-blockquote:italic prose-blockquote:text-2xl prose-blockquote:font-bold
-                prose-img:rounded-[2rem] prose-img:shadow-2xl
-                prose-a:text-rose-500 prose-a:no-underline hover:prose-a:underline"
+                prose-img:rounded-[2rem] prose-img:shadow-2xl prose-img:mx-auto
+                prose-a:text-rose-500 prose-a:no-underline hover:prose-a:underline
+                prose-pre:bg-zinc-900/50 prose-pre:border prose-pre:border-border/10 prose-pre:rounded-[2rem] prose-pre:p-8
+                prose-code:text-rose-400 prose-code:bg-rose-400/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none"
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
 

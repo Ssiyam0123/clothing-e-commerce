@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Product from '../product.model.js';
+import Order from '../../order/order.model.js';
 import Category from '../../category/category.model.js';
 import { asyncHandler } from '../../../middleware/asyncHandler.js';
 import { uploadMultipleImages, deleteImage } from '../../../services/imageUploadService.js';
@@ -82,6 +83,7 @@ export const getAdminProducts = asyncHandler(async (req, res) => {
         isActive,
         stockStatus,
         isFeatured,
+        subcategory,
     } = req.query;
 
     const matchStage = {};
@@ -113,6 +115,18 @@ export const getAdminProducts = asyncHandler(async (req, res) => {
     if (search) {
         const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         matchStage.name = { $regex: safeSearch, $options: 'i' };
+    }
+
+    if (subcategory && subcategory !== 'all') {
+        if (mongoose.Types.ObjectId.isValid(subcategory)) {
+            matchStage.subcategory = new mongoose.Types.ObjectId(subcategory);
+        }
+    }
+
+    if (minPrice || maxPrice) {
+        matchStage.price = {};
+        if (minPrice) matchStage.price.$gte = parseFloat(minPrice);
+        if (maxPrice) matchStage.price.$lte = parseFloat(maxPrice);
     }
 
     const pipeline = [{ $match: matchStage }];
@@ -241,4 +255,47 @@ export const deleteProduct = asyncHandler(async (req, res) => {
     if (product.images?.length) await Promise.all(product.images.map(img => deleteImage(img)));
     await product.deleteOne();
     res.json({ message: 'Product purged.' });
+});
+
+export const getProductHistory = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    
+    const product = await Product.findById(id).select('name images price').lean();
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    // Find all orders containing this product
+    const orders = await Order.find({
+        'orderItems.product': id,
+        'paymentResult.status': { $in: ['Completed', 'COD'] }
+    })
+    .populate('user', 'name email avatar')
+    .sort('-createdAt')
+    .lean();
+
+    const history = orders.map(order => {
+        const item = order.orderItems.find(oi => String(oi.product) === id);
+        return {
+            orderId: order._id,
+            date: order.createdAt,
+            customer: order.user || { name: order.shippingAddress.name, email: order.shippingAddress.email },
+            quantity: item.quantity,
+            price: item.price,
+            total: item.quantity * item.price,
+            orderStatus: order.orderStatus,
+            isGuest: order.isGuest
+        };
+    });
+
+    const totalSold = history.reduce((sum, h) => sum + h.quantity, 0);
+    const totalRevenue = history.reduce((sum, h) => sum + h.total, 0);
+
+    res.json({
+        product,
+        stats: {
+            totalSold,
+            totalRevenue,
+            orderCount: history.length
+        },
+        history
+    });
 });

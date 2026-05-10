@@ -11,14 +11,12 @@ export function AdminHeader({ isFetching, todayRevenue, isLoading }) {
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              "h-2 w-2 rounded-full transition-all duration-500",
-              isFetching 
-              ? "bg-primary animate-pulse" 
-              : "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]"
+              "h-2 w-2 rounded-full transition-all duration-500 bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]",
+              isLoading && "bg-muted animate-pulse shadow-none"
             )}
           />
           <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.4em]">
-            {isFetching ? "Updating Trajectory..." : "System Nominal"}
+            System Nominal
           </p>
         </div>
       </div>

@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useBlogs } from "@/hooks/useBlogs";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import Loader from "@/components/common/Loader";
-import { ShieldCheck, ArrowLeft, RefreshCcw, ImageIcon, Globe, Save, Trash2, Plus } from "lucide-react";
+import { ShieldCheck, ArrowLeft, RefreshCcw, ImageIcon, Globe, Save, Trash2, Plus, Zap } from "lucide-react";
 import { getImageUrl } from "@/utils/imageUtils";
 
 // Shadcn UI Imports
@@ -62,6 +62,7 @@ function BlogEditForm({ blog, updateBlog }) {
     content: blog.content || "",
     category: blog.category || "LIFESTYLE",
     status: blog.status || "PUBLISHED",
+    isFeatured: blog.isFeatured || false,
     seo: {
       metaTitle: blog.seo?.metaTitle || "",
       metaDescription: blog.seo?.metaDescription || "",
@@ -87,6 +88,7 @@ function BlogEditForm({ blog, updateBlog }) {
     data.append("content", formData.content);
     data.append("category", formData.category);
     data.append("status", formData.status);
+    data.append("isFeatured", formData.isFeatured);
     data.append("seo", JSON.stringify(formData.seo));
     
     if (imageFile) {
@@ -283,6 +285,23 @@ function BlogEditForm({ blog, updateBlog }) {
                     </Label>
                   </div>
                 </RadioGroup>
+              </div>
+
+              <div className="pt-4 border-t border-border/5">
+                <div className="flex items-center justify-between p-4 rounded-2xl bg-rose-600/5 border border-rose-600/10">
+                  <div className="space-y-1">
+                    <Label className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                      <Zap size={12} className="text-rose-600" /> Promoted Sequence
+                    </Label>
+                    <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Prioritize in journal grid</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={formData.isFeatured}
+                    onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                    className="h-6 w-11 rounded-full appearance-none bg-zinc-800 checked:bg-rose-600 relative transition-all cursor-pointer before:content-[''] before:absolute before:top-1 before:left-1 before:w-4 before:h-4 before:bg-white before:rounded-full before:transition-all checked:before:left-6"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>

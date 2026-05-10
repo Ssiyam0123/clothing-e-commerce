@@ -19,11 +19,18 @@ export const getActiveFlashSales = asyncHandler(async (req, res) => {
   .populate({
     path: 'products',
     model: 'Product',
-    populate: {
-      path: 'sizes.size',
-      model: 'Size',
-      select: 'name'
-    }
+    populate: [
+      {
+        path: 'sizes.size',
+        model: 'Size',
+        select: 'name'
+      },
+      {
+        path: 'subcategory',
+        model: 'Subcategory',
+        select: 'name'
+      }
+    ]
   })
   .lean();
 

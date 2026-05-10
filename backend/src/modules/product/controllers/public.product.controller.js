@@ -64,12 +64,16 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
     const skip = (Math.max(1, Number(page)) - 1) * itemsLimit;
     pipeline.push({ $skip: skip }, { $limit: itemsLimit });
 
-    // Populate Category
+    // Populate Category & Subcategory
     pipeline.push(
         {
             $lookup: { from: 'categories', localField: 'category', foreignField: '_id', as: 'category' }
         },
-        { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } }
+        { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: { from: 'subcategories', localField: 'subcategory', foreignField: '_id', as: 'subcategory' }
+        },
+        { $unwind: { path: '$subcategory', preserveNullAndEmptyArrays: true } }
     );
 
     // 🚀 STRICT PROJECTION FOR PUBLIC CONSUMPTION
@@ -80,7 +84,8 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
             price: 1,
             discount: 1,
             images: { $slice: ['$images', 1] }, // Only 1st image for card
-            category: { name: 1, slug: 1 },
+            category: { name: 1, slug: 1, _id: 1 },
+            subcategory: { name: 1, slug: 1, _id: 1 },
             sizes: 1,
             totalStock: 1,
             isFeatured: 1,

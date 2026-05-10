@@ -42,7 +42,8 @@ import {
   Sparkles,
   Percent,
   Star,
-  ShieldCheck
+  ShieldCheck,
+  List
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { swalToast, swalError } from "@/utils/swal";
@@ -52,7 +53,7 @@ import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
 /**
  * 🏗️ Architect Sortable Section Item
  */
-function SortableSection({ section, onToggleVisibility, onRemove, onUpdateConfig, categories = [], campaigns = [] }) {
+function SortableSection({ section, onToggleVisibility, onRemove, onUpdateConfig, categories = [], subcategories = [], campaigns = [] }) {
   const [isEditing, setIsEditing] = useState(false);
   const {
     attributes,
@@ -110,9 +111,11 @@ function SortableSection({ section, onToggleVisibility, onRemove, onUpdateConfig
         <div className="flex-1 min-w-0">
           <h4 className="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-foreground flex items-center gap-2 truncate">
             <span className="truncate">{section.title || section.type.replace(/_/g, ' ')}</span>
-            {(section.config?.categoryName || section.config?.campaignName || section.config?.saleName) && (
+            {(section.config?.categoryName || section.config?.campaignName || section.config?.saleName || section.config?.subcategoryId) && (
               <Badge variant="outline" className="hidden sm:inline-flex text-[8px] font-bold h-4 bg-muted/50 shrink-0">
-                {section.config.categoryName || section.config.campaignName || section.config.saleName}
+                {section.config.categoryName || 
+                 section.config.campaignName || 
+                 section.config.saleName + (section.config.subcategoryId ? ` (${subcategories.find(s => s._id === section.config.subcategoryId)?.name || 'Filtered'})` : '')}
               </Badge>
             )}
           </h4>
@@ -140,48 +143,64 @@ function SortableSection({ section, onToggleVisibility, onRemove, onUpdateConfig
             {section.type === 'HEADER' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Main Heading</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Main Heading (English)</label>
                   <input
                     type="text"
                     value={section.title || ''}
                     onChange={(e) => onUpdateConfig(section.id, { title: e.target.value }, true)}
                     className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
-                    placeholder="Enter Main Title"
+                    placeholder="Enter English Title"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Subtitle / Caption</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-primary">Main Heading (Bangla)</label>
+                  <input
+                    type="text"
+                    value={section.titleBn || ''}
+                    onChange={(e) => onUpdateConfig(section.id, { titleBn: e.target.value }, true)}
+                    className="w-full bg-background border border-primary/20 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none font-bn"
+                    placeholder="বাংলা শিরোনাম দিন"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Subtitle (English)</label>
                   <input
                     type="text"
                     value={section.subtitle || ''}
                     onChange={(e) => onUpdateConfig(section.id, { subtitle: e.target.value }, true)}
                     className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
-                    placeholder="Enter Subtitle"
+                    placeholder="Enter English Subtitle"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-primary">Subtitle (Bangla)</label>
+                  <input
+                    type="text"
+                    value={section.subtitleBn || ''}
+                    onChange={(e) => onUpdateConfig(section.id, { subtitleBn: e.target.value }, true)}
+                    className="w-full bg-background border border-primary/20 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none font-bn"
+                    placeholder="বাংলা সাবটাইটেল দিন"
                   />
                 </div>
 
+              </div>
+            )}
+
+            {section.type === 'FLASH_SALE' && (
+              <div className="pt-2">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Title Casing</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Filter by Subcategory (Optional)</label>
                   <select
-                    value={section.config?.casing || 'uppercase'}
-                    onChange={(e) => onUpdateConfig(section.id, { casing: e.target.value })}
-                    className="w-full bg-background border border-border/50 rounded-xl px-3 py-2 text-[10px] font-bold focus:border-primary/40 outline-none"
+                    value={section.config?.subcategoryId || ""}
+                    onChange={(e) => onUpdateConfig(section.id, { subcategoryId: e.target.value })}
+                    className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none appearance-none"
                   >
-                    <option value="uppercase">ALL CAPS</option>
-                    <option value="capitalize">Capitalize</option>
-                    <option value="normal-case">Normal Case</option>
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Subtitle Casing</label>
-                  <select
-                    value={section.config?.subtitleCasing || 'uppercase'}
-                    onChange={(e) => onUpdateConfig(section.id, { subtitleCasing: e.target.value })}
-                    className="w-full bg-background border border-border/50 rounded-xl px-3 py-2 text-[10px] font-bold focus:border-primary/40 outline-none"
-                  >
-                    <option value="uppercase">ALL CAPS</option>
-                    <option value="capitalize">Capitalize</option>
-                    <option value="normal-case">Normal Case</option>
+                    <option value="">All Products in Sale</option>
+                    {subcategories.map(sub => (
+                      <option key={sub._id} value={sub._id}>
+                        {sub.category?.name} &rsaquo; {sub.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -252,6 +271,14 @@ export default function LayoutBuilderPage() {
     queryKey: ['campaigns'],
     queryFn: async () => {
       const { data } = await api.get('/banner-campaigns');
+      return data;
+    }
+  });
+
+  const { data: subcategories = [] } = useQuery({
+    queryKey: ['subcategories'],
+    queryFn: async () => {
+      const { data } = await api.get('/subcategories');
       return data;
     }
   });
@@ -389,7 +416,16 @@ export default function LayoutBuilderPage() {
               <SortableContext items={layout.map(i => i.id)} strategy={verticalListSortingStrategy}>
                 <div className="space-y-4">
                   {layout.map((section) => (
-                    <SortableSection key={section.id} section={section} onToggleVisibility={toggleVisibility} onRemove={removeSection} onUpdateConfig={updateSectionConfig} categories={categories} campaigns={campaigns} />
+                    <SortableSection 
+                      key={section.id} 
+                      section={section} 
+                      onToggleVisibility={toggleVisibility} 
+                      onRemove={removeSection} 
+                      onUpdateConfig={updateSectionConfig} 
+                      categories={categories} 
+                      subcategories={subcategories}
+                      campaigns={campaigns} 
+                    />
                   ))}
                 </div>
               </SortableContext>
@@ -454,6 +490,28 @@ export default function LayoutBuilderPage() {
               </div>
             </div>
 
+
+            <div className="pt-6 md:pt-8 mt-6 md:mt-8 border-t border-border/50">
+              <h4 className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-6">Quick-Deploy Subcategories</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+                {subcategories.map((sub) => (
+                  <button 
+                    key={sub._id} 
+                    onClick={() => addNewSection('CATEGORY_COLLECTION', { subcategoryId: sub._id, slug: sub.slug, title: sub.name })} 
+                    className="flex items-center gap-3 p-2 rounded-xl border border-border/50 bg-background hover:bg-rose-500/5 transition-all group"
+                  >
+                    <div className="shrink-0 w-5 h-5 rounded-md bg-muted flex items-center justify-center text-muted-foreground ml-1">
+                      <List size={12} />
+                    </div>
+                    <div className="flex-1 min-w-0 text-left">
+                      <p className="text-[9px] font-black uppercase truncate">{sub.name}</p>
+                      <p className="text-[6px] font-bold uppercase text-rose-500/40 tracking-tighter">{sub.category?.name}</p>
+                    </div>
+                    <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity mr-2" />
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="pt-6 md:pt-8 mt-6 md:mt-8 border-t border-border/50">
               <h4 className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-6">Quick-Deploy Flash Sales</h4>

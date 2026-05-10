@@ -128,7 +128,6 @@
     @apply bg-background text-foreground;
     font-family: var(--font-theme, var(--font-inter)), sans-serif;
   }
-  
   /* Bengali Specific Overrides */
   [lang="bn"], .font-bn {
     font-family: 'Hind Siliguri', sans-serif !important;
@@ -162,7 +161,6 @@
     background-color: var(--sidebar);
     color: var(--sidebar-foreground);
     border-right: 1px solid var(--sidebar-border);
-    transition: background-color 500ms, color 500ms, border-color 500ms;
   }
   
   .sidebar-nav-item {
@@ -171,7 +169,6 @@
     gap: 1rem;
     padding: 1rem 1.25rem;
     border-radius: 1.2rem;
-    transition: all 300ms;
     font-weight: 700;
     font-size: 10px;
     text-transform: uppercase;
@@ -202,7 +199,6 @@
     align-items: flex-start;
     padding: 1.5rem 2rem;
     border-radius: 2rem;
-    transition: all 300ms;
     position: relative;
     overflow: hidden;
     margin-bottom: 0.5rem;
@@ -231,7 +227,7 @@
   }
 
   .admin-card {
-    @apply bg-card border border-border shadow-sm rounded-[2rem] transition-all hover:shadow-md;
+    @apply bg-card border border-border shadow-sm rounded-[2rem] hover:shadow-md;
   }
 
   .admin-table-form {

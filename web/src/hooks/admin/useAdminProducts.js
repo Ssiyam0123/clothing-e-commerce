@@ -19,6 +19,11 @@ export const useAdminProducts = (initialFilters = {}) => {
       search: initialFilters.search !== undefined ? initialFilters.search : (searchParams.get("search") || ""),
       sort: initialFilters.sort !== undefined ? initialFilters.sort : (searchParams.get("sort") || ""),
       category: initialFilters.category !== undefined ? initialFilters.category : (searchParams.get("category") || "all"),
+      subcategory: searchParams.get("subcategory") || "all",
+      stockStatus: searchParams.get("stockStatus") || "all",
+      isActive: searchParams.get("isActive") || "all",
+      minPrice: searchParams.get("minPrice") || "",
+      maxPrice: searchParams.get("maxPrice") || "",
       page: initialFilters.page !== undefined ? initialFilters.page : (Number(searchParams.get("page")) || 1),
       limit: initialFilters.limit || 12,
     }),
@@ -29,8 +34,11 @@ export const useAdminProducts = (initialFilters = {}) => {
     (newFilters) => {
       const params = new URLSearchParams(searchParams.toString());
       Object.entries(newFilters).forEach(([key, value]) => {
-        if (value && value !== "all") params.set(key, value);
-        else params.delete(key);
+        if (value !== undefined && value !== null && value !== "" && value !== "all") {
+           params.set(key, value);
+        } else {
+           params.delete(key);
+        }
       });
       if (newFilters.page === undefined) params.set("page", "1");
       router.push(`${pathname}?${params.toString()}`, { scroll: false });
@@ -40,7 +48,11 @@ export const useAdminProducts = (initialFilters = {}) => {
 
   const setSearch = useCallback((search) => updateFilters({ search }), [updateFilters]);
   const setSort = useCallback((sort) => updateFilters({ sort }), [updateFilters]);
-  const setCategory = useCallback((category) => updateFilters({ category }), [updateFilters]);
+  const setCategory = useCallback((category) => updateFilters({ category, subcategory: "all" }), [updateFilters]);
+  const setSubcategory = useCallback((subcategory) => updateFilters({ subcategory }), [updateFilters]);
+  const setStockStatus = useCallback((stockStatus) => updateFilters({ stockStatus }), [updateFilters]);
+  const setIsActive = useCallback((isActive) => updateFilters({ isActive }), [updateFilters]);
+  const setPriceRange = useCallback((min, max) => updateFilters({ minPrice: min, maxPrice: max }), [updateFilters]);
   const setPage = useCallback((page) => updateFilters({ page: page.toString() }), [updateFilters]);
 
   const apiParams = useMemo(
@@ -49,8 +61,12 @@ export const useAdminProducts = (initialFilters = {}) => {
       limit: filters.limit,
       search: filters.search,
       sort: filters.sort,
-      isActive: "all",
-      ...(filters.category !== "all" && { category: filters.category }),
+      category: filters.category,
+      subcategory: filters.subcategory,
+      stockStatus: filters.stockStatus,
+      isActive: filters.isActive,
+      minPrice: filters.minPrice,
+      maxPrice: filters.maxPrice,
     }),
     [filters],
   );
@@ -119,6 +135,10 @@ export const useAdminProducts = (initialFilters = {}) => {
     setSearch,
     setSort,
     setCategory,
+    setSubcategory,
+    setStockStatus,
+    setIsActive,
+    setPriceRange,
     setPage,
     deleteProduct: deleteProduct.mutateAsync,
     updateProduct: updateProduct.mutateAsync,
