@@ -28,15 +28,9 @@ const orderSchema = new mongoose.Schema(
     orderItems: [orderItemSchema],
     shippingAddress: {
       name: { type: String, required: true }, 
-      email: { type: String, required: true },
+      email: { type: String, required: false },
       phone: { type: String, required: true },
-      street: { type: String, required: true },
-      city: String,
-      state: String,
-      zip: String,
-      pathao_city_id: String,
-      pathao_zone_id: String,
-      pathao_area_id: String,
+      address: { type: String, required: true }, // Single line address
     },
     paymentMethod: { type: String, required: true },
     paymentResult: {

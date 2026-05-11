@@ -183,9 +183,9 @@ function UnifiedSettlementContent() {
 
   const [shippingInfo, setShippingInfo] = useState({
     name: "",
-    email: "",
-    street: "",
+    email: "", // Optional
     phone: "",
+    address: "",
   });
 
   const [editModal, setEditModal] = useState({ isOpen: false, item: null });
@@ -212,7 +212,7 @@ function UnifiedSettlementContent() {
         name: user.name || "",
         email: user.email || "",
         phone: user.phone || "",
-        street: user.addresses?.[0]?.street || "",
+        address: user.addresses?.[0]?.address || user.addresses?.[0]?.street || "",
       });
     }
   }, [user]);
@@ -274,13 +274,12 @@ function UnifiedSettlementContent() {
   const handlePlaceOrder = async () => {
     if (
       !shippingInfo.phone ||
-      !shippingInfo.street ||
-      !shippingInfo.name ||
-      !shippingInfo.email
+      !shippingInfo.address ||
+      !shippingInfo.name
     ) {
       return swalError(
         t.manifestIncomplete || "Manifest Incomplete",
-        t.provideLogistics || "Please provide all logistics data including email.",
+        t.provideLogistics || "Please provide name, phone and address.",
       );
     }
 
@@ -294,9 +293,8 @@ function UnifiedSettlementContent() {
         })),
         shippingAddress: {
           ...shippingInfo,
-          city: deliveryZone === "dhaka" ? "Dhaka" : "Outside Dhaka",
-          pathao_city_id: deliveryZone === "dhaka" ? "1" : "2",
         },
+        shippingPrice: shippingCharge,
         paymentMethod,
         couponCode: appliedCoupon?.coupon?.code,
         isDirectBuy,
@@ -510,11 +508,11 @@ function UnifiedSettlementContent() {
                 </div>
 
                 <div className="md:col-span-2 space-y-2 sm:space-y-3">
-                  <Label className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] ml-2 text-muted-foreground">{t.deploymentBase}</Label>
+                  <Label className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] ml-2 text-muted-foreground">{t.deploymentBase || "Full Address"}</Label>
                   <Input
-                    value={shippingInfo.street}
-                    onChange={(e) => setShippingInfo({ ...shippingInfo, street: e.target.value })}
-                    placeholder={t.addressPlaceholder}
+                    value={shippingInfo.address}
+                    onChange={(e) => setShippingInfo({ ...shippingInfo, address: e.target.value })}
+                    placeholder={t.addressPlaceholder || "Enter your full address"}
                     className="bg-accent/20 border-none h-14 sm:h-16 px-6 sm:px-8 rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-[11px] uppercase tracking-widest focus-visible:ring-2 focus-visible:ring-accent-secondary/50 shadow-inner"
                   />
                 </div>

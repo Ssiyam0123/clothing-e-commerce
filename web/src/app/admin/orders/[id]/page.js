@@ -339,8 +339,7 @@ export default function OrderDetailsPage() {
                     Deployment Base
                   </p>
                   <p className="text-xs font-bold text-foreground leading-relaxed uppercase">
-                    {order.shippingAddress.street},<br />
-                    {order.shippingAddress.city}
+                    {order.shippingAddress.address}
                   </p>
                 </div>
               </div>

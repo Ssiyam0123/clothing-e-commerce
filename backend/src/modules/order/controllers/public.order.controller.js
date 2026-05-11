@@ -33,6 +33,7 @@ export const initPayment = asyncHandler(async (req, res) => {
     shippingAddress,
     isDirectBuy,
     couponCode,
+    shippingPrice,
     paymentMethod = "ssl",
   } = req.body;
   
@@ -67,7 +68,7 @@ export const initPayment = asyncHandler(async (req, res) => {
     const orderData = await calculateValidatedOrder(
       orderItems,
       couponCode,
-      shippingAddress.pathao_city_id
+      shippingPrice
     );
 
     const order = new Order({

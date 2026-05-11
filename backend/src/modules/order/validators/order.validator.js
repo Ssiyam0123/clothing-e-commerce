@@ -5,13 +5,9 @@ const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
 const shippingAddressSchema = z.object({
     name: z.string().min(2, "Name is too short"),
-    email: z.string().email("Invalid email format"),
+    email: z.string().email("Invalid email format").optional().or(z.literal("")), // Optional email
     phone: z.string().min(10, "Invalid phone number"),
-    street: z.string().min(5, "Street address is too short"),
-    city: z.string().optional(),
-    pathao_city_id: z.string().optional(),
-    pathao_zone_id: z.string().optional(),
-    pathao_area_id: z.string().optional(),
+    address: z.string().min(5, "Address is too short"),
 });
 
 const orderItemSchema = z.object({

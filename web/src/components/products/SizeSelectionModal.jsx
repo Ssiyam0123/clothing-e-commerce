@@ -20,6 +20,7 @@ import { getTranslation } from "@/utils/typography/handler";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { ScrollArea } from "../ui/scroll-area";
 
 export default function SizeSelectionModal({ product, isOpen, onOpenChange, mode = "cart" }) {
   const router = useRouter();

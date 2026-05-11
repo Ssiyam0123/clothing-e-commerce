@@ -31,8 +31,7 @@ export default function OrderEditModal({ order, isOpen, onClose, onUpdate }) {
       name: order.shippingAddress?.name || "",
       email: order.shippingAddress?.email || "",
       phone: order.shippingAddress?.phone || "",
-      street: order.shippingAddress?.street || "",
-      city: order.shippingAddress?.city || "",
+      address: order.shippingAddress?.address || "",
     },
   });
 
@@ -240,12 +239,12 @@ export default function OrderEditModal({ order, isOpen, onClose, onUpdate }) {
                   <Input {...register("phone")} className="h-10 lg:h-12 bg-card border-border rounded-xl px-4 text-xs font-bold focus:ring-2 focus:ring-primary/20 transition-all" />
                 </div>
                 <div className="grid gap-1.5">
-                  <Label className="text-[8px] lg:text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Street Address</Label>
-                  <Input {...register("street")} className="h-10 lg:h-12 bg-card border-border rounded-xl px-4 text-xs font-bold focus:ring-2 focus:ring-primary/20 transition-all" />
+                  <Label className="text-[8px] lg:text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Email (Optional)</Label>
+                  <Input {...register("email")} className="h-10 lg:h-12 bg-card border-border rounded-xl px-4 text-xs font-bold focus:ring-2 focus:ring-primary/20 transition-all" />
                 </div>
                 <div className="grid gap-1.5">
-                  <Label className="text-[8px] lg:text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">City Node</Label>
-                  <Input {...register("city")} className="h-10 lg:h-12 bg-card border-border rounded-xl px-4 text-xs font-bold focus:ring-2 focus:ring-primary/20 transition-all" />
+                  <Label className="text-[8px] lg:text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Deployment Base (Full Address)</Label>
+                  <Input {...register("address")} className="h-10 lg:h-12 bg-card border-border rounded-xl px-4 text-xs font-bold focus:ring-2 focus:ring-primary/20 transition-all" />
                 </div>
               </div>
 

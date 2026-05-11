@@ -30,7 +30,7 @@ router.post('/', optionalAuth, async (req, res) => {
 
     await sendFacebookEvent({
       eventName,
-      eventId, // 👈 Pushing down to the CAPI service layer
+      eventId, 
       userData: finalUserData,
       customData: eventData,
       eventSourceUrl,

@@ -148,8 +148,7 @@ function SuccessContent() {
               <div className="space-y-2">
                 <p className="text-xs font-bold uppercase">{order.shippingAddress?.name}</p>
                 <p className="text-[10px] text-muted-foreground leading-relaxed uppercase">
-                  {order.shippingAddress?.street},<br />
-                  {order.shippingAddress?.city}
+                  {order.shippingAddress?.address}
                 </p>
                 <p className="text-[10px] font-bold mt-4 text-primary">
                   {order.shippingAddress?.phone}

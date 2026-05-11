@@ -8,15 +8,15 @@ export default function CountdownTimer({ targetDate, onExpire, label, className 
   const [timeLeft, setTimeLeft] = useState(null);
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const calculateTimeLeft = () => {
       const now = new Date().getTime();
       const target = new Date(targetDate).getTime();
       const difference = target - now;
 
       if (difference <= 0) {
-        clearInterval(timer);
         if (onExpire) onExpire();
         setTimeLeft(null);
+        return false;
       } else {
         setTimeLeft({
           days: Math.floor(difference / (1000 * 60 * 60 * 24)),
@@ -24,9 +24,15 @@ export default function CountdownTimer({ targetDate, onExpire, label, className 
           minutes: Math.floor((difference / 1000 / 60) % 60),
           seconds: Math.floor((difference / 1000) % 60),
         });
+        return true;
       }
-    }, 1000);
+    };
 
+    // Calculate immediately on mount
+    const isActive = calculateTimeLeft();
+    if (!isActive) return;
+
+    const timer = setInterval(calculateTimeLeft, 1000);
     return () => clearInterval(timer);
   }, [targetDate, onExpire]);
 

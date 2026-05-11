@@ -13,7 +13,7 @@ export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui }) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] sm:max-w-4xl h-[90vh] flex flex-col p-0 overflow-hidden bg-background border-border/20 rounded-[2rem] shadow-2xl">
+      <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[80vh] h-full flex flex-col p-0 overflow-hidden bg-background border-border/20 rounded-[2rem] shadow-2xl">
         <DialogHeader className="p-6 sm:p-10 border-b border-border/10 bg-accent/5 shrink-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
              <div className="space-y-1.5 text-left">
@@ -43,7 +43,7 @@ export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui }) 
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 w-full overflow-y-auto">
           <div className="p-6 sm:p-10 pb-20 sm:pb-32">
           {loading ? (
             <div className="h-64 flex flex-col items-center justify-center gap-4">
@@ -87,8 +87,8 @@ export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui }) 
                         <div className="space-y-1">
                            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Delivery Protocol</p>
                            <p className="text-sm font-bold leading-relaxed">
-                              {order.shippingAddress.address}, {order.shippingAddress.city}<br />
-                              <span className="text-muted-foreground font-medium text-xs">{order.shippingAddress.postalCode}, {order.shippingAddress.country}</span>
+                              {order.shippingAddress.address}<br />
+                              <span className="text-muted-foreground font-medium text-xs">{order.shippingAddress.phone}</span>
                            </p>
                         </div>
                      </div>
@@ -136,17 +136,29 @@ export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui }) 
                    <div className="absolute top-0 right-0 w-32 h-32 bg-accent-secondary/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-accent-secondary/20 transition-colors duration-1000" />
                    
                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-60">
-                      <span>Subtotal Value</span>
+                      <span>Artifact Subtotal</span>
                       <span>৳{(order.itemsPrice || 0).toFixed(0)}</span>
                    </div>
+
+                   {order.discountAmount > 0 && (
+                     <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                        <span>Voucher Discount</span>
+                        <span>- ৳{(order.discountAmount || 0).toFixed(0)}</span>
+                     </div>
+                   )}
+
                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-60">
-                      <span>Logistics Assessment</span>
+                      <span>Logistics Assessment (Shipping)</span>
                       <span>৳{(order.shippingPrice || 0).toFixed(0)}</span>
                    </div>
-                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-60">
-                      <span>Government Taxation</span>
-                      <span>৳{(order.taxPrice || 0).toFixed(0)}</span>
-                   </div>
+
+                   {order.taxPrice > 0 && (
+                     <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-60">
+                        <span>Government Taxation</span>
+                        <span>৳{(order.taxPrice || 0).toFixed(0)}</span>
+                     </div>
+                   )}
+
                    <div className="h-px bg-background/20 my-4" />
                    <div className="flex justify-between items-end">
                       <div className="space-y-1">

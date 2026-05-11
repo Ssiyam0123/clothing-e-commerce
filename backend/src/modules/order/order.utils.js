@@ -2,7 +2,7 @@ import Product from "../product/product.model.js";
 import Coupon from "../coupon/coupon.model.js";
 import Cart from "../cart/cart.model.js";
 
-export const calculateValidatedOrder = async (orderItems, couponCode, cityId) => {
+export const calculateValidatedOrder = async (orderItems, couponCode, shippingPrice = 60) => {
     let itemsPrice = 0;
     const validatedItems = [];
     
@@ -44,7 +44,8 @@ export const calculateValidatedOrder = async (orderItems, couponCode, cityId) =>
             image: product.images?.[0] || "",
         });
     }
-    const shippingPrice = Number(cityId) === 1 ? 60 : 120;
+    // Use provided shipping price or default to 60
+    const finalShippingPrice = Number(shippingPrice) || 60;
     let discountAmount = 0, finalCoupon = null;
     if (couponCode) {
         const coupon = await Coupon.findOne({ code: couponCode.toUpperCase(), isActive: true });
@@ -59,18 +60,18 @@ export const calculateValidatedOrder = async (orderItems, couponCode, cityId) =>
     return {
         itemsPrice: Number(itemsPrice.toFixed(2)),
         discountAmount: Number(discountAmount.toFixed(2)),
-        shippingPrice,
-        totalPrice: Number((itemsPrice - discountAmount + shippingPrice).toFixed(2)),
+        shippingPrice: finalShippingPrice,
+        totalPrice: Number((itemsPrice - discountAmount + finalShippingPrice).toFixed(2)),
         validatedItems,
         couponCode: finalCoupon
     };
 };
 
 export const normalizeShippingAddress = (addr) => ({
-    name: addr.name, email: addr.email, phone: addr.phone,
-    street: addr.street, city: addr.city, state: addr.state || "N/A",
-    zip: addr.zip || "1000", country: addr.country || "Bangladesh",
-    pathao_city_id: addr.pathao_city_id, pathao_zone_id: addr.pathao_zone_id, pathao_area_id: addr.pathao_area_id,
+    name: addr.name, 
+    email: addr.email, 
+    phone: addr.phone,
+    address: addr.address
 });
 
 export const finalizeOrderProcessing = async (order, session = null) => {
