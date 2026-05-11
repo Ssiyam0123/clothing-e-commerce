@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const pageSettingSchema = new mongoose.Schema({
     branding: {
-        siteName: { type: String, default: "VANGUARD" },
+        siteName: { type: String, default: "" },
         siteTitle: { type: String, default: "Premium Apparel" },
         logo: { type: String }, 
         logoDark: { type: String },
@@ -29,7 +29,7 @@ const pageSettingSchema = new mongoose.Schema({
         address: String,
         whatsapp: String
     },
-    // ✅ New: Payment method toggles
+    // Payment method 
     paymentOptions: {
         cod: { type: Boolean, default: true },
         online: { type: Boolean, default: true },

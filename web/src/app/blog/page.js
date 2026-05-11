@@ -26,7 +26,7 @@ export default async function BlogPage() {
   const postsPromise = fetch(
     `${API_URL}/blogs?fields=title,slug,featuredImage,category,readingTime,author,createdAt`,
     { next: { revalidate: 3600 } }
-  ).then(res => res.ok ? res.json() : []);
+  ).then(res => res.ok ? res.json().then(data => data.blogs || []) : []);
 
   const faqSchema = {
     "@context": "https://schema.org",

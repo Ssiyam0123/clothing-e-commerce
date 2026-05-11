@@ -6,8 +6,9 @@ import { cn } from "@/lib/utils";
 import { ArrowUpRight, Clock, User } from "lucide-react";
 
 export default function BlogListing({ posts, t }) {
-  const featured = posts?.[0];
-  const remaining = posts?.slice(1);
+  const safePosts = Array.isArray(posts) ? posts : [];
+  const featured = safePosts?.[0];
+  const remaining = safePosts?.slice(1);
 
   return (
     <div className="min-h-screen bg-background pb-32">
@@ -31,7 +32,7 @@ export default function BlogListing({ posts, t }) {
       <div className="max-w-screen-xl mx-auto px-6">
         {/* 📑 The Journal Grid - Unified Standard Design */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12">
-          {posts?.map((post) => (
+          {safePosts.map((post) => (
             <div key={post._id} className="group h-full">
               <Link href={`/blog/${post.slug}`} className="flex flex-col h-full space-y-6 group">
                 <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] bg-accent/20 border border-border/10 shadow-lg group-hover:shadow-rose-500/10 transition-all duration-700">

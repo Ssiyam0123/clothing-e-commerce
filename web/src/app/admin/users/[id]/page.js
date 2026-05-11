@@ -25,22 +25,35 @@ import { getImageUrl } from "@/utils/imageUtils";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useFilters } from "@/hooks/useFilters";
+import Pagination from "@/components/common/Pagination";
 
 export default function UserAuditPage() {
   const { id } = useParams();
+  const { 
+    page, 
+    setPage, 
+    queryParams 
+  } = useFilters({
+    initialLimit: 30
+  });
+
   const { useUser } = useUsers();
   const { data: userData, isLoading: isUserLoading } = useUser(id);
   
-  const { orders, isLoading: allOrdersLoading } = useAdminOrders({ user: id });
+  const { orders, total, pages, isLoading: allOrdersLoading } = useAdminOrders({ 
+    ...queryParams,
+    user: id 
+  });
 
   const stats = useMemo(() => {
     if (!orders) return { totalSpent: 0, totalOrders: 0 };
     const successfulOrders = orders.filter(o => o.paymentResult?.status === "Completed" || o.orderStatus === "Delivered");
     return {
       totalSpent: successfulOrders.reduce((acc, curr) => acc + curr.totalPrice, 0),
-      totalOrders: orders.length
+      totalOrders: total || 0
     };
-  }, [orders]);
+  }, [orders, total]);
 
   if (isUserLoading || allOrdersLoading)
     return (
@@ -215,6 +228,17 @@ export default function UserAuditPage() {
                 </table>
               )}
            </div>
+
+           {orders?.length > 0 && (
+             <div className="p-8 border-t border-border/5 bg-accent/5">
+                <Pagination 
+                  page={page} 
+                  totalPages={pages} 
+                  onPageChange={setPage} 
+                  className="py-0 sm:py-0 justify-between flex-row-reverse"
+                />
+             </div>
+           )}
         </Card>
       </div>
     </div>

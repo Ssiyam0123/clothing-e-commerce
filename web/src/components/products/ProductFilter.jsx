@@ -50,12 +50,13 @@ export default function ProductFilter({ initialCategories, t }) {
   }) || [];
 
   return (
-    <div className="mb-16 space-y-12" aria-label="Product filters">
-      {/* 🚀 Primary Interface: Search & Sort */}
+    <div className="mb-12 space-y-10" aria-label="Product discovery engine">
+      {/* 🔍 Phase 1: Search & Sort Interface */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-40"
       >
         <FilterBar
           search={filters.search}
@@ -74,28 +75,8 @@ export default function ProductFilter({ initialCategories, t }) {
         />
       </motion.div>
 
-      {/* 🏷️ Secondary Interface: Category Archives */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between px-2">
-           <div className="flex items-center gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-accent-secondary animate-pulse" />
-              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground">
-                {t.category || "Collections"}
-              </h3>
-           </div>
-           {(filters.category !== 'all' || filters.subcategory) && (
-             <button 
-              onClick={() => {
-                setCategory('all');
-                setSubcategory(null);
-              }}
-              className="text-[9px] font-black uppercase tracking-widest text-accent-secondary hover:underline underline-offset-4 transition-all"
-             >
-                {t.clearFilters}
-             </button>
-           )}
-        </div>
-
+      {/* 🏷️ Phase 2: Category Navigation (Labels Removed) */}
+      <div className="space-y-4">
         <ScrollArea className="w-full whitespace-nowrap rounded-none pb-4">
           <div className="flex w-max gap-6 px-2">
             {/* ♾️ Universal Node */}
@@ -129,16 +110,9 @@ export default function ProductFilter({ initialCategories, t }) {
         </ScrollArea>
       </div>
 
-      {/* 🔗 Tertiary Interface: Sub-Collections */}
+      {/* 🔗 Phase 3: Sub-Collections (Labels Removed) */}
       {filteredSubcategories.length > 0 && (
-        <div className="space-y-5">
-           <div className="flex items-center gap-3 px-2">
-              <div className="w-1 h-1 rounded-full bg-primary" />
-              <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/60">
-                Sub-Collections
-              </h3>
-           </div>
-           
+        <div className="space-y-4">
            <ScrollArea className="w-full whitespace-nowrap pb-2">
              <div className="flex w-max gap-3 px-2">
                 {filteredSubcategories.map((sub) => (

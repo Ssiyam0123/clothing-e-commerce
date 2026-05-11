@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 function AdminOrdersContent() {
   const { search, setSearch, sort, setSort, page, setPage, queryParams } =
     useFilters({
-      initialLimit: 10,
+      initialLimit: 30,
       initialSort: "-createdAt",
     });
 
@@ -84,23 +84,28 @@ function AdminOrdersContent() {
     {
       label: "Date & Time",
       render: (item) => {
-        const dateObj = new Date(item.createdAt);
+        const dateObj = item.createdAt ? new Date(item.createdAt) : null;
+        const isValid = dateObj && !isNaN(dateObj.getTime());
         return (
           <div className="flex flex-col gap-0.5">
             <span className="text-[11px] font-black text-foreground uppercase tracking-tighter leading-none">
-              {dateObj.toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })}
+              {isValid
+                ? dateObj.toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })
+                : "N/A"}
             </span>
-            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-[0.1em]">
-              {dateObj.toLocaleTimeString("en-US", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
-              })}
-            </span>
+            {isValid && (
+              <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-[0.1em]">
+                {dateObj.toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })}
+              </span>
+            )}
           </div>
         );
       },
@@ -240,15 +245,14 @@ function AdminOrdersContent() {
             >
               <DataTable columns={columns} data={orders || []} className="border-none rounded-none" />
 
-              {pages > 1 && (
-                <div className="p-8 border-t border-border/10 bg-background/10">
-                  <Pagination
-                    page={queryParams.page}
-                    totalPages={pages}
-                    onPageChange={setPage}
-                  />
-                </div>
-              )}
+              <div className="p-8 border-t border-border/10 bg-background/5">
+                <Pagination
+                  page={page}
+                  totalPages={pages}
+                  onPageChange={setPage}
+                  className="py-0 sm:py-0 justify-between flex-row-reverse"
+                />
+              </div>
             </div>
           )}
         </div>

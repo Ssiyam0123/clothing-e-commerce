@@ -240,15 +240,15 @@ function AdminProductsContent() {
               }`}
             >
               <DataTable columns={columns} data={products || []} className="border-none rounded-none" />
-              {pagination?.pages > 1 && (
-                <div className="p-8 border-t border-border/10 bg-background/10">
-                  <Pagination
-                    page={pagination?.page}
-                    totalPages={pagination?.pages}
-                    onPageChange={setPage}
-                  />
-                </div>
-              )}
+              
+              <div className="p-8 border-t border-border/10 bg-background/5">
+                <Pagination
+                  page={pagination?.page}
+                  totalPages={pagination?.pages}
+                  onPageChange={setPage}
+                  className="py-0 sm:py-0 justify-between flex-row-reverse"
+                />
+              </div>
             </div>
           )}
         </div>

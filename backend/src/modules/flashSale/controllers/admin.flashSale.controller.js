@@ -76,10 +76,25 @@ export const updateFlashSale = asyncHandler(async (req, res) => {
 });
 
 export const getAllFlashSales = asyncHandler(async (req, res) => {
-  const flashSales = await FlashSale.find({})
+  const { page = 1, limit = 30, search = '' } = req.query;
+  const filter = {};
+  if (search) {
+    filter.name = { $regex: search, $options: 'i' };
+  }
+  
+  const total = await FlashSale.countDocuments(filter);
+  const flashSales = await FlashSale.find(filter)
     .sort('-createdAt')
-    .populate(populatedProductsConfig); 
-  res.json(flashSales);
+    .populate(populatedProductsConfig)
+    .skip((page - 1) * limit)
+    .limit(Number(limit));
+    
+  res.json({
+    flashSales,
+    total,
+    page: Number(page),
+    pages: Math.ceil(total / limit)
+  });
 });
 
 export const deleteFlashSale = asyncHandler(async (req, res) => {

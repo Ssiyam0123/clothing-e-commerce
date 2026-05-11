@@ -299,7 +299,7 @@ export default function LayoutBuilderPage() {
     queryKey: ['campaigns'],
     queryFn: async () => {
       const { data } = await api.get('/banner-campaigns');
-      return data;
+      return data.campaigns || [];
     }
   });
 
@@ -307,7 +307,7 @@ export default function LayoutBuilderPage() {
     queryKey: ['subcategories'],
     queryFn: async () => {
       const { data } = await api.get('/subcategories');
-      return data;
+      return data.subcategories || [];
     }
   });
 
@@ -315,7 +315,7 @@ export default function LayoutBuilderPage() {
     queryKey: ['admin-flash-sales'],
     queryFn: async () => {
       const { data } = await api.get('/admin/flash-sales');
-      return data;
+      return data.flashSales || [];
     }
   });
 

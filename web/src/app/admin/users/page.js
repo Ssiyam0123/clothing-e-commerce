@@ -7,6 +7,7 @@ import { useFilters } from "@/hooks/useFilters";
 import DataTable from "@/components/admin/DataTable";
 import TableSkeleton from "@/components/common/TableSkeleton";
 import FilterBar from "@/components/common/FilterBar";
+import Pagination from "@/components/common/Pagination";
 import { getImageUrl } from "@/utils/imageUtils";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import { 
@@ -38,7 +39,7 @@ function UsersContent() {
     setPage, 
     queryParams 
   } = useFilters({
-    initialLimit: 10,
+    initialLimit: 30,
     initialSort: "-createdAt"
   });
 
@@ -118,15 +119,20 @@ function UsersContent() {
     },
     {
       label: "Joined Date",
-      render: (item) => (
-        <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-          {new Date(item.createdAt).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
-        </span>
-      ),
+      render: (item) => {
+        const date = item.createdAt ? new Date(item.createdAt) : null;
+        return (
+          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+            {date && !isNaN(date.getTime()) 
+              ? date.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+              : "N/A"}
+          </span>
+        );
+      },
     },
     {
       label: "Actions",
@@ -210,7 +216,7 @@ function UsersContent() {
               { label: "Newest Joined", value: "-createdAt" },
               { label: "Oldest Joined", value: "createdAt" },
               { label: "Alphabetical (A-Z)", value: "name" },
-              { label: "Role", value: "-role" },
+              { label: "Role", value: "role" },
             ]}
             searchPlaceholder="Search by Name or Email..."
           />
@@ -228,63 +234,15 @@ function UsersContent() {
           )}
         </div>
 
-        {/* 🚀 Sector Navigation (Pagination) */}
-        {!isLoading && totalPages > 1 && (
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8 p-6 md:p-8 border-t border-border/10 bg-background/10">
-            <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.5em] italic">
-              Page {currentPage} <span className="mx-3 opacity-20">/</span> {totalPages}
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-card/50 border-border/10 hover:bg-foreground hover:text-background transition-all"
-              >
-                <ChevronLeft size={20} strokeWidth={3} />
-              </Button>
-
-              <div className="flex items-center gap-2 px-1 md:px-2">
-                {[...Array(totalPages)].map((_, i) => {
-                  const pageNum = i + 1;
-                  if (pageNum === 1 || pageNum === totalPages || (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)) {
-                    return (
-                      <Button
-                        key={pageNum}
-                        onClick={() => setPage(pageNum)}
-                        variant={currentPage === pageNum ? "default" : "outline"}
-                        className={cn(
-                          "w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all",
-                          currentPage === pageNum 
-                            ? "bg-rose-600 text-white shadow-xl shadow-rose-600/20 scale-110 border-transparent" 
-                            : "bg-card/50 border-border/10 text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        {pageNum < 10 ? `0${pageNum}` : pageNum}
-                      </Button>
-                    );
-                  }
-                  if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
-                    return <span key={pageNum} className="text-muted-foreground/30 text-[10px] px-1 font-black">••</span>;
-                  }
-                  return null;
-                })}
-              </div>
-
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-card/50 border-border/10 hover:bg-foreground hover:text-background transition-all"
-              >
-                <ChevronRight size={20} strokeWidth={3} />
-              </Button>
-            </div>
-          </div>
-        )}
+        {/* Standardized Pagination */}
+        <div className="p-8 border-t border-border/10 bg-background/5">
+           <Pagination 
+             page={currentPage} 
+             totalPages={totalPages} 
+             onPageChange={setPage} 
+             className="py-0 sm:py-0 justify-between flex-row-reverse" 
+           />
+        </div>
       </div>
     </div>
   );

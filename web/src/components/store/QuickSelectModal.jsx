@@ -13,7 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function QuickSelectModal({ isOpen, onClose, product, lang }) {
   const { settings } = useAppStore();
-  const siteName = settings?.branding?.siteName || "Vanguard";
+  const siteName = settings?.branding?.siteName || "Store";
   const router = useRouter();
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);

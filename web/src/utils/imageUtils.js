@@ -1,5 +1,5 @@
 export const getImageUrl = (path, width = 800, quality = 75) => {
-  if (!path) return 'https://placehold.co/800x800/222/white?text=Vanguard';
+  if (!path) return 'https://placehold.co/800x800/222/white?text=Product';
   if (path.startsWith('blob:') || path.startsWith('data:')) return path;
   
   // Cloudinary optimizations: f_auto (WebP/AVIF), q_auto (smart quality), c_limit (fit within width)

@@ -43,8 +43,13 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
     }
 
     if (search) {
-        const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        matchStage.name = { $regex: safeSearch, $options: 'i' };
+        const words = search.trim().split(/\s+/).filter(Boolean);
+        if (words.length > 0) {
+            const searchRegex = words.map(word => 
+                `(?=.*${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`
+            ).join('');
+            matchStage.name = { $regex: searchRegex, $options: 'i' };
+        }
     }
 
     if (minPrice || maxPrice) {

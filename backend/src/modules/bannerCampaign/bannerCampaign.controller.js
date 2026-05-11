@@ -17,8 +17,19 @@ export const getActiveCampaign = asyncHandler(async (req, res) => {
 });
 
 export const getAllCampaigns = asyncHandler(async (req, res) => {
-  const campaigns = await BannerCampaign.find({}).sort('-createdAt');
-  res.json(campaigns);
+  const { page = 1, limit = 30 } = req.query;
+  const total = await BannerCampaign.countDocuments({});
+  const campaigns = await BannerCampaign.find({})
+    .sort('-createdAt')
+    .skip((page - 1) * limit)
+    .limit(Number(limit));
+
+  res.json({
+    campaigns,
+    total,
+    page: Number(page),
+    pages: Math.ceil(total / limit)
+  });
 });
 
 export const createCampaign = asyncHandler(async (req, res) => {

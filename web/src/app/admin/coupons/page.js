@@ -24,8 +24,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
+import { useFilters } from "@/hooks/useFilters";
+import Pagination from "@/components/common/Pagination";
+
 export default function CouponArchive() {
-  const { coupons, isLoading, deleteCoupon } = useCoupons();
+  const { page, setPage, queryParams } = useFilters({ initialLimit: 30 });
+  const { coupons, total, pages, isLoading, deleteCoupon } = useCoupons(queryParams);
 
   const handleDelete = async (id) => {
     const confirmed = await swalConfirm(
@@ -184,7 +188,7 @@ export default function CouponArchive() {
             Voucher <span className="text-emerald-600">Hub</span>
           </h1>
           <p className="admin-subtitle">
-            Logic Orchestration • Total Logs: {coupons?.length || 0}
+            Logic Orchestration • Total Logs: {total}
           </p>
         </div>
 
@@ -206,11 +210,23 @@ export default function CouponArchive() {
               <TableSkeleton rowCount={6} />
             </div>
           ) : (
-            <DataTable 
-              columns={columns} 
-              data={coupons} 
-              className="bg-transparent border-none rounded-none" 
-            />
+            <>
+              <DataTable 
+                columns={columns} 
+                data={coupons} 
+                className="bg-transparent border-none rounded-none" 
+              />
+              
+              {/* Pagination */}
+              <div className="p-8 border-t border-border/10 bg-background/5">
+                <Pagination 
+                  page={page} 
+                  totalPages={pages} 
+                  onPageChange={setPage} 
+                  className="py-0 sm:py-0 justify-between flex-row-reverse" 
+                />
+              </div>
+            </>
           )}
         </div>
       </div>

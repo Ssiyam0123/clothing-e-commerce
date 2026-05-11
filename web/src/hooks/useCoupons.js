@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 
-export const useCoupons = () => {
+export const useCoupons = (params = {}) => {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const {
@@ -10,8 +10,8 @@ export const useCoupons = () => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["admin-coupons"],
-    queryFn: async () => (await api.get("/coupons")).data,
+    queryKey: ["admin-coupons", params],
+    queryFn: async () => (await api.get("/coupons", { params })).data,
     enabled: !!user && user.role === "admin",
   });
 
@@ -49,7 +49,10 @@ export const useCoupons = () => {
   };
 
   return {
-    coupons,
+    coupons: coupons?.coupons || [],
+    total: coupons?.total || 0,
+    pages: coupons?.pages || 1,
+    page: coupons?.page || 1,
     getCoupon,
     isLoading,
     error,

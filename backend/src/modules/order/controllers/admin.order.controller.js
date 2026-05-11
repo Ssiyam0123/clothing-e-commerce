@@ -11,7 +11,7 @@ import {
 import pathaoService from '../../../services/pathao.service.js';
 
 export const getOrders = asyncHandler(async (req, res) => {
-  const { search, status, user, page = 1, limit = 10 } = req.query;
+  const { search, status, user, sort, page = 1, limit = 30 } = req.query;
   const filter = {};
 
   if (status && status !== "all") {
@@ -37,8 +37,11 @@ export const getOrders = asyncHandler(async (req, res) => {
   const skip = (Math.max(1, Number(page)) - 1) * Number(limit);
   const itemsLimit = Number(limit);
 
+  // 🏛️ Dynamic Sorting Logic
+  const sortOrder = sort && sort !== "all" ? sort.split(",").join(" ") : "-createdAt";
+
   const ordersRaw = await Order.find(filter)
-    .sort("-createdAt")
+    .sort(sortOrder)
     .skip(skip)
     .limit(itemsLimit)
     .lean();
@@ -127,10 +130,12 @@ export const createOrderAdmin = asyncHandler(async (req, res) => {
 });
 
 export const getAdminOrderById = asyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id).populate(
-        "orderItems.product",
-        "name images slug"
-    );
+    const order = await Order.findById(req.params.id)
+        .populate("user", "name email avatar")
+        .populate(
+            "orderItems.product",
+            "name images slug"
+        );
     if (!order) return res.status(404).json({ message: "Protocol not found." });
     res.json(order);
 });
@@ -179,7 +184,11 @@ export const updateOrder = asyncHandler(async (req, res) => {
     order.paymentResult = { ...order.paymentResult, ...req.body.paymentResult };
   }
 
-  const updatedOrder = await order.save();
+  await order.save();
+  const updatedOrder = await Order.findById(order._id)
+    .populate("user", "name email avatar")
+    .populate("orderItems.product", "name images slug");
+    
   res.json(updatedOrder);
 });
 

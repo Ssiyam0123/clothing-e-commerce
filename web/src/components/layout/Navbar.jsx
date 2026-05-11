@@ -96,7 +96,7 @@ export default function Navbar() {
     >
       <div className="w-full mx-auto flex items-center justify-between gap-2">
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-3 group flex-shrink-0" aria-label={branding.siteName || "Vanguard Home"}>
+        <Link href="/" className="flex items-center gap-3 group flex-shrink-0" aria-label={branding.siteName || "Home"}>
           {branding.logo || branding.logoDark ? (
             <img 
               src={getImageUrl(theme === 'dark' ? (branding.logoDark || branding.logo) : (branding.logo || branding.logoDark))} 
@@ -167,7 +167,7 @@ export default function Navbar() {
             )}
           </Button>
 
-          <Link href="/products?search=open" className="hidden md:inline-flex flex-shrink-0">
+          <Link href="/products" className="hidden md:inline-flex flex-shrink-0">
              <Button variant="ghost" size="icon" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30" aria-label="Search">
                <Search size={16} className="sm:size-[18px]" />
              </Button>
@@ -285,7 +285,7 @@ export default function Navbar() {
                     <div className="w-4 h-4" />
                   )}
                 </Button>
-                <Link href="/products?search=open" className="inline-flex">
+                <Link href="/products" className="inline-flex">
                   <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full hover:bg-accent/30" aria-label="Search">
                     <Search size={18} />
                   </Button>

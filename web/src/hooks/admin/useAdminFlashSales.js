@@ -2,12 +2,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 
-export const useAdminFlashSales = () => {
+export const useAdminFlashSales = (params = {}) => {
   const queryClient = useQueryClient();
 
   const { data: flashSales, isLoading } = useQuery({
-    queryKey: ["adminFlashSales"],
-    queryFn: async () => (await api.get("/admin/flash-sales")).data,
+    queryKey: ["adminFlashSales", params],
+    queryFn: async () => (await api.get("/admin/flash-sales", { params })).data,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -41,7 +41,10 @@ export const useAdminFlashSales = () => {
   };
 
   return {
-    flashSales: flashSales || [],
+    flashSales: flashSales?.flashSales || [],
+    total: flashSales?.total || 0,
+    pages: flashSales?.pages || 1,
+    page: flashSales?.page || 1,
     isLoading,
     createFlashSale: createFlashSale.mutateAsync,
     updateFlashSale: updateFlashSale.mutateAsync,

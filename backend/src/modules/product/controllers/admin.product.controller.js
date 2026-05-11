@@ -84,7 +84,7 @@ export const getAdminProducts = asyncHandler(async (req, res) => {
         maxPrice,
         sort,
         page = 1,
-        limit = 12,
+        limit = 30,
         isActive,
         stockStatus,
         isFeatured,

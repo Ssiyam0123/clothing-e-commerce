@@ -38,5 +38,7 @@
 **/CLAUDE.md
 **/graphify-out/
 **/.graphify_*
+/support/
+**/jsons/
 **/auditreport_*.md
 **/skills-lock.json

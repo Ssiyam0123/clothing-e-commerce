@@ -8,8 +8,23 @@ export const createCoupon = asyncHandler(async (req, res) => {
 });
 
 export const getCoupons = asyncHandler(async (req, res) => {
-  const coupons = await Coupon.find({}).sort({ createdAt: -1 });
-  res.json(coupons);
+  const { page = 1, limit = 30, search = '' } = req.query;
+  const filter = {};
+  if (search) {
+    filter.code = { $regex: search, $options: 'i' };
+  }
+  const total = await Coupon.countDocuments(filter);
+  const coupons = await Coupon.find(filter)
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(Number(limit));
+    
+  res.json({
+    coupons,
+    total,
+    page: Number(page),
+    pages: Math.ceil(total / limit)
+  });
 });
 
 export const getCouponById = asyncHandler(async (req, res) => {

@@ -30,7 +30,7 @@ export async function generateMetadata({ params }) {
     if (!res.ok) throw new Error("Product not found");
     const product = await res.json();
     const branding = settings?.branding || {};
-    const siteName = branding.siteName || "VANGUARD";
+    const siteName = branding.siteName || "Store";
 
     const discountedPrice =
       product.price - (product.price * (product.discount || 0)) / 100;
@@ -74,7 +74,7 @@ export async function generateMetadata({ params }) {
     };
   } catch (error) {
     const settings = await getSettings();
-    return { title: `Product Not Found | ${settings?.branding?.siteName || "VANGUARD"}` };
+    return { title: `Product Not Found | ${settings?.branding?.siteName || "Store"}` };
   }
 }
 
@@ -104,7 +104,7 @@ export default async function ProductPage({ params }) {
   const t = getTranslation('product_details', lang);
 
   const settings = await getSettings();
-  const siteName = settings?.branding?.siteName || "VANGUARD";
+  const siteName = settings?.branding?.siteName || "Store";
 
   const productSchema = {
     "@context": "https://schema.org",

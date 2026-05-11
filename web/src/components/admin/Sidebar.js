@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAppStore } from "@/store/appStore";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -52,6 +53,9 @@ const navGroups = [
 
 export default function Sidebar({ className, onItemClick }) {
   const pathname = usePathname();
+  const { settings } = useAppStore();
+  const branding = settings?.branding || {};
+  const siteName = branding.siteName || "Store";
 
   return (
     <aside className={cn("sidebar-vanguard", className)}>
@@ -59,11 +63,13 @@ export default function Sidebar({ className, onItemClick }) {
       <div className="p-8">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 bg-sidebar-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-black/20">
-            <span className="text-sidebar-primary-foreground font-black italic">V</span>
+            <span className="text-sidebar-primary-foreground font-black italic">
+              {siteName.charAt(0).toUpperCase()}
+            </span>
           </div>
           <div className="flex flex-col">
             <h2 className="text-sm font-black tracking-tighter uppercase text-sidebar-foreground leading-none">
-              Vanguard
+              {siteName}
             </h2>
             <span className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mt-1 opacity-70">
               Admin Panel
@@ -110,7 +116,7 @@ export default function Sidebar({ className, onItemClick }) {
       <div className="p-8">
         <div className="bg-sidebar-accent/50 rounded-2xl p-4 border border-sidebar-border">
           <p className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.3em] text-center opacity-60">
-            Vanguard Admin v2.0.6
+            {siteName} Admin v2.0.6
           </p>
         </div>
       </div>

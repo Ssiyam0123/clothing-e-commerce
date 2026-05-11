@@ -2,7 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 
-export const useAdminCategories = (initialData = undefined) => {
+export const useAdminCategories = (params = {}, initialData = undefined) => {
   const queryClient = useQueryClient();
 
   const {
@@ -10,9 +10,9 @@ export const useAdminCategories = (initialData = undefined) => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["adminCategories"],
+    queryKey: ["adminCategories", params],
     queryFn: async () => {
-      const { data } = await api.get("/admin/categories");
+      const { data } = await api.get("/admin/categories", { params });
       return data;
     },
     initialData,
@@ -68,7 +68,10 @@ export const useAdminCategories = (initialData = undefined) => {
   });
 
   return {
-    categories: categories || [],
+    categories: categories?.categories || [],
+    total: categories?.total || 0,
+    pages: categories?.pages || 1,
+    page: categories?.page || 1,
     isLoading,
     error,
     createCategory: createCategory.mutateAsync,

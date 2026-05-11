@@ -169,12 +169,12 @@ export default function Footer() {
         <div className="mt-12 flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-border/5">
            <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50" />
-              <p className="text-[9px] font-bold uppercase tracking-widest text-foreground/60">Systems Active Vanguard v4.2</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-foreground/60">Systems Active {branding.siteName || "Store"} v4.2</p>
            </div>
            <div className="flex items-center gap-6 md:gap-10">
               <Link href="/terms" className="text-[9px] font-bold uppercase tracking-widest text-foreground/60 hover:text-foreground transition-colors">{t.legal}</Link>
               <Link href="/privacy" className="text-[9px] font-bold uppercase tracking-widest text-foreground/60 hover:text-foreground transition-colors">{t.privacy}</Link>
-               <p className="text-[9px] font-bold uppercase tracking-widest text-foreground/60">© 2026 {branding.siteName || "Vanguard"}</p>
+               <p className="text-[9px] font-bold uppercase tracking-widest text-foreground/60">© 2026 {branding.siteName || "Store"}</p>
            </div>
         </div>
       </div>

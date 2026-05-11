@@ -159,7 +159,7 @@ export default async function RootLayout({ children }) {
   const pathname = headerList.get("x-pathname") || "";
 
   const contact = settings?.contact || {};
-  const siteName = branding.siteName || "Vanguard Premium Streetwear";
+  const siteName = branding.siteName || "Store";
   const SITE_URL =
     process.env.NEXT_PUBLIC_SITE_URL ||
     "https://clothing-e-commerce-web.vercel.app";

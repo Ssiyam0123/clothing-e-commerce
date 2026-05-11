@@ -206,6 +206,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid Order ID protocol." });
 
   const order = await Order.findById(id)
+    .populate("user", "name email avatar")
     .populate("orderItems.product", "name images slug")
     .populate("orderItems.size", "name");
 

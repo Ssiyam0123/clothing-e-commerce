@@ -84,7 +84,7 @@ export const changePassword = asyncHandler(async (req, res) => {
 // @route   GET /api/users
 // @access  Private/Admin
 export const getAllUsers = asyncHandler(async (req, res) => {
-  const { search, sort, page = 1, limit = 10 } = req.query;
+  const { search, sort, page = 1, limit = 30 } = req.query;
   
   const query = {};
   

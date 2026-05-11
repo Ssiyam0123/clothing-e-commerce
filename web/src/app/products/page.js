@@ -10,30 +10,46 @@ const SITE_URL =
   "https://clothing-e-commerce-web.vercel.app";
 
 export async function generateMetadata({ searchParams }) {
-  const { category, search } = await searchParams;
+  const { category, search, subcategory } = await searchParams;
   const settings = await getSettings();
-  const siteName = settings?.branding?.siteName || "VANGUARD";
+  const siteName = settings?.branding?.siteName || "Store";
 
-  let title = `The Collection | ${siteName}`;
-  let description =
-    `Browse our complete collection of premium apparel at ${siteName}. Sustainable fabrics, bold silhouettes.`;
+  let title = `Premium Collection | ${siteName}`;
+  let description = `Explore the latest high-end apparel at ${siteName}. Discover our curated collection of sustainable and modern fashion.`;
 
-  if (category) {
-    try {
+  try {
+    // 🔍 Case 1: Search Query active
+    if (search) {
+      title = `Results for "${search}" | ${siteName} Search`;
+      description = `Browsing search results for "${search}" in our premium catalog at ${siteName}. Find your style today.`;
+    } 
+    // 📂 Case 2: Category or Subcategory active
+    else if (category) {
       const res = await fetch(`${API_URL}/categories`);
       if (res.ok) {
         const categories = await res.json();
         const cat = categories.find((c) => c.slug === category);
         if (cat) {
-          title = `${cat.name} | ${siteName} Collection`;
-          description = `Explore our ${cat.name} collection. Premium urban apparel designed for the modern trendsetter.`;
+          if (subcategory) {
+            // Fetch subcategories to get the name
+            const subRes = await fetch(`${API_URL}/subcategories`);
+            if (subRes.ok) {
+              const subs = await subRes.json();
+              const sub = subs.find(s => s.slug === subcategory);
+              if (sub) {
+                title = `${sub.name} - ${cat.name} | ${siteName}`;
+                description = `Shop our exclusive ${sub.name} range within the ${cat.name} collection at ${siteName}. Premium quality guaranteed.`;
+              }
+            }
+          } else {
+            title = `${cat.name} Collection | ${siteName}`;
+            description = `Discover the ${cat.name} collection at ${siteName}. Premium urban apparel designed for the modern trendsetter.`;
+          }
         }
       }
-    } catch (e) {
-      console.error("Failed to fetch category for metadata");
     }
-  } else if (search) {
-    title = `Search results for "${search}" | ${siteName}`;
+  } catch (err) {
+    console.error("Metadata generation error:", err);
   }
 
   return {
@@ -42,10 +58,13 @@ export async function generateMetadata({ searchParams }) {
     openGraph: {
       title,
       description,
-      images: [`${SITE_URL}/og-image.jpg`],
+      type: "website",
+      url: `${SITE_URL}/products`,
     },
-    alternates: {
-      canonical: `${SITE_URL}/products`,
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
   };
 }

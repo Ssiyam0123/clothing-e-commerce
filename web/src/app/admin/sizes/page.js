@@ -17,10 +17,13 @@ import {
 import { swalConfirm, swalToast } from "@/utils/swal";
 import { cn } from "@/lib/utils";
 
+import { useFilters } from "@/hooks/useFilters";
+import Pagination from "@/components/common/Pagination";
+
 export default function Sizes() {
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const { page, setPage, category: selectedCategory, setCategory: setSelectedCategory, queryParams } = useFilters({ initialLimit: 30 });
   const { categories, isLoading: categoriesLoading } = useAdminCategories();
-  const { sizes, isLoading, deleteSize } = useSizes(selectedCategory);
+  const { sizes, total, pages, isLoading, deleteSize } = useSizes(queryParams);
 
   const handleDelete = async (id) => {
     const isConfirmed = await swalConfirm("Delete Size?", "This size will be permanently removed.");
@@ -66,7 +69,7 @@ export default function Sizes() {
             Product <span className="text-indigo-600">Sizes</span>
           </h1>
           <p className="admin-subtitle">
-            Manage your product sizes • Total: {sizes?.length || 0}
+            Manage your product sizes • Total: {total}
           </p>
         </div>
 
@@ -92,7 +95,7 @@ export default function Sizes() {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="bg-background/50 border border-border/10 rounded-xl h-12 md:h-14 px-6 text-[10px] font-black uppercase tracking-widest w-full md:w-64 focus:border-indigo-600 transition-all outline-none"
           >
-            <option value="">All Categories</option>
+            <option value="all">All Categories</option>
             {categories?.map((cat) => (
               <option key={cat._id} value={cat._id}>
                 {cat.name}
@@ -123,6 +126,16 @@ export default function Sizes() {
               </div>
             )}
           />
+        </div>
+        
+        {/* Pagination */}
+        <div className="p-8 border-t border-border/10 bg-background/5">
+           <Pagination 
+             page={page} 
+             totalPages={pages} 
+             onPageChange={setPage} 
+             className="py-0 sm:py-0 justify-between flex-row-reverse" 
+           />
         </div>
       </div>
     </div>

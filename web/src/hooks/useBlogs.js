@@ -3,15 +3,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { swalToast, swalError } from "@/utils/swal";
 
-export const useBlogs = (id = null, isId = false, adminView = false) => {
+export const useBlogs = (params = {}, adminView = false, id = null, isId = false) => {
   const queryClient = useQueryClient();
 
   // 📰 Fetch all blogs (public or admin)
   const { data: blogs, isLoading: blogsLoading } = useQuery({
-    queryKey: ["blogs", adminView],
+    queryKey: ["blogs", adminView, params],
     queryFn: async () => {
       const endpoint = adminView ? "/blogs?status=all" : "/blogs";
-      return (await api.get(endpoint)).data;
+      return (await api.get(endpoint, { params })).data;
     },
   });
 
@@ -80,7 +80,10 @@ export const useBlogs = (id = null, isId = false, adminView = false) => {
   });
 
   return {
-    blogs,
+    blogs: blogs?.blogs || [],
+    total: blogs?.total || 0,
+    pages: blogs?.pages || 1,
+    page: blogs?.page || 1,
     blog,
     blogsLoading,
     blogLoading,

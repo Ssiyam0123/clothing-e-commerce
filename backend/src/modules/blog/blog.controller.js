@@ -46,7 +46,7 @@ export const createPost = asyncHandler(async (req, res) => {
 
 // 📰 Get All Posts (public)
 export const getPosts = asyncHandler(async (req, res) => {
-  const { category, status = 'PUBLISHED', fields } = req.query;
+  const { category, status = 'PUBLISHED', fields, page = 1, limit = 30 } = req.query;
   const query = {};
   
   if (status !== 'all') {
@@ -55,9 +55,12 @@ export const getPosts = asyncHandler(async (req, res) => {
   
   if (category) query.category = category;
 
+  const total = await Blog.countDocuments(query);
   let postsQuery = Blog.find(query)
     .populate('author', 'name avatar')
-    .sort('-isFeatured -createdAt');
+    .sort('-isFeatured -createdAt')
+    .skip((page - 1) * limit)
+    .limit(Number(limit));
 
   if (fields) {
     postsQuery = postsQuery.select(fields.split(',').join(' '));
@@ -65,7 +68,12 @@ export const getPosts = asyncHandler(async (req, res) => {
   
   const posts = await postsQuery;
     
-  res.json(posts);
+  res.json({
+    blogs: posts,
+    total,
+    page: Number(page),
+    pages: Math.ceil(total / limit)
+  });
 });
 
 // 📖 Get Single Post by Slug

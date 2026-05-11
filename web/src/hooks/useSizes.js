@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../lib/api";
 
-export const useSizes = (categoryId = null) => {
+export const useSizes = (params = {}) => {
   const queryClient = useQueryClient();
 
   const {
@@ -9,10 +9,9 @@ export const useSizes = (categoryId = null) => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["sizes", categoryId],
+    queryKey: ["sizes", params],
     queryFn: async () => {
-      const url = categoryId ? `/sizes?category=${categoryId}` : "/sizes";
-      const { data } = await api.get(url);
+      const { data } = await api.get("/sizes", { params });
       return data; // Already sorted by natural order from backend
     },
   });
@@ -33,7 +32,10 @@ export const useSizes = (categoryId = null) => {
   });
 
   return { 
-    sizes, 
+    sizes: sizes?.sizes || [], 
+    total: sizes?.total || 0,
+    pages: sizes?.pages || 1,
+    page: sizes?.page || 1,
     isLoading, 
     error, 
     createSize: createSize.mutateAsync, 

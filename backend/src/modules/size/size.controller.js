@@ -26,9 +26,15 @@ export const createSize = asyncHandler(async (req, res) => {
 });
 
 export const getSizes = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 30, category } = req.query;
   const filter = {};
-  if (req.query.category) filter.category = req.query.category;
-  const sizes = await Size.find(filter).populate('category', 'name slug');
+  if (category && category !== 'all') filter.category = category;
+  
+  const total = await Size.countDocuments(filter);
+  const sizes = await Size.find(filter)
+    .populate('category', 'name slug')
+    .skip((page - 1) * limit)
+    .limit(Number(limit));
   
   // Sort sizes by natural order
   const sortedSizes = sizes.sort((a, b) => {
@@ -37,7 +43,12 @@ export const getSizes = asyncHandler(async (req, res) => {
     return orderA - orderB;
   });
   
-  res.json(sortedSizes);
+  res.json({
+    sizes: sortedSizes,
+    total,
+    page: Number(page),
+    pages: Math.ceil(total / limit)
+  });
 });
 
 export const getSizeById = asyncHandler(async (req, res) => {

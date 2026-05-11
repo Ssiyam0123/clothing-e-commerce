@@ -50,14 +50,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 
-export default function AdminBlogDashboard() {
-  const { blogs, isLoading, deleteBlog, toggleStatus, toggleFeatured } = useBlogs(null, false, true);
-  const [searchQuery, setSearchQuery] = useState("");
+import { useFilters } from "@/hooks/useFilters";
+import Pagination from "@/components/common/Pagination";
 
-  // 🕵️ Tactical Filter Logic
-  const filteredBlogs = blogs?.filter((post) =>
-    post.title.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+export default function AdminBlogDashboard() {
+  const { search, setSearch, page, setPage, queryParams } = useFilters({ initialLimit: 30 });
+  const { blogs, total, pages, isLoading, deleteBlog, toggleStatus, toggleFeatured } = useBlogs(queryParams, true);
+
+  const filteredBlogs = blogs;
 
   const handleDelete = async (id) => {
     const confirmed = await swalConfirm(
@@ -88,7 +88,7 @@ export default function AdminBlogDashboard() {
             Journal <span className="text-rose-600">Archives</span>
           </h1>
           <p className="admin-subtitle">
-            Operational • Total Logs: {blogs?.length || 0}
+            Operational • Total Logs: {total}
           </p>
         </div>
 
@@ -101,8 +101,8 @@ export default function AdminBlogDashboard() {
             <Input
               type="text"
               placeholder="SEARCH..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               className="bg-background/50 border-border/10 pl-12 pr-6 h-12 md:h-16 rounded-xl md:rounded-2xl outline-none text-[10px] font-black uppercase tracking-widest w-full md:w-64 lg:w-80 focus-visible:ring-rose-600/20 focus:border-rose-600 transition-all shadow-inner"
             />
           </div>
@@ -288,6 +288,16 @@ export default function AdminBlogDashboard() {
               )}
             </TableBody>
           </Table>
+        </div>
+
+        {/* Pagination */}
+        <div className="p-8 border-t border-border/10 bg-background/5">
+           <Pagination 
+             page={page} 
+             totalPages={pages} 
+             onPageChange={setPage} 
+             className="py-0 sm:py-0 justify-between flex-row-reverse" 
+           />
         </div>
       </div>
     </div>

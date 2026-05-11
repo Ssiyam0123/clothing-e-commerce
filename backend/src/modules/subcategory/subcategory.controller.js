@@ -50,8 +50,28 @@ export const deleteSubcategory = asyncHandler(async (req, res) => {
 });
 
 export const getSubcategories = asyncHandler(async (req, res) => {
-    const subcategories = await Subcategory.find({}).populate('category', 'name').sort('name');
-    res.json(subcategories);
+    const { page = 1, limit = 30, search = '', category } = req.query;
+    const filter = {};
+    if (search) {
+        filter.name = { $regex: search, $options: 'i' };
+    }
+    if (category && category !== 'all') {
+        filter.category = category;
+    }
+    
+    const total = await Subcategory.countDocuments(filter);
+    const subcategories = await Subcategory.find(filter)
+        .populate('category', 'name')
+        .sort('name')
+        .skip((page - 1) * limit)
+        .limit(Number(limit));
+
+    res.json({
+        subcategories,
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit)
+    });
 });
 
 export const getSubcategoryById = asyncHandler(async (req, res) => {

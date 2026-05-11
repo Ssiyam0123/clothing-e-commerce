@@ -283,7 +283,7 @@ export default function OrderDetailsPage() {
           {/* CUSTOMER INTELLIGENCE */}
           <Card className="rounded-[2.5rem] border-border bg-card p-8 shadow-sm">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] mb-8">
-              02. Customer Info
+              02. Account Holder
             </h3>
             <div className="flex items-center gap-5 mb-10">
               <div className="h-20 w-20 rounded-[2rem] bg-muted flex items-center justify-center font-black text-muted-foreground border border-border text-3xl shadow-inner overflow-hidden uppercase">
@@ -339,6 +339,9 @@ export default function OrderDetailsPage() {
                     Delivery Address
                   </p>
                   <p className="text-xs font-bold text-foreground leading-relaxed uppercase">
+                    <span className="text-[10px] text-muted-foreground mr-2 font-black italic underline decoration-blue-600/30">Recipient:</span> {order.shippingAddress.name}
+                  </p>
+                  <p className="text-xs font-bold text-foreground leading-relaxed uppercase mt-1">
                     {order.shippingAddress.address}
                   </p>
                 </div>

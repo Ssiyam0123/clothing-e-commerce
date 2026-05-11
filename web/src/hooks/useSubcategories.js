@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 
-export const useSubcategories = () => {
+export const useSubcategories = (params = {}) => {
   const queryClient = useQueryClient();
 
   const {
@@ -9,9 +9,9 @@ export const useSubcategories = () => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["subcategories"],
+    queryKey: ["subcategories", params],
     queryFn: async () => {
-      const { data } = await api.get("/subcategories");
+      const { data } = await api.get("/subcategories", { params });
       return data;
     },
   });
@@ -32,7 +32,10 @@ export const useSubcategories = () => {
   });
 
   return {
-    subcategories,
+    subcategories: subcategories?.subcategories || [],
+    total: subcategories?.total || 0,
+    pages: subcategories?.pages || 1,
+    page: subcategories?.page || 1,
     isLoading,
     error,
     createSubcategory: createSubcategory.mutateAsync,

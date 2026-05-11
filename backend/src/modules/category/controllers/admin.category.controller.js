@@ -50,8 +50,23 @@ export const deleteCategory = asyncHandler(async (req, res) => {
 });
 
 export const getAdminCategories = asyncHandler(async (req, res) => {
-    const categories = await Category.find({}).sort('name');
-    res.json(categories);
+    const { page = 1, limit = 30, search = '' } = req.query;
+    const filter = {};
+    if (search) {
+        filter.name = { $regex: search, $options: 'i' };
+    }
+    const total = await Category.countDocuments(filter);
+    const categories = await Category.find(filter)
+        .sort('name')
+        .skip((page - 1) * limit)
+        .limit(Number(limit));
+        
+    res.json({
+        categories,
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit)
+    });
 });
 
 export const getAdminCategoryById = asyncHandler(async (req, res) => {

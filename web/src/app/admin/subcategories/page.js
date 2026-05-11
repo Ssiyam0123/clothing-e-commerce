@@ -14,8 +14,12 @@ import {
 import { swalConfirm, swalToast } from "@/utils/swal";
 import { cn } from "@/lib/utils";
 
+import { useFilters } from "@/hooks/useFilters";
+import Pagination from "@/components/common/Pagination";
+
 export default function Subcategories() {
-  const { subcategories, isLoading, deleteSubcategory } = useSubcategories();
+  const { page, setPage, queryParams } = useFilters({ initialLimit: 30 });
+  const { subcategories, total, pages, isLoading, deleteSubcategory } = useSubcategories(queryParams);
 
   const handleDelete = async (id) => {
     const isConfirmed = await swalConfirm("Delete Subcategory?", "This subcategory will be permanently removed.");
@@ -60,7 +64,7 @@ export default function Subcategories() {
             Subcategory <span className="text-emerald-600">List</span>
           </h1>
           <p className="admin-subtitle">
-            Manage your subcategories • Total: {subcategories?.length || 0}
+            Manage your subcategories • Total Records: {total}
           </p>
         </div>
 
@@ -97,6 +101,16 @@ export default function Subcategories() {
               </div>
             )}
           />
+        </div>
+        
+        {/* Pagination */}
+        <div className="p-8 border-t border-border/10 bg-background/5">
+           <Pagination 
+             page={page} 
+             totalPages={pages} 
+             onPageChange={setPage} 
+             className="py-0 sm:py-0 justify-between flex-row-reverse" 
+           />
         </div>
       </div>
     </div>

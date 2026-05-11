@@ -14,8 +14,12 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit2, Trash2, Layers, Maximize2, Hash, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { useFilters } from "@/hooks/useFilters";
+import Pagination from "@/components/common/Pagination";
+
 export default function CategoryMasterControl() {
-  const { categories, isLoading: catLoading, deleteCategory, toggleFeatured } = useAdminCategories();
+  const { page, setPage, queryParams } = useFilters({ initialLimit: 30 });
+  const { categories, total, pages, isLoading: catLoading, deleteCategory, toggleFeatured } = useAdminCategories(queryParams);
   const {
     subcategories,
     isLoading: subLoading,
@@ -381,6 +385,18 @@ export default function CategoryMasterControl() {
           </Card>
         ))}
       </div>
+
+      {/* Pagination */}
+      {pages > 1 && (
+        <div className="mt-12 flex justify-center py-8 border-t border-border/10">
+          <Pagination 
+            page={page} 
+            totalPages={pages} 
+            onPageChange={setPage} 
+            className="py-0" 
+          />
+        </div>
+      )}
     </div>
   );
 }

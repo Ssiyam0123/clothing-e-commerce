@@ -18,7 +18,7 @@ export async function generateMetadata({ params }) {
 
     if (!res.ok) throw new Error("Flash sale not found");
     const sale = await res.json();
-    const siteName = settings?.branding?.siteName || "VANGUARD";
+    const siteName = settings?.branding?.siteName || "Store";
 
     const imageUrl = sale.banner?.startsWith("http")
       ? sale.banner
@@ -50,7 +50,7 @@ export async function generateMetadata({ params }) {
   } catch (error) {
     const settings = await getSettings();
     return {
-      title: `Flash Sale | ${settings?.branding?.siteName || "VANGUARD"}`,
+      title: `Flash Sale | ${settings?.branding?.siteName || "Store"}`,
     };
   }
 }

@@ -86,7 +86,7 @@ export default function ReviewSection({ productId, onReviewChange }) {
   } = useReviews(productId);
 
   const { lang, settings } = useAppStore();
-  const siteName = settings?.branding?.siteName || "Vanguard";
+  const siteName = settings?.branding?.siteName || "Store";
   const ui = useMemo(() => {
     const base = DICTIONARY[lang] || DICTIONARY["en"];
     return {

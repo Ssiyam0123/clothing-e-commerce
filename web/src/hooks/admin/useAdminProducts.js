@@ -25,7 +25,7 @@ export const useAdminProducts = (initialFilters = {}) => {
       minPrice: searchParams.get("minPrice") || "",
       maxPrice: searchParams.get("maxPrice") || "",
       page: initialFilters.page !== undefined ? initialFilters.page : (Number(searchParams.get("page")) || 1),
-      limit: initialFilters.limit || 12,
+      limit: initialFilters.limit || 30,
     }),
     [searchParams, initialFilters],
   );

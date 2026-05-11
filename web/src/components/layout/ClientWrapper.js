@@ -11,8 +11,9 @@ import SupportChat from "@/components/chat/SupportChat";
 export default function ClientWrapper({ children }) {
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-  const { initApp, lang } = useAppStore();
+  const { initApp, lang, settings } = useAppStore();
   const { checkSession, isLoading } = useAuthStore();
+  const branding = settings?.branding || {};
 
   const isAdminPage = pathname.startsWith("/admin");
 
@@ -25,8 +26,8 @@ export default function ClientWrapper({ children }) {
   if (!mounted || isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-surface">
-        <div className="animate-pulse text-primary font-black text-4xl italic tracking-tighter">
-          VANGUARD
+        <div className="animate-pulse text-primary font-black text-4xl italic tracking-tighter uppercase">
+          {branding.siteName || "Store"}
         </div>
       </div>
     );

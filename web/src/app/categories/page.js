@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 export async function generateMetadata() {
   const settings = await getSettings();
   const branding = settings?.branding || {};
-  const siteName = branding.siteName || "VANGUARD";
+  const siteName = branding.siteName || "Store";
 
   return {
     title: `Categories | ${siteName}`,

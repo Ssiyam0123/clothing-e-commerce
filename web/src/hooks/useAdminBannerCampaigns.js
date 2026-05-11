@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { revalidateHome } from "@/app/actions/revalidate";
 
-export const useAdminBannerCampaigns = () => {
+export const useAdminBannerCampaigns = (params = {}) => {
   const queryClient = useQueryClient();
 
   const {
@@ -10,9 +10,9 @@ export const useAdminBannerCampaigns = () => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["admin-banner-campaigns"],
+    queryKey: ["admin-banner-campaigns", params],
     queryFn: async () => {
-      const { data } = await api.get("/banner-campaigns");
+      const { data } = await api.get("/banner-campaigns", { params });
       return data;
     },
   });
@@ -56,7 +56,10 @@ export const useAdminBannerCampaigns = () => {
   });
 
   return {
-    campaigns,
+    campaigns: campaigns?.campaigns || [],
+    total: campaigns?.total || 0,
+    pages: campaigns?.pages || 1,
+    page: campaigns?.page || 1,
     isLoading,
     error,
     createCampaign: createCampaign.mutateAsync,
