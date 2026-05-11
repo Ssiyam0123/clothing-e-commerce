@@ -11,13 +11,13 @@ export function RecentOrders({ recentOrders, isLoading }) {
     <Card className="bg-card rounded-[3rem] border border-border shadow-sm transition-all duration-500">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">
-          Operational Logs
+          Recent Orders
         </CardTitle>
         <Link
           href="/admin/orders"
           className="text-[9px] font-black text-primary hover:text-primary/80 uppercase tracking-widest transition-colors"
         >
-          Full Archive →
+          View All →
         </Link>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -1,21 +1,25 @@
 import express from 'express';
 import { 
   getActiveLayout, 
-  updateLayout, 
   getAllLayouts, 
-  createNewVersion 
+  createLayout, 
+  updateLayout, 
+  switchLayout,
+  deleteLayout 
 } from './homeLayout.controller.js';
 import { protect, admin } from '../../middleware/auth.js';
 
 const router = express.Router();
 
-// Public route for storefront
+// Public: Get active layout
+router.get('/', getActiveLayout);
 router.get('/active', getActiveLayout);
 
-// Admin routes
-router.route('/')
-  .get(protect, admin, getAllLayouts)
-  .put(protect, admin, updateLayout)
-  .post(protect, admin, createNewVersion);
+// Admin: Manage architectures
+router.get('/all', protect, admin, getAllLayouts);
+router.post('/', protect, admin, createLayout);
+router.put('/:id', protect, admin, updateLayout);
+router.put('/:id/switch', protect, admin, switchLayout);
+router.delete('/:id', protect, admin, deleteLayout);
 
 export default router;

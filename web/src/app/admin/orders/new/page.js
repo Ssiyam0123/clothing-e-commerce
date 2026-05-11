@@ -212,14 +212,14 @@ export default function CreateAdminOrder() {
           <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
             <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           </div>
-          <span>Back to Archive</span>
+          <span>Back to History</span>
         </Button>
       </div>
 
       <div className="admin-section-header">
         <div>
-          <h1 className="admin-title">Initialize <span className="text-muted-foreground/50">Protocol</span></h1>
-          <p className="admin-subtitle text-rose-500/80">Manual Order Generation Interface</p>
+          <h1 className="admin-title">Create New <span className="text-muted-foreground/50">Order</span></h1>
+          <p className="admin-subtitle text-rose-500/80">Create a manual order for a customer</p>
         </div>
       </div>
 
@@ -234,12 +234,12 @@ export default function CreateAdminOrder() {
               <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
                 <Package size={16} className="text-primary" />
               </div>
-              <h3 className="text-sm font-black uppercase tracking-[0.2em]">Item Specification</h3>
+              <h3 className="text-sm font-black uppercase tracking-[0.2em]">Select Product</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="relative">
-                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3 block">Find Product</label>
+                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3 block">Search Product</label>
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                   <Input 
@@ -278,7 +278,7 @@ export default function CreateAdminOrder() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3 block">Matrix Size</label>
+                  <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3 block">Size</label>
                   <select 
                     value={selectedSize}
                     onChange={(e) => setSelectedSize(e.target.value)}
@@ -309,7 +309,7 @@ export default function CreateAdminOrder() {
               disabled={!selectedProduct || !selectedSize}
               className="w-full h-14 bg-foreground text-background hover:bg-primary hover:text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all"
             >
-              <Plus size={16} className="mr-2" /> Inject into Order
+              <Plus size={16} className="mr-2" /> Add to Order
             </Button>
           </div>
 
@@ -321,7 +321,7 @@ export default function CreateAdminOrder() {
                   <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
                     <ShoppingBag size={16} className="text-amber-500" />
                   </div>
-                  <h3 className="text-sm font-black uppercase tracking-[0.2em]">Transaction Manifest</h3>
+                  <h3 className="text-sm font-black uppercase tracking-[0.2em]">Order Summary</h3>
                 </div>
                 <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
                   Items: {items.length}
@@ -332,7 +332,7 @@ export default function CreateAdminOrder() {
             {items.length === 0 ? (
               <div className="p-20 text-center flex flex-col items-center gap-4 opacity-30">
                 <Package size={40} strokeWidth={1} />
-                <p className="text-[10px] font-black uppercase tracking-[0.3em]">Manifest empty. Inject products.</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em]">No items added yet. Search and add products.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -391,7 +391,7 @@ export default function CreateAdminOrder() {
               <div className="w-8 h-8 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
                 <UserIcon size={16} className="text-indigo-500" />
               </div>
-              <h3 className="text-sm font-black uppercase tracking-[0.2em]">Customer Identity</h3>
+              <h3 className="text-sm font-black uppercase tracking-[0.2em]">Customer Info</h3>
             </div>
 
             <div className="flex gap-2 p-1 bg-muted rounded-xl">
@@ -409,10 +409,10 @@ export default function CreateAdminOrder() {
 
             {!isGuest ? (
                <div className="relative">
-                <div className="relative">
+                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                   <Input 
-                    placeholder="Search Member Database..."
+                    placeholder="Search for a customer..."
                     value={userSearch}
                     onChange={(e) => {
                       setUserSearch(e.target.value);
@@ -460,8 +460,8 @@ export default function CreateAdminOrder() {
                   onChange={e => setGuestDetails({...guestDetails, name: e.target.value})}
                   className="bg-background/50 border-border/10 rounded-xl h-14 text-[11px] font-bold uppercase tracking-widest"
                 />
-                <Input 
-                  placeholder="Email Contact"
+                 <Input 
+                  placeholder="Email Address"
                   value={guestDetails.email}
                   onChange={e => setGuestDetails({...guestDetails, email: e.target.value})}
                   className="bg-background/50 border-border/10 rounded-xl h-14 text-[11px] font-bold uppercase tracking-widest"
@@ -469,8 +469,8 @@ export default function CreateAdminOrder() {
               </div>
             )}
 
-            <Input 
-              placeholder="Primary Phone Line"
+             <Input 
+              placeholder="Phone Number"
               value={guestDetails.phone}
               onChange={e => setGuestDetails({...guestDetails, phone: e.target.value})}
               className="bg-background/50 border-border/10 rounded-xl h-14 text-[11px] font-bold uppercase tracking-widest border-indigo-500/20"
@@ -483,11 +483,11 @@ export default function CreateAdminOrder() {
               <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
                 <Truck size={16} className="text-emerald-500" />
               </div>
-              <h3 className="text-sm font-black uppercase tracking-[0.2em]">Shipping Protocol</h3>
+              <h3 className="text-sm font-black uppercase tracking-[0.2em]">Shipping Address</h3>
             </div>
 
-            <textarea 
-              placeholder="Detailed Street Address / Hub Locator"
+             <textarea 
+              placeholder="Street Address / Landmark"
               value={guestDetails.street}
               onChange={e => setGuestDetails({...guestDetails, street: e.target.value})}
               className="w-full bg-background/50 border border-border/10 rounded-xl p-4 text-[11px] font-bold uppercase tracking-widest outline-none focus:border-emerald-500/50 transition-all min-h-[100px] resize-none"
@@ -538,23 +538,23 @@ export default function CreateAdminOrder() {
               <div className="w-8 h-8 rounded-xl bg-background/10 flex items-center justify-center border border-background/20">
                 <CreditCard size={16} className="text-background" />
               </div>
-              <h3 className="text-sm font-black uppercase tracking-[0.2em]">Settlement Matrix</h3>
+              <h3 className="text-sm font-black uppercase tracking-[0.2em]">Order Total</h3>
             </div>
 
             <div className="space-y-4">
-              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest opacity-60">
-                <span>Total Manifest Value</span>
+               <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest opacity-60">
+                <span>Subtotal</span>
                 <span>৳{subtotal}</span>
               </div>
-              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest opacity-60">
-                <span>Logistics Fee</span>
+               <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest opacity-60">
+                <span>Delivery Charge</span>
                 <span>+ ৳{shippingPrice}</span>
               </div>
               
               <div className="relative group">
-                <BadgePercent size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-background/40" />
+                 <BadgePercent size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-background/40" />
                 <input 
-                  placeholder="Coupon Protocol"
+                  placeholder="Coupon Code"
                   value={couponCode}
                   onChange={e => setCouponCode(e.target.value)}
                   className="w-full bg-background/5 border border-background/10 rounded-xl h-12 pl-12 pr-4 text-[10px] font-black uppercase tracking-widest outline-none focus:border-background/30 placeholder:text-background/30 transition-all"
@@ -579,12 +579,12 @@ export default function CreateAdminOrder() {
                 <option value="Paid">Prepaid / Manual Sync</option>
               </select>
 
-              <Button 
+               <Button 
                 type="submit"
                 disabled={items.length === 0 || isCreatingAdminOrder}
                 className="w-full h-16 bg-background text-foreground hover:bg-rose-600 hover:text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] transition-all shadow-2xl active:scale-95"
               >
-                {isCreatingAdminOrder ? "Syncing Logic..." : "Finalize Protocol"}
+                {isCreatingAdminOrder ? "Creating..." : "Create Order"}
               </Button>
             </div>
           </div>

@@ -90,7 +90,7 @@ export default function FlashSaleForm() {
   const onSubmit = async (data) => {
     if (selectedProducts.length === 0) {
       return swalError(
-        "Missing Payload",
+        "No Products",
         "Please select at least one product.",
       );
     }
@@ -103,7 +103,7 @@ export default function FlashSaleForm() {
     }
 
     if (start >= end) {
-      return swalError("Timeline Error", "End date must be after start date.");
+      return swalError("Invalid Dates", "End date must be after start date.");
     }
 
     const payload = {
@@ -120,16 +120,16 @@ export default function FlashSaleForm() {
     try {
       if (isEdit) {
         await updateFlashSale({ id, data: payload });
-        swalToast("Campaign Updated", "success");
+        swalToast("Sale Updated", "success");
       } else {
         await createFlashSale(payload);
-        swalToast("Campaign Launched", "success");
+        swalToast("Sale Created", "success");
       }
       setTimeout(() => router.push("/admin/flash-sales"), 1500);
     } catch (err) {
       swalError(
-        "Sync Protocol Failed",
-        err.response?.data?.message || "Check your parameters.",
+        "Error",
+        err.response?.data?.message || "Please check the form for errors.",
       );
     }
   };
@@ -153,16 +153,16 @@ export default function FlashSaleForm() {
           <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
             <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           </div>
-          <span>Return to Pulse</span>
+          <span>Back to Flash Sales</span>
         </Button>
       </div>
 
       <div className="admin-section-header">
         <div>
           <h1 className="admin-title">
-            {isEdit ? "Configure" : "Initialize"} <span className="text-rose-500">Pulse</span>
+            {isEdit ? "Edit" : "Create"} <span className="text-rose-500">Flash Sale</span>
           </h1>
-          <p className="admin-subtitle">High-Velocity Liquidation Protocol</p>
+          <p className="admin-subtitle">Manage your limited-time sale event</p>
         </div>
       </div>
 
@@ -175,31 +175,31 @@ export default function FlashSaleForm() {
               <div className="w-10 h-10 rounded-2xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
                 <Zap size={20} className="text-rose-500" />
               </div>
-              <h3 className="text-sm font-black uppercase tracking-[0.2em]">Operational Meta</h3>
+              <h3 className="text-sm font-black uppercase tracking-[0.2em]">Sale Details</h3>
             </div>
 
             <div className="space-y-6">
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-1">Campaign Title *</label>
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-1">Sale Name *</label>
                 <Input 
                   {...register("name", { required: true })}
-                  placeholder="e.g. Midnight Surge 2.0"
+                  placeholder="e.g. Weekend Flash Sale"
                   className="h-14 bg-muted/30 border-border/10 rounded-2xl px-6 text-[11px] font-black uppercase tracking-widest focus:ring-2 focus:ring-rose-500/20"
                 />
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-1">Narrative Context</label>
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-1">Description</label>
                 <textarea 
                   rows="3"
                   {...register("description")}
-                  placeholder="Marketing narrative for this drop..."
+                  placeholder="Tell customers about this sale."
                   className="w-full bg-muted/30 border border-border/10 rounded-2xl px-6 py-4 text-[11px] font-bold outline-none focus:ring-2 focus:ring-rose-500/20 transition-all resize-none"
                 />
               </div>
 
               <div className="p-6 bg-rose-600/5 rounded-3xl border border-rose-600/10 text-center space-y-3">
-                <label className="text-[9px] font-black text-rose-500 uppercase tracking-[0.3em]">Global Discount Magnitude (%)</label>
+                <label className="text-[9px] font-black text-rose-500 uppercase tracking-[0.3em]">Discount Percentage (%)</label>
                 <input 
                   type="number"
                   {...register("discount", { required: true })}
@@ -214,14 +214,14 @@ export default function FlashSaleForm() {
                   className="w-6 h-6 rounded-lg border-border/20 text-rose-600 focus:ring-0 cursor-pointer"
                 />
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-widest">Instant Ignition</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Sale begins immediately upon commit</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest">Start Immediately</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Start the sale as soon as it is saved.</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Temporal Start</label>
+                  <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Start Date & Time</label>
                   <input 
                     type="datetime-local"
                     {...register("startDate", { required: !watchStartImmediately })}
@@ -230,7 +230,7 @@ export default function FlashSaleForm() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Temporal End</label>
+                  <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">End Date & Time</label>
                   <input 
                     type="datetime-local"
                     {...register("endDate", { required: true })}
@@ -246,8 +246,8 @@ export default function FlashSaleForm() {
                   className="w-6 h-6 rounded-lg border-border/20 text-rose-600 focus:ring-0 cursor-pointer"
                 />
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-widest">Master Deployment Status</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Toggle visibility across all storefront nodes</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest">Active Status</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Turn this sale on or off on your website.</p>
                 </div>
               </div>
             </div>
@@ -262,17 +262,17 @@ export default function FlashSaleForm() {
                 <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">
                   <Package size={20} className="text-indigo-600" />
                 </div>
-                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Vault Linkage</h3>
+                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Add Products</h3>
               </div>
               <Badge variant="outline" className="h-8 px-4 rounded-full text-[9px] font-black border-indigo-600/20 text-indigo-600 uppercase tracking-widest bg-indigo-600/5">
-                Targeted Assets: {selectedProducts.length}
+                Selected Items: {selectedProducts.length}
               </Badge>
             </div>
 
             <div className="relative">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground opacity-40" size={18} />
               <Input 
-                placeholder="Scan global inventory..."
+                placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="h-16 pl-14 bg-muted/20 border-border/10 rounded-2xl text-[11px] font-black uppercase tracking-widest"
@@ -283,7 +283,7 @@ export default function FlashSaleForm() {
             {searchTerm.trim().length > 1 && (
               <div className="bg-muted/10 border border-border/5 rounded-[2rem] p-4 animate-in slide-in-from-top-2 duration-300">
                 {isFetching ? (
-                  <div className="p-8 text-center text-[10px] font-black uppercase tracking-[0.3em] opacity-40 animate-pulse italic">Scanning Vaults...</div>
+                  <div className="p-8 text-center text-[10px] font-black uppercase tracking-[0.3em] opacity-40 animate-pulse italic">Searching...</div>
                 ) : searchResults?.length > 0 ? (
                   <div className="space-y-2">
                     {searchResults.map((p) => {
@@ -306,25 +306,25 @@ export default function FlashSaleForm() {
                               <p className={cn("text-[8px] font-bold uppercase tracking-widest mt-1", isSelected ? "text-background/50" : "text-muted-foreground")}>৳{p.price}</p>
                             </div>
                           </div>
-                          {isSelected && <Badge className="bg-background text-foreground text-[8px] px-2 py-0.5 rounded-md">Linked</Badge>}
+                          {isSelected && <Badge className="bg-background text-foreground text-[8px] px-2 py-0.5 rounded-md">Added</Badge>}
                         </div>
                       );
                     })}
                   </div>
                 ) : (
-                  <div className="p-8 text-center text-[10px] font-black uppercase tracking-[0.3em] opacity-40 italic">Zero Matches Found</div>
+                  <div className="p-8 text-center text-[10px] font-black uppercase tracking-[0.3em] opacity-40 italic">No Matches Found</div>
                 )}
               </div>
             )}
 
             {/* Selected Matrix */}
             <div className="flex-1 bg-muted/20 rounded-[2.5rem] border border-border/5 p-6 overflow-hidden flex flex-col">
-               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] mb-6 px-2 italic">Linked Payload Matrix</p>
+               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] mb-6 px-2 italic">Products in this Sale</p>
                <div className="flex-1 overflow-y-auto no-scrollbar space-y-3">
                  {selectedProducts.length === 0 ? (
                    <div className="h-full flex flex-col items-center justify-center opacity-20 grayscale gap-4">
                      <Package size={48} strokeWidth={1} />
-                     <p className="text-[10px] font-black uppercase tracking-[0.4em]">Payload Static</p>
+                     <p className="text-[10px] font-black uppercase tracking-[0.4em]">No Products Selected</p>
                    </div>
                  ) : (
                    selectedProducts.map((p) => (
@@ -355,7 +355,7 @@ export default function FlashSaleForm() {
                 disabled={selectedProducts.length === 0}
                 className="w-full h-20 bg-foreground text-background hover:bg-rose-600 hover:text-white rounded-[2rem] font-black uppercase tracking-[0.4em] text-[11px] shadow-2xl transition-all active:scale-95 group"
               >
-                {isEdit ? "Sync Configuration" : "Launch Protocol"}
+                {isEdit ? "Save Changes" : "Create Sale"}
                 <ArrowRight size={18} className="ml-3 group-hover:translate-x-2 transition-transform" />
               </Button>
             </div>

@@ -41,20 +41,12 @@ export const updateSettings = asyncHandler(async (req, res) => {
     let brandingUpdated = !!req.body.branding;
 
     if (req.files) {
-        if (req.files.headerLogoLight) {
-            branding.headerLogoLight = await uploadImage(req.files.headerLogoLight[0], 'settings', currentSettings?.branding?.headerLogoLight);
+        if (req.files.logo) {
+            branding.logo = await uploadImage(req.files.logo[0], 'settings', currentSettings?.branding?.logo);
             brandingUpdated = true;
         }
-        if (req.files.headerLogoDark) {
-            branding.headerLogoDark = await uploadImage(req.files.headerLogoDark[0], 'settings', currentSettings?.branding?.headerLogoDark);
-            brandingUpdated = true;
-        }
-        if (req.files.footerLogoLight) {
-            branding.footerLogoLight = await uploadImage(req.files.footerLogoLight[0], 'settings', currentSettings?.branding?.footerLogoLight);
-            brandingUpdated = true;
-        }
-        if (req.files.footerLogoDark) {
-            branding.footerLogoDark = await uploadImage(req.files.footerLogoDark[0], 'settings', currentSettings?.branding?.footerLogoDark);
+        if (req.files.logoDark) {
+            branding.logoDark = await uploadImage(req.files.logoDark[0], 'settings', currentSettings?.branding?.logoDark);
             brandingUpdated = true;
         }
         if (req.files.favicon) {

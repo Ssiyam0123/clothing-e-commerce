@@ -74,9 +74,9 @@ export default function Footer() {
           {/* Brand Engine */}
           <div className="lg:col-span-5 space-y-8">
             <Link href="/" className="flex items-center gap-3 group">
-               {branding.footerLogoLight || branding.footerLogoDark ? (
+               {branding.logo || branding.logoDark ? (
                  <img 
-                   src={getImageUrl(theme === 'dark' ? (branding.footerLogoDark || branding.footerLogoLight) : (branding.footerLogoLight || branding.footerLogoDark))} 
+                   src={getImageUrl(theme === 'dark' ? (branding.logoDark || branding.logo) : (branding.logo || branding.logoDark))} 
                    alt={branding.siteName} 
                    className="h-8 md:h-10 w-auto object-contain transition-transform group-hover:scale-105 duration-500" 
                  />

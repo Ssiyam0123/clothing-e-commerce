@@ -9,10 +9,19 @@ import { getImageUrl } from "@/utils/imageUtils";
 import Loader from "@/components/common/Loader";
 import StarRating from "@/components/store/StarRating";
 import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
+import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
+import { useSubcategories } from "@/hooks/useSubcategories";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { 
   ChevronLeft, 
   Package, 
@@ -43,6 +52,7 @@ export default function ProductManagement() {
     value: "",
     extraData: null,
   });
+  const [modalSelectVal, setModalSelectVal] = useState("");
 
   const {
     data: product,
@@ -59,6 +69,8 @@ export default function ProductManagement() {
   });
 
   const { updateProduct: updateMutation } = useAdminProducts();
+  const { categories } = useAdminCategories();
+  const { subcategories } = useSubcategories();
 
   const salePrice = useMemo(() => {
     if (!product) return 0;
@@ -79,8 +91,8 @@ export default function ProductManagement() {
     return (
       <div className="admin-page-container flex flex-col items-center justify-center min-h-[40vh] gap-4">
         <Package size={64} className="opacity-10" />
-        <h1 className="text-2xl font-black uppercase tracking-widest opacity-20 italic text-center">Artifact De-synchronized</h1>
-        <Button onClick={() => router.push("/admin/products")} variant="outline" className="rounded-full px-8 uppercase tracking-widest text-[10px] font-black">Return to Catalog</Button>
+        <h1 className="text-2xl font-black uppercase tracking-widest opacity-20 italic text-center">Product not found</h1>
+        <Button onClick={() => router.push("/admin/products")} variant="outline" className="rounded-full px-8 uppercase tracking-widest text-[10px] font-black">Back to Products</Button>
       </div>
     );
 
@@ -119,17 +131,17 @@ export default function ProductManagement() {
 
     try {
       await updateMutation({ id, data: formData });
-      swalToast("Databanks Synchronized", "success");
+      swalToast("Product updated", "success");
       setModal({ ...modal, isOpen: false });
       refetch();
     } catch (err) {
-      swalError("Sync Protocol Failed", err.response?.data?.message || "Check connection.");
+      swalError("Update failed", err.response?.data?.message || "Check connection.");
     }
   };
 
   const handleModalSubmit = (e) => {
     e.preventDefault();
-    const val = e.target.inputVal?.value;
+    const val = modal.type === "select" ? modalSelectVal : e.target.inputVal?.value;
 
     if (modal.type === "stock") {
       const newSizes = product.sizes.map((s) =>
@@ -160,7 +172,7 @@ export default function ProductManagement() {
 
   const handleRemoveImage = async (index) => {
     const isConfirmed = await swalConfirm(
-      "Purge Visual?",
+      "Delete Image?",
       "This image will be permanently deleted.",
     );
     if (isConfirmed) {
@@ -172,16 +184,16 @@ export default function ProductManagement() {
 
   const handleDeleteReview = async (revId) => {
     const isConfirmed = await swalConfirm(
-      "Moderate Review?",
+      "Delete Review?",
       "This feedback will be removed.",
     );
     if (isConfirmed) {
       try {
         await api.delete(`/reviews/${revId}`);
         refetchReviews();
-        swalToast("Review Removed", "success");
+        swalToast("Review deleted", "success");
       } catch (err) {
-        swalError("Action Blocked", err.response?.data?.message || "Could not delete.");
+        swalError("Action failed", err.response?.data?.message || "Could not delete.");
       }
     }
   };
@@ -198,7 +210,7 @@ export default function ProductManagement() {
           <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
             <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           </div>
-          <span>Return to Catalog</span>
+          <span>Back to Products</span>
         </Button>
       </div>
 
@@ -216,7 +228,7 @@ export default function ProductManagement() {
           </div>
           <div>
             <h1 className="admin-title">{product.name}</h1>
-            <p className="admin-subtitle">Artifact Hub // ID: {id.slice(-8).toUpperCase()}</p>
+            <p className="admin-subtitle">Product Dashboard // ID: {id.slice(-8).toUpperCase()}</p>
           </div>
         </div>
         
@@ -246,7 +258,7 @@ export default function ProductManagement() {
              variant="outline"
              className="h-12 px-6 rounded-full text-[9px] font-black uppercase tracking-widest border-border hover:bg-foreground hover:text-background transition-all"
           >
-             <Settings size={14} className="mr-2" /> Base Configuration
+             <Settings size={14} className="mr-2" /> Edit Base Details
           </Button>
         </div>
       </div>
@@ -254,11 +266,11 @@ export default function ProductManagement() {
       {/* TACTICAL TABS */}
       <div className="flex bg-muted/20 p-2 rounded-full border border-border/10 mb-10 overflow-x-auto gap-2 no-scrollbar backdrop-blur-md">
         {[
-          { id: "stock", label: "Inventory", icon: Package },
-          { id: "pricing", label: "Financials", icon: Zap },
-          { id: "media", label: "Visuals", icon: Camera },
-          { id: "reviews", label: "Feedback", icon: MessageSquare },
-          { id: "details", label: "Narrative", icon: TrendingUp },
+          { id: "stock", label: "Stock", icon: Package },
+          { id: "pricing", label: "Price", icon: Zap },
+          { id: "media", label: "Images", icon: Camera },
+          { id: "reviews", label: "Reviews", icon: MessageSquare },
+          { id: "details", label: "Details", icon: TrendingUp },
         ].map((t) => (
           <button
             key={t.id}
@@ -285,14 +297,14 @@ export default function ProductManagement() {
                 <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">
                   <Package size={20} className="text-indigo-600" />
                 </div>
-                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Allocation Matrix</h3>
+                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Stock Levels</h3>
               </div>
               <Button
-                onClick={() => setModal({ isOpen: true, type: "bulkStock", title: "Global Sync", value: 0 })}
+                onClick={() => setModal({ isOpen: true, type: "bulkStock", title: "Update All Sizes", value: 0 })}
                 variant="outline"
                 className="h-10 px-6 rounded-full text-[9px] font-black uppercase tracking-widest border-border/10 hover:bg-indigo-600 hover:text-white transition-all"
               >
-                Global Override
+                Update All
               </Button>
             </div>
 
@@ -308,7 +320,7 @@ export default function ProductManagement() {
                       "text-[9px] font-black uppercase tracking-widest",
                       s.stock < 10 ? "bg-rose-500/10 text-rose-500" : "bg-emerald-500/10 text-emerald-600"
                     )}>
-                      {s.stock} Artifacts
+                      {s.stock} Items
                     </Badge>
                   </div>
                   <button
@@ -331,17 +343,17 @@ export default function ProductManagement() {
                 <div className="w-10 h-10 rounded-2xl bg-emerald-600/10 flex items-center justify-center border border-emerald-600/20">
                   <Zap size={20} className="text-emerald-600" />
                 </div>
-                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Financial Protocols</h3>
+                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Pricing Details</h3>
               </div>
               
               <div className="space-y-6">
                 <div className="flex justify-between items-center p-8 bg-muted/20 rounded-[2rem] border border-border/5 group hover:border-emerald-600/20 transition-all">
                   <div>
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 ml-1">Current Valuation</p>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 ml-1">Base Price</p>
                     <p className="text-4xl font-black text-foreground tracking-tighter leading-none">৳{product.price}</p>
                   </div>
                   <Button
-                    onClick={() => setModal({ isOpen: true, type: "price", title: "Refine Base Valuation", field: "price", value: product.price })}
+                    onClick={() => setModal({ isOpen: true, type: "price", title: "Edit Base Price", field: "price", value: product.price })}
                     className="rounded-full h-12 px-8 uppercase font-black text-[10px] tracking-widest bg-background border-border/10 text-foreground hover:bg-emerald-600 hover:text-white transition-all shadow-xl"
                   >
                     Edit
@@ -350,14 +362,14 @@ export default function ProductManagement() {
 
                 <div className="flex justify-between items-center p-8 bg-rose-500/5 rounded-[2rem] border border-rose-500/10 group hover:border-rose-500/30 transition-all">
                   <div>
-                    <p className="text-[10px] font-black text-rose-500/60 uppercase tracking-widest mb-2 ml-1">Liquidation Delta</p>
-                    <p className="text-4xl font-black text-rose-600 tracking-tighter leading-none">{product.discount || 0}% Yield</p>
+                    <p className="text-[10px] font-black text-rose-500/60 uppercase tracking-widest mb-2 ml-1">Discount Percentage</p>
+                    <p className="text-4xl font-black text-rose-600 tracking-tighter leading-none">{product.discount || 0}% Off</p>
                   </div>
                   <Button
-                    onClick={() => setModal({ isOpen: true, type: "discount", title: "Set Liquidation Protocol", field: "discount", value: product.discount })}
+                    onClick={() => setModal({ isOpen: true, type: "discount", title: "Set Discount", field: "discount", value: product.discount })}
                     className="rounded-full h-12 px-8 uppercase font-black text-[10px] tracking-widest bg-rose-600 text-white hover:bg-rose-700 transition-all shadow-xl"
                   >
-                    Adjust
+                    Set
                   </Button>
                 </div>
               </div>
@@ -366,13 +378,13 @@ export default function ProductManagement() {
             <div className="admin-table-form bg-foreground p-12 flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
               <div className="relative z-10 space-y-6">
-                <p className="text-[11px] font-black text-background/40 uppercase tracking-[0.5em] italic">Consumer End Magnitude</p>
+                <p className="text-[11px] font-black text-background/40 uppercase tracking-[0.5em] italic">Final Sale Price</p>
                 <h2 className="text-[7rem] md:text-[9rem] font-black text-background tracking-tighter leading-none animate-in fade-in duration-1000">
                   <span className="text-4xl md:text-5xl opacity-40 mr-2">৳</span>{salePrice}
                 </h2>
                 <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-background/5 border border-background/10 backdrop-blur-md">
                    <trending-up className="text-emerald-400 w-4 h-4" />
-                   <span className="text-[9px] font-black text-background/60 uppercase tracking-widest">Optimized for Conversion</span>
+                   <span className="text-[9px] font-black text-background/60 uppercase tracking-widest">Price after discount</span>
                 </div>
               </div>
             </div>
@@ -387,9 +399,9 @@ export default function ProductManagement() {
                 <div className="w-10 h-10 rounded-2xl bg-amber-600/10 flex items-center justify-center border border-amber-600/20">
                   <Camera size={20} className="text-amber-600" />
                 </div>
-                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Visual Artifact Management</h3>
+                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Manage Images</h3>
               </div>
-              <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest px-4 py-2 border-border/10">Quota: {product.images.length}/5</Badge>
+              <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest px-4 py-2 border-border/10">Limit: {product.images.length}/5</Badge>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
@@ -410,7 +422,7 @@ export default function ProductManagement() {
                     >
                       <Trash2 size={24} />
                     </button>
-                    <p className="text-[8px] font-black text-white uppercase tracking-widest">Purge Artifact</p>
+                    <p className="text-[8px] font-black text-white uppercase tracking-widest">Delete</p>
                   </div>
                 </div>
               ))}
@@ -418,7 +430,7 @@ export default function ProductManagement() {
               {product.images.length < 5 && (
                 <label className="relative aspect-[3/4] rounded-[2.5rem] border-2 border-dashed border-border/20 flex flex-col items-center justify-center cursor-pointer hover:border-amber-600/40 hover:bg-amber-600/5 transition-all group overflow-hidden bg-muted/10">
                   <Plus size={32} className="mb-3 text-muted-foreground group-hover:text-amber-600 transition-colors" />
-                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-amber-600">Inject Asset</span>
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-amber-600">Add Image</span>
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -441,10 +453,10 @@ export default function ProductManagement() {
                 <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">
                   <MessageSquare size={20} className="text-indigo-600" />
                 </div>
-                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Community Pulse</h3>
+                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Customer Reviews</h3>
               </div>
               <Badge className="bg-foreground text-background px-6 py-2 rounded-full text-[9px] uppercase tracking-widest font-black shadow-lg">
-                {reviewsData?.totalReviews || 0} Artifact Reports
+                {reviewsData?.totalReviews || 0} Total Reviews
               </Badge>
             </div>
             
@@ -491,7 +503,7 @@ export default function ProductManagement() {
                     variant="ghost"
                     className="text-rose-500 font-black text-[9px] border border-rose-500/10 bg-rose-500/5 px-6 py-3 rounded-full hover:bg-rose-600 hover:text-white transition-all uppercase tracking-widest shadow-sm"
                   >
-                    Moderate Report
+                    Delete Review
                   </Button>
                 </div>
               ))}
@@ -499,7 +511,7 @@ export default function ProductManagement() {
               {reviewsData?.reviews?.length === 0 && (
                 <div className="py-32 flex flex-col items-center justify-center opacity-10 gap-6 grayscale">
                   <MessageSquare size={64} strokeWidth={1} />
-                  <p className="text-sm font-black uppercase tracking-[0.5em] italic">No Community Pulse Detected</p>
+                  <p className="text-sm font-black uppercase tracking-[0.5em] italic">No reviews yet</p>
                 </div>
               )}
             </div>
@@ -513,14 +525,22 @@ export default function ProductManagement() {
                 <div className="w-10 h-10 rounded-2xl bg-foreground/10 flex items-center justify-center border border-foreground/20">
                   <TrendingUp size={20} className="text-foreground" />
                 </div>
-                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Narrative Parameters</h3>
+                <h3 className="text-sm font-black uppercase tracking-[0.2em]">Product Information</h3>
               </div>
 
               <div className="grid grid-cols-1 gap-8">
                 {[
-                  { label: "Artifact Identity", field: "name", value: product.name },
-                  { label: "Temporal Description", field: "description", value: product.description, multi: true },
-                  { label: "Unique Network Slug", field: "slug", value: product.slug, tactical: true },
+                  { label: "Product Name", field: "name", value: product.name },
+                  { label: "Product Description", field: "description", value: product.description, multi: true },
+                  { label: "Product URL (Slug)", field: "slug", value: product.slug, tactical: true },
+                  { label: "Category", field: "category", value: product.category?.name, isSelect: true, options: categories },
+                  { 
+                    label: "Subcategory", 
+                    field: "subcategory", 
+                    value: product.subcategory?.name, 
+                    isSelect: true, 
+                    options: subcategories?.filter(s => (s.category?._id || s.category) === product.category?._id) 
+                  },
                 ].map((d) => (
                   <div key={d.field} className="p-10 border border-border/5 bg-muted/20 rounded-[2.5rem] flex flex-col md:flex-row justify-between md:items-center gap-8 group hover:border-foreground/10 transition-all">
                     <div className="flex-1 space-y-3">
@@ -529,15 +549,25 @@ export default function ProductManagement() {
                         "text-foreground font-bold leading-relaxed",
                         d.tactical ? "text-indigo-600 font-mono text-sm" : "text-lg tracking-tight"
                       )}>
-                        {d.value || <span className="opacity-10 italic">Awaiting Protocol...</span>}
+                        {d.value || <span className="opacity-10 italic">Not set...</span>}
                       </p>
                     </div>
                     <Button
-                      onClick={() => setModal({ isOpen: true, type: "details", title: `Edit ${d.label}`, field: d.field, value: d.value })}
+                      onClick={() => {
+                        setModal({ 
+                          isOpen: true, 
+                          type: d.isSelect ? "select" : "details", 
+                          title: `Edit ${d.label}`, 
+                          field: d.field, 
+                          value: d.isSelect ? (product[d.field]?._id || product[d.field]) : d.value,
+                          extraData: d.options 
+                        });
+                        if (d.isSelect) setModalSelectVal(product[d.field]?._id || product[d.field] || "");
+                      }}
                       variant="outline"
                       className="h-12 px-10 rounded-full text-[10px] font-black uppercase tracking-widest border-border/10 hover:bg-foreground hover:text-background transition-all shadow-xl"
                     >
-                      Refine
+                      Edit
                     </Button>
                   </div>
                 ))}
@@ -562,8 +592,24 @@ export default function ProductManagement() {
                 <div className="space-y-6">
                   <div className="border-2 border-dashed border-border/20 rounded-[2.5rem] p-16 text-center hover:border-indigo-600/40 hover:bg-indigo-600/5 transition-all group bg-muted/10">
                      <Camera size={48} strokeWidth={1} className="mx-auto mb-6 text-muted-foreground group-hover:text-indigo-600 transition-all" />
-                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-indigo-600">Select Visual Assets</p>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-indigo-600">Select Images</p>
                   </div>
+                </div>
+              ) : modal.type === "select" ? (
+                <div className="space-y-4">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-2">Select {modal.title.replace('Edit ', '')}</p>
+                  <Select name="inputVal" value={modalSelectVal} onValueChange={setModalSelectVal}>
+                    <SelectTrigger className="h-20 bg-muted/30 border-border/10 rounded-[2rem] px-8 text-xl font-black uppercase tracking-widest">
+                      <SelectValue placeholder={`Choose ${modal.field}`} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border rounded-2xl p-2">
+                      {modal.extraData?.map((opt) => (
+                        <SelectItem key={opt._id} value={opt._id} className="rounded-xl py-3 font-black text-[10px] uppercase tracking-widest">
+                          {opt.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               ) : modal.field === "description" ? (
                 <textarea
@@ -572,11 +618,11 @@ export default function ProductManagement() {
                   required
                   rows="6"
                   className="w-full bg-muted/30 border border-border/10 rounded-[2rem] p-8 text-foreground font-medium outline-none focus:ring-2 focus:ring-indigo-600/20 transition-all resize-none shadow-inner"
-                  placeholder="Inject narrative content..."
+                  placeholder="Enter description..."
                 />
               ) : (
                 <div className="space-y-4">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-2">Protocol Input</p>
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-2">Input Value</p>
                   <input
                     name="inputVal"
                     type={["price", "discount", "stock", "bulkStock"].includes(modal.field || modal.type) ? "number" : "text"}
@@ -594,7 +640,7 @@ export default function ProductManagement() {
                   disabled={updateMutation.isLoading}
                   className="flex-1 h-20 bg-foreground text-background rounded-full font-black uppercase tracking-[0.5em] text-[11px] shadow-2xl hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-50"
                 >
-                  {updateMutation.isLoading ? "Synchronizing..." : "Synchronize Data"}
+                  {updateMutation.isLoading ? "Saving..." : "Update Now"}
                 </Button>
               </div>
             </form>

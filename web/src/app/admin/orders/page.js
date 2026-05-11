@@ -143,14 +143,14 @@ function AdminOrdersContent() {
           <Link
             href={`/admin/orders/${item._id}`}
             className="p-2.5 bg-muted text-muted-foreground hover:bg-foreground hover:text-background rounded-xl transition-all shadow-sm border border-border/10 group"
-            title="Inspect Manifest"
+            title="View Details"
           >
             <Eye size={16} className="group-hover:scale-110 transition-transform" />
           </Link>
           <Link
             href={`/admin/orders/${item._id}/edit`}
             className="p-2.5 bg-indigo-600/10 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-xl transition-all shadow-sm border border-border/10 group"
-            title="Refine Deployment"
+            title="Edit Order"
           >
             <Edit2 size={16} className="group-hover:scale-110 transition-transform" />
           </Link>
@@ -164,10 +164,10 @@ function AdminOrdersContent() {
       <div className="admin-section-header">
         <div>
           <h1 className="admin-title">
-            Orders <span className="text-muted-foreground/50">Archive</span>
+            Orders <span className="text-muted-foreground/50">History</span>
           </h1>
           <p className="admin-subtitle">
-            Logistics & Dispatch Management
+            Manage your shop orders
           </p>
         </div>
         <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto">
@@ -181,7 +181,7 @@ function AdminOrdersContent() {
           </div>
           <Button asChild className="bg-foreground text-background hover:bg-primary hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group">
             <Link href="/admin/orders/new">
-              <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Initialize Order
+              <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Create New Order
             </Link>
           </Button>
         </div>
@@ -219,7 +219,7 @@ function AdminOrdersContent() {
             sort={sort}
             onSortChange={setSort}
             sortOptions={[
-              { label: "🌟 Default Sequence", value: "all" },
+              { label: "🌟 Default", value: "all" },
               { label: "Newest First", value: "-createdAt" },
               { label: "Oldest First", value: "createdAt" },
               { label: "Price: High", value: "-totalPrice" },

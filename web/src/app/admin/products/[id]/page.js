@@ -63,7 +63,7 @@ export default function ProductForm() {
   const watchedCategory = watch("category");
   const watchedName = watch("name");
 
-  // 🧬 Automated Slug Generation Protocol
+  // Auto-generate URL slug
   useEffect(() => {
     if (watchedName && !isEdit) {
       const generatedSlug = watchedName
@@ -130,8 +130,8 @@ export default function ProductForm() {
       existingImages.length + selectedFiles.length + files.length;
     if (totalImages > 5) {
       return swalError(
-        "Limit Exceeded",
-        "Maximum 5 images allowed per product.",
+        "Too Many Images",
+        "You can only upload up to 5 images.",
       );
     }
     const newPreviews = files.map((file) => URL.createObjectURL(file));
@@ -218,14 +218,14 @@ export default function ProductForm() {
     try {
       if (isEdit) {
         await updateProduct({ id, data: formData });
-        swalToast("Artifact Synced", "success");
+        swalToast("Product updated", "success");
       } else {
         await createProduct(formData);
-        swalToast("Artifact Created", "success");
+        swalToast("Product created", "success");
       }
       setTimeout(() => router.push("/admin/products"), 1500);
     } catch (err) {
-      swalError("Sync Failed", err.response?.data?.message || "Check parameters.");
+      swalError("Error", err.response?.data?.message || "Please check your inputs.");
     } finally {
       setIsSubmitting(false);
     }
@@ -250,16 +250,16 @@ export default function ProductForm() {
           <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
             <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           </div>
-          <span>Return to Vault</span>
+          <span>Back to Products</span>
         </Button>
       </div>
 
       <div className="admin-section-header">
         <div>
           <h1 className="admin-title">
-            {isEdit ? "Refine" : "Initialize"} <span className="text-muted-foreground/30">Artifact</span>
+            {isEdit ? "Edit" : "Create"} <span className="text-muted-foreground/30">Product</span>
           </h1>
-          <p className="admin-subtitle">Inventory Lifecycle Management Protocol</p>
+          <p className="admin-subtitle">Manage your product details and inventory</p>
         </div>
       </div>
 
@@ -271,12 +271,12 @@ export default function ProductForm() {
             <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">
               <Package size={20} className="text-indigo-600" />
             </div>
-            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Core Identity Protocol</h3>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Basic Information</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="space-y-4 md:col-span-2">
-              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Artifact Name *</Label>
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Product Name *</Label>
               <Input 
                 {...register("name", { required: true })}
                 placeholder="e.g. Minimalist Vanguard Oversized Tee"
@@ -286,7 +286,7 @@ export default function ProductForm() {
               <input type="hidden" {...register("slug")} />
             </div>
             <div className="md:col-span-2 space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Descriptive Narrative</Label>
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Description</Label>
               <Textarea 
                 rows={4}
                 {...register("description")}
@@ -297,8 +297,11 @@ export default function ProductForm() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-6 border-t border-border/5">
              <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Department Classification</Label>
-                <Select value={watch("category")} onValueChange={(val) => setValue("category", val)}>
+                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Category</Label>
+                <Select value={watch("category")} onValueChange={(val) => {
+                  setValue("category", val);
+                  setValue("subcategory", ""); // Reset subcategory when category changes
+                }}>
                   <SelectTrigger className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-black uppercase tracking-widest">
                     <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
@@ -310,16 +313,17 @@ export default function ProductForm() {
                     ))}
                   </SelectContent>
                 </Select>
+                <input type="hidden" {...register("category", { required: true })} />
              </div>
              <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Sub-Classification</Label>
+                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Subcategory</Label>
                 <Select value={watch("subcategory")} onValueChange={(val) => setValue("subcategory", val)}>
                   <SelectTrigger className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-black uppercase tracking-widest">
                     <SelectValue placeholder="Select Subcategory" />
                   </SelectTrigger>
                   <SelectContent className="bg-card border-border rounded-2xl p-2">
                     {subcategories
-                      ?.filter((s) => (s.category?._id || s.category) === selectedCategory)
+                      ?.filter((s) => (s.category?._id || s.category) === watchedCategory)
                       .map((s) => (
                         <SelectItem key={s._id} value={s._id} className="rounded-xl py-3 font-black text-[10px] uppercase tracking-widest">
                           {s.name}
@@ -327,6 +331,7 @@ export default function ProductForm() {
                       ))}
                   </SelectContent>
                 </Select>
+                <input type="hidden" {...register("subcategory")} />
              </div>
           </div>
         </div>
@@ -337,12 +342,12 @@ export default function ProductForm() {
             <div className="w-10 h-10 rounded-2xl bg-emerald-600/10 flex items-center justify-center border border-emerald-600/20">
               <Zap size={20} className="text-emerald-600" />
             </div>
-            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Financial Parameters</h3>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Pricing</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Base Valuation (৳)</Label>
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Price (৳)</Label>
               <Input 
                 type="number"
                 {...register("price", { required: true, valueAsNumber: true })}
@@ -350,7 +355,7 @@ export default function ProductForm() {
               />
             </div>
             <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Liquidation Delta (%)</Label>
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Discount (%)</Label>
               <Input 
                 type="number"
                 {...register("discount", { valueAsNumber: true })}
@@ -366,7 +371,7 @@ export default function ProductForm() {
             <div className="w-10 h-10 rounded-2xl bg-amber-600/10 flex items-center justify-center border border-amber-600/20">
               <Camera size={20} className="text-amber-600" />
             </div>
-            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Visual Artifact Hub</h3>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Product Images</h3>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
@@ -385,31 +390,31 @@ export default function ProductForm() {
             {imagePreviews.length < 5 && (
               <label className="relative aspect-[3/4] rounded-3xl border-2 border-dashed border-border/20 flex flex-col items-center justify-center cursor-pointer hover:border-amber-600/40 hover:bg-amber-600/5 transition-all group overflow-hidden">
                 <Camera size={32} className="mb-3 text-muted-foreground group-hover:text-amber-600 transition-colors" />
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-amber-600">Inject Media</span>
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-amber-600">Add Image</span>
                 <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" multiple />
               </label>
             )}
           </div>
         </div>
 
-        {/* Stock Matrix */}
+        {/* Stock Levels */}
         <div className="admin-table-form p-8 md:p-14 space-y-12">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">
               <Layers size={20} className="text-indigo-600" />
             </div>
-            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Inventory Allocation Matrix</h3>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Stock by Size</h3>
           </div>
 
           {!watchedCategory ? (
             <div className="bg-muted/20 p-20 rounded-[2.5rem] border border-dashed border-border/10 text-center flex flex-col items-center gap-4">
                <Package size={48} className="opacity-10" strokeWidth={1} />
-               <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 italic">Awaiting Department Lock...</p>
+               <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 italic">Please select a category first...</p>
             </div>
           ) : filteredSizes.length === 0 ? (
             <div className="bg-rose-500/5 p-20 rounded-[2.5rem] border border-dashed border-rose-500/10 text-center flex flex-col items-center gap-4">
                <ShieldAlert size={48} className="text-rose-500/20" strokeWidth={1} />
-               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-rose-500/50">Zero sizing templates detected for this protocol</p>
+               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-rose-500/50">No sizes found for this category</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-6">
@@ -435,12 +440,12 @@ export default function ProductForm() {
             <div className="w-10 h-10 rounded-2xl bg-foreground/10 flex items-center justify-center border border-foreground/20">
               <Settings size={20} className="text-foreground" />
             </div>
-            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Deployment Protocol</h3>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Visibility & Settings</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="space-y-4">
-               <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Artifact Meta-Tags</Label>
+               <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Tags</Label>
                <Input 
                   {...register("tags")}
                   placeholder="limited, organic, industrial"
@@ -456,8 +461,8 @@ export default function ProductForm() {
                    className="w-8 h-8 rounded-xl border-border/20 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
                  />
                  <div>
-                   <p className="text-[10px] font-black uppercase tracking-widest leading-none">Active Status</p>
-                   <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-60">Visible to live nodes</p>
+                   <p className="text-[10px] font-black uppercase tracking-widest leading-none">Active</p>
+                   <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-60">Visible to customers</p>
                  </div>
                </div>
                <div className="flex items-center gap-4 bg-muted/20 p-6 rounded-3xl border border-border/5 flex-1 w-full sm:w-auto">
@@ -468,8 +473,8 @@ export default function ProductForm() {
                    className="w-8 h-8 rounded-xl border-border/20 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
                  />
                  <div>
-                   <p className="text-[10px] font-black uppercase tracking-widest leading-none">Featured Slot</p>
-                   <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-60">Premium spotlight</p>
+                   <p className="text-[10px] font-black uppercase tracking-widest leading-none">Featured</p>
+                   <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-60">Show on homepage</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 bg-muted/20 p-6 rounded-3xl border border-border/5 flex-1 w-full sm:w-auto">
@@ -481,7 +486,7 @@ export default function ProductForm() {
                  />
                  <div>
                    <p className="text-[10px] font-black uppercase tracking-widest leading-none">Show Ratings</p>
-                   <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-60">Feedback visibility</p>
+                   <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-60">Show customer reviews</p>
                  </div>
                </div>
             </div>
@@ -496,11 +501,11 @@ export default function ProductForm() {
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
-                  Synchronizing Node...
+                  Saving...
                 </div>
               ) : (
                 <>
-                  {isEdit ? "Synchronize Artifact Configuration" : "Launch Production Protocol"}
+                  {isEdit ? "Update Product" : "Create Product"}
                   <ArrowRight size={20} className="ml-4 group-hover:translate-x-2 transition-transform" />
                 </>
               )}

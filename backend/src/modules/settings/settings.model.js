@@ -4,10 +4,8 @@ const pageSettingSchema = new mongoose.Schema({
     branding: {
         siteName: { type: String, default: "VANGUARD" },
         siteTitle: { type: String, default: "Premium Apparel" },
-        headerLogoLight: { type: String }, 
-        headerLogoDark: { type: String },
-        footerLogoLight: { type: String },
-        footerLogoDark: { type: String },
+        logo: { type: String }, 
+        logoDark: { type: String },
         favicon: { type: String },
         activeTheme: { type: String, default: "executive", enum: ["executive", "streetwear", "earth", "luxury", "cyber"] },
         defaultTheme: { type: String, default: "dark", enum: ["light", "dark", "system"] }, 

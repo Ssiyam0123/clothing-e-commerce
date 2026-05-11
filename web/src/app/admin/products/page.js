@@ -28,14 +28,14 @@ function AdminProductsContent() {
 
   const handleDelete = async (id) => {
     const confirmed = await swalConfirm(
-      "Purge Product?",
+      "Delete Product?",
       "This action is permanent.",
     );
     if (!confirmed) return;
 
     try {
       await deleteProduct(id);
-      swalToast("Product Purged", "success");
+      swalToast("Product Deleted", "success");
     } catch (err) {
       const message =
         err.response?.data?.message || err.message || "Something went wrong.";
@@ -52,7 +52,7 @@ function AdminProductsContent() {
       const message =
         err.response?.data?.message ||
         err.message ||
-        "Could not sync with databanks.";
+        "Could not update status.";
       swalError("Visibility Error", message);
       console.error("Toggle active error:", err);
     }
@@ -149,9 +149,9 @@ function AdminProductsContent() {
             onClick={async () => {
               try {
                 await updateProduct({ id: item._id, data: { showReviews: !item.showReviews } });
-                swalToast(item.showReviews ? "Reviews Suppressed" : "Reviews Authorized", "success");
+                swalToast(item.showReviews ? "Reviews Disabled" : "Reviews Enabled", "success");
               } catch (err) {
-                swalError("Protocol Error", err.message);
+                swalError("Update Error", err.message);
               }
             }}
             className={cn(
@@ -171,22 +171,23 @@ function AdminProductsContent() {
           <Link
             href={`/admin/products/${item._id}/history`}
             className="p-2.5 bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500 hover:text-white rounded-xl transition-all shadow-sm"
-            title="Sales History & Audit"
+            title="Sales History"
           >
             <History className="w-4 h-4" strokeWidth={2.5} />
           </Link>
           <Link
             href={`/admin/products/${item._id}/manage`}
             className="p-2.5 bg-muted text-muted-foreground hover:bg-foreground hover:text-background rounded-xl transition-all shadow-sm"
-            title="Variants & Inventory"
+            title="Sizes & Stock"
           >
             <Settings className="w-4 h-4" strokeWidth={2.5} />
           </Link>
           <Link
             href={`/admin/products/${item._id}`}
             className="p-2.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-xl transition-all shadow-sm"
-            title="Edit Base Info"
+            title="Edit Product"
           >
+            <History className="hidden" /> {/* Added just to maintain alignment in my thought process, ignore */}
             <Edit className="w-4 h-4" strokeWidth={2.5} />
           </Link>
           <button
@@ -207,10 +208,10 @@ function AdminProductsContent() {
       <div className="admin-section-header">
         <div>
           <h1 className="admin-title">
-            Product <span className="text-muted-foreground/50">Catalog</span>
+            Products
           </h1>
           <p className="admin-subtitle">
-            Manage Store Inventory (Items: {pagination?.total || 0})
+            Manage your store's items (Total: {pagination?.total || 0})
           </p>
         </div>
         <Link
@@ -218,7 +219,7 @@ function AdminProductsContent() {
           className="bg-foreground text-background px-8 md:px-10 py-3 md:py-4 rounded-full font-black uppercase tracking-widest text-[9px] md:text-[10px] hover:scale-105 active:scale-95 transition-all shadow-xl flex items-center justify-center gap-2 w-full md:w-auto"
         >
           <Plus size={16} strokeWidth={3} />
-          Initialize Product
+          Add New Product
         </Link>
       </div>
 

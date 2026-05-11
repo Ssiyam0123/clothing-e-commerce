@@ -18,8 +18,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, Save, Trash2, Layers } from "lucide-react";
+import { ChevronLeft, Save, Trash2, Layers, Upload, Image as ImageIcon } from "lucide-react";
 import { swalToast, swalError } from "@/utils/swal";
+import { getImageUrl } from "@/utils/imageUtils";
+import { cn } from "@/lib/utils";
 
 export default function SubcategoryForm() {
   const { id } = useParams();
@@ -33,6 +35,8 @@ export default function SubcategoryForm() {
   const { categories, isLoading: categoriesLoading } = useAdminCategories();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const {
     register,
@@ -63,6 +67,7 @@ export default function SubcategoryForm() {
           category: sub.category?._id || sub.category,
           description: sub.description || ""
         });
+        if (sub.image) setImagePreview(getImageUrl(sub.image));
         setLoading(false);
       }
     } else if (!isEdit) {
@@ -80,15 +85,35 @@ export default function SubcategoryForm() {
     }
   }, [isEdit, presetCategory, selectedCategory, setValue]);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
+    const formData = new FormData();
+    formData.append("name", data.name.trim());
+    formData.append("slug", data.slug.trim());
+    formData.append("category", data.category);
+    if (data.description) formData.append("description", data.description);
+    
+    if (selectedFile) {
+      formData.append("image", selectedFile);
+    }
+
     try {
       if (isEdit) {
-        await updateSubcategory.mutateAsync({ id, data });
-        swalToast("Architecture Synchronized", "success");
+        await updateSubcategory({ id, data: formData });
+        swalToast("Subcategory updated", "success");
       } else {
-        await createSubcategory.mutateAsync(data);
-        swalToast("Sub-category Initialized", "success");
+        await createSubcategory(formData);
+        swalToast("Subcategory created", "success");
       }
       setTimeout(() => router.push("/admin/categories"), 1500);
     } catch (err) {
@@ -113,10 +138,10 @@ export default function SubcategoryForm() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
             <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tighter uppercase italic leading-none">
-              {isEdit ? "Refine Sub-Category" : "New Sub-Category"}
+              {isEdit ? "Edit Subcategory" : "Create Subcategory"}
             </h1>
             <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] ml-1">
-              Architecture Configuration Protocol
+              Set up your subcategory details
             </p>
           </div>
           <Button
@@ -124,7 +149,7 @@ export default function SubcategoryForm() {
             onClick={() => router.push("/admin/categories")}
             className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground rounded-full h-12 px-6"
           >
-            <ChevronLeft className="mr-2" size={16} /> Abort & Return
+            <ChevronLeft className="mr-2" size={16} /> Cancel
           </Button>
         </div>
       </Card>
@@ -136,14 +161,14 @@ export default function SubcategoryForm() {
             <div className="grid md:grid-cols-2 gap-10">
               <div className="md:col-span-1 space-y-3">
                 <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1">
-                  Parent Department *
+                  Main Category *
                 </Label>
                 <Select
                   value={selectedCategory}
                   onValueChange={(val) => setValue("category", val)}
                 >
                   <SelectTrigger className="h-14 bg-muted/30 border-border rounded-2xl px-6 text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all">
-                    <SelectValue placeholder="Assign to Department" />
+                    <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
                   <SelectContent className="bg-card border-border rounded-2xl">
                     {categories?.map((cat) => (
@@ -159,7 +184,7 @@ export default function SubcategoryForm() {
 
               <div className="space-y-3">
                 <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1">
-                  Sub-category Name *
+                  Subcategory Name *
                 </Label>
                 <Input
                   {...register("name", { required: true })}
@@ -170,7 +195,7 @@ export default function SubcategoryForm() {
 
               <div className="space-y-3">
                 <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1">
-                  URL Extension (Slug) *
+                  Subcategory URL (Slug) *
                 </Label>
                 <Input
                   {...register("slug", { required: true, pattern: /^[a-z0-9-]+$/ })}
@@ -182,14 +207,41 @@ export default function SubcategoryForm() {
 
             <div className="space-y-3">
               <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1">
-                Internal Narrative
+                Description
               </Label>
               <Textarea
                 {...register("description")}
-                rows={5}
+                rows={4}
                 className="bg-muted/30 border-border rounded-3xl px-6 py-5 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition-all resize-none shadow-inner"
-                placeholder="Describe the aesthetic scope of this sub-category..."
+                placeholder="Enter subcategory description..."
               />
+            </div>
+
+            <div className="space-y-6 pt-10 border-t border-border/5">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Subcategory Image</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <label className="relative h-64 rounded-3xl border-2 border-dashed border-border/20 flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all group overflow-hidden">
+                  <Upload size={32} className="mb-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-primary">Add Image</span>
+                  <input
+                     type="file"
+                     accept="image/*"
+                     className="hidden"
+                     onChange={handleImageChange}
+                  />
+                </label>
+
+                <div className="h-64 rounded-3xl bg-muted/20 border border-border/5 overflow-hidden flex items-center justify-center relative group">
+                  {imagePreview ? (
+                    <img src={imagePreview} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 opacity-10">
+                      <ImageIcon size={48} strokeWidth={1} />
+                      <p className="text-[8px] font-black uppercase tracking-widest italic text-center">No image selected</p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-10 border-t border-border mt-10">
@@ -201,12 +253,12 @@ export default function SubcategoryForm() {
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
-                    Processing Protocol...
+                    Saving...
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <Save size={16} />
-                    {isEdit ? "Update Architecture" : "Initialize Protocol"}
+                    {isEdit ? "Update Subcategory" : "Create Subcategory"}
                   </div>
                 )}
               </Button>

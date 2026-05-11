@@ -80,11 +80,11 @@ export default function SizeForm() {
     setIsSubmitting(true);
     try {
       if (isEdit) {
-        await updateSize.mutateAsync({ id, ...data });
-        swalToast("Size Template Updated", "success");
+        await updateSize({ id, ...data });
+        swalToast("Size updated", "success");
       } else {
-        await createSize.mutateAsync(data);
-        swalToast("Size Template Initialized", "success");
+        await createSize(data);
+        swalToast("Size created", "success");
       }
       setTimeout(() => router.push("/admin/categories"), 1500);
     } catch (err) {
@@ -109,10 +109,10 @@ export default function SizeForm() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
             <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tighter uppercase italic leading-none">
-              {isEdit ? "Refine Size" : "New Size Template"}
+              {isEdit ? "Edit Size" : "Create Size"}
             </h1>
             <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] ml-1">
-              Taxonomy Configuration Protocol
+              Set up size details
             </p>
           </div>
           <Button
@@ -120,7 +120,7 @@ export default function SizeForm() {
             onClick={() => router.push("/admin/categories")}
             className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground rounded-full h-12 px-6"
           >
-            <ChevronLeft className="mr-2" size={16} /> Abort & Return
+            <ChevronLeft className="mr-2" size={16} /> Cancel
           </Button>
         </div>
       </Card>
@@ -132,14 +132,14 @@ export default function SizeForm() {
             <div className="grid md:grid-cols-2 gap-10">
               <div className="space-y-3">
                 <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1">
-                  Department Mapping *
+                  Category *
                 </Label>
                 <Select
                   value={selectedCategory}
                   onValueChange={(val) => setValue("category", val)}
                 >
                   <SelectTrigger className="h-14 bg-muted/30 border-border rounded-2xl px-6 text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all">
-                    <SelectValue placeholder="Assign to Department" />
+                    <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
                   <SelectContent className="bg-card border-border rounded-2xl">
                     {categories?.map((cat) => (
@@ -153,7 +153,7 @@ export default function SizeForm() {
 
               <div className="space-y-3">
                 <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1">
-                  Size Tag *
+                  Size Name *
                 </Label>
                 <Input
                   {...register("name", { required: true })}
@@ -161,20 +161,20 @@ export default function SizeForm() {
                   placeholder="e.g. XL, 32, or 42"
                 />
                 <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-2 ml-1">
-                  Use standard alphanumeric notation.
+                  Enter size label (e.g. M, L, XL).
                 </p>
               </div>
             </div>
 
             <div className="space-y-3">
               <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1">
-                Internal Specification (Optional)
+                Description (Optional)
               </Label>
               <Textarea
                 {...register("description")}
                 rows={5}
                 className="bg-muted/30 border-border rounded-3xl px-6 py-5 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition-all resize-none shadow-inner"
-                placeholder="e.g. Extra large fit for oversized silhouettes..."
+                placeholder="Enter size description..."
               />
             </div>
 
@@ -187,12 +187,12 @@ export default function SizeForm() {
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
-                    Syncing Architecture...
+                    Saving...
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <Save size={16} />
-                    {isEdit ? "Sync Template" : "Initialize Template"}
+                    {isEdit ? "Update Size" : "Create Size"}
                   </div>
                 )}
               </Button>

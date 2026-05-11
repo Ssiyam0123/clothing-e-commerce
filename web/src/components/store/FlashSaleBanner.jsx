@@ -12,20 +12,20 @@ import { motion } from "framer-motion";
 
 const DICTIONARY = {
   en: {
-    drop: "Exclusive Drop",
-    defaultDesc: "Limited time premium offer. Once it's gone, it's gone forever.",
-    startsIn: "Sequence Inbound",
-    endsIn: "Protocol Termination",
-    discountLabel: "Sequence \n Advantage",
-    live: "PROTOCOL LIVE",
+    drop: "Special Offer",
+    defaultDesc: "Limited time offer. Get it before it's gone!",
+    startsIn: "Starts In",
+    endsIn: "Ends In",
+    discountLabel: "Flash \n Discount",
+    live: "LIVE NOW",
   },
   bn: {
-    drop: "এক্সক্লুসিভ ড্রপ",
-    defaultDesc: "সীমিত সময়ের প্রিমিয়াম অফার। স্টক শেষ হওয়ার আগেই লুফে নিন।",
-    startsIn: "শুরু হতে",
-    endsIn: "শেষ হতে",
-    discountLabel: "অতিরিক্ত \n ছাড়",
-    live: "লাইভ",
+    drop: "স্পেশাল অফার",
+    defaultDesc: "সীমিত সময়ের অফার। স্টক শেষ হওয়ার আগেই লুফে নিন!",
+    startsIn: "শুরু হবে",
+    endsIn: "শেষ হবে",
+    discountLabel: "অতিরিক্ত \n ছাড়",
+    live: "লাইভ চলছে",
   },
 };
 

@@ -133,7 +133,7 @@ export default function AdminLayout({ children }) {
                     className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors group"
                   >
                     <Globe size={14} className="opacity-50 group-hover:text-accent-secondary" />
-                    <span className="hidden sm:inline">Live Portal</span>
+                    <span className="hidden sm:inline">Go to Store</span>
                   </Link>
 
                   <button
@@ -176,7 +176,7 @@ export default function AdminLayout({ children }) {
                 <button
                   onClick={handleLogout}
                   className="text-muted-foreground hover:text-destructive transition-all hover:rotate-12"
-                  title="Disconnect Session"
+                  title="Logout"
                 >
                   <LogOut size={16} />
                 </button>

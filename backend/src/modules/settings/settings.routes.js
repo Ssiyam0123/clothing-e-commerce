@@ -10,10 +10,8 @@ router.get('/', getSettings);
 
 
 router.put('/', requireAuth, admin, upload.fields([
-    { name: 'headerLogoLight', maxCount: 1 },
-    { name: 'headerLogoDark', maxCount: 1 },
-    { name: 'footerLogoLight', maxCount: 1 },
-    { name: 'footerLogoDark', maxCount: 1 },
+    { name: 'logo', maxCount: 1 },
+    { name: 'logoDark', maxCount: 1 },
     { name: 'favicon', maxCount: 1 }
 ]), updateSettings);
 

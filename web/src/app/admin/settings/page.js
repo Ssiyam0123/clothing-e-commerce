@@ -36,19 +36,20 @@ export default function SettingsPage() {
   const [isFetching, setIsFetching] = useState(true);
 
   const tabs = [
-    { id: "branding", label: "Branding", desc: "Identity & Logos", icon: Globe },
-    { id: "theme", label: "Theme", desc: "Visual Signature", icon: Palette },
-    { id: "socials", label: "Social Links", desc: "Neural Networks", icon: Share2 },
-    { id: "contact", label: "Contact", desc: "Comms Channels", icon: Mail },
-    { id: "payment", label: "Payment", desc: "Monetary Gateway", icon: Settings2 },
+    { id: "branding", label: "Identity", desc: "Logos & Names", icon: Globe },
+    { id: "theme", label: "Style", desc: "Colors & Fonts", icon: Palette },
+    { id: "socials", label: "Social", desc: "Social Media Links", icon: Share2 },
+    { id: "contact", label: "Support", desc: "Contact Details", icon: Mail },
+    { id: "payment", label: "Payments", desc: "Payment Methods", icon: Settings2 },
   ];
 
   const [formData, setFormData] = useState({
     branding: {
       siteName: "",
+      siteTitle: "",
       description: "",
-      headerLogo: "",
-      footerLogo: "",
+      logo: "",
+      logoDark: "",
       favicon: "",
       defaultThemeColor: "Zinc",
       defaultThemeFont: "Inter",
@@ -69,10 +70,8 @@ export default function SettingsPage() {
   });
 
   const [files, setFiles] = useState({
-    headerLogoLight: null,
-    headerLogoDark: null,
-    footerLogoLight: null,
-    footerLogoDark: null,
+    logo: null,
+    logoDark: null,
     favicon: null,
   });
 
@@ -91,7 +90,7 @@ export default function SettingsPage() {
         }
       } catch (error) {
         console.error("Failed to load settings:", error);
-        toast.error("Protocol Sync Error: Failed to load core settings.");
+        toast.error("Error: Failed to load settings.");
       } finally {
         setIsFetching(false);
       }
@@ -119,17 +118,15 @@ export default function SettingsPage() {
       payload.append("paymentOptions", JSON.stringify(formData.paymentOptions));
 
       // Append Files
-      if (files.headerLogoLight) payload.append("headerLogoLight", files.headerLogoLight);
-      if (files.headerLogoDark) payload.append("headerLogoDark", files.headerLogoDark);
-      if (files.footerLogoLight) payload.append("footerLogoLight", files.footerLogoLight);
-      if (files.footerLogoDark) payload.append("footerLogoDark", files.footerLogoDark);
+      if (files.logo) payload.append("logo", files.logo);
+      if (files.logoDark) payload.append("logoDark", files.logoDark);
       if (files.favicon) payload.append("favicon", files.favicon);
 
       await api.put("/settings", payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      toast.success("Identity Matrix Updated Successfully");
+      toast.success("Settings Updated Successfully");
       
       // 🚀 Sync Global Store & Revalidate SSR Cache
       await initApp();
@@ -137,7 +134,7 @@ export default function SettingsPage() {
       
     } catch (error) {
       console.error("Update Error:", error);
-      toast.error("Command Execution Failed: Identity sync interrupted.");
+      toast.error("Update failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -161,10 +158,10 @@ export default function SettingsPage() {
         
         <div className="space-y-3 md:space-y-4 relative z-10">
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter dark:text-white italic leading-none">
-            Global <span className="text-muted-foreground">Parameters</span>
+            Site <span className="text-muted-foreground">Settings</span>
           </h1>
           <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-3">
-            <Cpu size={12} className="text-foreground" /> Config Core • Identity & Aesthetics
+            Website Branding & Support
           </p>
         </div>
 
@@ -174,7 +171,7 @@ export default function SettingsPage() {
           className="bg-foreground text-background hover:bg-accent-secondary hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group relative z-10 w-full md:w-auto"
         >
           <Save size={18} className={cn("mr-3", loading && "animate-pulse")} />
-          {loading ? "Syncing..." : "Apply Changes"}
+          {loading ? "Saving..." : "Save Changes"}
         </Button>
       </header>
 
@@ -182,7 +179,7 @@ export default function SettingsPage() {
         {/* 📟 Navigation Tabs (Responsive) */}
         <aside className="lg:col-span-3">
           <div className="hidden lg:block p-6 mb-4">
-            <p className="text-[8px] font-black uppercase tracking-[0.5em] text-muted-foreground opacity-50">Configuration Matrix</p>
+            <p className="text-[8px] font-black uppercase tracking-[0.5em] text-muted-foreground opacity-50">Settings Menu</p>
           </div>
           <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar gap-2 pb-4 lg:pb-0">
             {tabs.map((tab) => (
@@ -229,60 +226,46 @@ export default function SettingsPage() {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                       <FormInput
-                        label="Identity Name"
+                        label="Website Name"
                         name="siteName"
                         register={(n) => ({ value: formData.branding?.siteName, onChange: (e) => setFormData({...formData, branding: {...formData.branding, siteName: e.target.value}}) })}
                         errors={{}}
                         value={formData.branding?.siteName}
-                        placeholder="Vanguard Systems"
+                        placeholder="e.g. Vanguard Store"
                       />
                       <FormInput
-                        label="Meta Descriptor"
+                        label="Page Title"
                         name="siteTitle"
                         register={(n) => ({ value: formData.branding?.siteTitle, onChange: (e) => setFormData({...formData, branding: {...formData.branding, siteTitle: e.target.value}}) })}
                         errors={{}}
                         value={formData.branding?.siteTitle}
-                        placeholder="Premium Artifacts"
+                        placeholder="e.g. Premium Clothing"
                       />
                     </div>
 
                     <FormInput
-                      label="Neural Description"
+                      label="Site Description"
                       name="description"
                       register={(n) => ({ value: formData.branding?.description, onChange: (e) => setFormData({...formData, branding: {...formData.branding, description: e.target.value}}) })}
                       errors={{}}
                       value={formData.branding?.description}
-                      placeholder="Enter the primary mission statement..."
+                      placeholder="Enter a short description about your shop..."
                     />
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 pt-12 border-t border-border/5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 pt-12 border-t border-border/5">
                       <ImageUpload
-                        label="Header Light"
-                        name="headerLogoLight"
+                        label="Primary Logo"
+                        name="logo"
                         register={() => ({})}
-                        currentImage={formData.branding?.headerLogoLight}
-                        onImageChange={(f) => setFiles({ ...files, headerLogoLight: f })}
+                        currentImage={formData.branding?.logo}
+                        onImageChange={(f) => setFiles({ ...files, logo: f })}
                       />
                       <ImageUpload
-                        label="Header Dark"
-                        name="headerLogoDark"
+                        label="Logo (Dark Mode)"
+                        name="logoDark"
                         register={() => ({})}
-                        currentImage={formData.branding?.headerLogoDark}
-                        onImageChange={(f) => setFiles({ ...files, headerLogoDark: f })}
-                      />
-                      <ImageUpload
-                        label="Footer Light"
-                        name="footerLogoLight"
-                        register={() => ({})}
-                        currentImage={formData.branding?.footerLogoLight}
-                        onImageChange={(f) => setFiles({ ...files, footerLogoLight: f })}
-                      />
-                      <ImageUpload
-                        label="Footer Dark"
-                        name="footerLogoDark"
-                        register={() => ({})}
-                        currentImage={formData.branding?.footerLogoDark}
-                        onImageChange={(f) => setFiles({ ...files, footerLogoDark: f })}
+                        currentImage={formData.branding?.logoDark}
+                        onImageChange={(f) => setFiles({ ...files, logoDark: f })}
                       />
                       <ImageUpload
                         label="Favicon"
@@ -304,8 +287,8 @@ export default function SettingsPage() {
                   >
                     <section className="space-y-10">
                       <div>
-                        <h2 className="text-xl font-black uppercase tracking-tighter italic">Chromatic Identity</h2>
-                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Define the primary accent signature</p>
+                        <h2 className="text-xl font-black uppercase tracking-tighter italic">Theme Colors</h2>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Pick your brand's main color</p>
                       </div>
 
                       <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-8">
@@ -345,8 +328,8 @@ export default function SettingsPage() {
 
                     <section className="space-y-10 pt-16 border-t border-border/5">
                       <div>
-                        <h2 className="text-xl font-black uppercase tracking-tighter italic">Typography Protocol</h2>
-                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Select the primary system font</p>
+                        <h2 className="text-xl font-black uppercase tracking-tighter italic">Text Fonts</h2>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Choose the main font for your site</p>
                       </div>
 
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
@@ -388,8 +371,8 @@ export default function SettingsPage() {
 
                     <section className="space-y-10 pt-16 border-t border-border/5">
                       <div>
-                        <h2 className="text-xl font-black uppercase tracking-tighter italic">Identity Atmosphere</h2>
-                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Select the active branding personality</p>
+                        <h2 className="text-xl font-black uppercase tracking-tighter italic">Design Preset</h2>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Pick a visual style for your store</p>
                       </div>
 
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
@@ -436,11 +419,11 @@ export default function SettingsPage() {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                       {[
-                        { id: "facebook", label: "Facebook Matrix", placeholder: "https://facebook.com/vanguard" },
-                        { id: "instagram", label: "Instagram Visuals", placeholder: "https://instagram.com/vanguard" },
-                        { id: "twitter", label: "Twitter Comms", placeholder: "https://twitter.com/vanguard" },
-                        { id: "linkedin", label: "LinkedIn Network", placeholder: "https://linkedin.com/company/vanguard" },
-                        { id: "tiktok", label: "TikTok Stream", placeholder: "https://tiktok.com/@vanguard" },
+                        { id: "facebook", label: "Facebook Link", placeholder: "https://facebook.com/your-page" },
+                        { id: "instagram", label: "Instagram Link", placeholder: "https://instagram.com/your-profile" },
+                        { id: "twitter", label: "Twitter Link", placeholder: "https://twitter.com/your-profile" },
+                        { id: "linkedin", label: "LinkedIn Link", placeholder: "https://linkedin.com/company/your-page" },
+                        { id: "tiktok", label: "TikTok Link", placeholder: "https://tiktok.com/@your-profile" },
                       ].map((platform) => (
                         <FormInput
                           key={platform.id}
@@ -477,7 +460,7 @@ export default function SettingsPage() {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                       <FormInput
-                        label="Comms Channel (Phone)"
+                        label="Phone Number"
                         name="phone"
                         register={(n) => ({ value: formData.contact?.phone, onChange: (e) => setFormData({...formData, contact: {...formData.contact, phone: e.target.value}}) })}
                         errors={{}}
@@ -485,7 +468,7 @@ export default function SettingsPage() {
                         placeholder="+880 1234 567890"
                       />
                       <FormInput
-                        label="Direct Line (WhatsApp)"
+                        label="WhatsApp"
                         name="whatsapp"
                         register={(n) => ({ value: formData.contact?.whatsapp, onChange: (e) => setFormData({...formData, contact: {...formData.contact, whatsapp: e.target.value}}) })}
                         errors={{}}
@@ -493,20 +476,20 @@ export default function SettingsPage() {
                         placeholder="+880 1234 567890"
                       />
                       <FormInput
-                        label="Neural Node (Email)"
+                        label="Email Address"
                         name="email"
                         register={(n) => ({ value: formData.contact?.email, onChange: (e) => setFormData({...formData, contact: {...formData.contact, email: e.target.value}}) })}
                         errors={{}}
                         value={formData.contact?.email}
-                        placeholder="protocol@vanguard.com"
+                        placeholder="contact@yourstore.com"
                       />
                       <FormInput
-                        label="Physical Coordinates"
+                        label="Store Address"
                         name="address"
                         register={(n) => ({ value: formData.contact?.address, onChange: (e) => setFormData({...formData, contact: {...formData.contact, address: e.target.value}}) })}
                         errors={{}}
                         value={formData.contact?.address}
-                        placeholder="Sector 7, Utopia Prime"
+                        placeholder="e.g. Sector 7, Uttara, Dhaka"
                       />
                     </div>
                   </motion.div>
@@ -521,15 +504,15 @@ export default function SettingsPage() {
                   >
                     <section className="space-y-10">
                       <div>
-                        <h2 className="text-xl font-black uppercase tracking-tighter italic">Payment Protocol</h2>
-                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Manage active monetary gateways</p>
+                        <h2 className="text-xl font-black uppercase tracking-tighter italic">Payment Methods</h2>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Turn on or off your payment options</p>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
                         {[
-                          { id: "cod", label: "Cash On Delivery", desc: "Physical Currency Exchange" },
-                          { id: "online", label: "SSLCommerz", desc: "Digital Credit Matrix" },
-                          { id: "bkash", label: "bKash Token", desc: "Mobile Financial Layer" },
+                          { id: "cod", label: "Cash On Delivery", desc: "Pay when you get product" },
+                          { id: "online", label: "Online Payment", desc: "Cards, Mobile Banking" },
+                          { id: "bkash", label: "bKash Direct", desc: "Instant mobile payment" },
                         ].map((option) => (
                           <button
                             key={option.id}

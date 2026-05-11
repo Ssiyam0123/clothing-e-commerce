@@ -58,22 +58,22 @@ function UsersContent() {
 
   const handleDelete = async (id, role) => {
     if (role === "admin") {
-      return swalError("Termination Revoked", "Core administrative identities cannot be purged.");
+      return swalError("Action Denied", "Admin users cannot be deleted.");
     }
-    const isConfirmed = await swalConfirm("Terminate Identity?", "This personnel record will be permanently erased.");
+    const isConfirmed = await swalConfirm("Delete User?", "This user will be permanently deleted.");
     if (isConfirmed) {
       try {
         await deleteUser.mutateAsync(id);
-        swalToast("Identity Purged", "success");
+        swalToast("User deleted", "success");
       } catch (err) {
-        swalError("System Error", "Purge protocol rejected by security module.");
+        swalError("Error", "Could not delete user.");
       }
     }
   };
 
   const columns = [
     {
-      label: "Personnel Identity",
+      label: "User Details",
       render: (item) => (
         <div className="flex items-center gap-4">
           <div className="relative h-12 w-12 rounded-2xl overflow-hidden border border-border/10 shrink-0 bg-accent/5 group/avatar">
@@ -101,7 +101,7 @@ function UsersContent() {
       ),
     },
     {
-      label: "Clearance Level",
+      label: "Role",
       render: (item) => (
         <Badge
           variant="outline"
@@ -112,12 +112,12 @@ function UsersContent() {
               : "bg-zinc-500/10 text-zinc-500 border-zinc-500/20"
           )}
         >
-          {item.role === "admin" ? "★ Vanguard Admin" : "Syndicate Member"}
+          {item.role === "admin" ? "Admin" : "Customer"}
         </Badge>
       ),
     },
     {
-      label: "Inception Date",
+      label: "Joined Date",
       render: (item) => (
         <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
           {new Date(item.createdAt).toLocaleDateString("en-US", {
@@ -129,7 +129,7 @@ function UsersContent() {
       ),
     },
     {
-      label: "Command Ops",
+      label: "Actions",
       render: (item) => (
         <div className="flex items-center gap-3 justify-end">
           <Button 
@@ -171,19 +171,19 @@ function UsersContent() {
       <div className="admin-section-header">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-border/20 text-muted-foreground bg-accent/5 px-3 py-1">Identity Ops</Badge>
+             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-border/20 text-muted-foreground bg-accent/5 px-3 py-1">Users</Badge>
           </div>
           <h1 className="admin-title">
             User <span className="text-muted-foreground">Directory</span>
           </h1>
           <p className="admin-subtitle">
-            Personnel Management • Global Search Enabled
+            Manage your store's users
           </p>
         </div>
 
         <div className="bg-accent/5 px-6 md:px-8 py-3 md:py-5 rounded-2xl md:rounded-[2rem] border border-border/10 flex items-center justify-between md:justify-start gap-4 md:gap-6 shadow-inner w-full md:w-auto group/stat">
            <div className="flex flex-col">
-              <span className="text-[8px] md:text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em] mb-1">Sector Live</span>
+              <span className="text-[8px] md:text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em] mb-1">Total Users</span>
               <span className="text-xl md:text-3xl font-black text-foreground italic leading-none group-hover/stat:text-rose-600 transition-colors">
                 {total || 0}
               </span>
@@ -206,11 +206,11 @@ function UsersContent() {
             suggestionKey="users"
             entityType="user"
             sortOptions={[
-              { label: "🌟 Default Sequence", value: "-createdAt" },
+              { label: "Default", value: "-createdAt" },
               { label: "Newest Joined", value: "-createdAt" },
               { label: "Oldest Joined", value: "createdAt" },
               { label: "Alphabetical (A-Z)", value: "name" },
-              { label: "Clearance Level", value: "-role" },
+              { label: "Role", value: "-role" },
             ]}
             searchPlaceholder="Search by Name or Email..."
           />
@@ -232,7 +232,7 @@ function UsersContent() {
         {!isLoading && totalPages > 1 && (
           <div className="flex flex-col md:flex-row justify-between items-center gap-8 p-6 md:p-8 border-t border-border/10 bg-background/10">
             <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.5em] italic">
-              Navigating Sector {currentPage} <span className="mx-3 opacity-20">/</span> {totalPages}
+              Page {currentPage} <span className="mx-3 opacity-20">/</span> {totalPages}
             </div>
 
             <div className="flex items-center gap-3">

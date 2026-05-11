@@ -18,10 +18,10 @@ export default function Subcategories() {
   const { subcategories, isLoading, deleteSubcategory } = useSubcategories();
 
   const handleDelete = async (id) => {
-    const isConfirmed = await swalConfirm("Purge Branch?", "This sub-cluster will be permanently removed.");
+    const isConfirmed = await swalConfirm("Delete Subcategory?", "This subcategory will be permanently removed.");
     if (isConfirmed) {
       await deleteSubcategory.mutateAsync(id);
-      swalToast("Branch Purged", "success");
+      swalToast("Subcategory deleted", "success");
     }
   };
 
@@ -29,7 +29,7 @@ export default function Subcategories() {
     { label: "Name", key: "name" },
     { label: "Slug", key: "slug" },
     {
-      label: "Category Cluster",
+      label: "Category",
       key: "category",
       render: (item) => (
         <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg border-border/10 bg-background/50">
@@ -54,13 +54,13 @@ export default function Subcategories() {
       <div className="admin-section-header">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-emerald-600/30 text-emerald-600 bg-emerald-600/5 px-3 py-1">Structure Ops</Badge>
+             <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-emerald-600/30 text-emerald-600 bg-emerald-600/5 px-3 py-1">Subcategories</Badge>
           </div>
           <h1 className="admin-title">
-            Node <span className="text-emerald-600">Sub-Clusters</span>
+            Subcategory <span className="text-emerald-600">List</span>
           </h1>
           <p className="admin-subtitle">
-            Subcategory Orchestration • Total: {subcategories?.length || 0}
+            Manage your subcategories • Total: {subcategories?.length || 0}
           </p>
         </div>
 
@@ -69,7 +69,7 @@ export default function Subcategories() {
           className="bg-foreground text-background hover:bg-emerald-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group w-full md:w-auto"
         >
           <Link href="/admin/subcategories/new">
-            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> New Branch
+            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Add New Subcategory
           </Link>
         </Button>
       </div>

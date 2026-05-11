@@ -43,7 +43,7 @@ export default function ProductHistoryPage({ params: paramsPromise }) {
 
   const columns = [
     {
-      label: "Customer Identity",
+      label: "Customer",
       render: (item) => (
         <div className="flex items-center gap-4">
           <div className="h-10 w-10 rounded-full bg-muted overflow-hidden border border-border">
@@ -59,7 +59,7 @@ export default function ProductHistoryPage({ params: paramsPromise }) {
               {item.customer?.name}
             </p>
             <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
-              {item.isGuest ? "GUEST TRANSMISSION" : "VERIFIED ACCOUNT"}
+              {item.isGuest ? "GUEST ORDER" : "REGISTERED USER"}
             </p>
           </div>
         </div>
@@ -77,7 +77,7 @@ export default function ProductHistoryPage({ params: paramsPromise }) {
       )
     },
     {
-      label: "Settlement",
+      label: "Total Price",
       render: (item) => (
         <div className="flex flex-col">
           <span className="text-xs font-black text-foreground">৳{item.total.toLocaleString()}</span>
@@ -86,7 +86,7 @@ export default function ProductHistoryPage({ params: paramsPromise }) {
       )
     },
     {
-      label: "Temporal Data",
+      label: "Date & Time",
       render: (item) => (
         <div className="flex items-center gap-2 text-muted-foreground">
           <Calendar size={12} />
@@ -101,7 +101,7 @@ export default function ProductHistoryPage({ params: paramsPromise }) {
         render: (item) => <StatusBadge value={item.orderStatus} />
     },
     {
-      label: "Protocol",
+      label: "Details",
       render: (item) => (
         <Link 
           href={`/admin/orders/${item.orderId}`}
@@ -127,11 +127,11 @@ export default function ProductHistoryPage({ params: paramsPromise }) {
             <div className="flex items-center gap-3 mb-2">
                 <History className="text-primary" size={24} strokeWidth={3} />
                 <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter uppercase italic leading-none">
-                  Product <span className="text-muted-foreground/30">Audit</span>
+                  Product <span className="text-muted-foreground/30">History</span>
                 </h1>
             </div>
             <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] ml-1">
-              History Log for: <span className="text-primary">{product?.name}</span>
+              Sales History for: <span className="text-primary">{product?.name}</span>
             </p>
           </div>
         </div>
@@ -141,7 +141,7 @@ export default function ProductHistoryPage({ params: paramsPromise }) {
              <img src={getImageUrl(product?.images?.[0])} className="w-full h-full object-cover grayscale" />
            </div>
            <div className="pr-6">
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1">Price Marker</p>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1">Current Price</p>
               <p className="text-xl font-black text-foreground tracking-tight italic">৳{product?.price?.toLocaleString()}</p>
            </div>
         </div>
@@ -150,27 +150,27 @@ export default function ProductHistoryPage({ params: paramsPromise }) {
       {/* KPI Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
          <StatsCard 
-            label="Total Circulation" 
+            label="Total Sold" 
             value={stats?.totalSold} 
             unit="Units" 
             icon={<PackageCheck className="text-emerald-500" />} 
             description="Cumulative items sold"
          />
          <StatsCard 
-            label="Gross Settlement" 
+            label="Total Revenue" 
             value={`৳${stats?.totalRevenue?.toLocaleString()}`} 
             icon={<TrendingUp className="text-primary" />} 
             description="Total revenue generated"
          />
          <StatsCard 
-            label="Transmission Count" 
+            label="Total Orders" 
             value={stats?.orderCount} 
             unit="Orders" 
             icon={<ShoppingCart className="text-indigo-500" />} 
-            description="Distinct purchase events"
+            description="Number of orders"
          />
          <StatsCard 
-            label="Avg Velocity" 
+            label="Avg. Order Value" 
             value={(stats?.totalRevenue / (stats?.orderCount || 1)).toFixed(0)} 
             unit="৳/Order" 
             icon={<CreditCard className="text-amber-500" />} 
@@ -183,7 +183,7 @@ export default function ProductHistoryPage({ params: paramsPromise }) {
          <div className="p-8 border-b border-border/10">
             <h2 className="text-xs font-black text-foreground uppercase tracking-[0.4em] flex items-center gap-3">
                <History size={14} className="text-primary" />
-               Complete Sales Ledger
+               All Sales Records
             </h2>
          </div>
          <div className="p-2">

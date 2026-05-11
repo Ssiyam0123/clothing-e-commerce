@@ -6,7 +6,7 @@ export function AdminHeader({ isFetching, todayRevenue, isLoading }) {
     <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 animate-in fade-in slide-in-from-top-4 duration-700">
       <div>
         <h1 className="text-4xl md:text-7xl font-black text-foreground tracking-tighter uppercase italic leading-none mb-4">
-          Vanguard <span className="text-muted-foreground/30">HQ</span>
+          Admin <span className="text-muted-foreground/30">Dashboard</span>
         </h1>
         <div className="flex items-center gap-3">
           <div
@@ -16,14 +16,14 @@ export function AdminHeader({ isFetching, todayRevenue, isLoading }) {
             )}
           />
           <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.4em]">
-            System Nominal
+            Active
           </p>
         </div>
       </div>
 
       <div className="bg-card text-card-foreground border border-border p-6 rounded-[2rem] shadow-xl min-w-[240px] transition-all hover:scale-[1.02]">
         <p className="text-[9px] font-black text-muted-foreground uppercase mb-1 tracking-[0.2em]">
-          Settlement Today
+          Today's Sales
         </p>
         {isLoading ? (
           <Skeleton className="h-9 w-32 bg-emerald-500/10" />

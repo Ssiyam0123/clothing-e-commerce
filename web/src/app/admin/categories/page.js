@@ -33,7 +33,7 @@ export default function CategoryMasterControl() {
       setTogglingId(id);
       try {
         await toggleFeatured({ id, isFeatured: !currentStatus });
-        swalToast(currentStatus ? "Feature Removed" : "Category Featured", "success");
+        swalToast(currentStatus ? "Removed from featured" : "Category featured", "success");
       } catch (err) {
         swalError("Update Failed", "Could not update featured status.");
       } finally {
@@ -47,14 +47,14 @@ export default function CategoryMasterControl() {
     async (id) => {
       const confirmed = await swalConfirm(
         "Delete Category?",
-        "All associated products, subcategories, and sizes will lose their primary classification. This action is irreversible.",
+        "All products and subcategories in this category will be affected. This action cannot be undone.",
       );
       if (!confirmed) return;
 
       setDeletingCategoryId(id);
       try {
-        await deleteCategory.mutateAsync(id);
-        swalToast("Category Removed", "success");
+        await deleteCategory(id);
+        swalToast("Category deleted", "success");
       } catch (err) {
         swalError("Delete Failed", err.response?.data?.message || "Check if this category is in use.");
       } finally {
@@ -68,16 +68,16 @@ export default function CategoryMasterControl() {
     async (id) => {
       const confirmed = await swalConfirm(
         "Delete Subcategory?",
-        "All products in this subcategory will be uncategorized.",
+        "All products in this subcategory will be moved to uncategorized.",
       );
       if (!confirmed) return;
 
       setDeletingSubId(id);
       try {
-        await deleteSubcategory.mutateAsync(id);
-        swalToast("Sub-category Purged", "success");
+        await deleteSubcategory(id);
+        swalToast("Subcategory deleted", "success");
       } catch (err) {
-        swalError("Action Blocked", err.response?.data?.message || "Could not delete subcategory.");
+        swalError("Delete failed", err.response?.data?.message || "Could not delete subcategory.");
       } finally {
         setDeletingSubId(null);
       }
@@ -88,17 +88,17 @@ export default function CategoryMasterControl() {
   const handleDeleteSize = useCallback(
     async (id) => {
       const confirmed = await swalConfirm(
-        "Remove Size Template?",
-        "Products using this size will lose that size option.",
+        "Delete Size?",
+        "Products using this size will lose this option.",
       );
       if (!confirmed) return;
 
       setDeletingSizeId(id);
       try {
-        await deleteSize.mutateAsync(id);
-        swalToast("Size Template Deleted", "success");
+        await deleteSize(id);
+        swalToast("Size deleted", "success");
       } catch (err) {
-        swalError("Sync Error", err.response?.data?.message || "Could not delete size template.");
+        swalError("Delete failed", err.response?.data?.message || "Could not delete size.");
       } finally {
         setDeletingSizeId(null);
       }
@@ -131,15 +131,15 @@ export default function CategoryMasterControl() {
       <div className="admin-section-header">
         <div>
           <h1 className="admin-title">
-            Architecture
+            Categories
           </h1>
           <p className="admin-subtitle">
-            Taxonomy & Store Hierarchy
+            Manage your store's categories, subcategories, and sizes
           </p>
         </div>
         <Link href="/admin/categories/new" className="w-full md:w-auto">
           <Button className="bg-foreground text-background hover:bg-primary hover:text-primary-foreground h-12 md:h-14 px-8 md:px-10 rounded-full font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] transition-all shadow-2xl active:scale-95 w-full">
-            <Plus className="mr-2" size={16} /> Initialize Category
+            <Plus className="mr-2" size={16} /> Add New Category
           </Button>
         </Link>
       </div>
@@ -179,7 +179,7 @@ export default function CategoryMasterControl() {
                       variant="outline"
                       className="bg-primary/5 text-primary border-primary/20 text-[8px] font-black uppercase tracking-[0.2em] px-4 py-1"
                     >
-                      Infrastructure Node
+                      Main Category
                     </Badge>
                     <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-[0.3em] opacity-40">
                       ID: {cat.slug}
@@ -200,7 +200,7 @@ export default function CategoryMasterControl() {
                           ).length || 0}
                         </span>
                         <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">
-                          Sub-Units
+                          Subcategories
                         </span>
                       </div>
                       <div className="w-px h-8 bg-border/60" />
@@ -212,7 +212,7 @@ export default function CategoryMasterControl() {
                           ).length || 0}
                         </span>
                         <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">
-                          Matrix Templates
+                          Sizes
                         </span>
                       </div>
                     </div>
@@ -255,7 +255,7 @@ export default function CategoryMasterControl() {
                         <Layers className="text-primary" size={16} />
                       </div>
                       <h4 className="text-[11px] font-black text-foreground uppercase tracking-[0.3em]">
-                        Sub-Departments
+                        Subcategories
                       </h4>
                     </div>
                     <Link href={`/admin/subcategories/new?category=${cat._id}`}>
@@ -263,7 +263,7 @@ export default function CategoryMasterControl() {
                         variant="ghost"
                         className="h-9 px-5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all"
                       >
-                        <Plus size={14} className="mr-2" /> Initialize
+                        <Plus size={14} className="mr-2" /> Add New
                       </Button>
                     </Link>
                   </div>
@@ -306,7 +306,7 @@ export default function CategoryMasterControl() {
                     ).length === 0 && (
                       <div className="col-span-full py-8 flex flex-col items-center justify-center border-2 border-dashed border-border/50 rounded-3xl opacity-40">
                         <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-                          Manifest Empty
+                          No items found
                         </p>
                       </div>
                     )}
@@ -321,7 +321,7 @@ export default function CategoryMasterControl() {
                         <Maximize2 className="text-primary" size={16} />
                       </div>
                       <h4 className="text-[11px] font-black text-foreground uppercase tracking-[0.3em]">
-                        Dimensional Matrix
+                        Product Sizes
                       </h4>
                     </div>
                     <Link href={`/admin/sizes/new?category=${cat._id}`}>
@@ -329,7 +329,7 @@ export default function CategoryMasterControl() {
                         variant="ghost"
                         className="h-9 px-5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all"
                       >
-                        <Plus size={14} className="mr-2" /> Initialize
+                        <Plus size={14} className="mr-2" /> Add New
                       </Button>
                     </Link>
                   </div>
@@ -370,7 +370,7 @@ export default function CategoryMasterControl() {
                     ).length === 0 && (
                       <div className="col-span-full py-8 flex flex-col items-center justify-center border-2 border-dashed border-border/50 rounded-3xl opacity-40">
                         <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-                          Manifest Empty
+                          No items found
                         </p>
                       </div>
                     )}

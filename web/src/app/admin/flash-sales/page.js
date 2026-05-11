@@ -24,16 +24,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-const TacticalStatusBadge = ({ status }) => {
+const StatusBadge = ({ status }) => {
   const styles = {
     active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]",
     pending: "bg-amber-500/10 text-amber-500 border-amber-500/20",
     inactive: "bg-zinc-500/10 text-zinc-500 border-zinc-500/20",
   };
   const text = {
-    active: "● LIVE NOW",
-    pending: "◐ PENDING",
-    inactive: "○ ENDED",
+    active: "● ACTIVE",
+    pending: "◐ UPCOMING",
+    inactive: "○ FINISHED",
   };
   return (
     <Badge variant="outline" className={cn("px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em]", styles[status])}>
@@ -48,23 +48,23 @@ export default function AdminFlashSales() {
   const handleToggleActive = async (saleId, currentActive) => {
     try {
       await updateFlashSale({ id: saleId, data: { isActive: !currentActive } });
-      swalToast(`Protocol ${!currentActive ? "Activated" : "Deactivated"}`, "success");
+      swalToast(`Sale ${!currentActive ? "Activated" : "Deactivated"}`, "success");
     } catch (err) {
-      swalError("System Sync Failure", "Status update protocol rejected.");
+      swalError("Error", "Could not update sale status.");
     }
   };
 
   const handleDelete = async (id) => {
     const confirmed = await swalConfirm(
-      "Purge Campaign?",
-      "This promotion will be permanently erased from the neural marketing archives."
+      "Delete Sale?",
+      "Are you sure you want to delete this sale? This action cannot be undone."
     );
     if (confirmed) {
       try {
         await deleteFlashSale(id);
-        swalToast("Campaign Purged", "success");
+        swalToast("Sale Deleted", "success");
       } catch (err) {
-        swalError("Access Denied", "Deletion request blocked by core system.");
+        swalError("Error", "Could not delete sale.");
       }
     }
   };
@@ -75,13 +75,13 @@ export default function AdminFlashSales() {
       <div className="admin-section-header">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-rose-600/30 text-rose-600 bg-rose-600/5 px-3 py-1">Tactical Ops</Badge>
+             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-rose-600/30 text-rose-600 bg-rose-600/5 px-3 py-1">Sales</Badge>
           </div>
           <h1 className="admin-title">
-            Flash <span className="text-rose-600">Drops</span>
+            Flash <span className="text-rose-600">Sales</span>
           </h1>
           <p className="admin-subtitle">
-            Foundry • Active: {flashSales?.filter(s => s.isActive).length || 0}
+            Manage your storefront flash sales: {flashSales?.filter(s => s.isActive).length || 0}
           </p>
         </div>
 
@@ -90,7 +90,7 @@ export default function AdminFlashSales() {
           className="bg-foreground text-background hover:bg-rose-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group w-full md:w-auto"
         >
           <Link href="/admin/flash-sales/new">
-            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Initialize Protocol
+            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Create Sale
           </Link>
         </Button>
       </div>
@@ -118,8 +118,8 @@ export default function AdminFlashSales() {
             <div className="w-24 h-24 rounded-full bg-accent/10 flex items-center justify-center mb-8 opacity-20">
                <Zap size={48} className="text-rose-600" />
             </div>
-            <h2 className="text-3xl font-black uppercase tracking-tighter mb-2">Zero Active Protocols</h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground italic">Launch a new campaign sequence to drive neural engagement</p>
+            <h2 className="text-3xl font-black uppercase tracking-tighter mb-2">No Flash Sales Found</h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground italic">Create a new flash sale to offer limited-time discounts.</p>
           </Card>
         ) : (
           flashSales.map((sale) => {
@@ -139,10 +139,10 @@ export default function AdminFlashSales() {
                   <div className="flex justify-between items-start mb-8">
                     <div className="bg-rose-600 text-white w-20 h-20 rounded-[1.5rem] flex flex-col items-center justify-center shadow-[0_10px_30px_rgba(225,29,72,0.3)] transform -rotate-6 group-hover:rotate-0 transition-transform duration-700">
                       <span className="text-3xl font-black italic">{sale.discount}%</span>
-                      <span className="text-[8px] font-black uppercase tracking-widest -mt-1">BURN</span>
+                      <span className="text-[8px] font-black uppercase tracking-widest -mt-1">OFF</span>
                     </div>
                     <div className="flex flex-col items-end gap-4">
-                      <TacticalStatusBadge status={status} />
+                      <StatusBadge status={status} />
                       <Button
                         variant="outline"
                         size="sm"
@@ -155,7 +155,7 @@ export default function AdminFlashSales() {
                         )}
                       >
                         <Power size={12} className="mr-2" />
-                        {sale.isActive ? "Deactivate" : "Initialize"}
+                        {sale.isActive ? "Deactivate" : "Activate"}
                       </Button>
                     </div>
                   </div>
@@ -168,22 +168,22 @@ export default function AdminFlashSales() {
                   {status === "pending" && (
                     <div className="p-6 bg-accent/5 rounded-[1.5rem] border border-border/5 flex flex-col items-center gap-4">
                        <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest italic flex items-center gap-2">
-                         <Timer size={12} /> Syncing Launch Sequence
+                         <Timer size={12} /> Starting Soon
                        </span>
                        <CountdownTimer targetDate={start} />
                     </div>
                   )}
 
                   <div className="grid grid-cols-1 gap-3">
-                    <DataPoint icon={<Clock size={14} />} label="Inception" value={start.toLocaleString([], { dateStyle: "medium", timeStyle: "short" })} />
-                    <DataPoint icon={<BarChart3 size={14} />} label="Expiration" value={end.toLocaleString([], { dateStyle: "medium", timeStyle: "short" })} />
-                    <DataPoint icon={<Package size={14} />} label="Neural Load" value={`${sale.products?.length || 0} Assets Linked`} />
+                    <DataPoint icon={<Clock size={14} />} label="Starts" value={start.toLocaleString([], { dateStyle: "medium", timeStyle: "short" })} />
+                    <DataPoint icon={<BarChart3 size={14} />} label="Ends" value={end.toLocaleString([], { dateStyle: "medium", timeStyle: "short" })} />
+                    <DataPoint icon={<Package size={14} />} label="Products" value={`${sale.products?.length || 0} Items`} />
                   </div>
 
                   <div className="pt-8 border-t border-border/5 flex items-center gap-4">
                     <Button asChild variant="outline" className="flex-1 h-12 rounded-xl border-border/10 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-all">
                       <Link href={`/admin/flash-sales/${sale._id}`}>
-                        <Edit3 size={14} className="mr-2" /> Modify Config
+                        <Edit3 size={14} className="mr-2" /> Edit
                       </Link>
                     </Button>
                     <Button 

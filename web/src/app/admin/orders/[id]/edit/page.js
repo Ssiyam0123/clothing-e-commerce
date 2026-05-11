@@ -117,7 +117,7 @@ export default function EditOrderPage() {
         } 
       });
       
-      swalToast("Deployment Data Synchronized", "success");
+      swalToast("Order updated successfully", "success");
       router.push(`/admin/orders/${id}`);
     } catch (err) {
       swalError("Sync Failed", err.response?.data?.message || err.message);
@@ -150,12 +150,12 @@ export default function EditOrderPage() {
           <div>
             <div className="flex items-center gap-3 mb-1">
               <Badge className="bg-indigo-600/10 text-indigo-600 border-none px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">
-                Deployment Protocol
+                Edit Order
               </Badge>
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">/ Manifest_Refinement</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">/ Updating Order</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter text-foreground leading-none">
-              Refine Sequence #{id.slice(-8)}
+              Order #{id.slice(-8)}
             </h1>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function EditOrderPage() {
             onClick={() => router.back()}
             className="hidden sm:flex text-[10px] font-black uppercase tracking-widest hover:bg-rose-600/5 hover:text-rose-500"
           >
-            Abort Refinement
+            Cancel
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
@@ -174,7 +174,7 @@ export default function EditOrderPage() {
             className="h-16 px-10 rounded-2xl bg-foreground text-background hover:bg-indigo-600 hover:text-white transition-all duration-500 font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl shadow-indigo-600/20"
           >
             {isSubmitting ? <Loader size="small" className="mr-3" /> : <Save className="mr-3" size={16} />}
-            Synchronize Node
+            Save Changes
           </Button>
         </div>
       </header>
@@ -185,7 +185,7 @@ export default function EditOrderPage() {
           <Card className="rounded-[3rem] border border-border bg-card shadow-sm overflow-hidden">
             <CardHeader className="p-8 pb-4">
                <CardTitle className="text-[11px] font-black uppercase tracking-[0.5em] text-muted-foreground flex items-center gap-3">
-                 <Package size={16} className="text-indigo-600" /> Artifact Manifest
+                 <Package size={16} className="text-indigo-600" /> Products in Order
                </CardTitle>
             </CardHeader>
             <CardContent className="p-8 pt-4 space-y-6">
@@ -244,17 +244,17 @@ export default function EditOrderPage() {
               {items.length === 0 && (
                 <div className="py-20 text-center border-2 border-dashed border-border rounded-[2.5rem] bg-muted/10">
                    <Package className="mx-auto text-muted-foreground/10 mb-6" size={64} strokeWidth={1} />
-                   <p className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.4em]">Zero Artifacts In Manifest</p>
+                   <p className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.4em]">No products in this order</p>
                 </div>
               )}
 
               {/* Artifact Search Overlay */}
               <div className="mt-10 pt-10 border-t border-border">
-                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1 mb-4 block">Inject New Artifact</Label>
+                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1 mb-4 block">Add a Product</Label>
                 <div className="relative">
                   <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground/40" size={20} />
                   <Input
-                    placeholder="ENTER ARTIFACT ID OR NAME..."
+                    placeholder="Search by product name..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="h-16 bg-muted/50 border-border rounded-2xl pl-16 text-[11px] font-black uppercase tracking-[0.2em] focus:ring-2 focus:ring-indigo-600/20 transition-all"
@@ -296,29 +296,29 @@ export default function EditOrderPage() {
           <Card className="rounded-[3rem] border border-border bg-card shadow-sm overflow-hidden">
             <CardHeader className="p-8 pb-4">
                <CardTitle className="text-[11px] font-black uppercase tracking-[0.5em] text-muted-foreground flex items-center gap-3">
-                 <Truck size={16} className="text-indigo-600" /> Deployment Address
+                 <Truck size={16} className="text-indigo-600" /> Shipping Address
                </CardTitle>
             </CardHeader>
             <CardContent className="p-8 pt-4 space-y-6">
               <div className="space-y-6">
                 <div className="grid gap-2">
-                  <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Recipient Identity</Label>
+                  <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Full Name</Label>
                   <Input {...register("name")} className="h-14 bg-muted/30 border-border rounded-xl px-6 text-xs font-bold focus:ring-2 focus:ring-indigo-600/20" />
                 </div>
                 <div className="grid gap-2">
-                  <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Digital Link (Email)</Label>
+                  <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Email Address</Label>
                   <Input {...register("email")} className="h-14 bg-muted/30 border-border rounded-xl px-6 text-xs font-bold focus:ring-2 focus:ring-indigo-600/20" />
                 </div>
                 <div className="grid gap-2">
-                  <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Vocal Link (Phone)</Label>
+                  <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Phone Number</Label>
                   <Input {...register("phone")} className="h-14 bg-muted/30 border-border rounded-xl px-6 text-xs font-bold focus:ring-2 focus:ring-indigo-600/20" />
                 </div>
                 <div className="grid gap-2">
-                  <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Deployment Sector (Street)</Label>
+                  <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Street Address</Label>
                   <Input {...register("street")} className="h-14 bg-muted/30 border-border rounded-xl px-6 text-xs font-bold focus:ring-2 focus:ring-indigo-600/20" />
                 </div>
                 <div className="grid gap-2">
-                  <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">City Hub</Label>
+                  <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">City</Label>
                   <Input {...register("city")} className="h-14 bg-muted/30 border-border rounded-xl px-6 text-xs font-bold focus:ring-2 focus:ring-indigo-600/20" />
                 </div>
               </div>
@@ -328,12 +328,12 @@ export default function EditOrderPage() {
           <Card className="rounded-[3rem] border border-border bg-card shadow-sm overflow-hidden">
             <CardHeader className="p-8 pb-4">
                <CardTitle className="text-[11px] font-black uppercase tracking-[0.5em] text-muted-foreground flex items-center gap-3">
-                 <ShieldAlert size={16} className="text-indigo-600" /> Settlement Protocol
+                 <ShieldAlert size={16} className="text-indigo-600" /> Payment Details
                </CardTitle>
             </CardHeader>
             <CardContent className="p-8 pt-4 space-y-8">
               <div className="grid gap-3">
-                <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Payment Channel</Label>
+                <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Payment Method</Label>
                 <select
                   {...register("paymentMethod")}
                   className="w-full h-14 bg-muted/30 border border-border rounded-xl px-6 text-xs font-bold focus:ring-2 focus:ring-indigo-600/20 outline-none appearance-none cursor-pointer uppercase tracking-widest"
@@ -346,13 +346,13 @@ export default function EditOrderPage() {
 
               <div className="pt-8 border-t border-border flex justify-between items-end">
                  <div className="space-y-1">
-                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Total Settlement</p>
+                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Order Total</p>
                    <p className="text-4xl font-black italic tracking-tighter">
                      ৳{items.reduce((acc, item) => acc + (item.price * item.quantity), 0).toFixed(0)}
                    </p>
                  </div>
                  <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest border-indigo-600/20 text-indigo-600 px-3 py-1 mb-1">
-                   Final Valuation
+                   Total Amount
                  </Badge>
               </div>
             </CardContent>

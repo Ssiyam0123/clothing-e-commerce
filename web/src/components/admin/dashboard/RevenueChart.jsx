@@ -51,7 +51,7 @@ export function RevenueChart({
           <div className="flex flex-col items-center gap-3">
             <RefreshCw size={24} className="text-primary animate-spin" />
             <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary">
-              Syncing...
+              Updating...
             </span>
           </div>
         </div>
@@ -60,7 +60,7 @@ export function RevenueChart({
       <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-0 pb-8 gap-4">
         <div>
           <CardTitle className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">
-            Revenue Trajectory
+            Revenue Overview
           </CardTitle>
           {isLoading ? (
             <Skeleton className="h-4 w-32 mt-1" />

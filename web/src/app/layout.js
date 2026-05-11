@@ -40,9 +40,9 @@ export async function generateMetadata() {
     branding.description ||
     `Discover the latest premium apparel at ${siteName}.`;
   
-  // Use headerLogoDark as primary OG image if available, otherwise Light
-  const ogImage = (branding.headerLogoDark || branding.headerLogoLight)
-    ? getImageUrl(branding.headerLogoDark || branding.headerLogoLight)
+  // Use logoDark as primary OG image if available, otherwise logo
+  const ogImage = (branding.logoDark || branding.logo)
+    ? getImageUrl(branding.logoDark || branding.logo)
     : "/og-image.jpg";
 
   return {

@@ -28,15 +28,15 @@ export const useSubcategories = () => {
 
   const deleteSubcategory = useMutation({
     mutationFn: (id) => api.delete(`/subcategories/${id}`),
-    onSuccess: () => queryClient.invalidateQueries(["subcategories"]),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["subcategories"] }),
   });
 
   return {
     subcategories,
     isLoading,
     error,
-    createSubcategory,
-    updateSubcategory,
-    deleteSubcategory,
+    createSubcategory: createSubcategory.mutateAsync,
+    updateSubcategory: updateSubcategory.mutateAsync,
+    deleteSubcategory: deleteSubcategory.mutateAsync,
   };
 };

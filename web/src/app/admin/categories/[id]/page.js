@@ -73,11 +73,11 @@ export default function CategoryForm() {
 
     try {
       if (isEdit) {
-        await updateCategory.mutateAsync({ id, data: formData });
-        swalToast("Category Updated", "success");
+        await updateCategory({ id, data: formData });
+        swalToast("Category updated", "success");
       } else {
-        await createCategory.mutateAsync(formData);
-        swalToast("Category Created", "success");
+        await createCategory(formData);
+        swalToast("Category created", "success");
       }
       setTimeout(() => router.push("/admin/categories"), 1500);
     } catch (err) {
@@ -106,16 +106,16 @@ export default function CategoryForm() {
           <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
             <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           </div>
-          <span>Return to Vault</span>
+          <span>Back to Categories</span>
         </Button>
       </div>
 
       <div className="admin-section-header">
         <div>
           <h1 className="admin-title">
-            {isEdit ? "Refine" : "Initialize"} <span className="text-muted-foreground/30">Taxonomy</span>
+            {isEdit ? "Edit" : "Create"} <span className="text-muted-foreground/30">Category</span>
           </h1>
-          <p className="admin-subtitle">Structural Configuration Protocol</p>
+          <p className="admin-subtitle">Set up your category details and appearance</p>
         </div>
       </div>
 
@@ -124,7 +124,7 @@ export default function CategoryForm() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Category Designation *</Label>
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Category Name *</Label>
               <Input 
                 {...register("name", { required: true })}
                 className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-primary/20 transition-all"
@@ -132,7 +132,7 @@ export default function CategoryForm() {
               />
             </div>
             <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Unique Path (Slug) *</Label>
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Category URL (Slug) *</Label>
               <Input 
                 {...register("slug", { required: true, pattern: /^[a-z0-9-]+$/ })}
                 className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-primary/20 transition-all text-primary"
@@ -140,22 +140,22 @@ export default function CategoryForm() {
               />
             </div>
             <div className="md:col-span-2 space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Structural Narrative</Label>
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Description</Label>
               <Textarea 
                 {...register("description")}
                 rows={4}
                 className="bg-muted/30 border-border/10 rounded-3xl px-6 py-5 font-medium focus:ring-2 focus:ring-primary/20 resize-none"
-                placeholder="Describe the aesthetic scope..."
+                placeholder="Enter category description..."
               />
             </div>
           </div>
 
           <div className="space-y-6 pt-6 border-t border-border/5">
-            <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Department Cover Asset</Label>
+            <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Category Image</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               <label className="relative h-64 rounded-3xl border-2 border-dashed border-border/20 flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all group overflow-hidden">
                 <Upload size={32} className="mb-3 text-muted-foreground group-hover:text-primary transition-colors" />
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-primary">Inject Asset</span>
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-primary">Add Image</span>
                 <input
                    type="file"
                    accept="image/*"
@@ -170,7 +170,7 @@ export default function CategoryForm() {
                 ) : (
                   <div className="flex flex-col items-center gap-2 opacity-10">
                     <ImageIcon size={48} strokeWidth={1} />
-                    <p className="text-[8px] font-black uppercase tracking-widest italic">Awaiting Asset...</p>
+                    <p className="text-[8px] font-black uppercase tracking-widest italic">No image selected</p>
                   </div>
                 )}
               </div>
@@ -183,7 +183,7 @@ export default function CategoryForm() {
           disabled={isSubmitting}
           className="w-full h-24 bg-foreground text-background hover:bg-primary hover:text-white rounded-[2.5rem] font-black uppercase tracking-[0.5em] text-[12px] shadow-2xl transition-all active:scale-95 group"
         >
-          {isSubmitting ? "Processing Node..." : (isEdit ? "Synchronize Structural Data" : "Initialize Architecture")}
+          {isSubmitting ? "Saving..." : (isEdit ? "Update Category" : "Create Category")}
           <ArrowRight size={20} className="ml-4 group-hover:translate-x-2 transition-transform" />
         </Button>
       </form>

@@ -21,31 +21,31 @@ import { cn } from "@/lib/utils";
 
 const navGroups = [
   {
-    label: "Core Protocol",
+    label: "Management",
     items: [
-      { name: "Command Center", href: "/admin", icon: <LayoutDashboard size={18} /> },
+      { name: "Dashboard", href: "/admin", icon: <LayoutDashboard size={18} /> },
       { name: "Orders", href: "/admin/orders", icon: <ShoppingBag size={18} /> },
       { name: "Products", href: "/admin/products", icon: <Shirt size={18} /> },
       { name: "Categories", href: "/admin/categories", icon: <FolderTree size={18} /> },
-      { name: "Architect", href: "/admin/layout-builder", icon: <Layout size={18} /> },
+      { name: "Layout Builder", href: "/admin/layout-builder", icon: <Layout size={18} /> },
       { name: "Live Chat", href: "/admin/chat", icon: <MessageCircle size={18} /> },
     ]
   },
   {
-    label: "Narrative & Ops",
+    label: "Marketing & Content",
     items: [
-      { name: "Campaigns", href: "/admin/banner-campaigns", icon: <Sparkles size={18} /> },
-      { name: "Flash Drops", href: "/admin/flash-sales", icon: <Zap size={18} /> },
+      { name: "Banners", href: "/admin/banner-campaigns", icon: <Sparkles size={18} /> },
+      { name: "Flash Sales", href: "/admin/flash-sales", icon: <Zap size={18} /> },
       { name: "Coupons", href: "/admin/coupons", icon: <Ticket size={18} /> },
-      { name: "Blog Ledger", href: "/admin/blog", icon: <Bold size={18} /> },
+      { name: "Blog", href: "/admin/blog", icon: <Bold size={18} /> },
     ]
   },
   {
-    label: "System Matrix",
+    label: "Settings & Users",
     items: [
       { name: "Users", href: "/admin/users", icon: <Users size={18} /> },
-      { name: "My Identity", href: "/admin/profile", icon: <User size={18} /> },
-      { name: "Parameters", href: "/admin/settings", icon: <Settings size={18} /> },
+      { name: "Profile", href: "/admin/profile", icon: <User size={18} /> },
+      { name: "Settings", href: "/admin/settings", icon: <Settings size={18} /> },
     ]
   }
 ];
@@ -66,7 +66,7 @@ export default function Sidebar({ className, onItemClick }) {
               Vanguard
             </h2>
             <span className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mt-1 opacity-70">
-              OS Foundry
+              Admin Panel
             </span>
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function Sidebar({ className, onItemClick }) {
       <div className="p-8">
         <div className="bg-sidebar-accent/50 rounded-2xl p-4 border border-sidebar-border">
           <p className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.3em] text-center opacity-60">
-            Vanguard Node v2.0.6
+            Vanguard Admin v2.0.6
           </p>
         </div>
       </div>

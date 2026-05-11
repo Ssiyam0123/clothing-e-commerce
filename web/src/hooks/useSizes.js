@@ -32,5 +32,12 @@ export const useSizes = (categoryId = null) => {
     onSuccess: () => queryClient.invalidateQueries(["sizes"]),
   });
 
-  return { sizes, isLoading, error, createSize, updateSize, deleteSize };
+  return { 
+    sizes, 
+    isLoading, 
+    error, 
+    createSize: createSize.mutateAsync, 
+    updateSize: updateSize.mutateAsync, 
+    deleteSize: deleteSize.mutateAsync 
+  };
 };

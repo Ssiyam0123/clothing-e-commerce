@@ -11,7 +11,7 @@ export function InventoryAlerts({ inventory, isLoading }) {
     <Card className="bg-card rounded-[3rem] border border-border shadow-sm transition-all duration-500">
       <CardHeader>
         <CardTitle className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">
-          Critical Stock Alerts
+          Low Stock Alerts
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -44,7 +44,7 @@ export function InventoryAlerts({ inventory, isLoading }) {
                     : "bg-amber-500/20 text-amber-500"
                   )}
                 >
-                  {item.status === "OUT" ? "Deficit" : "Low Threshold"}
+                  {item.status === "OUT" ? "Out of Stock" : "Low Stock"}
                 </Badge>
               </div>
               <p
@@ -59,14 +59,14 @@ export function InventoryAlerts({ inventory, isLoading }) {
           ))
         ) : (
           <p className="text-center text-muted-foreground text-[10px] font-black uppercase tracking-widest py-12">
-            All stocks healthy
+            Stock levels are normal
           </p>
         )}
         <Link
           href="/admin/products"
           className="block w-full text-center py-4 bg-foreground text-background hover:bg-foreground/90 rounded-2xl font-black text-[10px] uppercase tracking-[0.25em] transition-all shadow-xl"
         >
-          Sync Inventory Vault
+          Manage Inventory
         </Link>
       </CardContent>
     </Card>

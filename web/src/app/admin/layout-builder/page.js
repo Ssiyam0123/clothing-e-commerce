@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   DndContext, 
@@ -43,7 +44,9 @@ import {
   Percent,
   Star,
   ShieldCheck,
-  List
+  List,
+  Copy,
+  LayoutTemplate
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { swalToast, swalError } from "@/utils/swal";
@@ -257,15 +260,40 @@ const DEFAULT_LAYOUT = [
 export default function LayoutBuilderPage() {
   const queryClient = useQueryClient();
   const { categories } = useAdminCategories();
+  const [selectedLayoutId, setSelectedLayoutId] = useState(null);
   const [layout, setLayout] = useState([]);
 
-  const { data: remoteLayout, isLoading: isLayoutLoading } = useQuery({
-    queryKey: ['homeLayout'],
+  // 🏛️ Fetch all architectures
+  const { data: architectures = [], refetch: refetchArchitectures } = useQuery({
+    queryKey: ['architectures'],
     queryFn: async () => {
-      const { data } = await api.get('/home-layouts/active');
-      return data?.sections || DEFAULT_LAYOUT;
+      const { data } = await api.get('/home-layouts/all');
+      return data;
     }
   });
+
+  // 🏗️ Fetch specific selected layout
+  const { data: remoteLayout, isLoading: isLayoutLoading } = useQuery({
+    queryKey: ['homeLayout', selectedLayoutId],
+    queryFn: async () => {
+      if (!selectedLayoutId) {
+        const { data } = await api.get('/home-layouts');
+        return data?.sections || DEFAULT_LAYOUT;
+      }
+      
+      const { data: allLayouts } = await api.get('/home-layouts/all');
+      const found = allLayouts.find(l => l._id === selectedLayoutId);
+      return found?.sections || DEFAULT_LAYOUT;
+    }
+  });
+
+  // 🚀 Initial selection
+  useEffect(() => {
+    if (architectures.length > 0 && !selectedLayoutId) {
+      const active = architectures.find(a => a.isActive);
+      if (active) setSelectedLayoutId(active._id);
+    }
+  }, [architectures, selectedLayoutId]);
 
   const { data: campaigns = [] } = useQuery({
     queryKey: ['campaigns'],
@@ -292,12 +320,42 @@ export default function LayoutBuilderPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (sections) => await api.put('/home-layouts', { sections }),
+    mutationFn: async (sections) => {
+        if (!selectedLayoutId) return;
+        return await api.put(`/home-layouts/${selectedLayoutId}`, { sections });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries(['homeLayout']);
+      queryClient.invalidateQueries(['homeLayout', selectedLayoutId]);
+      queryClient.invalidateQueries(['architectures']);
       swalToast("Blueprint Committed", "success");
     },
     onError: () => swalError("Sync Failure", "Could not persist blueprint.")
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (name) => await api.post('/home-layouts', { name }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(['architectures']);
+      setSelectedLayoutId(data.data._id);
+      swalToast("New Architecture Forged", "success");
+    }
+  });
+
+  const activateMutation = useMutation({
+    mutationFn: async (id) => await api.put(`/home-layouts/${id}/switch`),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['architectures']);
+      queryClient.invalidateQueries(['homeLayout']);
+      swalToast("Architecture Deployed Globally", "success");
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => await api.delete(`/home-layouts/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['architectures']);
+      swalToast("Architecture Scrapped", "info");
+    }
   });
 
   useEffect(() => {
@@ -369,7 +427,7 @@ export default function LayoutBuilderPage() {
   const resetLayout = () => {
     if (remoteLayout) {
       setLayout(remoteLayout);
-      swalToast("Blueprint Reverted", "info");
+      swalToast("Layout Reset", "info");
     }
   };
 
@@ -383,19 +441,84 @@ export default function LayoutBuilderPage() {
 
   return (
     <div className="admin-page-container">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-12">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter italic">Architect</h1>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Blueprint Engine & Sequencer</p>
+      {/* 🏛️ Architecture Selector */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 bg-card/30 p-8 rounded-[2.5rem] border border-border/10 backdrop-blur-xl">
+        <div className="space-y-4">
+            <div>
+              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-2">Design Hub</h2>
+              <p className="text-2xl font-black italic uppercase tracking-tighter">Choose a Layout</p>
+            </div>
+            
+            <div className="flex flex-wrap gap-3">
+                {architectures.map(arch => (
+                    <button
+                        key={arch._id}
+                        onClick={() => setSelectedLayoutId(arch._id)}
+                        className={cn(
+                            "group relative px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-3",
+                            selectedLayoutId === arch._id 
+                                ? "bg-foreground text-background border-foreground shadow-2xl scale-105" 
+                                : "bg-background/50 border-border/10 text-muted-foreground hover:border-primary/40 hover:bg-background"
+                        )}
+                    >
+                        <LayoutTemplate size={14} className={cn(selectedLayoutId === arch._id ? "text-background" : "text-primary")} />
+                        {arch.name}
+                        {arch.isActive && (
+                          <div className="flex items-center gap-1.5 ml-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="text-[7px] text-emerald-500">LIVE</span>
+                          </div>
+                        )}
+                        {selectedLayoutId === arch._id && (
+                          <motion.div layoutId="active-arch" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full" />
+                        )}
+                    </button>
+                ))}
+                
+                <button 
+                    onClick={() => {
+                        const name = prompt("Enter a name for this new layout version:");
+                        if (name) createMutation.mutate(name);
+                    }}
+                    className="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-dashed border-primary/40 text-primary hover:bg-primary/10 transition-all flex items-center gap-3"
+                >
+                    <Plus size={14} /> New Layout Version
+                </button>
+            </div>
         </div>
+
         <div className="flex flex-wrap gap-3">
-          <Button variant="outline" onClick={resetLayout} className="flex-1 md:flex-none rounded-full h-11 px-6 font-black text-[10px] uppercase tracking-widest border-border transition-all">
-            <RefreshCcw size={14} className="mr-2" /> Reset
+          {selectedLayoutId && architectures.find(a => a._id === selectedLayoutId && !a.isActive) && (
+             <Button 
+                onClick={() => activateMutation.mutate(selectedLayoutId)}
+                className="rounded-xl h-14 px-8 font-black text-[10px] uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-xl shadow-emerald-500/20 group"
+             >
+                <Zap size={16} className="mr-3 group-hover:scale-125 transition-transform" />
+                Make This Live
+             </Button>
+          )}
+          
+          <Button variant="outline" onClick={resetLayout} className="rounded-xl h-14 px-6 font-black text-[10px] uppercase tracking-widest border-border/20 hover:bg-muted transition-all">
+            <RefreshCcw size={16} className="mr-3" /> Reset
           </Button>
-          <Button onClick={() => updateMutation.mutate(layout)} disabled={updateMutation.isPending} className="flex-1 md:flex-none rounded-full h-11 px-8 font-black text-[10px] uppercase tracking-widest bg-foreground text-background hover:bg-primary transition-all">
-            {updateMutation.isPending ? <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin mr-2" /> : <Save size={14} className="mr-2" />}
-            {updateMutation.isPending ? "Syncing..." : "Commit Blueprint"}
+
+          <Button onClick={() => updateMutation.mutate(layout)} disabled={updateMutation.isPending} className="rounded-xl h-14 px-10 font-black text-[10px] uppercase tracking-widest bg-foreground text-background hover:bg-primary transition-all shadow-xl">
+            {updateMutation.isPending ? <div className="w-5 h-5 border-2 border-background border-t-transparent rounded-full animate-spin mr-3" /> : <Save size={16} className="mr-3" />}
+            {updateMutation.isPending ? "Saving..." : "Save Layout"}
           </Button>
+
+          {selectedLayoutId && architectures.find(a => a._id === selectedLayoutId && !a.isActive) && (
+             <Button 
+                onClick={() => {
+                    if(confirm("Delete this layout version?")) deleteMutation.mutate(selectedLayoutId);
+                }}
+                variant="ghost"
+                size="icon"
+                className="h-14 w-14 rounded-xl text-destructive hover:bg-destructive/10 border border-destructive/10"
+             >
+                <Trash2 size={20} />
+             </Button>
+          )}
         </div>
       </div>
 
@@ -403,12 +526,12 @@ export default function LayoutBuilderPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-elevated border border-border/50 rounded-[2rem] md:rounded-[2.5rem] p-5 md:p-12 shadow-2xl">
             <header className="mb-8 md:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/50 pb-6">
-              <div>
-                <h3 className="text-lg md:text-xl font-black uppercase tracking-tighter italic">Structural Sequence</h3>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Architectural flow of the storefront</p>
+              <div className="flex flex-col gap-2">
+                <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter italic">Home Designer</h1>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Drag and drop to reorder sections</p>
               </div>
               <Badge variant="outline" className="w-fit rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest bg-primary/5 text-primary border-primary/20">
-                {layout.length} Active Modules
+                {layout.length} Sections
               </Badge>
             </header>
 

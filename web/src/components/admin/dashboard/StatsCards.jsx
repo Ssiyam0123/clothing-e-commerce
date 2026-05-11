@@ -8,28 +8,28 @@ import { cn } from "@/lib/utils";
 export function StatsCards({ revenue, customers, inventory, recentOrdersCount, isLoading }) {
   const stats = [
     {
-      label: "Annual Revenue",
+      label: "Total Sales",
       value: revenue ? `৳${revenue.total.toLocaleString()}` : null,
       icon: <TrendingUp className="h-4 w-4 text-primary" />,
-      description: "Total settlement this year",
+      description: "Total revenue this year",
     },
     {
-      label: "Identities",
+      label: "Customers",
       value: customers?.total,
       icon: <Users className="h-4 w-4 text-primary" />,
       description: "Total registered users",
     },
     {
-      label: "SKU Density",
+      label: "Total Products",
       value: inventory?.totalProducts,
       icon: <Package className="h-4 w-4 text-primary" />,
-      description: "Total products in vault",
+      description: "Total items in stock",
     },
     {
-      label: "Transmission",
+      label: "Recent Orders",
       value: recentOrdersCount,
       icon: <ShoppingCart className="h-4 w-4 text-primary" />,
-      description: "Recent order volume",
+      description: "Order volume recently",
     },
   ];
 

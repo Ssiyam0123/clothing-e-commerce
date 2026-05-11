@@ -149,16 +149,6 @@ export const getAdminProducts = asyncHandler(async (req, res) => {
     const countResult = await Product.aggregate(countPipeline);
     const total = countResult.length > 0 ? countResult[0].total : 0;
 
-    let sortObj = { createdAt: -1 };
-    if (sort === 'price') sortObj = { price: 1 };
-    else if (sort === '-price') sortObj = { price: -1 };
-    else if (sort === 'stockHigh') sortObj = { totalStock: -1 };
-    else if (sort === 'stockLow') sortObj = { totalStock: 1 };
-
-    pipeline.push({ $sort: sortObj });
-    const skip = (Math.max(1, Number(page)) - 1) * Math.max(1, Number(limit));
-    pipeline.push({ $skip: skip }, { $limit: Math.max(1, Number(limit)) });
-
     // Populate full details for Admin
     pipeline.push(
         { $unwind: { path: '$sizes', preserveNullAndEmptyArrays: true } },
@@ -205,6 +195,16 @@ export const getAdminProducts = asyncHandler(async (req, res) => {
         },
         { $unwind: { path: '$subcategory', preserveNullAndEmptyArrays: true } }
     );
+
+    let sortObj = { createdAt: -1, _id: 1 };
+    if (sort === 'price') sortObj = { price: 1, _id: 1 };
+    else if (sort === '-price') sortObj = { price: -1, _id: 1 };
+    else if (sort === 'stockHigh') sortObj = { totalStock: -1, _id: 1 };
+    else if (sort === 'stockLow') sortObj = { totalStock: 1, _id: 1 };
+
+    pipeline.push({ $sort: sortObj });
+    const skip = (Math.max(1, Number(page)) - 1) * Math.max(1, Number(limit));
+    pipeline.push({ $skip: skip }, { $limit: Math.max(1, Number(limit)) });
 
     const products = await Product.aggregate(pipeline);
 

@@ -25,29 +25,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 export default function AdminBannerCampaigns() {
-  const { campaigns, isLoading, deleteCampaign, toggleActive } = useAdminBannerCampaigns();
-
-  const handleToggleActive = async (id) => {
-    try {
-      await toggleActive(id);
-      swalToast("Status Synchronized", "success");
-    } catch (err) {
-      swalError("Sync Failed", "Could not update campaign status.");
-    }
-  };
+  const { campaigns, isLoading, deleteCampaign } = useAdminBannerCampaigns();
 
   const handleDelete = async (id) => {
     const isConfirmed = await swalConfirm(
-      "Purge Campaign?",
-      "This sequence will be permanently removed from the homepage hero archives."
+      "Delete Banner Campaign?",
+      "This campaign will be permanently deleted."
     );
 
     if (isConfirmed) {
       try {
         await deleteCampaign(id);
-        swalToast("Campaign Purged", "success");
+        swalToast("Campaign Deleted", "success");
       } catch (err) {
-        swalError("Action Blocked", "System failure during purge protocol.");
+        swalError("Error", "Could not delete the campaign.");
       }
     }
   };
@@ -58,13 +49,13 @@ export default function AdminBannerCampaigns() {
       <div className="admin-section-header">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-indigo-600/30 text-indigo-600 bg-indigo-600/5 px-3 py-1">Visual Ops</Badge>
+             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-indigo-600/30 text-indigo-600 bg-indigo-600/5 px-3 py-1">Banners</Badge>
           </div>
           <h1 className="admin-title">
-            Hero <span className="text-indigo-600">Archives</span>
+            Banner <span className="text-indigo-600">Campaigns</span>
           </h1>
           <p className="admin-subtitle">
-            Media Deck Orchestration • Active: {campaigns?.filter(c => c.isActive).length || 0}
+            Manage your storefront banners • Active: {campaigns?.filter(c => c.isActive).length || 0}
           </p>
         </div>
 
@@ -73,7 +64,7 @@ export default function AdminBannerCampaigns() {
           className="bg-foreground text-background hover:bg-indigo-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group w-full md:w-auto"
         >
           <Link href="/admin/banner-campaigns/new">
-            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Initialize Deck
+            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Create Banner
           </Link>
         </Button>
       </div>
@@ -101,8 +92,8 @@ export default function AdminBannerCampaigns() {
             <div className="w-24 h-24 rounded-full bg-accent/10 flex items-center justify-center mb-8 opacity-20">
                <Layout size={48} className="text-indigo-600" />
             </div>
-            <h2 className="text-3xl font-black uppercase tracking-tighter mb-2">Zero Narrative Decks</h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground italic">Construct a new campaign deck to drive portal traffic</p>
+            <h2 className="text-3xl font-black uppercase tracking-tighter mb-2">No Banner Campaigns</h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground italic">Create a new banner campaign to display on your homepage.</p>
           </Card>
         ) : (
           campaigns.map((campaign) => (
@@ -119,23 +110,14 @@ export default function AdminBannerCampaigns() {
                       ID: {campaign._id.slice(-8).toUpperCase()}
                     </p>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleToggleActive(campaign._id)}
-                    className={cn(
-                      "h-10 px-5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all",
-                      campaign.isActive 
-                        ? "bg-foreground text-background border-transparent hover:bg-indigo-600 hover:text-white"
-                        : "bg-accent/10 border-border/20 text-muted-foreground hover:border-indigo-600/50 hover:text-indigo-600"
-                    )}
-                  >
-                    <Power size={12} className="mr-2" />
-                    {campaign.isActive ? "Live" : "Inactive"}
-                  </Button>
+                  {campaign.isActive && (
+                    <Badge className="bg-indigo-600 text-white border-none rounded-full px-4 py-1 text-[9px] font-bold uppercase tracking-widest">
+                      In Use
+                    </Badge>
+                  )}
                 </div>
                 <CardDescription className="text-xs font-medium text-muted-foreground line-clamp-2 leading-relaxed">
-                  {campaign.description || "No tactical description provided for this visual sequence."}
+                  {campaign.description || "No description provided."}
                 </CardDescription>
               </CardHeader>
 
@@ -144,10 +126,10 @@ export default function AdminBannerCampaigns() {
                 <div className="bg-accent/5 border border-border/5 rounded-[1.5rem] p-6 relative">
                   <div className="flex items-center justify-between mb-4">
                      <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] flex items-center gap-2">
-                        <FileImage size={12} /> Campaign Asset
+                        <FileImage size={12} /> Banner Image
                      </span>
                      <span className="text-[10px] font-black text-indigo-600 bg-indigo-600/10 px-3 py-0.5 rounded-full uppercase tracking-widest">
-                        Single Plate
+                        Preview
                      </span>
                   </div>
                   <div className="flex overflow-hidden">
@@ -175,7 +157,7 @@ export default function AdminBannerCampaigns() {
                 <div className="flex items-center gap-4">
                   <Button asChild variant="outline" className="flex-1 h-14 rounded-xl border-border/10 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-all">
                     <Link href={`/admin/banner-campaigns/${campaign._id}`}>
-                      <Settings2 size={14} className="mr-2" /> Configure Sequence
+                      <Settings2 size={14} className="mr-2" /> Edit Banner
                     </Link>
                   </Button>
                   <Button 

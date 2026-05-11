@@ -97,9 +97,9 @@ export default function Navbar() {
       <div className="w-full mx-auto flex items-center justify-between gap-2">
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-3 group flex-shrink-0" aria-label={branding.siteName || "Vanguard Home"}>
-          {branding.headerLogoLight || branding.headerLogoDark ? (
+          {branding.logo || branding.logoDark ? (
             <img 
-              src={getImageUrl(theme === 'dark' ? (branding.headerLogoDark || branding.headerLogoLight) : (branding.headerLogoLight || branding.headerLogoDark))} 
+              src={getImageUrl(theme === 'dark' ? (branding.logoDark || branding.logo) : (branding.logo || branding.logoDark))} 
               alt={branding.siteName || "Logo"} 
               className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105 duration-500" 
             />

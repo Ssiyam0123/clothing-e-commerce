@@ -92,8 +92,8 @@ export default function BannerCampaignForm() {
     const mainSlide = formData.slides[0];
     if (!mainSlide?.image) {
       return swalError(
-        "Missing Asset",
-        "Please inject a banner image to proceed.",
+        "Missing Image",
+        "Please upload a banner image.",
       );
     }
 
@@ -123,16 +123,16 @@ export default function BannerCampaignForm() {
     try {
       if (isEdit) {
         await updateCampaign({ id, formData: formDataToSend });
-        swalToast("Deployment Updated", "success");
+        swalToast("Banner Updated", "success");
       } else {
         await createCampaign(formDataToSend);
-        swalToast("Campaign Deployed", "success");
+        swalToast("Banner Created", "success");
       }
       setTimeout(() => router.push("/admin/banner-campaigns"), 1500);
     } catch (err) {
       swalError(
-        "Sync Error",
-        err.response?.data?.message || "Error processing protocol data.",
+        "Error",
+        err.response?.data?.message || "Could not save changes.",
       );
     }
   };
@@ -156,16 +156,16 @@ export default function BannerCampaignForm() {
           <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
             <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           </div>
-          <span>Return to Command Center</span>
+          <span>Back to Banners</span>
         </Button>
       </div>
 
       <div className="admin-section-header">
         <div>
           <h1 className="admin-title">
-            {isEdit ? "Refine" : "Establish"} <span className="text-muted-foreground/30">Campaign</span>
+            {isEdit ? "Edit" : "Create"} <span className="text-muted-foreground/30">Banner</span>
           </h1>
-          <p className="admin-subtitle">Primary visual impact orchestration protocol</p>
+          <p className="admin-subtitle">Manage your banner details and visuals</p>
         </div>
       </div>
 
@@ -176,41 +176,28 @@ export default function BannerCampaignForm() {
             <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">
               <Layers size={20} className="text-indigo-600" />
             </div>
-            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Deployment Identity</h3>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em]">Banner Details</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="space-y-4">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-1">Protocol Name *</label>
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-1">Banner Name *</label>
               <Input 
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g. Summer Matrix 2024"
+                placeholder="e.g. Summer Sale 2024"
                 required
                 className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 text-[11px] font-black uppercase tracking-widest focus:ring-2 focus:ring-indigo-600/20"
               />
             </div>
             <div className="space-y-4">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-1">Protocol Narrative</label>
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-1">Description</label>
               <textarea 
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Strategic objective overview..."
+                placeholder="What is this banner about?"
                 className="w-full h-16 bg-muted/30 border border-border/10 rounded-2xl px-6 py-4 text-[11px] font-bold uppercase tracking-widest focus:ring-2 focus:ring-indigo-600/20 outline-none resize-none"
               />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6 bg-muted/20 p-6 rounded-[2rem] border border-border/5 w-fit">
-            <input
-              type="checkbox"
-              checked={formData.isActive}
-              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-              className="w-6 h-6 rounded-lg border-border/20 text-indigo-600 focus:ring-0 cursor-pointer"
-            />
-            <div className="space-y-1">
-              <p className="text-[10px] font-black uppercase tracking-widest">Active Deployment</p>
-              <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Set as the primary live homepage banner</p>
             </div>
           </div>
         </div>
@@ -219,9 +206,9 @@ export default function BannerCampaignForm() {
         <div className="space-y-8">
           <div className="px-4">
             <h3 className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3">
-              <FileImage size={18} className="text-muted-foreground" /> Banner Asset
+              <FileImage size={18} className="text-muted-foreground" /> Banner Image
             </h3>
-            <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Define the visual impact and messaging</p>
+            <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Upload an image and set your text</p>
           </div>
 
           {formData.slides.map((slide) => {
@@ -234,7 +221,7 @@ export default function BannerCampaignForm() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                   {/* Media Hub */}
                   <div className="lg:col-span-5">
-                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] block mb-4">Hero Visual *</label>
+                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] block mb-4">Main Image *</label>
                     <div className="relative aspect-[16/9] lg:aspect-video rounded-[2rem] overflow-hidden border-2 border-dashed border-border/10 bg-muted/20 group/upload hover:border-indigo-600/30 transition-all cursor-pointer flex flex-col items-center justify-center overflow-hidden">
                       {slide.image ? (
                         <>
@@ -244,13 +231,13 @@ export default function BannerCampaignForm() {
                             alt="Banner Preview"
                           />
                           <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/upload:opacity-100 transition-all">
-                            <span className="text-[9px] font-black text-white uppercase tracking-widest bg-white/10 backdrop-blur-md px-6 py-3 rounded-full border border-white/20">Replace Media</span>
+                            <span className="text-[9px] font-black text-white uppercase tracking-widest bg-white/10 backdrop-blur-md px-6 py-3 rounded-full border border-white/20">Change Image</span>
                           </div>
                         </>
                       ) : (
                         <div className="flex flex-col items-center gap-4 opacity-30 group-hover/upload:opacity-100 transition-all text-center p-4">
                           <ImageIcon size={40} strokeWidth={1} />
-                          <span className="text-[9px] font-black uppercase tracking-widest">Inject 1920x1080 Asset</span>
+                          <span className="text-[9px] font-black uppercase tracking-widest">Upload 1920x1080 image</span>
                         </div>
                       )}
                       <input
@@ -266,7 +253,7 @@ export default function BannerCampaignForm() {
                   <div className="lg:col-span-7 space-y-8">
                     <div className="grid grid-cols-1 gap-8">
                       <div className="space-y-3">
-                        <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Primary Headline</label>
+                        <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Main Title</label>
                         <Input 
                           value={slide.title || ""}
                           onChange={(e) => updateSlide(slideId, "title", e.target.value)}
@@ -275,7 +262,7 @@ export default function BannerCampaignForm() {
                         />
                       </div>
                       <div className="space-y-3">
-                        <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Contextual Subheadline</label>
+                        <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Subtitle</label>
                         <Input 
                           value={slide.subtitle || ""}
                           onChange={(e) => updateSlide(slideId, "subtitle", e.target.value)}
@@ -284,7 +271,7 @@ export default function BannerCampaignForm() {
                         />
                       </div>
                       <div className="space-y-3">
-                        <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Destination URL</label>
+                        <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Link</label>
                         <Input 
                           value={slide.link || ""}
                           onChange={(e) => updateSlide(slideId, "link", e.target.value)}
@@ -302,8 +289,8 @@ export default function BannerCampaignForm() {
           {formData.slides.length === 0 && (
             <div className="admin-table-form py-32 flex flex-col items-center justify-center text-center opacity-30 grayscale">
               <Sparkles size={48} strokeWidth={1} className="mb-6" />
-              <h4 className="text-[10px] font-black uppercase tracking-[0.4em]">Empty Narrative Deck</h4>
-              <p className="text-[8px] font-bold uppercase tracking-widest mt-2">Initialize at least one slide artifact to proceed</p>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.4em]">No Banner Image</h4>
+              <p className="text-[8px] font-bold uppercase tracking-widest mt-2">Upload an image to create this banner.</p>
             </div>
           )}
         </div>
@@ -314,7 +301,7 @@ export default function BannerCampaignForm() {
             type="submit"
             className="flex-1 h-20 bg-foreground text-background hover:bg-indigo-600 hover:text-white rounded-[2rem] font-black uppercase tracking-[0.4em] text-[11px] shadow-2xl transition-all active:scale-95 group"
           >
-            {isEdit ? "Synchronize Configuration" : "Launch Narrative Protocol"}
+            {isEdit ? "Save Changes" : "Create Banner"}
             <ArrowRight size={18} className="ml-3 group-hover:translate-x-2 transition-transform" />
           </Button>
           <Button
@@ -323,7 +310,7 @@ export default function BannerCampaignForm() {
             onClick={() => router.push("/admin/banner-campaigns")}
             className="flex-1 h-20 rounded-[2rem] border-border/10 text-[10px] font-black uppercase tracking-[0.4em] hover:bg-rose-600 hover:text-white transition-all"
           >
-            Discard & Abort
+            Cancel
           </Button>
         </div>
       </form>

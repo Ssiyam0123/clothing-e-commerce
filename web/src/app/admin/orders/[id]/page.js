@@ -115,7 +115,7 @@ export default function OrderDetailsPage() {
             href="/admin/orders"
             className="text-[10px] font-black text-muted-foreground hover:text-primary uppercase tracking-[0.3em] flex items-center gap-2 transition-all group"
           >
-            <ChevronLeft size={12} className="group-hover:-translate-x-1 transition-transform" /> Order Archives
+            <ChevronLeft size={12} className="group-hover:-translate-x-1 transition-transform" /> Orders History
           </Link>
           <div className="flex items-center gap-4">
             <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter uppercase italic">
@@ -137,7 +137,7 @@ export default function OrderDetailsPage() {
             className="h-14 border-border bg-muted/30 hover:bg-foreground hover:text-background rounded-2xl px-8 text-[10px] font-black uppercase tracking-widest transition-all"
           >
             <Link href={`/admin/orders/${id}/edit`}>
-              Edit Protocol
+              Edit Order
             </Link>
           </Button>
 
@@ -193,7 +193,7 @@ export default function OrderDetailsPage() {
           <Card className="rounded-[2.5rem] border-border bg-card p-4 md:p-8 shadow-sm">
             <CardHeader className="px-4 pb-10">
               <CardTitle className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] border-b border-border pb-4">
-                01. Artifact Manifest
+                01. Products Ordered
               </CardTitle>
             </CardHeader>
 
@@ -249,7 +249,7 @@ export default function OrderDetailsPage() {
                     </span>
                   </div>
                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                    <span>Logistics Fee</span>
+                    <span>Delivery Charge</span>
                     <span className="text-foreground">
                       ৳{order.shippingPrice?.toFixed(0)}
                     </span>
@@ -263,7 +263,7 @@ export default function OrderDetailsPage() {
                 </div>
                 <div className="md:text-right md:border-l border-border md:pl-12">
                   <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] mb-2">
-                    Total Settlement
+                    Grand Total
                   </p>
                   <p className="text-6xl md:text-7xl font-black text-foreground tracking-tighter leading-none italic">
                     ৳{order.totalPrice.toFixed(0)}
@@ -283,7 +283,7 @@ export default function OrderDetailsPage() {
           {/* CUSTOMER INTELLIGENCE */}
           <Card className="rounded-[2.5rem] border-border bg-card p-8 shadow-sm">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] mb-8">
-              02. Identity Profile
+              02. Customer Info
             </h3>
             <div className="flex items-center gap-5 mb-10">
               <div className="h-20 w-20 rounded-[2rem] bg-muted flex items-center justify-center font-black text-muted-foreground border border-border text-3xl shadow-inner overflow-hidden uppercase">
@@ -304,7 +304,7 @@ export default function OrderDetailsPage() {
                   variant="outline"
                   className={cn("text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border mt-1", isRegistered ? "bg-primary/10 text-primary border-primary/20" : "bg-muted text-muted-foreground border-border")}
                 >
-                  {isRegistered ? "Verified Member" : "Guest Identity"}
+                  {isRegistered ? "Registered User" : "Guest User"}
                 </Badge>
               </div>
             </div>
@@ -314,7 +314,7 @@ export default function OrderDetailsPage() {
                 <Mail size={16} className="text-muted-foreground mt-1" />
                 <div>
                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">
-                    Neural Address
+                    Email Address
                   </p>
                   <p className="text-xs font-bold text-foreground break-all">
                     {customerEmail}
@@ -325,7 +325,7 @@ export default function OrderDetailsPage() {
                 <Phone size={16} className="text-muted-foreground mt-1" />
                 <div>
                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">
-                    Contact Link
+                    Phone Number
                   </p>
                   <p className="text-xs font-bold text-foreground">
                     {order.shippingAddress.phone}
@@ -336,7 +336,7 @@ export default function OrderDetailsPage() {
                 <MapPin size={16} className="text-muted-foreground mt-1" />
                 <div>
                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">
-                    Deployment Base
+                    Delivery Address
                   </p>
                   <p className="text-xs font-bold text-foreground leading-relaxed uppercase">
                     {order.shippingAddress.address}
@@ -349,12 +349,12 @@ export default function OrderDetailsPage() {
           {/* PAYMENT METADATA */}
           <Card className="bg-muted/30 rounded-[2.5rem] border-border p-8 shadow-inner">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] mb-6">
-              03. Financial Metadata
+              03. Payment Details
             </h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center py-3 border-b border-border">
                 <span className="text-[10px] font-black text-muted-foreground uppercase">
-                  Clearance Status
+                  Payment Status
                 </span>
                 <div className="flex items-center gap-2">
                   <div
@@ -370,7 +370,7 @@ export default function OrderDetailsPage() {
               {order.paymentResult?.transactionId && (
                 <div className="pt-2">
                   <p className="text-[9px] font-black text-muted-foreground uppercase mb-2">
-                    Sequence ID
+                    Transaction ID
                   </p>
                   <p className="font-mono text-[10px] font-bold text-foreground break-all bg-card p-4 rounded-2xl border border-border">
                     {order.paymentResult.transactionId}

@@ -22,7 +22,7 @@ export function CategoryPie({ categories, isFetching, isLoading }) {
       )}
       <CardHeader>
         <CardTitle className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] text-center">
-          Market Share
+          Sales by Category
         </CardTitle>
       </CardHeader>
       <CardContent>
