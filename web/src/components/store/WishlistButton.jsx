@@ -2,7 +2,7 @@
 
 import React, { memo, useCallback } from "react";
 import { useProductStore } from "@/store/productStore";
-import { swalToast } from "@/utils/swal";
+import { notify } from "@/utils/swal";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "@/store/authStore";
@@ -31,15 +31,14 @@ const WishlistButton = memo(({ product, lang }) => {
 
     // ২. মেসেজ (টোস্ট মেসেজ ব্রাউজারের থ্রেড কিছুটা ব্লক করে, তাই এটি অপশনাল রাখতে পারিস)
     const isBn = lang === "bn";
-    swalToast(
+    notify.success(
       inWishlist
         ? isBn
           ? "সরানো হয়েছে"
           : "Removed"
         : isBn
           ? "যোগ হয়েছে"
-          : "Added",
-      "success",
+          : "Added"
     );
   };
 

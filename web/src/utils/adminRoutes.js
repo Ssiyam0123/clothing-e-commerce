@@ -24,7 +24,7 @@ export const navGroups = [
       { name: "Orders", href: "/admin/orders", icon: <ShoppingBag size={18} />, permission: "orders:view" },
       { name: "Products", href: "/admin/products", icon: <Shirt size={18} />, permission: "products:view" },
       { name: "Categories", href: "/admin/categories", icon: <FolderTree size={18} />, permission: "categories:view" },
-      { name: "Layout Builder", href: "/admin/layout-builder", icon: <Layout size={18} />, permission: "settings:manage" },
+      { name: "Layout Builder", href: "/admin/layout-builder", icon: <Layout size={18} />, permission: "homeLayout:view" },
       { name: "Live Chat", href: "/admin/chat", icon: <MessageCircle size={18} />, permission: "chat:view" },
     ]
   },

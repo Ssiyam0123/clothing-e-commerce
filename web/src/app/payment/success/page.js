@@ -14,13 +14,46 @@ import {
   MapPin,
   FileText
 } from "lucide-react";
-import Loader from "@/components/common/Loader";
 import { useProductStore } from "@/store/productStore";
+import { getTranslation } from "@/utils/typography/handler";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+
+
+function SuccessSkeleton() {
+  return (
+    <div className="success-page-wrapper">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-16 space-y-4">
+          <div className="flex justify-center">
+             <Skeleton className="w-20 h-20 rounded-full" />
+          </div>
+          <Skeleton className="h-12 w-3/4 mx-auto rounded-xl" />
+          <Skeleton className="h-4 w-1/2 mx-auto rounded-full" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2 space-y-6">
+            <Skeleton className="h-[400px] w-full rounded-3xl" />
+          </div>
+          <div className="space-y-6">
+            <Skeleton className="h-40 w-full rounded-3xl" />
+            <Skeleton className="h-40 w-full rounded-3xl" />
+            <Skeleton className="h-32 w-full rounded-2xl" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const orderId = searchParams.get("orderId");
+  
+  // Get language from cookies (simple client-side check)
+  const lang = typeof document !== 'undefined' ? document.cookie.split('; ').find(row => row.startsWith('vanguard-lang='))?.split('=')[1] || "en" : "en";
+  const t = getTranslation('success', lang);
 
   const { orderDetails: order, orderDetailsLoading: isLoading } = useOrders(orderId);
   const { clearCart } = useProductStore();
@@ -35,152 +68,188 @@ function SuccessContent() {
     }
   }, [order, isLoading, clearCart]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader />
-      </div>
-    );
-  }
+  if (isLoading) return <SuccessSkeleton />;
 
   if (!order)
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center font-sans tracking-tight">
-        <Package size={48} className="mb-4 text-muted-foreground opacity-20" />
-        <h2 className="text-xl font-bold">Order Not Found</h2>
-        <p className="text-sm text-muted-foreground mt-2">We couldn't retrieve your order details.</p>
-        <button 
-          onClick={() => router.push("/")}
-          className="mt-6 px-8 py-3 bg-foreground text-background rounded-full text-xs font-bold uppercase tracking-widest"
+      <div className="min-h-screen flex flex-col items-center justify-center font-sans tracking-tight p-6 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center"
         >
-          Return Home
-        </button>
+          <Package size={64} className="mb-6 text-muted-foreground opacity-20" />
+          <h2 className="text-2xl font-black uppercase italic tracking-tighter">{t.orderNotFound}</h2>
+          <p className="text-sm text-muted-foreground mt-2 font-medium max-w-xs">{t.orderNotFoundMsg}</p>
+          <button 
+            onClick={() => router.push("/")}
+            className="mt-8 px-10 py-4 bg-foreground text-background rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl hover:scale-105 transition-all"
+          >
+            {t.returnHome}
+          </button>
+        </motion.div>
       </div>
     );
 
+  const isBn = lang === 'bn';
+
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#080808] py-16 px-4">
+    <div className="success-page-wrapper">
       <div className="max-w-4xl mx-auto">
         {/* Success Banner */}
         <div className="text-center mb-16">
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="inline-flex items-center justify-center w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full mb-8"
+            className="success-icon-container"
           >
             <CheckCircle2 size={40} />
           </motion.div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-            Thank You for Your Order
-          </h1>
-          <p className="text-muted-foreground text-sm max-w-md mx-auto leading-relaxed">
-            Your acquisition sequence is confirmed. We are now preparing your artifacts for delivery.
-          </p>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className={cn("success-title", isBn && "font-sans normal-case italic-none")}
+          >
+            {t.thankYou}
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="success-subtitle"
+          >
+            {t.confirmationMsg}
+          </motion.p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Order Details */}
           <div className="md:col-span-2 space-y-6">
-            <div className="bg-white dark:bg-[#111] rounded-3xl p-8 shadow-sm border border-border/40">
-              <div className="flex items-center justify-between mb-8 pb-6 border-b">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="success-card"
+            >
+              <div className="flex items-center justify-between mb-8 pb-6 border-b border-border/10">
                 <div className="flex items-center gap-3">
-                  <FileText size={18} className="text-muted-foreground" />
-                  <span className="text-xs font-bold uppercase tracking-widest">Order Summary</span>
+                  <FileText size={18} className="text-primary" />
+                  <span className={cn("text-[10px] font-black uppercase tracking-[0.3em]", isBn && "font-bold tracking-normal")}>
+                    {t.orderSummary}
+                  </span>
                 </div>
-                <span className="text-[10px] font-mono bg-accent/10 px-3 py-1 rounded-full">
+                <span className="text-[10px] font-black font-mono bg-primary text-background px-4 py-1.5 rounded-full shadow-lg">
                   #{order._id?.slice(-8).toUpperCase()}
                 </span>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {order.orderItems?.map((item, idx) => (
-                  <div key={idx} className="flex gap-4 items-center">
-                    <div className="w-16 h-20 rounded-xl overflow-hidden bg-accent/5 border shrink-0">
+                  <div key={idx} className="success-item-card">
+                    <div className="success-item-image">
                       <img
                         src={getImageUrl(item.image)}
                         className="w-full h-full object-cover"
-                        alt=""
+                        alt={item.name}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold uppercase truncate">{item.name}</p>
-                      <p className="text-[10px] text-muted-foreground font-medium mt-1 uppercase">
-                        Size: {item.size?.name || item.size || "Standard"} • Qty: {item.quantity}
+                      <p className={cn("text-xs font-black uppercase truncate", isBn && "font-bold tracking-tight")}>
+                        {item.name}
+                      </p>
+                      <p className="text-[9px] text-muted-foreground font-bold mt-1 uppercase tracking-widest">
+                        {isBn ? 'সাইজ' : 'Size'}: {item.size?.name || item.size || "Standard"} • {isBn ? 'পরিমাণ' : 'Qty'}: {item.quantity}
                       </p>
                     </div>
-                    <p className="text-sm font-bold">
-                      ৳{(item.price * item.quantity).toFixed(0)}
+                    <p className="text-sm font-black">
+                      ৳{(item.price * item.quantity).toLocaleString()}
                     </p>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-8 pt-6 border-t space-y-3">
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Subtotal</span>
-                  <span>৳{order.itemsPrice}</span>
+              <div className="mt-8 pt-6 border-t border-border/10 space-y-3">
+                <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  <span>{t.subtotal}</span>
+                  <span className="text-foreground">৳{order.itemsPrice?.toLocaleString()}</span>
                 </div>
                 {order.discountAmount > 0 && (
-                  <div className="flex justify-between text-xs text-emerald-500">
-                    <span>Discount Applied</span>
-                    <span>-৳{order.discountAmount}</span>
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-emerald-500">
+                    <span>{t.discount}</span>
+                    <span>-৳{order.discountAmount?.toLocaleString()}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Shipping</span>
-                  <span>৳{order.shippingPrice}</span>
+                <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  <span>{t.shipping}</span>
+                  <span className="text-foreground">৳{order.shippingPrice?.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between items-center pt-4 text-lg font-black uppercase tracking-tighter">
-                  <span>Total Investment</span>
-                  <span className="text-2xl">৳{order.totalPrice}</span>
+                <div className="success-total-row">
+                  <span className={isBn ? "font-bold" : ""}>{t.total}</span>
+                  <span className="text-3xl">৳{order.totalPrice?.toLocaleString()}</span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Logistics Summary */}
           <div className="space-y-6">
-            <div className="bg-white dark:bg-[#111] rounded-3xl p-8 shadow-sm border border-border/40">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+              className="success-card"
+            >
               <div className="flex items-center gap-3 mb-6">
-                <MapPin size={18} className="text-muted-foreground" />
-                <span className="text-xs font-bold uppercase tracking-widest">Shipping</span>
+                <MapPin size={18} className="text-primary" />
+                <span className={cn("text-[10px] font-black uppercase tracking-[0.3em]", isBn && "font-bold tracking-normal")}>
+                  {t.shippingDetails}
+                </span>
               </div>
               <div className="space-y-2">
-                <p className="text-xs font-bold uppercase">{order.shippingAddress?.name}</p>
-                <p className="text-[10px] text-muted-foreground leading-relaxed uppercase">
+                <p className="text-xs font-black uppercase tracking-tight">{order.shippingAddress?.name}</p>
+                <p className="text-[10px] text-muted-foreground font-medium leading-relaxed uppercase tracking-wider">
                   {order.shippingAddress?.address}
                 </p>
-                <p className="text-[10px] font-bold mt-4 text-primary">
+                <div className="h-px w-8 bg-primary/20 my-4" />
+                <p className="text-xs font-black text-primary">
                   {order.shippingAddress?.phone}
                 </p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="bg-white dark:bg-[#111] rounded-3xl p-8 shadow-sm border border-border/40">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+              className="success-card"
+            >
               <div className="flex items-center gap-3 mb-6">
-                <Clock size={18} className="text-muted-foreground" />
-                <span className="text-xs font-bold uppercase tracking-widest">Payment</span>
+                <Clock size={18} className="text-primary" />
+                <span className={cn("text-[10px] font-black uppercase tracking-[0.3em]", isBn && "font-bold tracking-normal")}>
+                  {t.paymentDetails}
+                </span>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-bold uppercase">{order.paymentMethod}</p>
-                <p className="text-[10px] text-muted-foreground uppercase">
-                  Status: {order.paymentResult?.status || "Processing"}
+                <p className="text-xs font-black uppercase tracking-tight">{order.paymentMethod}</p>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
+                  {t.status}: <span className="text-emerald-500">{order.paymentResult?.status || (isBn ? "প্রসেসিং" : "Processing")}</span>
                 </p>
               </div>
-            </div>
+            </motion.div>
 
             <div className="pt-4 space-y-4">
               <button
                 onClick={() => router.push("/profile/order")}
-                className="w-full py-4 bg-foreground text-background rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+                className="w-full py-5 bg-foreground text-background rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-xl"
               >
-                Track Order <ArrowRight size={14} />
+                {t.trackOrder} <ArrowRight size={14} />
               </button>
               <button
                 onClick={() => router.push("/products")}
-                className="w-full py-4 bg-accent/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-accent/20 transition-all"
+                className="w-full py-5 bg-accent/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-accent/20 transition-all border border-border/10"
               >
-                <ShoppingBag size={14} /> Continue Shopping
+                <ShoppingBag size={14} /> {t.continueShopping}
               </button>
             </div>
           </div>
@@ -192,14 +261,9 @@ function SuccessContent() {
 
 export default function PaymentSuccessPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="h-screen flex items-center justify-center bg-background">
-          <Loader />
-        </div>
-      }
-    >
+    <Suspense fallback={<SuccessSkeleton />}>
       <SuccessContent />
     </Suspense>
   );
 }
+

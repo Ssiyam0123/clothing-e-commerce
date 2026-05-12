@@ -1,0 +1,36 @@
+{
+  "en": {
+    "thankYou": "Thank You for Your Order",
+    "confirmationMsg": "Your acquisition sequence is confirmed. We are now preparing your artifacts for delivery.",
+    "orderSummary": "Order Summary",
+    "subtotal": "Subtotal",
+    "discount": "Discount Applied",
+    "shipping": "Shipping",
+    "total": "Total Investment",
+    "shippingDetails": "Shipping Details",
+    "paymentDetails": "Payment Details",
+    "status": "Status",
+    "trackOrder": "Track Order",
+    "continueShopping": "Continue Shopping",
+    "orderNotFound": "Order Not Found",
+    "orderNotFoundMsg": "We couldn't retrieve your order details.",
+    "returnHome": "Return Home"
+  },
+  "bn": {
+    "thankYou": "আপনার অর্ডারের জন্য ধন্যবাদ",
+    "confirmationMsg": "আপনার অর্ডারটি সফলভাবে গৃহীত হয়েছে। আমরা খুব শীঘ্রই আপনার পণ্যগুলো পৌঁছে দেওয়ার ব্যবস্থা করছি।",
+    "orderSummary": "অর্ডারের সারসংক্ষেপ",
+    "subtotal": "উপমোট",
+    "discount": "ডিসকাউন্ট",
+    "shipping": "ডেলিভারি চার্জ",
+    "total": "মোট পরিমাণ",
+    "shippingDetails": "ডেলিভারি ঠিকানা",
+    "paymentDetails": "পেমেন্ট তথ্য",
+    "status": "অবস্থা",
+    "trackOrder": "অর্ডার ট্র্যাক করুন",
+    "continueShopping": "আরও কেনাকাটা করুন",
+    "orderNotFound": "অর্ডার পাওয়া যায়নি",
+    "orderNotFoundMsg": "আমরা আপনার অর্ডারের তথ্য খুঁজে পাচ্ছি না।",
+    "returnHome": "হোমপেজে ফিরে যান"
+  }
+}

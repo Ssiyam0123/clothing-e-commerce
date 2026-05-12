@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Mail, Send, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { swalToast, swalError } from "@/utils/swal";
+import { notify } from "@/utils/swal";
 
 export default function Newsletter({ lang = "en" }) {
   const [email, setEmail] = useState("");
@@ -20,10 +20,10 @@ export default function Newsletter({ lang = "en" }) {
       // Mock API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       setIsSuccess(true);
-      swalToast("Transmission Successful", "success");
+      notify.success("Subscribed Successfully");
       setEmail("");
     } catch (err) {
-      swalError("Sync Failed", "Could not join the sequence.");
+      notify.error("Error", "Please try again later.");
     } finally {
       setIsSubmitting(false);
     }

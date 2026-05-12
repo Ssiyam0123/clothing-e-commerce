@@ -30,15 +30,32 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
+import { notify } from "@/utils/swal";
 import { cn } from "@/lib/utils";
 
 const RESOURCES = [
   "dashboard", "products", "categories", "orders", "users", "roles", 
-  "coupons", "blogs", "settings", "banner-campaigns", "flash-sales", "chat", "reports"
+  "coupons", "blogs", "settings", "banner-campaigns", "flash-sales", "chat", "reports", "homeLayout"
 ];
 
 const ACTIONS = ["view", "create", "update", "delete", "manage"];
+
+const RESOURCE_LABELS = {
+  "dashboard": "Dashboard",
+  "products": "Products",
+  "categories": "Categories",
+  "orders": "Orders",
+  "users": "Users",
+  "roles": "Roles",
+  "coupons": "Coupons",
+  "blogs": "Blogs",
+  "settings": "Settings",
+  "banner-campaigns": "Banners",
+  "flash-sales": "Flash Sales",
+  "chat": "Live Chat",
+  "reports": "Reports",
+  "homeLayout": "Layout Builder"
+};
 
 export default function RolesPage() {
   const queryClient = useQueryClient();
@@ -63,7 +80,7 @@ export default function RolesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries(["roles"]);
       checkSession(); // Refresh current user permissions
-      toast.success("Role created successfully");
+      notify.success("Role created successfully");
       setView("list");
     },
     onError: (err) => toast.error(err.response?.data?.message || "Failed to create role")
@@ -74,7 +91,7 @@ export default function RolesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries(["roles"]);
       checkSession(); // Refresh current user permissions
-      toast.success("Role updated successfully");
+      notify.success("Role updated successfully");
       setView("list");
     },
     onError: (err) => toast.error(err.response?.data?.message || "Failed to update role")
@@ -84,9 +101,9 @@ export default function RolesPage() {
     mutationFn: (id) => api.delete(`/roles/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries(["roles"]);
-      toast.success("Role deleted successfully");
+      notify.success("Role deleted successfully");
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Failed to delete role")
+    onError: (error) => notify.error(error.response?.data?.message || "Failed to delete role"),
   });
 
   const handleStartAdd = () => {
@@ -135,7 +152,7 @@ export default function RolesPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) return toast.error("Role name is required");
+    if (!formData.name.trim()) return notify.error("Role name is required");
 
     if (view === "edit" && editingRole) {
       updateMutation.mutate({ id: editingRole._id, data: formData });
@@ -144,8 +161,13 @@ export default function RolesPage() {
     }
   };
 
-  const handleDelete = (id) => {
-    if (confirm("Are you sure you want to delete this role?")) {
+  const handleDelete = async (id) => {
+    const confirmed = await notify.confirm(
+      "Terminate Role?",
+      "This action will immediately revoke all associated administrative privileges. This protocol cannot be easily reversed."
+    );
+    
+    if (confirmed) {
       deleteMutation.mutate(id);
     }
   };
@@ -158,7 +180,7 @@ export default function RolesPage() {
           <div className="space-y-2">
             <div className="flex items-center gap-3 text-primary">
               <Shield size={20} className="animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-70">Security Protocol</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-70">Admin Access</span>
             </div>
             <h1 className="text-5xl sm:text-6xl font-black uppercase italic tracking-tighter text-gradient leading-none">
               Role Management
@@ -228,7 +250,7 @@ export default function RolesPage() {
                     <div className="flex flex-wrap gap-1.5">
                       {role.name === "superadmin" ? (
                         <Badge className="bg-rose-500/10 text-rose-500 border-none text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full animate-pulse">
-                          Omnipotent
+                          Full Access
                         </Badge>
                       ) : (
                         <Badge variant="secondary" className="bg-accent/30 text-foreground border-none text-[9px] font-bold px-2 py-0.5 rounded-lg">
@@ -340,7 +362,7 @@ export default function RolesPage() {
         <div className="bg-card/40 backdrop-blur-2xl rounded-[2.5rem] border border-border/10 p-8 md:p-12">
           <div className="flex items-center justify-between mb-10">
             <div className="space-y-1">
-              <h2 className="text-2xl font-black uppercase italic tracking-tight">Access Control Matrix</h2>
+              <h2 className="text-2xl font-black uppercase italic tracking-tight">Permissions Matrix</h2>
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                 Selected Permissions: <span className="text-primary font-black">{formData.permissions.length}</span>
               </p>
@@ -361,7 +383,9 @@ export default function RolesPage() {
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-[11px] font-black uppercase tracking-widest text-foreground">{resource}</h3>
+                        <h3 className="text-[11px] font-black uppercase tracking-widest text-foreground">
+                          {RESOURCE_LABELS[resource] || resource}
+                        </h3>
                         {isLocked && <Lock size={12} className="text-muted-foreground/50" />}
                       </div>
                       <button

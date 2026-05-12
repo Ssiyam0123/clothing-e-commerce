@@ -49,7 +49,7 @@ import {
   LayoutTemplate
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { swalToast, swalError } from "@/utils/swal";
+import { notify } from "@/utils/swal";
 import api from "@/lib/api";
 import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
 
@@ -327,9 +327,9 @@ export default function LayoutBuilderPage() {
     onSuccess: () => {
       queryClient.invalidateQueries(['homeLayout', selectedLayoutId]);
       queryClient.invalidateQueries(['architectures']);
-      swalToast("Blueprint Committed", "success");
+      notify.success("Blueprint Committed");
     },
-    onError: () => swalError("Sync Failure", "Could not persist blueprint.")
+    onError: () => notify.error("Sync Failure", "Could not persist blueprint.")
   });
 
   const createMutation = useMutation({
@@ -337,7 +337,7 @@ export default function LayoutBuilderPage() {
     onSuccess: (data) => {
       queryClient.invalidateQueries(['architectures']);
       setSelectedLayoutId(data.data._id);
-      swalToast("New Architecture Forged", "success");
+      notify.success("New Architecture Forged");
     }
   });
 
@@ -346,7 +346,7 @@ export default function LayoutBuilderPage() {
     onSuccess: () => {
       queryClient.invalidateQueries(['architectures']);
       queryClient.invalidateQueries(['homeLayout']);
-      swalToast("Architecture Deployed Globally", "success");
+      notify.success("Architecture Deployed Globally");
     }
   });
 
@@ -354,7 +354,7 @@ export default function LayoutBuilderPage() {
     mutationFn: async (id) => await api.delete(`/home-layouts/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries(['architectures']);
-      swalToast("Architecture Scrapped", "info");
+      notify.info("Architecture Scrapped");
     }
   });
 
@@ -421,13 +421,13 @@ export default function LayoutBuilderPage() {
       config: config
     };
     setLayout(prev => [...prev, newSection]);
-    swalToast(`${type.replace(/_/g, ' ')} Added`, "success");
+    notify.success(`${type.replace(/_/g, ' ')} Added`);
   };
 
   const resetLayout = () => {
     if (remoteLayout) {
       setLayout(remoteLayout);
-      swalToast("Layout Reset", "info");
+      notify.info("Layout Reset");
     }
   };
 
@@ -509,8 +509,9 @@ export default function LayoutBuilderPage() {
 
           {selectedLayoutId && architectures.find(a => a._id === selectedLayoutId && !a.isActive) && (
              <Button 
-                onClick={() => {
-                    if(confirm("Delete this layout version?")) deleteMutation.mutate(selectedLayoutId);
+                onClick={async () => {
+                    const confirmed = await notify.confirm("Delete this layout version?", "This architecture blueprint will be permanently scrapped.");
+                    if(confirmed) deleteMutation.mutate(selectedLayoutId);
                 }}
                 variant="ghost"
                 size="icon"

@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: { type: Date, select: false },
 }, { timestamps: true });
 
+userSchema.index({ createdAt: -1 });
+userSchema.index({ name: 1 });
+
+
 // ✅ Correct async pre-save hook (no next)
 userSchema.pre("save", async function() {
   if (!this.isModified("password")) return;

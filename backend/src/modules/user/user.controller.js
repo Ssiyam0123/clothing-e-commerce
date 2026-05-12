@@ -108,7 +108,9 @@ export const getAllUsers = asyncHandler(async (req, res) => {
     .populate("role")
     .sort(sortOrder)
     .limit(Number(limit))
-    .skip((Number(page) - 1) * Number(limit));
+    .skip((Number(page) - 1) * Number(limit))
+    .allowDiskUse();
+
 
   res.json({
     users,

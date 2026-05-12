@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import StarRating from "./StarRating";
 import Loader from "../common/Loader";
 import { getImageUrl } from "@/utils/imageUtils";
-import { swalConfirm, swalToast, swalError } from "@/utils/swal";
+import { notify } from "@/utils/swal";
 import { useAppStore } from "@/store/appStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/store/authStore";
@@ -150,9 +150,9 @@ export default function ReviewSection({ productId, onReviewChange }) {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (images.length + files.length > 5) {
-      return swalError(
+      return notify.error(
         "Limit Exceeded",
-        "Maximum 5 images allowed per review.",
+        "Maximum 5 images allowed per review."
       );
     }
     setImages((prev) => [...prev, ...files]);
@@ -173,9 +173,9 @@ export default function ReviewSection({ productId, onReviewChange }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!comment.trim())
-      return swalError(
+      return notify.error(
         "Missing Comment",
-        "Please write a brief description of your experience.",
+        "Please write a brief description of your experience."
       );
 
     setIsSubmitting(true);
@@ -190,17 +190,17 @@ export default function ReviewSection({ productId, onReviewChange }) {
     try {
       if (userReview && isEditing) {
         await updateReview({ reviewId: userReview._id, data: formData });
-        swalToast("Feedback Updated", "success");
+        notify.success("Feedback Updated");
       } else {
         await createReview(formData);
-        swalToast("Feedback Published", "success");
+        notify.success("Feedback Published");
       }
       handleCancel();
       if (onReviewChange) onReviewChange();
     } catch (error) {
-      swalError(
+      notify.error(
         "Publication Failed",
-        error.response?.data?.message || ui.error,
+        error.response?.data?.message || ui.error
       );
     } finally {
       setIsSubmitting(false);
@@ -208,17 +208,17 @@ export default function ReviewSection({ productId, onReviewChange }) {
   };
 
   const handleDelete = async () => {
-    const confirmed = await swalConfirm(
+    const confirmed = await notify.confirm(
       ui.confirmDelete,
-      "This action is irreversible.",
+      "This action is irreversible."
     );
     if (confirmed) {
       try {
         await deleteReview(userReview._id);
-        swalToast("Feedback Removed", "success");
+        notify.success("Feedback Removed");
         if (onReviewChange) onReviewChange();
       } catch (error) {
-        swalError("Delete Error", "Could not remove the feedback.");
+        notify.error("Delete Error", "Could not remove the feedback.");
       }
     }
   };

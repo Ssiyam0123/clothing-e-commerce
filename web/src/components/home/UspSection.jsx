@@ -10,7 +10,7 @@ const UspSkeleton = () => (
   </div>
 );
 
-export default function UspSection({ ui, lang = "en" }) {
+export default function UspSection({ config, lang = "en" }) {
   const defaultUsp = [
     {
       icon: "🛡️",
@@ -29,7 +29,17 @@ export default function UspSection({ ui, lang = "en" }) {
     }
   ];
 
-  const uspData = ui?.usp && ui.usp.length > 0 ? ui.usp : defaultUsp;
+  const uspData = config?.items && config.items.length > 0 
+    ? config.items.map(item => ({
+        icon: item.icon === 'Truck' ? '🚚' : 
+              item.icon === 'RotateCcw' ? '🔄' : 
+              item.icon === 'ShieldCheck' ? '🛡️' : 
+              item.icon === 'Headset' ? '🎧' : item.icon,
+        title: item.title,
+        desc: item.subtitle
+      })) 
+    : defaultUsp;
+
 
   return (
     <section

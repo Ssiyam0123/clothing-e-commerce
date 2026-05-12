@@ -16,6 +16,7 @@ import authLang from './auth.json';
 
 
 import categoriesLang from './categories.json';
+import successLang from './success.json';
 
 // Future expansion: Add more page languages here
 const langMaps = {
@@ -30,7 +31,9 @@ const langMaps = {
   footer: footerLang,
   auth: authLang,
   categories: categoriesLang,
+  success: successLang,
 };
+
 
 export const getTranslation = (page, lang = 'en') => {
   const map = langMaps[page];

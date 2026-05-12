@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { X, Minus, Plus, ShoppingCart, Zap, PackageCheck } from "lucide-react";
 import { useProductStore } from "@/store/productStore";
-import { swalToast } from "@/utils/swal";
+import { notify } from "@/utils/swal";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { getImageUrl } from "@/utils/imageUtils";
@@ -51,11 +51,10 @@ export default function QuickSelectModal({ isOpen, onClose, product, lang }) {
 
   const handleAction = async (type) => {
     if (!selectedSize) {
-      return swalToast(
+      return notify.error(
         isBn
           ? "অনুগ্রহ করে সাইজ নির্বাচন করুন"
-          : "Operational Error: Select Size",
-        "error",
+          : "Please select a size"
       );
     }
 
@@ -66,14 +65,13 @@ export default function QuickSelectModal({ isOpen, onClose, product, lang }) {
         onClose();
       } else {
         console.error("Store Error: initiateBuyNow is not defined.");
-        swalToast("System Error: Please refresh", "error");
+        notify.error("System Error", "Please refresh");
       }
     } else {
       if (typeof addToCart === "function") {
         addToCart(product, selectedSize._id, quantity, isAuthenticated);
-        swalToast(
-          isBn ? "ব্যাগে যোগ করা হয়েছে" : "Artifact Secured in Bag",
-          "success",
+        notify.success(
+          isBn ? "ব্যাগে যোগ করা হয়েছে" : "Added to Bag"
         );
         onClose();
       }

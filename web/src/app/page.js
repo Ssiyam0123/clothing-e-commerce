@@ -95,10 +95,20 @@ export default async function HomePage() {
           const standardMargin = isFollowingHeader ? "mt-3 md:mt-12" : "mt-12 md:mt-24 lg:mt-32";
 
           switch (section.type) {
+            case 'HERO':
+              return (
+                <section key={section.id} className="w-full" aria-label="Main Hero Slider">
+                  <HeroSectionServer 
+                    campaign={{ slides: section.config?.slides || [] }} 
+                    lang={lang} 
+                    ui={{ ...t, heroBtn: section.buttonText }} 
+                  />
+                </section>
+              );
             case 'USP':
               return (
                 <section key={section.id} className={cn("w-full", idx > 0 && standardMargin)} aria-label="Trust Markers">
-                  <UspSection />
+                  <UspSection config={section.config} lang={lang} />
                 </section>
               );
             case 'HEADER':
@@ -136,6 +146,7 @@ export default async function HomePage() {
                   </Suspense>
                 </section>
               );
+
             case 'NEW_ARRIVALS':
               return (
                 <section key={section.id} className={cn("w-full", idx > 0 && standardMargin)} aria-label="Fresh New Arrivals">

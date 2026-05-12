@@ -9,7 +9,7 @@ import TableSkeleton from "@/components/common/TableSkeleton";
 import FilterBar from "@/components/common/FilterBar";
 import Pagination from "@/components/common/Pagination";
 import { getImageUrl } from "@/utils/imageUtils";
-import { swalConfirm, swalToast, swalError } from "@/utils/swal";
+import { notify } from "@/utils/swal";
 import { 
   Users as UsersIcon, 
   Trash2, 
@@ -59,15 +59,15 @@ function UsersContent() {
 
   const handleDelete = async (id, role) => {
     if (role?.name === "admin") {
-      return swalError("Action Denied", "Admin users cannot be deleted.");
+      return notify.error("Action Denied", "Admin users cannot be deleted.");
     }
-    const isConfirmed = await swalConfirm("Delete User?", "This user will be permanently deleted.");
+    const isConfirmed = await notify.confirm("Delete User?", "This user will be permanently deleted.");
     if (isConfirmed) {
       try {
         await deleteUser.mutateAsync(id);
-        swalToast("User deleted", "success");
+        notify.success("User deleted");
       } catch (err) {
-        swalError("Error", "Could not delete user.");
+        notify.error("Error", "Could not delete user.");
       }
     }
   };

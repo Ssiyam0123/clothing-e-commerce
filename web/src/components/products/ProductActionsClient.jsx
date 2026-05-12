@@ -7,7 +7,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { useProductStore } from "@/store/productStore";
 import { useTrackingStore } from "@/store/trackingStore";
-import { swalError, swalToast } from "@/utils/swal";
+import { notify } from "@/utils/swal";
 import Loader from "@/components/common/Loader";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -58,17 +58,16 @@ export default function ProductActionsClient({ product }) {
 
   const handleBagAction = async () => {
     if (!selectedSize)
-      return swalError("Protocol Error", "Select Architecture (Size).");
+      return notify.error("Error", "Please select a size.");
     setIsAdding(true);
     try {
       await addToCart(product, selectedSize, quantity, isAuthenticated);
-      swalToast(
-        lang === "bn" ? "ব্যাগে যোগ হয়েছে" : "Artifact Secured",
-        "success",
+      notify.success(
+        lang === "bn" ? "ব্যাগে যোগ হয়েছে" : "Added to Bag"
       );
       trackAddToCart(product._id, discountedPrice, quantity);
     } catch (err) {
-      swalError("Vault Sync Failed", "Unable to secure item.");
+      notify.error("Error", "Could not add to bag.");
     } finally {
       setIsAdding(false);
     }
@@ -76,7 +75,7 @@ export default function ProductActionsClient({ product }) {
 
   const handleInstantBuy = () => {
     if (!selectedSize)
-      return swalError("Protocol Error", "Architecture required.");
+      return notify.error("Error", "Please select a size.");
     initiateBuyNow(product, selectedSize, quantity);
     router.push("/cart?type=direct");
   };
