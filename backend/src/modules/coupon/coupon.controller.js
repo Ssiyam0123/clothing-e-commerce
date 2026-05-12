@@ -28,17 +28,33 @@ export const getCoupons = asyncHandler(async (req, res) => {
 });
 
 export const getCouponById = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
   const coupon = await Coupon.findById(req.params.id);
   if (!coupon) return res.status(404).json({ message: 'Coupon not found' });
   
-  // 🔍 Forensic Audit: Retrieve all orders that used this coupon code
-  const usageHistory = await Order.find({ couponCode: coupon.code })
+  // 🔍 Forensic Audit: Retrieve orders that used this coupon code (paginated)
+  const filter = { couponCode: coupon.code };
+  const total = await Order.countDocuments(filter);
+  
+  const usageHistory = await Order.find(filter)
     .populate('user', 'name email avatar')
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .skip((Number(page) - 1) * Number(limit))
+    .limit(Number(limit));
+
+  // 🔍 Strategic Intelligence: Calculate unique products impacted
+  const uniqueProductsImpacted = await Order.distinct('orderItems.product', { couponCode: coupon.code });
 
   res.json({
     ...coupon.toObject(),
-    usageHistory
+    usageHistory,
+    uniqueProductsCount: uniqueProductsImpacted.length,
+    usagePagination: {
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / Number(limit)),
+      limit: Number(limit)
+    }
   });
 });
 

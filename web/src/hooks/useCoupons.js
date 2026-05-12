@@ -40,10 +40,10 @@ export const useCoupons = (params = {}) => {
     },
   });
 
-  const getCoupon = (id) => {
+  const getCoupon = (id, usageParams = { page: 1, limit: 10 }) => {
     return useQuery({
-      queryKey: ["admin-coupon", id],
-      queryFn: async () => (await api.get(`/coupons/${id}`)).data,
+      queryKey: ["admin-coupon", id, usageParams],
+      queryFn: async () => (await api.get(`/coupons/${id}`, { params: usageParams })).data,
       enabled: !!user && user.role === "admin" && !!id && id !== "new",
     });
   };

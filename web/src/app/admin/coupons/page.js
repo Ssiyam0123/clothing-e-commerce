@@ -29,7 +29,7 @@ import Pagination from "@/components/common/Pagination";
 
 export default function CouponArchive() {
   const { page, setPage, queryParams } = useFilters({ initialLimit: 30 });
-  const { coupons, total, pages, isLoading, deleteCoupon } = useCoupons(queryParams);
+  const { coupons, total, pages, isLoading, deleteCoupon, updateCoupon } = useCoupons(queryParams);
 
   const handleDelete = async (id) => {
     const confirmed = await swalConfirm(
@@ -51,11 +51,21 @@ export default function CouponArchive() {
       label: "Voucher Identity",
       render: (item) => (
         <div className="flex items-center gap-4">
-           <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600">
+           <div className={cn(
+             "w-10 h-10 rounded-xl flex items-center justify-center relative",
+             item.isActive ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600"
+           )}>
               <Ticket size={20} />
+              <div className={cn(
+                "absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-background",
+                item.isActive ? "bg-emerald-500" : "bg-rose-500"
+              )} />
            </div>
-           <span className="font-black text-indigo-600 bg-indigo-600/5 px-4 py-2 rounded-xl border border-indigo-600/10 uppercase tracking-[0.2em] text-[10px] shadow-sm">
-             {item.code}
+           <span className={cn(
+             "font-black px-4 py-2 rounded-xl border uppercase tracking-[0.2em] text-[10px] shadow-sm",
+             item.isActive ? "text-emerald-600 bg-emerald-600/5 border-emerald-600/10" : "text-rose-600 bg-rose-600/5 border-rose-600/10"
+           )}>
+              {item.code}
            </span>
         </div>
       ),
@@ -103,46 +113,30 @@ export default function CouponArchive() {
       },
     },
     {
-      label: "Operational Status",
-      render: (item) => {
-        const now = new Date();
-        const start = new Date(item.startDate);
-        const end = item.endDate ? new Date(item.endDate) : null;
-
-        let status = {
-          label: "● Active",
-          style: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-        };
-        if (!item.isActive)
-          status = {
-            label: "○ Disabled",
-            style: "bg-zinc-500/10 text-zinc-500 border-zinc-500/20",
-          };
-        else if (now < start)
-          status = {
-            label: "◐ Pending",
-            style: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-          };
-        else if (end && now > end)
-          status = {
-            label: "× Expired",
-            style: "bg-rose-500/10 text-rose-500 border-rose-500/20",
-          };
-
-        return (
-          <Badge
-            variant="outline"
-            className={cn("px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.15em]", status.style)}
-          >
-            {status.label}
-          </Badge>
-        );
-      },
-    },
-    {
       label: "Command Ops",
       render: (item) => (
         <div className="flex items-center gap-3 justify-end">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={async () => {
+              try {
+                await updateCoupon({ id: item._id, data: { isActive: !item.isActive } });
+                swalToast(`Voucher ${item.isActive ? 'Deactivated' : 'Activated'}`, "success");
+              } catch (err) {
+                swalError("Action Rejected", "Neural override failed.");
+              }
+            }}
+            className={cn(
+              "h-10 w-10 rounded-xl border-border/10 transition-all active:scale-95 group",
+              item.isActive 
+                ? "bg-rose-500/10 text-rose-600 hover:bg-rose-600 hover:text-white" 
+                : "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-600 hover:text-white"
+            )}
+            title={item.isActive ? "Deactivate Coupon" : "Activate Coupon"}
+          >
+            <Power size={16} className="transition-transform group-hover:scale-110" />
+          </Button>
           <Button 
             asChild 
             variant="outline" 
