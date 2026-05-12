@@ -104,7 +104,7 @@ export default function ProductCard({ product, className }) {
             <div className="flex items-center gap-1 mb-4">
               <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
               <span className="text-xs font-medium">
-                {(product.averageRating || 5).toFixed(1)}
+                {Number(product.averageRating || 0).toFixed(1)}
               </span>
               <span className="text-xs text-muted-foreground">
                 ({product.totalReviews || 0})

@@ -103,7 +103,9 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
             sizes: 1,
             totalStock: 1,
             isFeatured: 1,
-            showReviews: 1
+            showReviews: 1,
+            averageRating: 1,
+            totalReviews: 1
         }
     });
 

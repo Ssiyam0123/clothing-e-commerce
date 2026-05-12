@@ -276,17 +276,32 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
 export const getProductHistory = asyncHandler(async (req, res) => {
     const { id } = req.params;
+    const { page = 1, limit = 10 } = req.query;
     
     const product = await Product.findById(id).select('name images price').lean();
     if (!product) return res.status(404).json({ message: 'Product not found' });
 
-    // Find all orders containing this product
-    const orders = await Order.find({
+    const filter = {
         'orderItems.product': id,
         'paymentResult.status': { $in: ['Completed', 'COD'] }
-    })
+    };
+
+    // Calculate totals based on ALL history
+    const allOrders = await Order.find(filter).lean();
+    const allItems = allOrders.map(order => order.orderItems.find(oi => String(oi.product) === id));
+    
+    const totalSold = allItems.reduce((sum, item) => sum + (item?.quantity || 0), 0);
+    const totalRevenue = allItems.reduce((sum, item) => sum + ((item?.quantity || 0) * (item?.price || 0)), 0);
+
+    const total = allOrders.length;
+    const skip = (Math.max(1, Number(page)) - 1) * Math.max(1, Number(limit));
+
+    // Find paginated orders
+    const orders = await Order.find(filter)
     .populate('user', 'name email avatar')
     .sort('-createdAt')
+    .skip(skip)
+    .limit(Number(limit))
     .lean();
 
     const history = orders.map(order => {
@@ -303,15 +318,18 @@ export const getProductHistory = asyncHandler(async (req, res) => {
         };
     });
 
-    const totalSold = history.reduce((sum, h) => sum + h.quantity, 0);
-    const totalRevenue = history.reduce((sum, h) => sum + h.total, 0);
-
     res.json({
+        success: true,
         product,
         stats: {
             totalSold,
             totalRevenue,
-            orderCount: history.length
+            orderCount: total
+        },
+        pagination: {
+            total,
+            currentPage: Number(page),
+            pages: Math.ceil(total / Number(limit))
         },
         history
     });

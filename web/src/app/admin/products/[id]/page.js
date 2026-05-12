@@ -1,8 +1,8 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { useEffect, useState, useMemo } from "react";
 import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
 import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
 import { useSubcategories } from "@/hooks/useSubcategories";
@@ -45,8 +45,6 @@ export default function ProductForm() {
   const { sizes } = useSizes();
 
   const [loading, setLoading] = useState(isEdit);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [filteredSizes, setFilteredSizes] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]); 
   const [existingImages, setExistingImages] = useState([]); 
   const [imagePreviews, setImagePreviews] = useState([]); 
@@ -57,6 +55,7 @@ export default function ProductForm() {
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = useForm();
   
@@ -76,22 +75,25 @@ export default function ProductForm() {
     }
   }, [watchedName, setValue, isEdit]);
 
-  useEffect(() => {
-    if (watchedCategory && sizes) {
-      const filtered = sizes.filter(
-        (size) =>
-          size.category?._id === watchedCategory ||
-          size.category === watchedCategory,
-      );
-      setFilteredSizes(filtered);
-      setSelectedCategory(watchedCategory);
-    } else {
-      setFilteredSizes([]);
-    }
+  const filteredSizes = useMemo(() => {
+    if (!watchedCategory || !sizes) return [];
+    return sizes.filter(
+      (size) =>
+        size.category?._id === watchedCategory ||
+        size.category === watchedCategory,
+    );
   }, [watchedCategory, sizes]);
 
+  const filteredSubcategories = useMemo(() => {
+    if (!watchedCategory || !subcategories) return [];
+    return subcategories.filter(
+      (s) => (s.category?._id || s.category) === watchedCategory
+    );
+  }, [watchedCategory, subcategories]);
+
   useEffect(() => {
-    if (isEdit && products && products.length > 0) {
+    if (isEdit && products && products.length > 0 && loading) {
+      setLoading(false);
       const product = products.find((p) => p._id === id);
       if (product) {
         setValue("name", product.name);
@@ -116,13 +118,11 @@ export default function ProductForm() {
           sizesObj[sizeId] = item.stock;
         });
         setValue("sizes", sizesObj);
-        setSelectedCategory(product.category._id);
-        setLoading(false);
       } else if (products) setLoading(false);
-    } else {
+    } else if (!isEdit) {
       setLoading(false);
     }
-  }, [isEdit, id, products, setValue]);
+  }, [isEdit, id, products, setValue, loading]);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -298,40 +298,52 @@ export default function ProductForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-6 border-t border-border/5">
              <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Category</Label>
-                <Select value={watch("category")} onValueChange={(val) => {
-                  setValue("category", val);
-                  setValue("subcategory", ""); // Reset subcategory when category changes
-                }}>
-                  <SelectTrigger className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-black uppercase tracking-widest">
-                    <SelectValue placeholder="Select Category" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border rounded-2xl p-2">
-                    {categories?.map((c) => (
-                      <SelectItem key={c._id} value={c._id} className="rounded-xl py-3 font-black text-[10px] uppercase tracking-widest">
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <input type="hidden" {...register("category", { required: true })} />
+                <Controller
+                  name="category"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select 
+                      value={field.value || ""} 
+                      onValueChange={(val) => {
+                        field.onChange(val);
+                        setValue("subcategory", ""); // Reset subcategory
+                      }}
+                    >
+                      <SelectTrigger className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-black uppercase tracking-widest">
+                        <SelectValue placeholder="Select Category" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card border-border rounded-2xl p-2">
+                        {categories?.map((c) => (
+                          <SelectItem key={c._id} value={c._id} className="rounded-xl py-3 font-black text-[10px] uppercase tracking-widest">
+                            {c.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
              </div>
              <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Subcategory</Label>
-                <Select value={watch("subcategory")} onValueChange={(val) => setValue("subcategory", val)}>
-                  <SelectTrigger className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-black uppercase tracking-widest">
-                    <SelectValue placeholder="Select Subcategory" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border rounded-2xl p-2">
-                    {subcategories
-                      ?.filter((s) => (s.category?._id || s.category) === watchedCategory)
-                      .map((s) => (
-                        <SelectItem key={s._id} value={s._id} className="rounded-xl py-3 font-black text-[10px] uppercase tracking-widest">
-                          {s.name}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                <input type="hidden" {...register("subcategory")} />
+                <Controller
+                  name="subcategory"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value || ""} onValueChange={field.onChange}>
+                      <SelectTrigger className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-black uppercase tracking-widest">
+                        <SelectValue placeholder="Select Subcategory" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card border-border rounded-2xl p-2">
+                        {filteredSubcategories.map((s) => (
+                          <SelectItem key={s._id} value={s._id} className="rounded-xl py-3 font-black text-[10px] uppercase tracking-widest">
+                            {s.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
              </div>
           </div>
         </div>

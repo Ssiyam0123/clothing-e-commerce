@@ -19,11 +19,14 @@ import { getImageUrl } from "@/utils/imageUtils";
 import DataTable from "@/components/admin/DataTable";
 import StatusBadge from "@/components/admin/StatusBadge";
 import { cn } from "@/lib/utils";
+import Pagination from "@/components/common/Pagination";
+import { useState } from "react";
 
 export default function ProductHistoryPage({ params: paramsPromise }) {
   const params = use(paramsPromise);
   const { id } = params;
-  const { data, isLoading } = useProductHistory(id);
+  const [page, setPage] = useState(1);
+  const { data, isLoading } = useProductHistory(id, page, 10);
 
   if (isLoading) {
     return (
@@ -39,7 +42,7 @@ export default function ProductHistoryPage({ params: paramsPromise }) {
     );
   }
 
-  const { product, stats, history } = data || {};
+  const { product, stats, history, pagination } = data || {};
 
   const columns = [
     {
@@ -193,6 +196,16 @@ export default function ProductHistoryPage({ params: paramsPromise }) {
                 className="border-none bg-transparent"
             />
          </div>
+         {pagination?.pages > 1 && (
+            <div className="p-8 border-t border-border/5 bg-muted/5 flex justify-center">
+              <Pagination 
+                page={page}
+                totalPages={pagination.pages}
+                onPageChange={setPage}
+                className="py-0"
+              />
+            </div>
+         )}
          {history?.length === 0 && (
             <div className="py-20 flex flex-col items-center justify-center opacity-30 text-center">
                 <PackageCheck size={64} strokeWidth={1} className="mb-4" />

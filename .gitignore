@@ -19,6 +19,7 @@
 /backend/uploads/
 /backend/dbdata/
 /backend/images/
+/backend/jsons/**
 /backend/.env
 
 /web/node_modules/

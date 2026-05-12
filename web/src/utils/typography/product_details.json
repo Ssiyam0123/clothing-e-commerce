@@ -17,7 +17,9 @@
     "addToCart": "Add to cart",
     "buyNow": "Buy now",
     "addedToCart": "Added to cart",
-    "outOfStock": "Out of stock"
+    "outOfStock": "Out of stock",
+    "featuredProduct": "Featured Product",
+    "off": "OFF"
   },
   "bn": {
     "about": "বিবরণ",
@@ -37,6 +39,8 @@
     "addToCart": "কার্টে যোগ করুন",
     "buyNow": "এখনই কিনুন",
     "addedToCart": "কার্টে যোগ হয়েছে",
-    "outOfStock": "স্টকে নেই"
+    "outOfStock": "স্টকে নেই",
+    "featuredProduct": "ফিচারড পণ্য",
+    "off": "ছাড়"
   }
 }

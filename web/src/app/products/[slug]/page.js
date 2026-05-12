@@ -84,7 +84,7 @@ export default async function ProductPage({ params }) {
 
   try {
     const res = await fetch(`${API_URL}/products/details/${slug}`, {
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
     if (!res.ok) {
       if (res.status === 404) notFound();
@@ -186,14 +186,19 @@ export default async function ProductPage({ params }) {
                   </Badge>
                   {product.isFeatured && (
                     <Badge className="bg-amber-500 text-black border-none px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg">
-                      {t.featuredArtifact}
+                      {t.featuredProduct || "Featured Product"}
                     </Badge>
                   )}
-                  {product.showReviews !== false && (
+                  {product.discount > 0 && (
+                    <Badge className="bg-red-600 text-white border-none px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg">
+                      {product.discount}% {t.off || "OFF"}
+                    </Badge>
+                  )}
+                  {product.showReviews !== false && product.totalReviews > 0 && (
                     <div className="flex items-center gap-2 glass px-3 py-1 rounded-xl">
-                      <StarRating rating={product.averageRating || 5} size="small" />
+                      <StarRating rating={product.averageRating || 0} size="small" />
                       <span className="text-[9px] font-black text-foreground">
-                        {product.totalReviews || 0} {t.reviews}
+                        {product.totalReviews} {t.reviews}
                       </span>
                     </div>
                   )}

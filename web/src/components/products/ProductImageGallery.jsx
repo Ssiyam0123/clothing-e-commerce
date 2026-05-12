@@ -26,19 +26,6 @@ export default function ProductImageGallery({ images, name, discount, isFeatured
           
           {/* Glass Overlay Elements */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          
-          <div className="absolute top-8 left-8 md:top-12 md:left-12 flex flex-col gap-3 z-10">
-            {discount > 0 && (
-              <Badge className="bg-accent-secondary text-white border-none px-6 py-2 rounded-full text-[10px] md:text-xs font-black uppercase tracking-[0.3em] shadow-2xl">
-                -{discount}% ARTIFACT DROP
-              </Badge>
-            )}
-            {isFeatured && (
-              <Badge className="bg-amber-500 text-black border-none px-6 py-2 rounded-full text-[10px] md:text-xs font-black uppercase tracking-[0.3em] shadow-2xl">
-                Featured Artifact
-              </Badge>
-            )}
-          </div>
 
           {/* Image Navigation Dots (Mobile) */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 lg:hidden">

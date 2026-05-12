@@ -43,6 +43,12 @@ const DICTIONARY = {
     success: "Feedback published successfully!",
     error: "Action failed. Please try again.",
     confirmDelete: "Remove this feedback permanently?",
+    prev: "Previous",
+    next: "Next",
+    page: "Page",
+    overallRating: "Overall Rating",
+    reports: "Reports",
+    score: "Score",
   },
   bn: {
     title: "কমিউনিটি ফিডব্যাক",
@@ -68,22 +74,31 @@ const DICTIONARY = {
     success: "ফিডব্যাক সফলভাবে পাবলিশ হয়েছে!",
     error: "দুঃখিত, আবার চেষ্টা করুন।",
     confirmDelete: "এই রিভিউটি কি মুছে ফেলতে চান?",
+    prev: "আগের",
+    next: "পরের",
+    page: "পেজ",
+    overallRating: "ওভারঅল রেটিং",
+    reports: "রিপোর্টস",
+    score: "স্কোর",
   },
 };
 
 export default function ReviewSection({ productId, onReviewChange }) {
   const router = useRouter();
   const { user } = useAuthStore();
+  const [currentPage, setCurrentPage] = useState(1);
   const {
     reviews,
     userReview,
     averageRating,
     totalReviews,
+    total,
+    pages,
     loading,
     createReview,
     updateReview,
     deleteReview,
-  } = useReviews(productId);
+  } = useReviews(productId, currentPage, 5);
 
   const { lang, settings } = useAppStore();
   const siteName = settings?.branding?.siteName || "Store";
@@ -225,15 +240,17 @@ export default function ReviewSection({ productId, onReviewChange }) {
           </h3>
           <div className="flex items-center gap-6">
             <div className="flex flex-col gap-1">
-               <StarRating rating={averageRating || 0} size="medium" />
+               <StarRating rating={Number(averageRating) || 0} size="medium" />
                <p className="text-[10px] font-black text-accent-secondary uppercase tracking-[0.4em]">
-                 {totalReviews || 0} Artifact Reports
+                 {totalReviews || 0} {ui.reports}
                </p>
             </div>
             <div className="h-10 w-px bg-border/30" />
             <div className="flex items-baseline gap-2">
-               <span className="text-3xl font-black italic">{averageRating?.toFixed(1) || "5.0"}</span>
-               <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Score</span>
+               <span className="text-3xl font-black italic">
+                 {typeof averageRating === 'number' ? averageRating.toFixed(1) : "0.0"}
+               </span>
+               <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{ui.score}</span>
             </div>
           </div>
         </div>
@@ -524,6 +541,41 @@ export default function ReviewSection({ productId, onReviewChange }) {
                 </Card>
               </motion.div>
             ))}
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {pages > 1 && (
+        <div className="flex items-center justify-center gap-4 pt-12">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className="rounded-xl border-border/30 font-black uppercase text-[9px] tracking-widest h-12 px-6"
+          >
+            {ui.prev}
+          </Button>
+          <div className="flex items-center gap-2 px-6 h-12 glass rounded-xl">
+            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-tighter">
+              {ui.page}
+            </span>
+            <span className="text-sm font-black italic text-accent-secondary">
+              {currentPage}
+            </span>
+            <span className="text-[10px] font-black text-muted-foreground/40 italic">
+              / {pages}
+            </span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.min(pages, prev + 1))}
+            disabled={currentPage === pages}
+            className="rounded-xl border-border/30 font-black uppercase text-[9px] tracking-widest h-12 px-6"
+          >
+            {ui.next}
+          </Button>
         </div>
       )}
     </div>

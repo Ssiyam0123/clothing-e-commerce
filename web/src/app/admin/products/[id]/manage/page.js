@@ -37,6 +37,7 @@ import {
   X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Pagination from "@/components/common/Pagination";
 
 export default function ProductManagement() {
   const { id } = useParams();
@@ -53,6 +54,7 @@ export default function ProductManagement() {
     extraData: null,
   });
   const [modalSelectVal, setModalSelectVal] = useState("");
+  const [reviewPage, setReviewPage] = useState(1);
 
   const {
     data: product,
@@ -64,8 +66,10 @@ export default function ProductManagement() {
   });
 
   const { data: reviewsData, refetch: refetchReviews } = useQuery({
-    queryKey: ["reviews", id],
-    queryFn: async () => (await api.get(`/reviews/product/${id}`)).data,
+    queryKey: ["reviews", id, reviewPage],
+    queryFn: async () => (await api.get(`/reviews/product/${id}`, {
+      params: { page: reviewPage, limit: 5 }
+    })).data,
   });
 
   const { updateProduct: updateMutation } = useAdminProducts();
@@ -383,7 +387,7 @@ export default function ProductManagement() {
                   <span className="text-4xl md:text-5xl opacity-40 mr-2">৳</span>{salePrice}
                 </h2>
                 <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-background/5 border border-background/10 backdrop-blur-md">
-                   <trending-up className="text-emerald-400 w-4 h-4" />
+                   <TrendingUp className="text-emerald-400 w-4 h-4" />
                    <span className="text-[9px] font-black text-background/60 uppercase tracking-widest">Price after discount</span>
                 </div>
               </div>
@@ -507,7 +511,16 @@ export default function ProductManagement() {
                   </Button>
                 </div>
               ))}
-              
+              {reviewsData?.pages > 1 && (
+                <div className="p-10 border-t border-border/5 bg-muted/5 flex justify-center">
+                  <Pagination 
+                    page={reviewPage}
+                    totalPages={reviewsData.pages}
+                    onPageChange={setReviewPage}
+                    className="py-0"
+                  />
+                </div>
+              )}
               {reviewsData?.reviews?.length === 0 && (
                 <div className="py-32 flex flex-col items-center justify-center opacity-10 gap-6 grayscale">
                   <MessageSquare size={64} strokeWidth={1} />

@@ -1,13 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 
-export const useReviews = (productId) => {
+export const useReviews = (productId, page = 1, limit = 5) => {
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["reviews", productId],
+    queryKey: ["reviews", productId, page, limit],
     queryFn: async () => {
-      const { data } = await api.get(`/reviews/product/${productId}`);
+      const { data } = await api.get(`/reviews/product/${productId}?page=${page}&limit=${limit}`);
       return data;
     },
     enabled: !!productId,
@@ -19,7 +19,6 @@ export const useReviews = (productId) => {
         headers: { "Content-Type": "multipart/form-data" },
       }),
     onSuccess: () => {
-      // 👈 FIXED: React Query v5 syntax { queryKey: [...] }
       queryClient.invalidateQueries({ queryKey: ["reviews", productId] });
       queryClient.invalidateQueries({ queryKey: ["product", productId] });
     },
@@ -49,6 +48,9 @@ export const useReviews = (productId) => {
     userReview: data?.userReview || null,
     averageRating: data?.averageRating || 0,
     totalReviews: data?.totalReviews || 0,
+    total: data?.total || 0,
+    pages: data?.pages || 1,
+    currentPage: data?.currentPage || 1,
     isLoading,
     error,
     createReview: createReview.mutateAsync,

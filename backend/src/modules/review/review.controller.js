@@ -29,13 +29,21 @@ const attachUserToReview = async (reviewDoc) => {
   const db = mongoose.connection.db;
   const review = reviewDoc.toObject ? reviewDoc.toObject() : reviewDoc;
   
-  const user = await db.collection('users').findOne({ 
-    $or: [{ id: review.user }, { _id: review.user }] 
-  });
+  // Try to find user by id string or converted ObjectId
+  const lookupId = review.user;
+  const query = { $or: [{ id: lookupId }] };
+  
+  if (mongoose.Types.ObjectId.isValid(lookupId)) {
+    query.$or.push({ _id: new mongoose.Types.ObjectId(lookupId) });
+  } else {
+    query.$or.push({ _id: lookupId });
+  }
+
+  const user = await db.collection('users').findOne(query);
 
   review.user = user 
-    ? { _id: review.user, name: user.name, avatar: user.avatar } 
-    : { _id: review.user, name: 'Anonymous', avatar: '' };
+    ? { _id: lookupId, name: user.name, avatar: user.avatar } 
+    : { _id: lookupId, name: 'Anonymous', avatar: '' };
 
   return review;
 };
@@ -128,21 +136,39 @@ export const deleteReview = asyncHandler(async (req, res) => {
 export const getProductReviews = asyncHandler(async (req, res) => {
     const db = mongoose.connection.db;
     const { productId } = req.params;
+    const { page = 1, limit = 5 } = req.query; // Default 5 reviews per page
     
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
     // 🌟 FIXED: Removed .populate('user')
+    const total = await Review.countDocuments({ product: productId });
     const reviewsRaw = await Review.find({ product: productId })
         .sort('-createdAt')
+        .skip(skip)
+        .limit(parseInt(limit))
         .lean();
 
     // 🌟 Manual Population for Users in bulk (Fast and Efficient)
     const userIdsToFetch = [...new Set(reviewsRaw.map(r => r.user))];
+    
+    // Prepare IDs for query (mix of strings and ObjectIds)
+    const objectIds = userIdsToFetch
+      .filter(id => mongoose.Types.ObjectId.isValid(id))
+      .map(id => new mongoose.Types.ObjectId(id));
+    
     const users = await db.collection('users').find({
-      $or: [{ id: { $in: userIdsToFetch } }, { _id: { $in: userIdsToFetch } }]
+      $or: [
+        { id: { $in: userIdsToFetch } }, 
+        { _id: { $in: userIdsToFetch } },
+        { _id: { $in: objectIds } }
+      ]
     }).toArray();
 
     const userMap = users.reduce((acc, u) => {
-      const idStr = u.id || u._id.toString();
+      const idStr = u._id.toString();
+      const customId = u.id;
       acc[idStr] = { _id: idStr, name: u.name, avatar: u.avatar };
+      if (customId) acc[customId] = { _id: idStr, name: u.name, avatar: u.avatar };
       return acc;
     }, {});
 
@@ -156,12 +182,24 @@ export const getProductReviews = asyncHandler(async (req, res) => {
     let userReview = null;
     if (req.user) {
         const reqUserId = req.user.id || req.user._id;
-        userReview = reviews.find(r => r.user?._id?.toString() === reqUserId.toString());
+        userReview = await Review.findOne({ product: productId, user: reqUserId.toString() }).lean();
+        if (userReview) {
+          // Attach user data to userReview too
+          const u = users.find(u => (u.id || u._id.toString()) === userReview.user);
+          if (u) {
+            userReview.user = { _id: u._id.toString(), name: u.name, avatar: u.avatar };
+          } else {
+            userReview.user = { _id: userReview.user, name: 'You', avatar: '' };
+          }
+        }
     }
 
     res.json({
         reviews,
         userReview,
+        total,
+        pages: Math.ceil(total / parseInt(limit)),
+        currentPage: parseInt(page),
         averageRating: product?.averageRating || 0,
         totalReviews: product?.totalReviews || 0
     });
