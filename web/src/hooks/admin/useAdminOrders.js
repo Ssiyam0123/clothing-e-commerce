@@ -2,9 +2,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { swalSuccess, swalError } from "@/utils/swal";
+import { useAuthStore } from "@/store/authStore";
+import { hasPermission } from "@/utils/rbacUtils";
 
 export const useAdminOrders = (params = {}, orderId = null) => {
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
 
   const {
     data: allOrdersData,
@@ -17,6 +20,7 @@ export const useAdminOrders = (params = {}, orderId = null) => {
       return data;
     },
     staleTime: 1000 * 60 * 5,
+    enabled: !!user && hasPermission(user, ["orders:view", "all"]),
   });
 
   const { data: orderDetails, isLoading: orderDetailsLoading } = useQuery({
@@ -25,7 +29,7 @@ export const useAdminOrders = (params = {}, orderId = null) => {
       const { data } = await api.get(`/admin/orders/${orderId}`);
       return data;
     },
-    enabled: !!orderId,
+    enabled: !!orderId && !!user && hasPermission(user, ["orders:view", "all"]),
   });
 
   const updateOrder = useMutation({

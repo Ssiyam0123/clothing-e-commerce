@@ -1,14 +1,18 @@
 // src/hooks/admin/useAdminFlashSales.js
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
+import { hasPermission } from "@/utils/rbacUtils";
 
 export const useAdminFlashSales = (params = {}) => {
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
 
   const { data: flashSales, isLoading } = useQuery({
     queryKey: ["adminFlashSales", params],
     queryFn: async () => (await api.get("/admin/flash-sales", { params })).data,
     staleTime: 1000 * 60 * 5,
+    enabled: !!user && hasPermission(user, ["flash-sales:view", "all"]),
   });
 
   const createFlashSale = useMutation({

@@ -21,3 +21,17 @@ export const hasPermission = (user, requiredPermission) => {
   // 3. Single permission check
   return role.permissions?.includes(requiredPermission);
 };
+
+/**
+ * Checks if the user has ANY administrative permission.
+ * Used for top-level access to the admin panel.
+ */
+export const hasAnyAdminPermission = (user) => {
+  if (!user || !user.role) return false;
+  if (user.role.name === 'superadmin' || user.role.permissions?.includes('all')) return true;
+  
+  // Check if they have at least one permission
+  // In this system, only admins/staff have roles with explicit permissions
+  return (user.role.permissions && user.role.permissions.length > 0);
+};
+

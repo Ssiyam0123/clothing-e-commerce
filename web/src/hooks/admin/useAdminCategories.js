@@ -1,9 +1,12 @@
 // src/hooks/admin/useAdminCategories.js
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
+import { hasPermission } from "@/utils/rbacUtils";
 
 export const useAdminCategories = (params = {}, initialData = undefined) => {
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
 
   const {
     data: categories,
@@ -17,6 +20,7 @@ export const useAdminCategories = (params = {}, initialData = undefined) => {
     },
     initialData,
     staleTime: 1000 * 60 * 5,
+    enabled: !!user && hasPermission(user, ["categories:view", "all"]),
   });
 
   const createCategory = useMutation({

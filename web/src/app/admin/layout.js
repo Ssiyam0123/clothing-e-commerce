@@ -13,6 +13,7 @@ import { Menu, Globe, Sun, Moon, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
+import { hasPermission, hasAnyAdminPermission } from "@/utils/rbacUtils";
 
 export default function AdminLayout({ children }) {
   const { user, isLoading: authLoading, logout } = useAuthStore();
@@ -27,10 +28,7 @@ export default function AdminLayout({ children }) {
 
   // 🛡️ Redirect non-admins
   useEffect(() => {
-    const hasAdminAccess = user?.role?.name === "superadmin" || 
-                          user?.role?.permissions?.includes("all") || 
-                          user?.role?.permissions?.includes("dashboard:view") ||
-                          user?.role?.permissions?.includes("reports:view");
+    const hasAdminAccess = hasAnyAdminPermission(user);
 
     if (!authLoading && (!user || !hasAdminAccess)) {
       router.replace("/");
@@ -93,10 +91,7 @@ export default function AdminLayout({ children }) {
     );
   }
 
-  const hasAdminAccess = user?.role?.name === "superadmin" || 
-                        user?.role?.permissions?.includes("all") || 
-                        user?.role?.permissions?.includes("dashboard:view") ||
-                        user?.role?.permissions?.includes("reports:view");
+  const hasAdminAccess = hasAnyAdminPermission(user);
 
   if (!user || !hasAdminAccess) return null;
 

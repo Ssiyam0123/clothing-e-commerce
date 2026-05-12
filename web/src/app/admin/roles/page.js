@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
 import { 
   Shield, 
   Plus, 
@@ -41,6 +42,7 @@ const ACTIONS = ["view", "create", "update", "delete", "manage"];
 
 export default function RolesPage() {
   const queryClient = useQueryClient();
+  const { checkSession } = useAuthStore();
   const [view, setView] = useState("list"); // "list" | "add" | "edit"
   const [editingRole, setEditingRole] = useState(null);
   const [formData, setFormData] = useState({
@@ -60,6 +62,7 @@ export default function RolesPage() {
     mutationFn: (data) => api.post("/roles", data),
     onSuccess: () => {
       queryClient.invalidateQueries(["roles"]);
+      checkSession(); // Refresh current user permissions
       toast.success("Role created successfully");
       setView("list");
     },
@@ -70,6 +73,7 @@ export default function RolesPage() {
     mutationFn: ({ id, data }) => api.put(`/roles/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries(["roles"]);
+      checkSession(); // Refresh current user permissions
       toast.success("Role updated successfully");
       setView("list");
     },
@@ -148,7 +152,7 @@ export default function RolesPage() {
 
   if (view === "list") {
     return (
-      <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
+      <div className="admin-page-container space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
         {/* 🚀 Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
@@ -157,10 +161,10 @@ export default function RolesPage() {
               <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-70">Security Protocol</span>
             </div>
             <h1 className="text-5xl sm:text-6xl font-black uppercase italic tracking-tighter text-gradient leading-none">
-              Identity Matrix
+              Role Management
             </h1>
             <p className="text-muted-foreground text-sm font-medium tracking-tight max-w-xl">
-              Configure granular access controls and permission sets for administrative entities.
+              Create and manage administrative roles and their access permissions.
             </p>
           </div>
 
@@ -169,7 +173,7 @@ export default function RolesPage() {
             className="h-14 px-8 rounded-[1.5rem] bg-foreground text-background font-black uppercase tracking-widest text-[10px] shadow-2xl hover:bg-primary hover:text-background transition-all group"
           >
             <Plus size={16} className="mr-2 group-hover:rotate-90 transition-transform" />
-            Initialize Identity
+            Create New Role
           </Button>
         </div>
 
@@ -178,7 +182,7 @@ export default function RolesPage() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow className="border-border/5 hover:bg-transparent">
-                <TableHead className="py-6 px-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground">Identity</TableHead>
+                <TableHead className="py-6 px-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground">Role</TableHead>
                 <TableHead className="py-6 px-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground">Description</TableHead>
                 <TableHead className="py-6 px-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground">Clearance</TableHead>
                 <TableHead className="py-6 px-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground text-right">Operations</TableHead>
@@ -234,7 +238,7 @@ export default function RolesPage() {
                     </div>
                   </TableCell>
                   <TableCell className="py-8 px-8 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">
+                    <div className="flex items-center justify-end gap-2">
                       <Button 
                         variant="ghost" 
                         size="icon"
@@ -265,7 +269,7 @@ export default function RolesPage() {
 
   // 📝 Form View (Add/Edit)
   return (
-    <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
+    <div className="admin-page-container space-y-10 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       {/* 🛠️ Form Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-6">
@@ -278,10 +282,10 @@ export default function RolesPage() {
           </Button>
           <div className="space-y-1">
             <h1 className="text-4xl font-black uppercase italic tracking-tighter text-gradient">
-              {view === "edit" ? "Reconfigure Identity" : "Initialize Identity"}
+              {view === "edit" ? "Edit Role" : "Create New Role"}
             </h1>
             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground">
-              {view === "edit" ? "Modify operational clearance" : "Create new administrative entity"}
+              {view === "edit" ? "Modify access permissions" : "Setup a new administrative role"}
             </p>
           </div>
         </div>
@@ -292,7 +296,7 @@ export default function RolesPage() {
             onClick={() => setView("list")}
             className="h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px]"
           >
-            Abort
+            Cancel
           </Button>
           <Button 
             onClick={handleSubmit}
@@ -300,19 +304,19 @@ export default function RolesPage() {
             className="h-14 px-10 rounded-2xl bg-primary text-background font-black uppercase tracking-widest text-[10px] shadow-2xl hover:scale-[1.02] transition-all"
           >
             <Save size={16} className="mr-2" />
-            {view === "edit" ? "Commit Changes" : "Confirm Initialization"}
+            {view === "edit" ? "Save Changes" : "Create Role"}
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* 📝 Identity Profile */}
-        <div className="lg:col-span-4 space-y-8">
-          <div className="bg-card/40 backdrop-blur-2xl rounded-[2.5rem] border border-border/10 p-8 space-y-8">
+      <div className="space-y-10">
+        {/* 📝 Role Information (Top) */}
+        <div className="bg-card/40 backdrop-blur-2xl rounded-[2.5rem] border border-border/10 p-8 md:p-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Identity Name</label>
+              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Role Name</label>
               <Input 
-                placeholder="e.g. SYSTEM_AUDITOR"
+                placeholder="e.g. Manager"
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
                 disabled={editingRole && !editingRole.isEditable}
@@ -321,98 +325,90 @@ export default function RolesPage() {
             </div>
 
             <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Operational Description</label>
+              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Description</label>
               <textarea 
-                placeholder="Define the scope and objectives..."
+                placeholder="What is this role for?"
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className="w-full h-40 p-6 rounded-3xl bg-accent/5 border border-border/10 font-bold tracking-tight text-[14px] resize-none focus:ring-2 focus:ring-primary/20 outline-none leading-relaxed"
+                className="w-full h-16 md:h-16 p-4 rounded-2xl bg-accent/5 border border-border/10 font-bold tracking-tight text-[14px] resize-none focus:ring-2 focus:ring-primary/20 outline-none leading-relaxed"
               />
             </div>
+          </div>
+        </div>
 
-            <div className="p-6 bg-primary/5 rounded-3xl border border-primary/10 flex gap-4">
-              <Info className="text-primary shrink-0" size={20} />
-              <p className="text-[10px] font-bold text-primary/70 leading-relaxed uppercase tracking-tight">
-                Roles define the boundaries of administrative access. Ensure the tactical description aligns with the assigned permissions.
+        {/* 🛡️ Permission Matrix (Bottom) */}
+        <div className="bg-card/40 backdrop-blur-2xl rounded-[2.5rem] border border-border/10 p-8 md:p-12">
+          <div className="flex items-center justify-between mb-10">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-black uppercase italic tracking-tight">Access Control Matrix</h2>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                Selected Permissions: <span className="text-primary font-black">{formData.permissions.length}</span>
               </p>
             </div>
           </div>
-        </div>
 
-        {/* 🛡️ Permission Matrix */}
-        <div className="lg:col-span-8 space-y-6">
-          <div className="bg-card/40 backdrop-blur-2xl rounded-[2.5rem] border border-border/10 p-8">
-            <div className="flex items-center justify-between mb-8">
-              <div className="space-y-1">
-                <h2 className="text-xl font-black uppercase italic tracking-tight">Access Control Matrix</h2>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                  Active Nodes: <span className="text-primary">{formData.permissions.length}</span>
-                </p>
-              </div>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {RESOURCES.map((resource) => {
+              const resourcePermissions = ACTIONS.map(a => `${resource}:${a}`);
+              const hasAll = resourcePermissions.every(p => formData.permissions.includes(p));
+              const isLocked = editingRole && !editingRole.isEditable && editingRole.isSystem;
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[600px] overflow-y-auto pr-4 custom-scrollbar">
-              {RESOURCES.map((resource) => {
-                const resourcePermissions = ACTIONS.map(a => `${resource}:${a}`);
-                const hasAll = resourcePermissions.every(p => formData.permissions.includes(p));
-                const isLocked = editingRole && !editingRole.isEditable && editingRole.isSystem;
-
-                return (
-                  <div key={resource} className={cn(
-                    "p-6 rounded-[2rem] border transition-all duration-300",
-                    hasAll ? "bg-primary/5 border-primary/30" : "bg-accent/5 border-border/10"
-                  )}>
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-[11px] font-black uppercase tracking-widest text-foreground">{resource}</h3>
-                          {isLocked && <Lock size={12} className="text-muted-foreground/50" />}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleToggleResourceAll(resource)}
-                          disabled={isLocked}
-                          className={cn(
-                            "text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full transition-all border",
-                            hasAll 
-                              ? "bg-primary text-background border-primary" 
-                              : "bg-transparent text-muted-foreground border-border/10 hover:bg-accent/20"
-                          )}
-                        >
-                          {hasAll ? "FULL_ACCESS" : "GRANT_ALL"}
-                        </button>
+              return (
+                <div key={resource} className={cn(
+                  "p-6 rounded-[2rem] border transition-all duration-300",
+                  hasAll ? "bg-primary/5 border-primary/30 shadow-lg shadow-primary/5" : "bg-accent/5 border-border/10"
+                )}>
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-[11px] font-black uppercase tracking-widest text-foreground">{resource}</h3>
+                        {isLocked && <Lock size={12} className="text-muted-foreground/50" />}
                       </div>
-                      
-                      <div className="flex flex-wrap gap-2">
-                        {ACTIONS.map((action) => {
-                          const perm = `${resource}:${action}`;
-                          const isChecked = formData.permissions.includes(perm);
-                          return (
-                            <button
-                              key={action}
-                              type="button"
-                              onClick={() => handleTogglePermission(perm)}
-                              disabled={isLocked}
-                              className={cn(
-                                "px-4 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border",
-                                isChecked 
-                                  ? "bg-foreground text-background border-foreground shadow-lg" 
-                                  : "bg-background text-muted-foreground border-border/10 hover:border-primary/50"
-                              )}
-                            >
-                              {action}
-                            </button>
-                          );
-                        })}
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleResourceAll(resource)}
+                        disabled={isLocked}
+                        className={cn(
+                          "text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full transition-all border",
+                          hasAll 
+                            ? "bg-primary text-background border-primary" 
+                            : "bg-transparent text-muted-foreground border-border/10 hover:bg-accent/20"
+                        )}
+                      >
+                        {hasAll ? "ALL_ON" : "ALL_OFF"}
+                      </button>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-2">
+                      {ACTIONS.map((action) => {
+                        const perm = `${resource}:${action}`;
+                        const isChecked = formData.permissions.includes(perm);
+                        return (
+                          <button
+                            key={action}
+                            type="button"
+                            onClick={() => handleTogglePermission(perm)}
+                            disabled={isLocked}
+                            className={cn(
+                              "px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border",
+                              isChecked 
+                                ? "bg-foreground text-background border-foreground shadow-lg" 
+                                : "bg-background text-muted-foreground border-border/10 hover:border-primary/50"
+                            )}
+                          >
+                            {action}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
+
     </div>
   );
 }

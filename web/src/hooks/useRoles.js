@@ -1,8 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../lib/api";
+import { useAuthStore } from "@/store/authStore";
+import { hasPermission } from "@/utils/rbacUtils";
 
 export const useRoles = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
 
   const {
     data: roles,
@@ -14,6 +17,7 @@ export const useRoles = () => {
       const { data } = await api.get("/roles");
       return data;
     },
+    enabled: !!user && hasPermission(user, ["roles:view", "all"]),
   });
 
   const createRole = useMutation({

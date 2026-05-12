@@ -3,57 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAppStore } from "@/store/appStore";
-import {
-  LayoutDashboard,
-  ShoppingBag,
-  Shirt,
-  FolderTree,
-  Zap,
-  Ticket,
-  Users,
-  User,
-  Settings,
-  Bold,
-  MessageCircle,
-  Sparkles,
-  Layout,
-  Shield,
-} from "lucide-react";
+import { navGroups } from "@/utils/adminRoutes";
 import { cn } from "@/lib/utils";
-
 import { useAuthStore } from "@/store/authStore";
+import { hasPermission } from "@/utils/rbacUtils";
 
-const navGroups = [
-  {
-    label: "Management",
-    items: [
-      { name: "Dashboard", href: "/admin", icon: <LayoutDashboard size={18} />, permission: ["dashboard:view", "reports:view"] },
-      { name: "Orders", href: "/admin/orders", icon: <ShoppingBag size={18} />, permission: "orders:view" },
-      { name: "Products", href: "/admin/products", icon: <Shirt size={18} />, permission: "products:view" },
-      { name: "Categories", href: "/admin/categories", icon: <FolderTree size={18} />, permission: "categories:view" },
-      { name: "Layout Builder", href: "/admin/layout-builder", icon: <Layout size={18} />, permission: "settings:manage" },
-      { name: "Live Chat", href: "/admin/chat", icon: <MessageCircle size={18} />, permission: "chat:view" },
-    ]
-  },
-  {
-    label: "Marketing & Content",
-    items: [
-      { name: "Banners", href: "/admin/banner-campaigns", icon: <Sparkles size={18} />, permission: "banner-campaigns:view" },
-      { name: "Flash Sales", href: "/admin/flash-sales", icon: <Zap size={18} />, permission: "flash-sales:view" },
-      { name: "Coupons", href: "/admin/coupons", icon: <Ticket size={18} />, permission: "coupons:view" },
-      { name: "Blog", href: "/admin/blog", icon: <Bold size={18} />, permission: "blogs:view" },
-    ]
-  },
-  {
-    label: "Settings & Users",
-    items: [
-      { name: "Users", href: "/admin/users", icon: <Users size={18} />, permission: "users:view" },
-      { name: "Roles", href: "/admin/roles", icon: <Shield size={18} />, permission: "roles:view" },
-      { name: "Profile", href: "/admin/profile", icon: <User size={18} /> }, // No specific permission needed for profile
-      { name: "Settings", href: "/admin/settings", icon: <Settings size={18} />, permission: "settings:view" },
-    ]
-  }
-];
 
 export default function Sidebar({ className, onItemClick }) {
   const pathname = usePathname();
@@ -66,10 +20,7 @@ export default function Sidebar({ className, onItemClick }) {
     ...group,
     items: group.items.filter(item => {
       if (!item.permission) return true;
-      if (user?.role?.name === 'superadmin') return true;
-      if (user?.role?.permissions?.includes('all')) return true;
-      const perms = Array.isArray(item.permission) ? item.permission : [item.permission];
-      return perms.some(p => user?.role?.permissions?.includes(p));
+      return hasPermission(user, item.permission);
     })
   })).filter(group => group.items.length > 0);
 

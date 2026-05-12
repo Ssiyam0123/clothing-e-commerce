@@ -9,6 +9,7 @@ import { Search, ShoppingBag, User, Menu, X, Sun, Moon, Sparkles, Heart, Chevron
 import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { useProductStore } from "@/store/productStore";
+import { hasAnyAdminPermission } from "@/utils/rbacUtils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -64,12 +65,7 @@ export default function Navbar() {
       { label: "Flash Sale", key: "flashSale", href: "/flash-sale" },
       { label: "Blog", key: "blog", href: "/blog" },
     ];
-    if (
-      user?.role?.name === 'superadmin' || 
-      user?.role?.permissions?.includes('all') || 
-      user?.role?.permissions?.includes('dashboard:view') ||
-      user?.role?.permissions?.includes('reports:view')
-    ) {
+    if (hasAnyAdminPermission(user)) {
       links.push({ label: "Admin", key: "admin", href: "/admin", isSpecial: true });
     }
     return links;

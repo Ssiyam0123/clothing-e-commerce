@@ -1,8 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../lib/api";
+import { useAuthStore } from "@/store/authStore";
+import { hasPermission } from "@/utils/rbacUtils";
 
 export const useUsers = (params = {}) => {
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
 
   const {
     data: usersData,
@@ -15,6 +18,7 @@ export const useUsers = (params = {}) => {
       const { data } = await api.get("/users", { params });
       return data;
     },
+    enabled: !!user && hasPermission(user, ["users:view", "all"]),
   });
 
   const updateUser = useMutation({
@@ -31,7 +35,7 @@ export const useUsers = (params = {}) => {
     return useQuery({
       queryKey: ["user", id],
       queryFn: async () => (await api.get(`/users/${id}`)).data,
-      enabled: !!id,
+      enabled: !!id && !!user && hasPermission(user, ["users:view", "all"]),
     });
   };
 

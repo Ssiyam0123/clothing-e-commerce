@@ -8,11 +8,14 @@ import {
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import api from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
+import { hasPermission } from "@/utils/rbacUtils";
 
 export const useAdminProducts = (initialFilters = {}) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { user } = useAuthStore();
 
   const filters = useMemo(
     () => ({
@@ -83,6 +86,7 @@ export const useAdminProducts = (initialFilters = {}) => {
     placeholderData: keepPreviousData,
     staleTime: 0,
     gcTime: 1000 * 60 * 30,
+    enabled: !!user && hasPermission(user, ["products:view", "all"]),
   });
 
   const deleteProduct = useMutation({

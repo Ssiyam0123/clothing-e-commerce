@@ -5,6 +5,12 @@ import dynamic from "next/dynamic";
 import { useAdminDashboard } from "@/hooks/useAdminDashboard";
 import { AdminHeader } from "@/components/admin/dashboard/AdminHeader";
 import { StatsCards } from "@/components/admin/dashboard/StatsCards";
+import { hasPermission } from "@/utils/rbacUtils";
+import { useAuthStore } from "@/store/authStore";
+import { getFirstAllowedRoute } from "@/utils/adminRoutes";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Loader from "@/components/common/Loader";
 
 // Dynamically import heavy components for better first load performance
 const RevenueChart = dynamic(() => import("@/components/admin/dashboard/RevenueChart").then(mod => mod.RevenueChart), {
@@ -64,7 +70,30 @@ export default function Dashboard() {
   // Use userData for user growth specifically
   const customers = userData?.customers || { total: 0, newThisMonth: 0, growth: [], recent: [] };
 
+  const { user } = useAuthStore();
+  const router = useRouter();
+  const canViewDashboard = hasPermission(user, ["dashboard:view", "reports:view", "all"]);
+
+  useEffect(() => {
+    if (!canViewDashboard) {
+      const targetRoute = getFirstAllowedRoute(user, hasPermission);
+      if (targetRoute && targetRoute !== "/admin") {
+        router.replace(targetRoute);
+      }
+    }
+  }, [canViewDashboard, user, router]);
+
+  if (!canViewDashboard) {
+    return (
+      <div className="h-[60vh] flex items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
+
+
   const isLoading = revLoading || userLoading;
+
   const isFetching = revFetching || userFetching;
 
   return (
