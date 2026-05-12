@@ -14,15 +14,36 @@ Returns aggregated statistics for the admin dashboard.
 **Response:**
 ```json
 {
-  "stats": {
-    "totalSales": 150000,
-    "totalOrders": 120,
-    "totalUsers": 450,
-    "totalProducts": 85
+  "revenue": {
+    "total": 150000,
+    "avgOrder": 1250,
+    "today": 5000,
+    "trend": [
+      { "_id": "2024-05-01", "revenue": 12000, "orderCount": 10 }
+    ],
+    "forecast": 180000
   },
-  "charts": {
-    "salesOverTime": [...],
-    "categoryDistribution": [...]
+  "analytics": {
+    "mostSoldCategories": [
+      { "name": "Men", "sales": 45, "revenue": 55000 },
+      { "name": "Women", "sales": 30, "revenue": 42000 }
+    ],
+    "retentionRate": 25
+  },
+  "inventory": {
+    "totalProducts": 85,
+    "outOfStock": 5,
+    "criticalItems": [
+      { "name": "Classic Tee", "stock": 2, "status": "LOW" }
+    ]
+  },
+  "categories": [
+    { "name": "Men", "count": 40 },
+    { "name": "Women", "count": 45 }
+  ],
+  "customers": {
+    "total": 450,
+    "newThisMonth": 25
   },
   "recentOrders": [...]
 }

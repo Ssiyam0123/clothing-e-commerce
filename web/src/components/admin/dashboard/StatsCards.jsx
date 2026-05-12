@@ -14,10 +14,16 @@ export function StatsCards({ revenue, customers, inventory, recentOrdersCount, i
       description: "Total revenue this year",
     },
     {
-      label: "Customers",
-      value: customers?.total,
-      icon: <Users className="h-4 w-4 text-primary" />,
-      description: "Total registered users",
+      label: "Forecast",
+      value: revenue?.forecast ? `৳${revenue.forecast.toLocaleString()}` : "৳0",
+      icon: <TrendingUp className="h-4 w-4 text-green-500" />,
+      description: "Predicted month-end revenue",
+    },
+    {
+      label: "Retention",
+      value: `${customers?.retentionRate || 0}%`,
+      icon: <Users className="h-4 w-4 text-blue-500" />,
+      description: "Returning customers rate",
     },
     {
       label: "Total Products",
@@ -34,7 +40,7 @@ export function StatsCards({ revenue, customers, inventory, recentOrdersCount, i
   ];
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
       {stats.map((stat, i) => (
         <Card key={i} className="border border-border shadow-sm bg-card rounded-[2rem] transition-all hover:shadow-xl hover:scale-[1.03]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

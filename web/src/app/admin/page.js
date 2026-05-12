@@ -25,63 +25,117 @@ const InventoryAlerts = dynamic(() => import("@/components/admin/dashboard/Inven
   ssr: false
 });
 
-export default function Dashboard() {
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState("all");
+const TopSellingCategories = dynamic(() => import("@/components/admin/dashboard/TopSellingCategories").then(mod => mod.TopSellingCategories), {
+  ssr: false
+});
 
-  const { data, isLoading, isFetching } = useAdminDashboard({
-    year: selectedYear,
-    month: selectedMonth,
+const UserGrowthChart = dynamic(() => import("@/components/admin/dashboard/UserGrowthChart").then(mod => mod.UserGrowthChart), {
+  ssr: false
+});
+
+const UsersTable = dynamic(() => import("@/components/admin/dashboard/UsersTable").then(mod => mod.UsersTable), {
+  ssr: false
+});
+
+export default function Dashboard() {
+  const [revYear, setRevYear] = useState(new Date().getFullYear());
+  const [revMonth, setRevMonth] = useState("all");
+  
+  const [userYear, setUserYear] = useState(new Date().getFullYear());
+  const [userMonth, setUserMonth] = useState("all");
+
+  const { data: revData, isLoading: revLoading, isFetching: revFetching } = useAdminDashboard({
+    year: revYear,
+    month: revMonth,
   });
 
-  // Fallback to empty data structure if undefined
-  const revenue = data?.revenue || { today: 0, total: 0, avgOrder: 0, trend: [] };
-  const inventory = data?.inventory || { totalProducts: 0, outOfStock: 0, criticalItems: [] };
-  const categories = data?.categories || [];
-  const customers = data?.customers || { total: 0, newThisMonth: 0 };
-  const recentOrders = data?.recentOrders || [];
+  const { data: userData, isLoading: userLoading, isFetching: userFetching } = useAdminDashboard({
+    year: userYear,
+    month: userMonth,
+  });
+
+  // Use revData for general stats and revenue
+  const revenue = revData?.revenue || { today: 0, total: 0, avgOrder: 0, trend: [], forecast: 0 };
+  const inventory = revData?.inventory || { totalProducts: 0, outOfStock: 0, criticalItems: [] };
+  const categories = revData?.categories || [];
+  const recentOrders = revData?.recentOrders || [];
+  const analytics = revData?.analytics || { mostSoldCategories: [], retentionRate: 0 };
+  
+  // Use userData for user growth specifically
+  const customers = userData?.customers || { total: 0, newThisMonth: 0, growth: [], recent: [] };
+
+  const isLoading = revLoading || userLoading;
+  const isFetching = revFetching || userFetching;
 
   return (
-    <div className="admin-page-container">
+    <div className="admin-page-container space-y-8 pb-12">
       {/* 1. HEADER */}
-      <AdminHeader isFetching={isFetching} todayRevenue={revenue.today} isLoading={isLoading} />
+      <AdminHeader 
+        isFetching={revFetching} 
+        todayRevenue={revenue.today} 
+        isLoading={revLoading}
+      />
 
       {/* 2. KPI GRID */}
       <StatsCards 
         revenue={revenue} 
-        customers={customers} 
+        customers={{ ...customers, retentionRate: analytics.retentionRate }} 
         inventory={inventory} 
         recentOrdersCount={recentOrders.length} 
-        isLoading={isLoading}
+        isLoading={revLoading}
       />
 
-      {/* 3. ANALYTICS BLOCK */}
+      {/* 3. MAIN ANALYTICS ROW */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 min-h-[300px] md:min-h-[480px]">
+        <div className="lg:col-span-2 min-h-[480px]">
           <RevenueChart 
             revenue={revenue}
-            selectedYear={selectedYear}
-            setSelectedYear={setSelectedYear}
-            selectedMonth={selectedMonth}
-            setSelectedMonth={setSelectedMonth}
-            isFetching={isFetching}
-            isLoading={isLoading}
+            selectedYear={revYear}
+            setSelectedYear={setRevYear}
+            selectedMonth={revMonth}
+            setSelectedMonth={setRevMonth}
+            isFetching={revFetching}
+            isLoading={revLoading}
           />
         </div>
-        <div className="min-h-[300px] md:min-h-[400px]">
+        <div className="lg:col-span-1">
           <CategoryPie 
             categories={categories} 
-            isFetching={isFetching} 
-            isLoading={isLoading}
+            isFetching={revFetching} 
+            isLoading={revLoading}
           />
         </div>
       </div>
 
-      {/* 4. ACTIVITY & INVENTORY ALERTS */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <RecentOrders recentOrders={recentOrders} isLoading={isLoading} />
-        <InventoryAlerts inventory={inventory} isLoading={isLoading} />
+      {/* 4. USER GROWTH & TOP CATEGORIES */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <UserGrowthChart 
+            data={customers.growth}
+            selectedYear={userYear}
+            setSelectedYear={setUserYear}
+            selectedMonth={userMonth}
+            setSelectedMonth={setUserMonth}
+            isFetching={userFetching}
+            isLoading={userLoading}
+          />
+        </div>
+        <div className="lg:col-span-1">
+          <TopSellingCategories 
+            categories={analytics.mostSoldCategories} 
+            isLoading={revLoading}
+          />
+        </div>
       </div>
+
+      {/* 5. DATA TABLES */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <RecentOrders recentOrders={recentOrders} isLoading={revLoading} />
+        <UsersTable users={customers.recent} isLoading={userLoading} />
+      </div>
+
+      {/* 6. INVENTORY ALERTS */}
+      <InventoryAlerts inventory={inventory} isLoading={revLoading} />
     </div>
   );
 }

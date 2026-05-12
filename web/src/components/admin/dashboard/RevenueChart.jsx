@@ -15,7 +15,6 @@ import {
 } from "recharts";
 import { RefreshCw } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
-import { cn } from "@/lib/utils";
 
 const MONTHS = [
   { label: "All Months", value: "all" },
@@ -36,8 +35,8 @@ const MONTHS = [
 export function RevenueChart({ 
   revenue, 
   selectedYear, 
-  setSelectedYear, 
-  selectedMonth, 
+  setSelectedYear,
+  selectedMonth,
   setSelectedMonth,
   isFetching,
   isLoading
