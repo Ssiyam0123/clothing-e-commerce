@@ -58,7 +58,7 @@ function UsersContent() {
   }, [setSearch, setPage]);
 
   const handleDelete = async (id, role) => {
-    if (role === "admin") {
+    if (role?.name === "admin") {
       return swalError("Action Denied", "Admin users cannot be deleted.");
     }
     const isConfirmed = await swalConfirm("Delete User?", "This user will be permanently deleted.");
@@ -101,6 +101,7 @@ function UsersContent() {
         </div>
       ),
     },
+
     {
       label: "Role",
       render: (item) => (
@@ -108,12 +109,14 @@ function UsersContent() {
           variant="outline"
           className={cn(
             "px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-full",
-            item.role === "admin"
-              ? "bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.1)]"
-              : "bg-zinc-500/10 text-zinc-500 border-zinc-500/20"
+            item.role?.name === "superadmin" 
+              ? "bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.1)]"
+              : item.role?.name === "admin"
+                ? "bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.1)]"
+                : "bg-zinc-500/10 text-zinc-500 border-zinc-500/20"
           )}
         >
-          {item.role === "admin" ? "Admin" : "Customer"}
+          {item.role?.name || "Customer"}
         </Badge>
       ),
     },

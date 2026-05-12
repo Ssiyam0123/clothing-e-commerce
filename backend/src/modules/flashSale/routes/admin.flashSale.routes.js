@@ -6,19 +6,20 @@ import {
     deleteFlashSale,
     getAdminFlashSaleById
 } from '../controllers/admin.flashSale.controller.js';
-import { protect, admin } from '../../../middleware/auth.js';
+import { protect } from '../../../middleware/auth.js';
+import { authorize } from '../../../middleware/rbac.js';
 
 const router = express.Router();
 
-router.use(protect, admin);
+router.use(protect);
 
 router.route('/')
-    .get(getAllFlashSales)
-    .post(createFlashSale);
+    .get(authorize('flash-sales:view'), getAllFlashSales)
+    .post(authorize('flash-sales:create'), createFlashSale);
 
 router.route('/:id')
-    .get(getAdminFlashSaleById)
-    .put(updateFlashSale)
-    .delete(deleteFlashSale);
+    .get(authorize('flash-sales:view'), getAdminFlashSaleById)
+    .put(authorize('flash-sales:update'), updateFlashSale)
+    .delete(authorize('flash-sales:delete'), deleteFlashSale);
 
 export default router;

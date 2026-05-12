@@ -52,7 +52,7 @@ export const getOrders = asyncHandler(async (req, res) => {
 
   const users = await User.find({
     _id: { $in: userIds }
-  }).select("name email avatar role");
+  }).select("name email avatar role").populate("role");
 
   const userMap = users.reduce((acc, u) => {
     acc[String(u._id)] = u;
@@ -130,8 +130,8 @@ export const createOrderAdmin = asyncHandler(async (req, res) => {
 });
 
 export const getAdminOrderById = asyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id)
-        .populate("user", "name email avatar")
+  const order = await Order.findById(req.params.id)
+    .populate({ path: "user", select: "name email avatar role", populate: { path: "role" } })
         .populate(
             "orderItems.product",
             "name images slug"
@@ -186,7 +186,7 @@ export const updateOrder = asyncHandler(async (req, res) => {
 
   await order.save();
   const updatedOrder = await Order.findById(order._id)
-    .populate("user", "name email avatar")
+    .populate({ path: "user", select: "name email avatar role", populate: { path: "role" } })
     .populate("orderItems.product", "name images slug");
     
   res.json(updatedOrder);

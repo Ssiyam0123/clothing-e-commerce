@@ -1,4 +1,5 @@
 import User from "../user/user.model.js";
+import Role from "../role/role.model.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { sendVerificationEmail, sendPasswordResetEmail } from "../../services/email.service.js";
@@ -28,14 +29,18 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "Email already registered" });
     }
 
+    // Assign default "customer" role
+    const customerRole = await Role.findOne({ name: "customer" });
+
     const verificationToken = crypto.randomBytes(32).toString("hex");
 
     const user = await User.create({
       name,
       email: email.toLowerCase(),
       password,
+      role: customerRole ? customerRole._id : null,
       emailVerificationToken: verificationToken,
-      isEmailVerified: false, // start as unverified
+      isEmailVerified: false, 
     });
 
     // Try to send verification email, but don't block registration
@@ -46,7 +51,6 @@ export const register = async (req, res) => {
       emailSent = true;
     } catch (emailError) {
       console.error("Email sending failed (optional SMTP):", emailError.message);
-      // If SMTP is not configured, auto‑verify the user for development
       if (!process.env.SMTP_HOST) {
         user.isEmailVerified = true;
         user.emailVerificationToken = undefined;
@@ -55,7 +59,6 @@ export const register = async (req, res) => {
       }
     }
 
-    // If SMTP is not configured or email fails, we can optionally auto-login the user
     const token = generateToken(user._id);
 
     res.status(201).json({
@@ -68,7 +71,7 @@ export const register = async (req, res) => {
         name: user.name,
         email: user.email,
         avatar: user.avatar,
-        role: user.role,
+        role: customerRole, // Send back the role object
       },
     });
   } catch (error) {
@@ -86,12 +89,14 @@ export const login = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ email: email.toLowerCase() }).select("+password");
+    const user = await User.findOne({ email: email.toLowerCase() })
+      .select("+password")
+      .populate("role");
+
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Check verification only if user is not auto‑verified
     if (!user.isEmailVerified && process.env.SMTP_HOST) {
       return res.status(401).json({ message: "Please verify your email before logging in" });
     }
@@ -103,7 +108,6 @@ export const login = async (req, res) => {
 
     const token = generateToken(user._id);
 
-    // No session – pure JWT
     res.json({
       message: "Login successful",
       token,
@@ -112,7 +116,7 @@ export const login = async (req, res) => {
         name: user.name,
         email: user.email,
         avatar: user.avatar,
-        role: user.role,
+        role: user.role, // Contains permissions now
       },
     });
   } catch (error) {
@@ -167,14 +171,12 @@ export const forgotPassword = async (req, res) => {
 
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
-    // Try to send email, but don't fail if SMTP is missing
     let emailSent = false;
     try {
       await sendPasswordResetEmail(user.email, resetUrl);
       emailSent = true;
     } catch (emailError) {
       console.error("Password reset email failed (optional SMTP):", emailError.message);
-      // In development, log the reset link to console
       if (!process.env.SMTP_HOST) {
         console.log(`🔐 Password reset link (dev): ${resetUrl}`);
       }
@@ -184,7 +186,7 @@ export const forgotPassword = async (req, res) => {
       message: emailSent
         ? "Password reset link sent to your email"
         : "Password reset link generated (SMTP not configured). Check server console for the link.",
-      ...(!emailSent && !process.env.SMTP_HOST && { devResetUrl: resetUrl }), // optional for frontend dev
+      ...(!emailSent && !process.env.SMTP_HOST && { devResetUrl: resetUrl }), 
     });
   } catch (error) {
     console.error("Forgot password error:", error);
@@ -230,7 +232,7 @@ export const resetPassword = async (req, res) => {
 // Get Current User (JWT)
 export const getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.id).select("-password").populate("role");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -239,4 +241,4 @@ export const getMe = async (req, res) => {
     console.error("Get me error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-};
+};

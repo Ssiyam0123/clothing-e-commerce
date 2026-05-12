@@ -30,7 +30,7 @@ function ChatContent({ children }) {
   const filteredConversations = useMemo(() => {
     if (!searchQuery.trim()) return conversations;
     return conversations.filter((conv) => {
-      const customer = conv.participants?.find((p) => p.role === "customer");
+      const customer = conv.participants?.find((p) => p.role?.name === "customer");
       return customer?.name?.toLowerCase().includes(searchQuery.toLowerCase());
     });
   }, [conversations, searchQuery]);
@@ -102,7 +102,7 @@ function ChatContent({ children }) {
             )}
             
             {filteredConversations.map((conv) => {
-              const customer = conv.participants?.find((p) => p.role === "customer");
+              const customer = conv.participants?.find((p) => p.role?.name === "customer");
               const isActive = id === conv._id;
               const lastMsgTime = new Date(conv.updatedAt);
               const isToday = lastMsgTime.toDateString() === new Date().toDateString();

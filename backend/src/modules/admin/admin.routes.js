@@ -1,7 +1,8 @@
 // src/modules/admin/admin.routes.js
 import express from 'express';
 import { getDashboardData } from './admin.controller.js';
-import { protect, admin } from '../../middleware/auth.js';
+import { protect } from '../../middleware/auth.js';
+import { authorize } from '../../middleware/rbac.js';
 
 import adminProductRoutes from '../product/routes/admin.product.routes.js';
 import adminCategoryRoutes from '../category/routes/admin.category.routes.js';
@@ -10,10 +11,10 @@ import adminOrderRoutes from '../order/routes/admin.order.routes.js';
 
 const router = express.Router();
 
-// All routes require admin authentication
-router.use(protect, admin);
+// Base protection for admin entry points
+router.use(protect);
 
-router.get('/dashboard', getDashboardData);
+router.get('/dashboard', authorize(['dashboard:view', 'reports:view']), getDashboardData);
 
 // 📦 Integrated Admin Modules
 router.use('/products', adminProductRoutes);

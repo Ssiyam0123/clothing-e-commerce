@@ -2,6 +2,7 @@ import { asyncHandler } from '../../middleware/asyncHandler.js';
 import Order from '../order/order.model.js';
 import Product from '../product/product.model.js';
 import User from '../user/user.model.js';
+import Role from '../role/role.model.js';
 import mongoose from 'mongoose';
 
 export const getDashboardData = asyncHandler(async (req, res) => {
@@ -127,10 +128,13 @@ export const getDashboardData = asyncHandler(async (req, res) => {
         user: order.user ? userMap[String(order.user)] : { name: order.shippingAddress?.name || 'Guest User' }
     }));
 
+    const customerRole = await Role.findOne({ name: 'customer' });
+    const customerRoleId = customerRole ? customerRole._id : null;
+
     const userGrowth = await User.aggregate([
         { 
             $match: { 
-                role: 'customer',
+                role: customerRoleId,
                 createdAt: { $gte: startDate, $lte: endDate }
             } 
         },
@@ -143,7 +147,7 @@ export const getDashboardData = asyncHandler(async (req, res) => {
         { $sort: { "_id": 1 } }
     ]);
 
-    const recentCustomers = await User.find({ role: 'customer' })
+    const recentCustomers = await User.find({ role: customerRoleId })
         .sort('-createdAt')
         .limit(5)
         .select('name email avatar createdAt')
@@ -168,8 +172,8 @@ export const getDashboardData = asyncHandler(async (req, res) => {
         },
         categories: categoryStats,
         customers: {
-            total: await User.countDocuments({ role: 'customer' }),
-            newThisMonth: await User.countDocuments({ role: 'customer', createdAt: { $gte: new Date(today.getFullYear(), today.getMonth(), 1) } }),
+            total: await User.countDocuments({ role: customerRoleId }),
+            newThisMonth: await User.countDocuments({ role: customerRoleId, createdAt: { $gte: new Date(today.getFullYear(), today.getMonth(), 1) } }),
             growth: userGrowth,
             recent: recentCustomers
         },

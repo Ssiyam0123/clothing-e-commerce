@@ -15,7 +15,7 @@ export const initSocketEvents = (io) => {
     socket.join(userId);
 
     // 🛡️ Admin Protocol: Join a dedicated support room if needed
-    if (userRole === "admin") {
+    if (userRole?.name === "admin") {
       socket.join("admin_support_room");
     }
 
@@ -31,7 +31,7 @@ export const initSocketEvents = (io) => {
         if (!text) return;
 
         let conversation;
-        if (user.role === "customer") {
+        if (user.role?.name === "customer") {
           // Find or create a conversation for this customer (without a specific admin)
           conversation = await Conversation.findOne({
             participants: { $in: [senderId] },
@@ -67,7 +67,7 @@ export const initSocketEvents = (io) => {
           // Also echo back to sender (for UI consistency)
           io.to(senderId).emit("new_message", broadcastData);
         } 
-        else if (user.role === "admin") {
+        else if (user.role?.name === "admin") {
           // Admin replying to a specific customer
           if (!recipientId) return;
           

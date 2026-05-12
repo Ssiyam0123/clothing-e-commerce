@@ -27,7 +27,12 @@ export default function AdminLayout({ children }) {
 
   // 🛡️ Redirect non-admins
   useEffect(() => {
-    if (!authLoading && (!user || user.role !== "admin")) {
+    const hasAdminAccess = user?.role?.name === "superadmin" || 
+                          user?.role?.permissions?.includes("all") || 
+                          user?.role?.permissions?.includes("dashboard:view") ||
+                          user?.role?.permissions?.includes("reports:view");
+
+    if (!authLoading && (!user || !hasAdminAccess)) {
       router.replace("/");
     }
   }, [user, authLoading, router]);
@@ -88,7 +93,12 @@ export default function AdminLayout({ children }) {
     );
   }
 
-  if (!user || user.role !== "admin") return null;
+  const hasAdminAccess = user?.role?.name === "superadmin" || 
+                        user?.role?.permissions?.includes("all") || 
+                        user?.role?.permissions?.includes("dashboard:view") ||
+                        user?.role?.permissions?.includes("reports:view");
+
+  if (!user || !hasAdminAccess) return null;
 
   return (
     <div className="flex h-screen bg-background text-foreground transition-colors duration-700 overflow-hidden">
@@ -168,7 +178,7 @@ export default function AdminLayout({ children }) {
                       {user?.name}
                     </p>
                     <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
-                      Admin
+                      {user?.role?.name}
                     </p>
                   </div>
                 </div>

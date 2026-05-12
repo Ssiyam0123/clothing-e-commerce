@@ -6,20 +6,21 @@ import {
     getAdminCategories,
     getAdminCategoryById
 } from '../controllers/admin.category.controller.js';
-import { protect, admin } from '../../../middleware/auth.js';
+import { protect } from '../../../middleware/auth.js';
+import { authorize } from '../../../middleware/rbac.js';
 import upload from '../../../middleware/upload.js';
 
 const router = express.Router();
 
-router.use(protect, admin);
+router.use(protect);
 
 router.route('/')
-    .get(getAdminCategories)
-    .post(upload.single('image'), createCategory);
+    .get(authorize('categories:view'), getAdminCategories)
+    .post(authorize('categories:create'), upload.single('image'), createCategory);
 
 router.route('/:id')
-    .get(getAdminCategoryById)
-    .put(upload.single('image'), updateCategory)
-    .delete(deleteCategory);
+    .get(authorize('categories:view'), getAdminCategoryById)
+    .put(authorize('categories:update'), upload.single('image'), updateCategory)
+    .delete(authorize('categories:delete'), deleteCategory);
 
 export default router;

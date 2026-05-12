@@ -1,0 +1,56 @@
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import Role from "../modules/role/role.model.js";
+
+dotenv.config();
+
+const roles = [
+  {
+    name: "superadmin",
+    description: "Has full access to all system modules and actions.",
+    permissions: ["all"],
+    isEditable: false,
+  },
+  {
+    name: "admin",
+    description: "Full access to dashboard, products, and orders.",
+    permissions: [
+      "dashboard:view",
+      "products:view", "products:create", "products:update", "products:delete",
+      "orders:view", "orders:update",
+      "users:view", "users:update",
+      "categories:view", "categories:manage"
+    ],
+  },
+  {
+    name: "customer",
+    description: "Standard customer role with no admin access.",
+    permissions: [],
+    isSystem: true,
+    isEditable: false
+  }
+];
+
+const seedRoles = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Connected to MongoDB for seeding...");
+
+    for (const roleData of roles) {
+      await Role.findOneAndUpdate(
+        { name: roleData.name },
+        roleData,
+        { upsert: true, new: true }
+      );
+      console.log(`✅ Seeded role: ${roleData.name}`);
+    }
+
+    console.log("🚀 All roles seeded successfully!");
+    process.exit();
+  } catch (error) {
+    console.error("❌ Seeding failed:", error);
+    process.exit(1);
+  }
+};
+
+seedRoles();

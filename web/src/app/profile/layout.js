@@ -161,7 +161,9 @@ export default function ProfileLayout({ children }) {
                       <CreditCard size={14} className="text-muted-foreground" />
                       <span className="text-[10px] font-bold text-muted-foreground uppercase">{ui.level}</span>
                     </div>
-                    <span className="text-[10px] font-black text-primary uppercase tracking-widest">{user.role}</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-widest">
+                      {user.role?.name === 'admin' || user.role?.name === 'superadmin' ? ui.admin : ui.member}
+                    </span>
                   </div>
                 </div>
 

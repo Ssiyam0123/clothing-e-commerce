@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useUsers } from "@/hooks/useUsers";
+import { useRoles } from "@/hooks/useRoles";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Loader from "@/components/common/Loader";
@@ -25,6 +26,7 @@ export default function UserEditPage() {
   const { id } = useParams();
   const router = useRouter();
   const { useUser, updateUser } = useUsers();
+  const { roles, isLoading: isRolesLoading } = useRoles();
   const { data: userData, isLoading: isUserLoading } = useUser(id);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -40,7 +42,7 @@ export default function UserEditPage() {
       setValue("name", userData.name);
       setValue("email", userData.email);
       setValue("phone", userData.phone || "");
-      setValue("role", userData.role);
+      setValue("role", userData.role?._id || userData.role);
       setValue("isEmailVerified", userData.isEmailVerified);
     }
   }, [userData, setValue]);
@@ -58,7 +60,7 @@ export default function UserEditPage() {
     }
   };
 
-  if (isUserLoading)
+  if (isUserLoading || isRolesLoading)
     return (
       <div className="p-20">
         <Loader />
@@ -154,8 +156,11 @@ export default function UserEditPage() {
                 {...register("role")}
                 className="w-full bg-accent/5 border border-border/10 rounded-2xl p-5 font-bold focus:border-blue-500 outline-none cursor-pointer appearance-none"
               >
-                <option value="customer">Syndicate Member (Customer)</option>
-                <option value="admin">Vanguard Admin (Root Access)</option>
+                {roles?.map((role) => (
+                  <option key={role._id} value={role._id}>
+                    {role.name.toUpperCase()} {role.isSystem ? "(SYSTEM)" : ""}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

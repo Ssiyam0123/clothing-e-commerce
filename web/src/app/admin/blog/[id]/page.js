@@ -25,7 +25,7 @@ import { Separator } from "@/components/ui/separator";
  */
 export default function EditBlog() {
   const { id } = useParams();
-  const { blog, blogLoading, updateBlog } = useBlogs(id, true);
+  const { blog, blogLoading, updateBlog } = useBlogs({}, true, id, true);
 
   if (blogLoading) {
     return (

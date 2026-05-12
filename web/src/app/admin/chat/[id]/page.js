@@ -61,7 +61,7 @@ export default function ActiveChatPage() {
   const messagesEndRef = useRef(null);
 
   const activeConv = useMemo(() => conversations.find((c) => c._id === id), [conversations, id]);
-  const customer = useMemo(() => activeConv?.participants?.find((p) => p.role === "customer"), [activeConv]);
+  const customer = useMemo(() => activeConv?.participants?.find((p) => p.role?.name === "customer"), [activeConv]);
 
   // Fetch messages
   useEffect(() => {
@@ -188,7 +188,7 @@ export default function ActiveChatPage() {
             messages.map((msg, idx) => {
               const myId = user?._id || user?.id;
               const senderId = typeof msg.sender === "string" ? msg.sender : msg.sender?._id || msg.sender?.id;
-              const isMe = msg.sender?.role === "admin" || senderId === myId;
+              const isMe = msg.sender?.role?.name === "admin" || senderId === myId;
               const showStatus = idx === messages.length - 1 && isMe;
               return <ChatMessage key={msg._id || idx} message={msg} isMe={isMe} showStatus={showStatus} />;
             })

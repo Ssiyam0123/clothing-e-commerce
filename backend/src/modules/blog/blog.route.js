@@ -7,7 +7,8 @@ import {
   updatePost, 
   deletePost 
 } from './blog.controller.js';
-import { protect, admin } from '../../middleware/auth.js';
+import { protect } from '../../middleware/auth.js';
+import { authorize } from '../../middleware/rbac.js';
 import upload from '../../middleware/upload.js';
 
 const router = express.Router();
@@ -15,14 +16,13 @@ const router = express.Router();
 // 📰 Public: List | Admin: Create
 router.route('/')
   .get(getPosts)
-  .post(protect, admin, upload.single('image'), createPost);
+  .post(protect, authorize('blogs:create'), upload.single('image'), createPost);
 
 // 🛠️ Admin: Get, Update & Delete by ID
-// Using /admin/:id prefix to avoid collision with /:slug public route
 router.route('/admin/:id')
-  .get(protect, admin, getPostById)
-  .put(protect, admin, upload.single('image'), updatePost)
-  .delete(protect, admin, deletePost);
+  .get(protect, authorize('blogs:view'), getPostById)
+  .put(protect, authorize('blogs:update'), upload.single('image'), updatePost)
+  .delete(protect, authorize('blogs:delete'), deletePost);
 
 // 📖 Public: Read by Slug (Keep this last)
 router.route('/:slug')

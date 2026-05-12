@@ -7,7 +7,7 @@ import { uploadImage, deleteImage } from "../../services/imageUploadService.js";
 // @access  Private
 export const getMe = asyncHandler(async (req, res) => {
   // req.user is attached by protect middleware
-  const user = await User.findById(req.user._id).select("-password");
+  const user = await User.findById(req.user._id).select("-password").populate("role");
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
@@ -37,14 +37,16 @@ export const updateProfile = asyncHandler(async (req, res) => {
 
   await user.save();
 
+  const updatedUser = await User.findById(user._id).populate("role");
+
   res.json({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-    bio: user.bio,
-    avatar: user.avatar,
-    role: user.role,
+    _id: updatedUser._id,
+    name: updatedUser.name,
+    email: updatedUser.email,
+    phone: updatedUser.phone,
+    bio: updatedUser.bio,
+    avatar: updatedUser.avatar,
+    role: updatedUser.role,
   });
 });
 
@@ -103,6 +105,7 @@ export const getAllUsers = asyncHandler(async (req, res) => {
   const total = await User.countDocuments(query);
   const users = await User.find(query)
     .select("-password")
+    .populate("role")
     .sort(sortOrder)
     .limit(Number(limit))
     .skip((Number(page) - 1) * Number(limit));
@@ -119,7 +122,7 @@ export const getAllUsers = asyncHandler(async (req, res) => {
 // @route   GET /api/users/:id
 // @access  Private/Admin
 export const getUserById = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id).select("-password");
+  const user = await User.findById(req.params.id).select("-password").populate("role");
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
@@ -149,14 +152,16 @@ export const updateUser = asyncHandler(async (req, res) => {
 
   await user.save();
 
+  const updatedUser = await User.findById(user._id).populate("role");
+
   res.json({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    phone: user.phone,
-    bio: user.bio,
-    avatar: user.avatar,
+    _id: updatedUser._id,
+    name: updatedUser.name,
+    email: updatedUser.email,
+    role: updatedUser.role,
+    phone: updatedUser.phone,
+    bio: updatedUser.bio,
+    avatar: updatedUser.avatar,
   });
 });
 

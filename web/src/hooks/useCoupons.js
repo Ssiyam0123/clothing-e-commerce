@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
+import { hasPermission } from "@/utils/rbacUtils";
 
 export const useCoupons = (params = {}) => {
   const queryClient = useQueryClient();
@@ -12,7 +13,7 @@ export const useCoupons = (params = {}) => {
   } = useQuery({
     queryKey: ["admin-coupons", params],
     queryFn: async () => (await api.get("/coupons", { params })).data,
-    enabled: !!user && user.role === "admin",
+    enabled: !!user && hasPermission(user, 'coupons:view'),
   });
 
   const createCoupon = useMutation({
@@ -44,7 +45,7 @@ export const useCoupons = (params = {}) => {
     return useQuery({
       queryKey: ["admin-coupon", id, usageParams],
       queryFn: async () => (await api.get(`/coupons/${id}`, { params: usageParams })).data,
-      enabled: !!user && user.role === "admin" && !!id && id !== "new",
+      enabled: !!user && hasPermission(user, 'coupons:view') && !!id && id !== "new",
     });
   };
 

@@ -165,7 +165,7 @@ export default function LiveSupportPage() {
               messages.map((msg, i) => {
                 const myId = user?._id || user?.id;
                 const senderId = typeof msg.sender === "string" ? msg.sender : msg.sender?._id || msg.sender?.id;
-                const isMe = msg.sender?.role === 'customer' || senderId === myId;
+                const isMe = msg.sender?.role?.name === 'customer' || senderId === myId;
                 return (
                   <ChatMessage 
                     key={msg._id || i} 

@@ -14,7 +14,9 @@ export const protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select("-password");
+    // Populate role to get its name and permissions
+    const user = await User.findById(decoded.id).select("-password").populate("role");
+    
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
@@ -26,8 +28,12 @@ export const protect = async (req, res, next) => {
 };
 
 export const admin = (req, res, next) => {
-  if (req.user && req.user.role === "admin") return next();
-  res.status(403).json({ message: "Forbidden. Admin clearance required." });
+  // Fallback: Only allow superadmin by default if using legacy admin check
+  const roleName = req.user.role?.name;
+  if (roleName === "superadmin") {
+    return next();
+  }
+  res.status(403).json({ message: "Forbidden. SuperAdmin clearance required for this legacy route." });
 };
 
 export const optionalAuth = async (req, res, next) => {

@@ -17,45 +17,61 @@ import {
   MessageCircle,
   Sparkles,
   Layout,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+import { useAuthStore } from "@/store/authStore";
 
 const navGroups = [
   {
     label: "Management",
     items: [
-      { name: "Dashboard", href: "/admin", icon: <LayoutDashboard size={18} /> },
-      { name: "Orders", href: "/admin/orders", icon: <ShoppingBag size={18} /> },
-      { name: "Products", href: "/admin/products", icon: <Shirt size={18} /> },
-      { name: "Categories", href: "/admin/categories", icon: <FolderTree size={18} /> },
-      { name: "Layout Builder", href: "/admin/layout-builder", icon: <Layout size={18} /> },
-      { name: "Live Chat", href: "/admin/chat", icon: <MessageCircle size={18} /> },
+      { name: "Dashboard", href: "/admin", icon: <LayoutDashboard size={18} />, permission: ["dashboard:view", "reports:view"] },
+      { name: "Orders", href: "/admin/orders", icon: <ShoppingBag size={18} />, permission: "orders:view" },
+      { name: "Products", href: "/admin/products", icon: <Shirt size={18} />, permission: "products:view" },
+      { name: "Categories", href: "/admin/categories", icon: <FolderTree size={18} />, permission: "categories:view" },
+      { name: "Layout Builder", href: "/admin/layout-builder", icon: <Layout size={18} />, permission: "settings:manage" },
+      { name: "Live Chat", href: "/admin/chat", icon: <MessageCircle size={18} />, permission: "chat:view" },
     ]
   },
   {
     label: "Marketing & Content",
     items: [
-      { name: "Banners", href: "/admin/banner-campaigns", icon: <Sparkles size={18} /> },
-      { name: "Flash Sales", href: "/admin/flash-sales", icon: <Zap size={18} /> },
-      { name: "Coupons", href: "/admin/coupons", icon: <Ticket size={18} /> },
-      { name: "Blog", href: "/admin/blog", icon: <Bold size={18} /> },
+      { name: "Banners", href: "/admin/banner-campaigns", icon: <Sparkles size={18} />, permission: "banner-campaigns:view" },
+      { name: "Flash Sales", href: "/admin/flash-sales", icon: <Zap size={18} />, permission: "flash-sales:view" },
+      { name: "Coupons", href: "/admin/coupons", icon: <Ticket size={18} />, permission: "coupons:view" },
+      { name: "Blog", href: "/admin/blog", icon: <Bold size={18} />, permission: "blogs:view" },
     ]
   },
   {
     label: "Settings & Users",
     items: [
-      { name: "Users", href: "/admin/users", icon: <Users size={18} /> },
-      { name: "Profile", href: "/admin/profile", icon: <User size={18} /> },
-      { name: "Settings", href: "/admin/settings", icon: <Settings size={18} /> },
+      { name: "Users", href: "/admin/users", icon: <Users size={18} />, permission: "users:view" },
+      { name: "Roles", href: "/admin/roles", icon: <Shield size={18} />, permission: "roles:view" },
+      { name: "Profile", href: "/admin/profile", icon: <User size={18} /> }, // No specific permission needed for profile
+      { name: "Settings", href: "/admin/settings", icon: <Settings size={18} />, permission: "settings:view" },
     ]
   }
 ];
 
 export default function Sidebar({ className, onItemClick }) {
   const pathname = usePathname();
+  const { user } = useAuthStore();
   const { settings } = useAppStore();
   const branding = settings?.branding || {};
   const siteName = branding.siteName || "Store";
+
+  const filteredGroups = navGroups.map(group => ({
+    ...group,
+    items: group.items.filter(item => {
+      if (!item.permission) return true;
+      if (user?.role?.name === 'superadmin') return true;
+      if (user?.role?.permissions?.includes('all')) return true;
+      const perms = Array.isArray(item.permission) ? item.permission : [item.permission];
+      return perms.some(p => user?.role?.permissions?.includes(p));
+    })
+  })).filter(group => group.items.length > 0);
 
   return (
     <aside className={cn("sidebar-vanguard", className)}>
@@ -80,7 +96,7 @@ export default function Sidebar({ className, onItemClick }) {
 
       {/* 🧭 Navigation */}
       <nav className="flex-1 overflow-y-auto no-scrollbar px-6 py-4 space-y-10">
-        {navGroups.map((group, groupIdx) => (
+        {filteredGroups.map((group, groupIdx) => (
           <div key={groupIdx}>
             <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.5em] mb-6 pl-4">
               {group.label}

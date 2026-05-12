@@ -206,7 +206,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid Order ID protocol." });
 
   const order = await Order.findById(id)
-    .populate("user", "name email avatar")
+    .populate({ path: "user", select: "name email avatar role", populate: { path: "role" } })
     .populate("orderItems.product", "name images slug")
     .populate("orderItems.size", "name");
 
@@ -216,7 +216,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
   }
 
   const currentUserId = getUserIdFromReq(req); 
-  const orderUserId = order.user?.toString();
+  const orderUserId = order.user?._id ? order.user._id.toString() : order.user?.toString();
   
   console.log("👤 IDENTITY AUDIT", {
     requestUserId: currentUserId,
@@ -226,8 +226,9 @@ export const getOrderById = asyncHandler(async (req, res) => {
   });
 
   const isOwner = (order.user && orderUserId === currentUserId) || (order.isGuest && !order.user); 
+  const isAdmin = req.user?.role?.name === 'admin' || req.user?.role?.name === 'superadmin';
 
-  if (!isOwner && req.user?.role !== 'admin') {
+  if (!isOwner && !isAdmin) {
     console.error("🚫 ACCESS DENIED: Identity mismatch", {
         expected: orderUserId,
         received: currentUserId

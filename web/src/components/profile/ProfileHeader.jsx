@@ -29,7 +29,7 @@ export default function ProfileHeader({ user, ui }) {
           </Avatar>
           
           <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 z-20 bg-background border border-border p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-xl">
-             {user.role === 'admin' ? (
+             {user.role?.name === 'admin' || user.role?.name === 'superadmin' ? (
                <ShieldCheck className="w-4 h-4 sm:w-6 sm:h-6 text-accent-secondary" />
              ) : (
                <User className="w-4 h-4 sm:w-6 sm:h-6 text-primary" />
@@ -40,7 +40,7 @@ export default function ProfileHeader({ user, ui }) {
         <div className="text-center md:text-left flex-1 space-y-4 sm:space-y-6">
           <div className="space-y-2">
              <Badge variant="outline" className="px-3 sm:px-4 py-1 rounded-full border-primary/20 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] bg-accent/30 text-primary">
-               {user.role === 'admin' ? ui.admin : ui.member}
+               {user.role?.name === 'admin' || user.role?.name === 'superadmin' ? ui.admin : ui.member}
              </Badge>
              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase italic tracking-tighter leading-[0.9] text-gradient py-2">
                {user.name}

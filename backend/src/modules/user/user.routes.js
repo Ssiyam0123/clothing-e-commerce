@@ -8,7 +8,8 @@ import {
   updateUser,
   deleteUser,
 } from "./user.controller.js";
-import { protect, admin } from "../../middleware/auth.js";
+import { protect } from "../../middleware/auth.js";
+import { authorize } from "../../middleware/rbac.js";
 import upload from "../../middleware/upload.js";
 
 const router = express.Router();
@@ -19,9 +20,9 @@ router.put("/profile", protect, upload.single("avatar"), updateProfile);
 router.put("/change-password", protect, changePassword);
 
 // Admin only routes
-router.get("/", protect, admin, getAllUsers);
-router.get("/:id", protect, admin, getUserById);
-router.put("/:id", protect, admin, upload.single("avatar"), updateUser);
-router.delete("/:id", protect, admin, deleteUser);
+router.get("/", protect, authorize("users:view"), getAllUsers);
+router.get("/:id", protect, authorize("users:view"), getUserById);
+router.put("/:id", protect, authorize("users:update"), upload.single("avatar"), updateUser);
+router.delete("/:id", protect, authorize("users:delete"), deleteUser);
 
 export default router;

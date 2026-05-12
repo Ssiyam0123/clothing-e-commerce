@@ -7,18 +7,23 @@ import {
   deleteCampaign,
   toggleActive,
 } from './bannerCampaign.controller.js';
-import { protect, admin } from '../../middleware/auth.js';
+import { protect } from '../../middleware/auth.js';
+import { authorize } from '../../middleware/rbac.js';
 import upload from '../../middleware/upload.js';
 
 const router = express.Router();
 
 router.get('/active', getActiveCampaign);
 
-router.use(protect, admin);
-router.get('/', getAllCampaigns);
-router.post('/', upload.array('slideImages', 20), createCampaign);
-router.put('/:id', upload.array('slideImages', 20), updateCampaign);
-router.delete('/:id', deleteCampaign);
-router.patch('/:id/toggle', toggleActive);
+// Admin routes
+router.route('/')
+  .get(protect, authorize('banner-campaigns:view'), getAllCampaigns)
+  .post(protect, authorize('banner-campaigns:create'), upload.array('slideImages', 20), createCampaign);
+
+router.route('/:id')
+  .put(protect, authorize('banner-campaigns:update'), upload.array('slideImages', 20), updateCampaign)
+  .delete(protect, authorize('banner-campaigns:delete'), deleteCampaign);
+
+router.patch('/:id/toggle', protect, authorize('banner-campaigns:update'), toggleActive);
 
 export default router;

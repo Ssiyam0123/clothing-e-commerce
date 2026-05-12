@@ -58,14 +58,19 @@ export default function Navbar() {
 
   const dynamicNavLinks = useMemo(() => {
     const links = [
-      { label: t.home, href: "/" },
-      { label: t.categories, href: "/categories" },
-      { label: t.products, href: "/products" },
-      { label: t.flashSale, href: "/flash-sale" },
-      { label: t.blog, href: "/blog" },
+      { label: "Home", key: "home", href: "/" },
+      { label: "Categories", key: "categories", href: "/categories" },
+      { label: "Products", key: "products", href: "/products" },
+      { label: "Flash Sale", key: "flashSale", href: "/flash-sale" },
+      { label: "Blog", key: "blog", href: "/blog" },
     ];
-    if (user?.role === 'admin') {
-      links.push({ label: t.admin, href: "/admin", isSpecial: true });
+    if (
+      user?.role?.name === 'superadmin' || 
+      user?.role?.permissions?.includes('all') || 
+      user?.role?.permissions?.includes('dashboard:view') ||
+      user?.role?.permissions?.includes('reports:view')
+    ) {
+      links.push({ label: "Admin", key: "admin", href: "/admin", isSpecial: true });
     }
     return links;
   }, [user, t]);
@@ -318,7 +323,7 @@ export default function Navbar() {
                     <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-4">{mounted ? t.directory : "DIRECTORY"}</p>
                     <div className="space-y-3">
                       {dynamicNavLinks.map((link) => {
-                        const label = mounted ? link.label : (getTranslation('navbar', 'en')[link.href === '/' ? 'home' : link.href.replace('/', '')] || link.label);
+                        const label = mounted ? (t[link.key] || link.label) : link.label;
                         return (
                           <Link
                             key={link.href}

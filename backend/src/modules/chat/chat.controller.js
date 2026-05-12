@@ -32,7 +32,11 @@ export const getChatHistory = asyncHandler(async (req, res) => {
 export const getAllConversations = asyncHandler(async (req, res) => {
   // 🛡️ শুধুমাত্র সাপোর্ট টাইপের কথোপকথনগুলো দেখাবে
   const rawConversations = await Conversation.find({ type: "support" })
-    .populate("participants", "name email avatar role")
+    .populate({
+      path: "participants",
+      select: "name email avatar role",
+      populate: { path: "role" }
+    })
     .sort("-updatedAt")
     .lean();
 
@@ -40,7 +44,7 @@ export const getAllConversations = asyncHandler(async (req, res) => {
     // Count unread messages from customers (not from admins)
     const unreadCount = conv.messages.filter(msg => 
       !msg.isRead && 
-      conv.participants.find(p => p._id.toString() === msg.sender.toString())?.role === "customer"
+      conv.participants.find(p => p._id.toString() === msg.sender.toString())?.role?.name === "customer"
     ).length;
 
     return {
@@ -61,7 +65,11 @@ export const getAllConversations = asyncHandler(async (req, res) => {
  */
 export const getConversationMessages = asyncHandler(async (req, res) => {
   const conversation = await Conversation.findById(req.params.id)
-    .populate("messages.sender", "name avatar role");
+    .populate({
+      path: "messages.sender",
+      select: "name avatar role",
+      populate: { path: "role" }
+    });
   
   if (!conversation) {
     return res.status(404).json({ success: false, message: "Conversation not found" });
@@ -70,7 +78,7 @@ export const getConversationMessages = asyncHandler(async (req, res) => {
   // 📝 মার্ক অ্যাজ রিড: কাস্টমারের মেসেজগুলো পড়া হয়েছে বলে চিহ্নিত করা হবে
   let updated = false;
   conversation.messages.forEach(msg => {
-    if (!msg.isRead && msg.sender && msg.sender.role === "customer") {
+    if (!msg.isRead && msg.sender && msg.sender.role?.name === "customer") {
       msg.isRead = true;
       updated = true;
     }
@@ -92,7 +100,11 @@ export const getMyConversation = asyncHandler(async (req, res) => {
     participants: req.user._id,
     type: "support",
   })
-  .populate("messages.sender", "name avatar role")
+  .populate({
+    path: "messages.sender",
+    select: "name avatar role",
+    populate: { path: "role" }
+  })
   .lean();
 
   res.json(conversation);
