@@ -88,15 +88,14 @@ export default async function CategoriesPage() {
                   {/* Content Container */}
                   <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-10 z-10">
                     <div className="translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                      <div className="inline-flex items-center gap-2 mb-2 md:mb-3">
-                        <span className={cn("w-6 md:w-8 h-[1px]", isOnSale ? "bg-rose-500" : "bg-accent-secondary")} />
-                        <span className={cn(
-                          "text-[7px] md:text-[10px] font-black tracking-[0.4em] uppercase",
-                          isOnSale ? "text-rose-500" : "text-accent-secondary"
-                        )}>
-                          {isOnSale ? "Offer" : "Collection"}
-                        </span>
-                      </div>
+                      {isOnSale && (
+                        <div className="inline-flex items-center gap-2 mb-2 md:mb-3 bg-rose-500/20 backdrop-blur-md px-3 md:px-4 py-1 md:py-1.5 rounded-full border border-rose-500/20 shadow-inner">
+                          <span className="w-6 md:w-8 h-[1px] bg-rose-500" />
+                          <span className="text-[8px] md:text-[10px] font-black tracking-[0.4em] uppercase text-rose-500">
+                            Offer
+                          </span>
+                        </div>
+                      )}
                       
                       <div className="relative">
                         <h3 className="text-xl md:text-5xl font-black text-white uppercase tracking-tighter leading-[0.85] italic mb-3 md:mb-4 drop-shadow-2xl">
@@ -120,10 +119,6 @@ export default async function CategoriesPage() {
                     </div>
                   </div>
 
-                  {/* Decorative index number - Scaled for Mobile */}
-                  <div className="absolute top-4 right-4 md:top-10 md:right-10 text-white/10 text-4xl md:text-8xl font-black italic tracking-tighter select-none transition-transform duration-700 md:group-hover:scale-110 md:group-hover:-translate-x-2">
-                    0{idx + 1}
-                  </div>
                 </Link>
               </Card>
             );

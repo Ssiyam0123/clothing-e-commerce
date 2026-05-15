@@ -76,17 +76,16 @@ export default function CategoryGrid({ categories }) {
                 )} />
 
                 {/* Content Container */}
-                <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-14 z-10">
+                <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-14 z-10">
                   <div className="translate-y-6 group-hover:translate-y-0 transition-all duration-700 ease-out">
-                    <div className="inline-flex items-center gap-3 mb-6 bg-black/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/5 shadow-inner">
-                      <span className={cn("w-10 h-[1px]", cat.slug === 'on-sale' ? "bg-rose-500" : "bg-accent-secondary")} />
-                      <span className={cn(
-                        "text-[9px] md:text-[11px] font-black tracking-[0.5em] uppercase",
-                        cat.slug === 'on-sale' ? "text-rose-500" : "text-accent-secondary"
-                      )}>
-                        {cat.slug === 'on-sale' ? "Limited Offer" : "Collection"}
-                      </span>
-                    </div>
+                    {cat.slug === 'on-sale' && (
+                      <div className="inline-flex items-center gap-2 md:gap-3 mb-4 md:mb-6 bg-rose-500/20 backdrop-blur-md px-3 md:px-4 py-1 md:py-1.5 rounded-full border border-rose-500/20 shadow-inner">
+                        <span className="w-6 md:w-10 h-[1px] bg-rose-500" />
+                        <span className="text-[8px] md:text-[11px] font-black tracking-[0.4em] md:tracking-[0.5em] uppercase text-rose-500">
+                          Offer
+                        </span>
+                      </div>
+                    )}
                     
                     <div className="relative">
                       <h3 className="text-3xl md:text-6xl font-black text-white tracking-tighter leading-[0.8] italic mb-6 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
@@ -101,11 +100,6 @@ export default function CategoryGrid({ categories }) {
                       </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Decorative index number */}
-                <div className="absolute top-6 right-6 text-white/10 text-6xl font-black italic tracking-tighter select-none">
-                  0{idx + 1}
                 </div>
               </Link>
             </Card>

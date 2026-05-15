@@ -15,6 +15,7 @@ import bkashService from '../../../services/bkash.service.js';
 import PageSetting from "../../settings/settings.model.js";
 import ApiKey from "../../settings/apiKey.model.js";
 import { decrypt } from "../../../utils/encryption.js";
+import PDFDocument from "pdfkit";
 
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
@@ -206,8 +207,6 @@ export const getMyOrders = asyncHandler(async (req, res) => {
 
 export const getOrderById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { phone } = req.query; // Used for guest tracking verification
-
   if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid Order ID protocol." });
 
   const order = await Order.findById(id)
@@ -215,19 +214,109 @@ export const getOrderById = asyncHandler(async (req, res) => {
     .populate("orderItems.product", "name images slug")
     .populate("orderItems.size", "name");
 
-  if (!order) {
-    return res.status(404).json({ message: "Protocol not found." });
-  }
+  if (!order) return res.status(404).json({ message: "Protocol not found." });
 
   const currentUserId = getUserIdFromReq(req); 
   const orderUserId = order.user?._id ? order.user._id.toString() : order.user?.toString();
-  
   const isAdmin = req.user?.role?.name === 'admin' || req.user?.role?.name === 'superadmin';
   const isRegisteredOwner = order.user && orderUserId === currentUserId;
 
-  if (!isRegisteredOwner && !isAdmin) {
-    return res.status(401).json({ message: "Access Denied. Identity mismatch." });
-  }
+  if (!isRegisteredOwner && !isAdmin) return res.status(401).json({ message: "Access Denied." });
 
   res.json(order);
+});
+
+export const getOrderReport = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const order = await Order.findById(id)
+    .populate("orderItems.product", "name")
+    .populate("orderItems.size", "name");
+
+  if (!order) {
+    return res.status(404).json({ message: "Order not found." });
+  }
+
+  const doc = new PDFDocument({ margin: 50 });
+  let filename = `invoice-${order._id.toString().slice(-8).toUpperCase()}.pdf`;
+
+  res.setHeader('Content-disposition', 'attachment; filename="' + filename + '"');
+  res.setHeader('Content-type', 'application/pdf');
+
+  doc.pipe(res);
+
+  // Brand Header
+  const settings = await PageSetting.findOne();
+  const siteName = settings?.branding?.siteName || "Vanguard";
+  
+  doc.fontSize(25).font('Helvetica-Bold').text(siteName.toUpperCase(), { align: 'right' });
+  doc.fontSize(10).font('Helvetica').text("Official Order Receipt", { align: 'right' });
+  doc.moveDown();
+
+  // Horizontal line
+  doc.moveTo(50, 115).lineTo(550, 115).stroke();
+  doc.moveDown(2);
+
+  // Order Details Header
+  doc.fontSize(14).font('Helvetica-Bold').text(`Invoice: #${order._id.toString().slice(-8).toUpperCase()}`);
+  doc.fontSize(10).font('Helvetica').text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`);
+  doc.text(`Status: ${order.orderStatus.toUpperCase()}`);
+  doc.moveDown();
+
+  // Shipping Details
+  doc.fontSize(12).font('Helvetica-Bold').text("Shipping Address:");
+  doc.fontSize(10).font('Helvetica').text(order.shippingAddress.name);
+  doc.text(order.shippingAddress.address);
+  doc.text(`Phone: ${order.shippingAddress.phone}`);
+  doc.moveDown(2);
+
+  // Table Header
+  const tableTop = 270;
+  doc.fontSize(10).font('Helvetica-Bold');
+  doc.text("Item Name", 50, tableTop);
+  doc.text("Size", 250, tableTop);
+  doc.text("Qty", 350, tableTop);
+  doc.text("Price", 450, tableTop);
+  doc.text("Total", 500, tableTop, { align: 'right' });
+
+  doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+  
+  // Table Items
+  let currentY = tableTop + 25;
+  doc.font('Helvetica');
+  
+  order.orderItems.forEach(item => {
+    doc.text(item.name, 50, currentY, { width: 190 });
+    doc.text(item.size?.name || "Standard", 250, currentY);
+    doc.text(item.quantity.toString(), 350, currentY);
+    doc.text(`TK ${item.price.toLocaleString()}`, 450, currentY);
+    doc.text(`TK ${(item.price * item.quantity).toLocaleString()}`, 500, currentY, { align: 'right' });
+    currentY += 25;
+  });
+
+  doc.moveTo(50, currentY).lineTo(550, currentY).stroke();
+  currentY += 15;
+
+  // Totals
+  doc.text("Subtotal:", 400, currentY);
+  doc.text(`TK ${order.itemsPrice.toLocaleString()}`, 500, currentY, { align: 'right' });
+  currentY += 15;
+
+  if (order.discountAmount > 0) {
+    doc.fillColor('green').text("Discount:", 400, currentY);
+    doc.text(`-TK ${order.discountAmount.toLocaleString()}`, 500, currentY, { align: 'right' });
+    doc.fillColor('black');
+    currentY += 15;
+  }
+
+  doc.text("Shipping:", 400, currentY);
+  doc.text(`TK ${order.shippingPrice.toLocaleString()}`, 500, currentY, { align: 'right' });
+  currentY += 20;
+
+  doc.fontSize(14).font('Helvetica-Bold').text("Grand Total:", 350, currentY);
+  doc.text(`TK ${order.totalPrice.toLocaleString()}`, 500, currentY, { align: 'right' });
+
+  // Footer
+  doc.fontSize(8).font('Helvetica-Oblique').text("Thank you for shopping with us.", 50, 700, { align: 'center', width: 500 });
+
+  doc.end();
 });

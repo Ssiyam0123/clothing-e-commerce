@@ -7,7 +7,8 @@ import {
     paymentCancel,
     ipn,
     getMyOrders,
-    getOrderById
+    getOrderById,
+    getOrderReport
 } from '../controllers/public.order.controller.js';
 import { protect, extractUser } from '../../../middleware/auth.js';
 
@@ -25,5 +26,6 @@ router.post('/ssl/ipn', ipn);
 
 router.get('/myorders', protect, getMyOrders);
 router.get('/:id', extractUser, getOrderById);
+router.get('/:id/report', extractUser, getOrderReport);
 
 export default router;

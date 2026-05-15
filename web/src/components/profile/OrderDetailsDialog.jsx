@@ -10,6 +10,12 @@ import { cn } from "@/lib/utils";
 
 export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui, phone = null }) {
   const { orderDetails: order, orderDetailsLoading: loading } = useOrders(orderId, phone);
+  
+  const handleDownload = () => {
+    if (!orderId) return;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/report`;
+    window.open(url, '_blank');
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -22,8 +28,8 @@ export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui, ph
                       Order_Report
                     </DialogTitle>
                     <div className="hidden sm:flex gap-2">
-                        <button className="p-2 rounded-full hover:bg-accent/10 transition-colors text-muted-foreground"><Printer size={16}/></button>
-                        <button className="p-2 rounded-full hover:bg-accent/10 transition-colors text-muted-foreground"><Download size={16}/></button>
+                        <button className="p-2 rounded-full hover:bg-accent/10 transition-colors text-muted-foreground" onClick={() => window.print()}><Printer size={16}/></button>
+                        <button className="p-2 rounded-full hover:bg-accent/10 transition-colors text-muted-foreground" onClick={handleDownload}><Download size={16}/></button>
                     </div>
                 </div>
                 <DialogDescription className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">

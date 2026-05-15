@@ -12,7 +12,8 @@ import {
   ShoppingBag,
   Clock,
   MapPin,
-  FileText
+  FileText,
+  Download
 } from "lucide-react";
 import { useProductStore } from "@/store/productStore";
 import { useTrackingStore } from "@/store/trackingStore";
@@ -145,9 +146,18 @@ function SuccessContent() {
                     {t.orderSummary}
                   </span>
                 </div>
-                <span className="text-[10px] font-black font-mono bg-primary text-background px-4 py-1.5 rounded-full shadow-lg">
-                  #{order._id?.slice(-8).toUpperCase()}
-                </span>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL}/orders/${order._id}/report`, '_blank')}
+                    className="p-2 rounded-xl bg-accent/5 hover:bg-accent/10 transition-colors text-muted-foreground group"
+                    title="Download Receipt"
+                  >
+                    <Download size={14} className="group-hover:scale-110 transition-transform" />
+                  </button>
+                  <span className="text-[10px] font-black font-mono bg-primary text-background px-4 py-1.5 rounded-full shadow-lg">
+                    #{order._id?.slice(-8).toUpperCase()}
+                  </span>
+                </div>
               </div>
 
               <div className="space-y-4">
