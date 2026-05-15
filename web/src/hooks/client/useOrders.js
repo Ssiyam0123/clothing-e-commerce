@@ -12,16 +12,17 @@ export const useOrders = (orderId = null, phone = null) => {
   const userId = user?._id || guestId;
 
   const { data: myOrders, isLoading: myOrdersLoading } = useQuery({
-    queryKey: ["myOrders", userId],
+    queryKey: ["myOrders", userId, phone],
     queryFn: async () => {
-      const { data } = await api.get("/orders/myorders");
+      const url = phone ? `/orders/myorders?phone=${phone}` : "/orders/myorders";
+      const { data } = await api.get(url);
       return data;
     },
-    enabled: !!userId && !authLoading,
+    enabled: (!!userId || !!phone) && !authLoading,
     staleTime: 1000 * 60 * 5,
   });
 
-  const { data: orderDetails, isLoading: orderDetailsLoading } = useQuery({
+  const { data: orderDetails, isLoading: orderDetailsLoading, isError: isDetailsError } = useQuery({
     queryKey: ["order", orderId, userId, phone],
     queryFn: async () => {
       const url = phone ? `/orders/${orderId}?phone=${phone}` : `/orders/${orderId}`;
@@ -52,6 +53,7 @@ export const useOrders = (orderId = null, phone = null) => {
     isLoading: myOrdersLoading,
     orderDetails,
     orderDetailsLoading,
+    isError: isDetailsError,
     initOrder: initOrder.mutateAsync,
     isInitializing: initOrder.isPending,
   };

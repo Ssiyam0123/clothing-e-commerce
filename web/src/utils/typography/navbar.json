@@ -15,7 +15,8 @@
     "accountControl": "Account Settings",
     "authorization": "Sign In",
     "initLogin": "Get Started",
-    "categories": "Collections"
+    "categories": "Collections",
+    "trackOrder": "Track Order"
   },
   "bn": {
     "home": "হোম",
@@ -33,6 +34,7 @@
     "directory": "ব্রাউজ করুন",
     "accountControl": "অ্যাকাউন্ট সেটিংস",
     "authorization": "সাইন ইন",
-    "initLogin": "শুরু করুন"
+    "initLogin": "শুরু করুন",
+    "trackOrder": "অর্ডার ট্র্যাক"
   }
 }

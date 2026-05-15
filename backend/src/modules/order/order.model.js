@@ -25,6 +25,11 @@ const orderSchema = new mongoose.Schema(
       type: Boolean, 
       default: false 
     },
+    guestId: {
+      type: String,
+      required: false,
+      index: true
+    },
     orderItems: [orderItemSchema],
     shippingAddress: {
       name: { type: String, required: true }, 

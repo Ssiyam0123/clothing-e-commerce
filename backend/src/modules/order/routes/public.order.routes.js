@@ -24,7 +24,7 @@ router.post('/ssl/fail/:tran_id', paymentFail);
 router.post('/ssl/cancel/:tran_id', paymentCancel);
 router.post('/ssl/ipn', ipn);
 
-router.get('/myorders', protect, getMyOrders);
+router.get('/myorders', extractUser, getMyOrders);
 router.get('/:id', extractUser, getOrderById);
 router.get('/:id/report', extractUser, getOrderReport);
 

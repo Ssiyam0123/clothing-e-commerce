@@ -13,7 +13,9 @@ export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui, ph
   
   const handleDownload = () => {
     if (!orderId) return;
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/report`;
+    const url = phone 
+      ? `${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/report?phone=${phone}` 
+      : `${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/report`;
     window.open(url, '_blank');
   };
 

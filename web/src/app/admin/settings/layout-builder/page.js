@@ -259,12 +259,12 @@ const DEFAULT_LAYOUT = [
 
 export default function LayoutBuilderPage() {
   const queryClient = useQueryClient();
-  const { categories } = useAdminCategories();
+  const { categories, isLoading: isCatLoading } = useAdminCategories();
   const [selectedLayoutId, setSelectedLayoutId] = useState(null);
   const [layout, setLayout] = useState([]);
 
   // 🏛️ Fetch all architectures
-  const { data: architectures = [], refetch: refetchArchitectures } = useQuery({
+  const { data: architectures = [], isLoading: isArchLoading } = useQuery({
     queryKey: ['architectures'],
     queryFn: async () => {
       const { data } = await api.get('/home-layouts/all');
@@ -275,19 +275,25 @@ export default function LayoutBuilderPage() {
   // 🏗️ Fetch specific selected layout
   const { data: remoteLayout, isLoading: isLayoutLoading } = useQuery({
     queryKey: ['homeLayout', selectedLayoutId],
+    enabled: !isArchLoading, // Wait for architectures to load first to determine active ID
     queryFn: async () => {
       if (!selectedLayoutId) {
+        // If no ID, try to get the active one directly
         const { data } = await api.get('/home-layouts');
         return data?.sections || DEFAULT_LAYOUT;
       }
       
+      // If we have an ID, use it from architectures or fetch all and find
+      const found = architectures.find(l => l._id === selectedLayoutId);
+      if (found) return found.sections;
+
       const { data: allLayouts } = await api.get('/home-layouts/all');
-      const found = allLayouts.find(l => l._id === selectedLayoutId);
-      return found?.sections || DEFAULT_LAYOUT;
+      const foundRemote = allLayouts.find(l => l._id === selectedLayoutId);
+      return foundRemote?.sections || DEFAULT_LAYOUT;
     }
   });
 
-  // 🚀 Initial selection
+  // 🚀 Initial selection - simplified to avoid redundant state updates
   useEffect(() => {
     if (architectures.length > 0 && !selectedLayoutId) {
       const active = architectures.find(a => a.isActive);
@@ -295,7 +301,7 @@ export default function LayoutBuilderPage() {
     }
   }, [architectures, selectedLayoutId]);
 
-  const { data: campaigns = [] } = useQuery({
+  const { data: campaigns = [], isLoading: isCampLoading } = useQuery({
     queryKey: ['campaigns'],
     queryFn: async () => {
       const { data } = await api.get('/banner-campaigns');
@@ -303,7 +309,7 @@ export default function LayoutBuilderPage() {
     }
   });
 
-  const { data: subcategories = [] } = useQuery({
+  const { data: subcategories = [], isLoading: isSubLoading } = useQuery({
     queryKey: ['subcategories'],
     queryFn: async () => {
       const { data } = await api.get('/subcategories');
@@ -311,7 +317,7 @@ export default function LayoutBuilderPage() {
     }
   });
 
-  const { data: flashSales = [] } = useQuery({
+  const { data: flashSales = [], isLoading: isFlashLoading } = useQuery({
     queryKey: ['admin-flash-sales'],
     queryFn: async () => {
       const { data } = await api.get('/admin/flash-sales');
@@ -381,7 +387,7 @@ export default function LayoutBuilderPage() {
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    if (active && over && active.id !== over.id) {
       setLayout((items) => {
         const oldIndex = items.findIndex((i) => i.id === active.id);
         const newIndex = items.findIndex((i) => i.id === over.id);
@@ -431,10 +437,20 @@ export default function LayoutBuilderPage() {
     }
   };
 
-  if (isLayoutLoading) {
+  // 🛡️ Consolidated Loading State
+  const isInitialSync = isArchLoading || isLayoutLoading || isSubLoading || isFlashLoading || isCatLoading;
+
+  if (isInitialSync) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-primary/20 rounded-full" />
+          <div className="absolute top-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+        <div className="flex flex-col items-center animate-pulse">
+           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Architectural Protocol</p>
+           <p className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Synchronizing Home Blueprint...</p>
+        </div>
       </div>
     );
   }

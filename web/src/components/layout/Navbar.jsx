@@ -64,6 +64,7 @@ export default function Navbar() {
       { label: "Products", key: "products", href: "/products" },
       { label: "Flash Sale", key: "flashSale", href: "/flash-sale" },
       { label: "Blog", key: "blog", href: "/blog" },
+      { label: "Track Order", key: "trackOrder", href: "/track-order" },
     ];
     if (hasAnyAdminPermission(user)) {
       links.push({ label: "Admin", key: "admin", href: "/admin", isSpecial: true });

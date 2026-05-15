@@ -1,4 +1,5 @@
-import { Suspense, cache } from "react";
+import { Suspense } from "react";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { getTranslation } from "@/utils/typography/handler";
@@ -12,63 +13,64 @@ import { GridSkeleton, HeroSkeleton } from "@/components/common/Skeletons";
 import SectionHeader from "@/components/common/SectionHeader";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
- 
-export const revalidate = 60;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-// Request-level Memoization + High Performance Fetching
-const getHomeData = cache(async () => {
-  try {
-    const fetchOptions = {
-      next: { 
-        revalidate: 60,
-        tags: ['home-data', 'layout', 'products', 'categories'] 
-      }
-    };
+const getHomeData = unstable_cache(
+  async () => {
+    try {
+      const fetchOptions = {
+        next: { 
+          revalidate: 60,
+          tags: ['home-data', 'layout', 'products', 'categories'] 
+        }
+      };
 
-    const [productsRes, categoriesRes, flashSalesRes, bannerRes, allProductsRes, layoutRes] =
-      await Promise.all([
-        fetch(`${API_URL}/products?limit=24`, fetchOptions),
-        fetch(`${API_URL}/categories`, fetchOptions),
-        fetch(`${API_URL}/flash-sales/active`, fetchOptions),
-        fetch(`${API_URL}/banner-campaigns/active`, fetchOptions),
-        fetch(`${API_URL}/products?limit=200`, fetchOptions),
-        fetch(`${API_URL}/home-layouts/active`, fetchOptions),
+      const [productsRes, categoriesRes, flashSalesRes, bannerRes, allProductsRes, layoutRes] =
+        await Promise.all([
+          fetch(`${API_URL}/products?limit=24`, fetchOptions),
+          fetch(`${API_URL}/categories`, fetchOptions),
+          fetch(`${API_URL}/flash-sales/active`, fetchOptions),
+          fetch(`${API_URL}/banner-campaigns/active`, fetchOptions),
+          fetch(`${API_URL}/products?limit=200`, fetchOptions),
+          fetch(`${API_URL}/home-layouts/active`, fetchOptions),
+        ]);
+
+      const bannerData = bannerRes.ok ? await bannerRes.json() : null;
+      const campaigns = Array.isArray(bannerData) ? bannerData : (bannerData ? [bannerData] : []);
+
+      const [layoutData, productData, categoryData, flashSaleData, allProductsData] = await Promise.all([
+        layoutRes.ok ? layoutRes.json() : null,
+        productsRes.ok ? productsRes.json() : { products: [] },
+        categoriesRes.ok ? categoriesRes.json() : [],
+        flashSalesRes.ok ? flashSalesRes.json() : null,
+        allProductsRes.ok ? allProductsRes.json() : { products: [] }
       ]);
 
-    const bannerData = bannerRes.ok ? await bannerRes.json() : null;
-    const campaigns = Array.isArray(bannerData) ? bannerData : (bannerData ? [bannerData] : []);
-
-    const [layoutData, productData, categoryData, flashSaleData, allProductsData] = await Promise.all([
-      layoutRes.ok ? layoutRes.json() : null,
-      productsRes.ok ? productsRes.json() : { products: [] },
-      categoriesRes.ok ? categoriesRes.json() : [],
-      flashSalesRes.ok ? flashSalesRes.json() : null,
-      allProductsRes.ok ? allProductsRes.json() : { products: [] }
-    ]);
-
-    return {
-      products: productData.products || [],
-      categories: categoryData,
-      flashSales: flashSaleData,
-      activeCampaign: campaigns.find(c => c.isActive) || campaigns[0] || null,
-      allCampaigns: campaigns,
-      allProducts: allProductsData.products || [],
-      layout: layoutData?.sections || [],
-    };
-  } catch (e) {
-    console.error("Home data fetch failed:", e);
-    return {
-      products: [],
-      categories: [],
-      flashSales: null,
-      activeCampaign: null,
-      allCampaigns: [],
-      layout: [],
-    };
-  }
-});
+      return {
+        products: productData.products || [],
+        categories: categoryData,
+        flashSales: flashSaleData,
+        activeCampaign: campaigns.find(c => c.isActive) || campaigns[0] || null,
+        allCampaigns: campaigns,
+        allProducts: allProductsData.products || [],
+        layout: layoutData?.sections || [],
+      };
+    } catch (e) {
+      console.error("Home data fetch failed:", e);
+      return {
+        products: [],
+        categories: [],
+        flashSales: null,
+        activeCampaign: null,
+        allCampaigns: [],
+        layout: [],
+      };
+    }
+  },
+  ['home-page-data'],
+  { revalidate: 60, tags: ['home-data'] }
+);
 
 export default async function HomePage() {
   const cookieStore = await cookies();

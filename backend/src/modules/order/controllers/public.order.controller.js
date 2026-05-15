@@ -80,6 +80,7 @@ export const initPayment = asyncHandler(async (req, res) => {
     const order = new Order({
       user: isRegisteredUser ? userId : undefined, 
       isGuest: !isRegisteredUser,
+      guestId: !isRegisteredUser ? userId : undefined,
       orderItems: orderData.validatedItems,
       shippingAddress: normalizeShippingAddress(shippingAddress),
       itemsPrice: orderData.itemsPrice,
@@ -194,9 +195,16 @@ export const getMyOrders = asyncHandler(async (req, res) => {
   let query;
   if (mongoose.Types.ObjectId.isValid(userId)) {
     query = { user: userId };
+  } else if (userId) {
+    query = { guestId: userId };
   } else {
-    query = { "shippingAddress.phone": req.user?.phone || "" }; 
-    if (!req.user?.phone && !mongoose.Types.ObjectId.isValid(userId)) return res.json([]); 
+    // Ultimate fallback for tracking
+    const phone = req.query.phone || req.user?.phone;
+    if (phone) {
+      query = { "shippingAddress.phone": phone };
+    } else {
+      return res.json([]); 
+    }
   }
 
   const orders = await Order.find(query)
@@ -209,12 +217,26 @@ export const getMyOrders = asyncHandler(async (req, res) => {
 
 export const getOrderById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid Order ID protocol." });
+  const { phone } = req.query;
 
-  const order = await Order.findById(id)
-    .populate({ path: "user", select: "name email avatar role", populate: { path: "role" } })
-    .populate("orderItems.product", "name images slug")
-    .populate("orderItems.size", "name");
+  let order;
+
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    order = await Order.findById(id)
+      .populate({ path: "user", select: "name email avatar role", populate: { path: "role" } })
+      .populate("orderItems.product", "name images slug")
+      .populate("orderItems.size", "name");
+  } else if (id.length >= 6 && phone) {
+    // Support for short IDs (e.g. last 8 chars) when phone is provided
+    const orders = await Order.find({ "shippingAddress.phone": phone })
+      .populate({ path: "user", select: "name email avatar role", populate: { path: "role" } })
+      .populate("orderItems.product", "name images slug")
+      .populate("orderItems.size", "name");
+    
+    order = orders.find(o => o._id.toString().toLowerCase().endsWith(id.toLowerCase()));
+  } else {
+    return res.status(400).json({ message: "Invalid Order ID protocol." });
+  }
 
   if (!order) return res.status(404).json({ message: "Protocol not found." });
 
@@ -222,8 +244,14 @@ export const getOrderById = asyncHandler(async (req, res) => {
   const orderUserId = order.user?._id ? order.user._id.toString() : order.user?.toString();
   const isAdmin = req.user?.role?.name === 'admin' || req.user?.role?.name === 'superadmin';
   const isRegisteredOwner = order.user && orderUserId === currentUserId;
+  const isGuestOwner = order.isGuest && order.guestId === currentUserId;
+  
+  // Also allow if phone number matches (for tracking without guest session)
+  const isPhoneMatch = phone && order.shippingAddress?.phone === phone;
 
-  if (!isRegisteredOwner && !isAdmin) return res.status(401).json({ message: "Access Denied." });
+  if (!isRegisteredOwner && !isGuestOwner && !isAdmin && !isPhoneMatch) {
+    return res.status(401).json({ message: "Access Denied." });
+  }
 
   res.json(order);
 });
@@ -236,6 +264,19 @@ export const getOrderReport = asyncHandler(async (req, res) => {
 
   if (!order) {
     return res.status(404).json({ message: "Order not found." });
+  }
+
+  // Security Check
+  const currentUserId = getUserIdFromReq(req); 
+  const orderUserId = order.user?._id ? order.user._id.toString() : order.user?.toString();
+  const isAdmin = req.user?.role?.name === 'admin' || req.user?.role?.name === 'superadmin';
+  const isRegisteredOwner = order.user && orderUserId === currentUserId;
+  const isGuestOwner = order.isGuest && order.guestId === currentUserId;
+  const { phone } = req.query;
+  const isPhoneMatch = phone && order.shippingAddress?.phone === phone;
+
+  if (!isRegisteredOwner && !isGuestOwner && !isAdmin && !isPhoneMatch) {
+    return res.status(401).json({ message: "Access Denied." });
   }
 
   const doc = new PDFDocument({ margin: 50 });
