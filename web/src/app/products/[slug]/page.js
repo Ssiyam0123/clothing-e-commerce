@@ -254,7 +254,10 @@ export default async function ProductPage({ params }) {
                   )}
                 </div>
                 <div className="flex items-center gap-3">
-                  <WishlistButtonClient product={product} />
+                  <WishlistButtonClient 
+                    product={product} 
+                    className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
+                  />
                   <Button variant="ghost" size="icon" className="w-10 h-10 sm:w-12 sm:h-12 rounded-full glass hover:bg-accent-secondary hover:text-white transition-all">
                     <Share2 size={18} />
                   </Button>

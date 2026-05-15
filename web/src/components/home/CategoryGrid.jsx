@@ -41,64 +41,43 @@ export default function CategoryGrid({ categories }) {
       >
         {categories.filter(cat => cat.slug !== 'on-sale').map((cat, idx) => (
           <SwiperSlide key={cat._id || idx}>
-            <Card className="relative aspect-[4/5] min-h-[200px] md:min-h-[500px] w-full rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl select-none group border-none bg-elevated">
+            <Card className="relative aspect-[4/5] md:aspect-square min-h-[200px] md:min-h-[320px] w-full rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl select-none group border-none bg-elevated transition-all duration-700 md:hover:-translate-y-2">
               <Link
                 href={`/products?category=${cat.slug || cat._id}`}
                 className="block w-full h-full"
                 aria-label={`Browse ${cat.name} category`}
               >
                 {/* Background Image with advanced hover */}
-                <div className="absolute inset-0 transition-all duration-[1.5s] cubic-bezier(0.4, 0, 0.2, 1) group-hover:scale-110 group-hover:rotate-1">
-                  {cat.slug === 'on-sale' ? (
-                    <div className="absolute inset-0 bg-rose-600/20">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-rose-500/30 via-transparent to-transparent opacity-60" />
-                    </div>
-                  ) : (
-                    <Image
-                      src={getImageUrl(cat.image, 800, 80)}
-                      alt={cat.name}
-                      fill
-                      sizes="(max-width: 768px) 55vw, 25vw"
-                      className="object-cover grayscale-[100%] contrast-125 transition-all duration-700 group-hover:grayscale-0 group-hover:contrast-100"
-                      priority={idx < 2}
-                    />
-                  )}
+                {/* Simple Background Image */}
+                <div className="absolute inset-0 overflow-hidden">
+                  <Image
+                    src={getImageUrl(cat.image, 800, 80)}
+                    alt={cat.name}
+                    fill
+                    sizes="(max-width: 768px) 55vw, 25vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    priority={idx < 2}
+                  />
+                  {/* Soft Gradient for readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
                 </div>
 
-                {/* Multi-layered Overlay */}
-                <div className={cn(
-                  "absolute inset-0 transition-opacity duration-700",
-                  cat.slug === 'on-sale' ? "bg-gradient-to-t from-rose-950/90 via-rose-900/20 to-transparent opacity-80" : "bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-40"
-                )} />
-                <div className={cn(
-                  "absolute inset-0 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-700",
-                  cat.slug === 'on-sale' ? "bg-rose-500/20" : "bg-accent-primary/10"
-                )} />
+                {/* Minimalist "Offer" Badge */}
+                {cat.slug === 'on-sale' && (
+                  <div className="absolute top-4 left-4 z-10">
+                    <span className="bg-rose-600 text-white text-[9px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-lg">
+                      Offer
+                    </span>
+                  </div>
+                )}
 
-                {/* Content Container */}
-                <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-14 z-10">
-                  <div className="translate-y-6 group-hover:translate-y-0 transition-all duration-700 ease-out">
-                    {cat.slug === 'on-sale' && (
-                      <div className="inline-flex items-center gap-2 md:gap-3 mb-4 md:mb-6 bg-rose-500/20 backdrop-blur-md px-3 md:px-4 py-1 md:py-1.5 rounded-full border border-rose-500/20 shadow-inner">
-                        <span className="w-6 md:w-10 h-[1px] bg-rose-500" />
-                        <span className="text-[8px] md:text-[11px] font-black tracking-[0.4em] md:tracking-[0.5em] uppercase text-rose-500">
-                          Offer
-                        </span>
-                      </div>
-                    )}
-                    
-                    <div className="relative">
-                      <h3 className="text-3xl md:text-6xl font-black text-white tracking-tighter leading-[0.8] italic mb-6 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
-                        {cat.name}
-                      </h3>
-                      
-                      {/* Interactive Button-like text */}
-                      <div className="flex items-center gap-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-700 delay-100">
-                        <span className="text-[10px] font-black text-white tracking-[0.3em] uppercase bg-white/10 backdrop-blur-xl px-6 py-3 rounded-2xl border border-white/10 shadow-2xl hover:bg-accent-secondary hover:border-accent-secondary transition-all">
-                          Explore Catalog
-                        </span>
-                      </div>
-                    </div>
+                {/* Minimalist Content */}
+                <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-8 z-10">
+                  <div className="space-y-1">
+                    <h3 className="text-xl md:text-3xl font-black text-white uppercase tracking-tighter leading-tight drop-shadow-lg">
+                      {cat.name}
+                    </h3>
+                    <div className="w-8 h-1 bg-accent-secondary rounded-full transform origin-left transition-transform duration-500 scale-x-50 group-hover:scale-x-100" />
                   </div>
                 </div>
               </Link>

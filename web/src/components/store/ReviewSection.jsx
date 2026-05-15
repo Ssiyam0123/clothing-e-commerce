@@ -17,6 +17,31 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ImagePlus, X, Trash2, Edit3, MessageSquare, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const ReviewSkeleton = () => (
+  <Card className="p-8 rounded-[2.5rem] bg-background border-border/40 shadow-xl shadow-black/5 h-full flex flex-col gap-8">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <Skeleton className="w-14 h-14 rounded-2xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-2 w-16" />
+        </div>
+      </div>
+      <Skeleton className="h-4 w-20" />
+    </div>
+    <div className="space-y-3 flex-1">
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-[90%]" />
+      <Skeleton className="h-4 w-[80%]" />
+    </div>
+    <div className="flex gap-3 pt-6 border-t border-border/10">
+      <Skeleton className="w-14 h-16 rounded-xl" />
+      <Skeleton className="w-14 h-16 rounded-xl" />
+    </div>
+  </Card>
+);
 
 const DICTIONARY = {
   en: {
@@ -223,12 +248,7 @@ export default function ReviewSection({ productId, onReviewChange }) {
     }
   };
 
-  if (loading)
-    return (
-      <div className="py-20 flex justify-center">
-        <Loader size="large" />
-      </div>
-    );
+  // Initial loading is handled by wrapper if needed, but we want skeletons for pagination
 
   return (
     <div className="space-y-24">
@@ -468,7 +488,13 @@ export default function ReviewSection({ productId, onReviewChange }) {
       </AnimatePresence>
 
       {/* Global Archive Feed */}
-      {!userReview && reviews.length === 0 && !showForm ? (
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          {[...Array(4)].map((_, i) => (
+            <ReviewSkeleton key={i} />
+          ))}
+        </div>
+      ) : !userReview && reviews.length === 0 && !showForm ? (
         <div className="text-center py-32 glass rounded-[4rem] border-dashed border-accent-secondary/20 border-2">
           <div className="w-20 h-20 bg-accent/30 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
              <MessageSquare size={32} className="text-muted-foreground opacity-30" />

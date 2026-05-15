@@ -56,69 +56,43 @@ export default async function CategoriesPage() {
             return (
               <Card 
                 key={cat._id || idx}
-                className="relative aspect-[3/4] md:aspect-[4/5] min-h-[220px] md:min-h-[450px] w-full rounded-[1.5rem] md:rounded-[3rem] overflow-hidden shadow-2xl select-none group border-none bg-elevated transition-all duration-700 md:hover:-translate-y-2"
+                className="relative aspect-[3/4] md:aspect-square min-h-[220px] md:min-h-[380px] w-full rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl select-none group border-none bg-elevated transition-all duration-700 md:hover:-translate-y-2"
               >
                 <Link
                   href={`/products?category=${cat.slug || cat._id}&page=1`}
                   className="block w-full h-full"
                   aria-label={`Browse ${cat.name} category`}
                 >
-                  {/* Background Image with advanced hover */}
-                  <div className="absolute inset-0 transition-all duration-[1.5s] ease-out md:group-hover:scale-110 md:group-hover:rotate-1">
-                    {isOnSale ? (
-                      <div className="absolute inset-0 bg-rose-600/20">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-rose-500/30 via-transparent to-transparent opacity-60" />
-                      </div>
-                    ) : (
-                      <img
-                        src={getImageUrl(cat.image || "/placeholder-cat.jpg", 800, 80)}
-                        alt={cat.name}
-                        className="absolute inset-0 w-full h-full object-cover grayscale-[50%] md:grayscale-[100%] contrast-125 transition-all duration-700 md:group-hover:grayscale-0 md:group-hover:contrast-100"
-                        loading="lazy"
-                      />
-                    )}
+                  {/* Simple Background Image */}
+                  <div className="absolute inset-0 overflow-hidden">
+                    <img
+                      src={getImageUrl(cat.image || "/placeholder-cat.jpg", 800, 80)}
+                      alt={cat.name}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 md:group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    {/* Soft Gradient for readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80" />
                   </div>
 
-                  {/* Multi-layered Overlay */}
-                  <div className={cn(
-                    "absolute inset-0 transition-opacity duration-700",
-                    isOnSale ? "bg-gradient-to-t from-rose-950/90 via-rose-900/20 to-transparent opacity-90" : "bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-70 md:group-hover:opacity-40"
-                  )} />
-                  
-                  {/* Content Container */}
-                  <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-10 z-10">
-                    <div className="translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                      {isOnSale && (
-                        <div className="inline-flex items-center gap-2 mb-2 md:mb-3 bg-rose-500/20 backdrop-blur-md px-3 md:px-4 py-1 md:py-1.5 rounded-full border border-rose-500/20 shadow-inner">
-                          <span className="w-6 md:w-8 h-[1px] bg-rose-500" />
-                          <span className="text-[8px] md:text-[10px] font-black tracking-[0.4em] uppercase text-rose-500">
-                            Offer
-                          </span>
-                        </div>
-                      )}
-                      
-                      <div className="relative">
-                        <h3 className="text-xl md:text-5xl font-black text-white uppercase tracking-tighter leading-[0.85] italic mb-3 md:mb-4 drop-shadow-2xl">
-                          {cat.name}
-                        </h3>
-                        
-                        <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-white/60 mb-4 md:mb-6">
-                          {isOnSale ? t.onSaleDesc : `${cat.productCount || 0} ${t.items}`}
-                        </p>
+                  {/* Minimalist "Offer" Badge */}
+                  {isOnSale && (
+                    <div className="absolute top-4 left-4 z-10">
+                      <span className="bg-rose-600 text-white text-[8px] md:text-[10px] font-bold uppercase tracking-wider px-3 py-1 md:px-4 md:py-1.5 rounded-full shadow-lg">
+                        Offer
+                      </span>
+                    </div>
+                  )}
 
-                        {/* Interactive Button - Permanent on Mobile */}
-                        <div className="flex items-center gap-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 translate-x-0 md:-translate-x-4 md:group-hover:translate-x-0 transition-all duration-500 delay-100">
-                          <span className={cn(
-                            "text-[8px] md:text-[9px] font-black uppercase tracking-widest backdrop-blur-md px-4 md:px-6 py-2 md:py-2.5 rounded-full border border-white/10 shadow-2xl transition-colors",
-                            isOnSale ? "bg-rose-600 text-white" : "bg-white/10 md:bg-white/20 text-white md:hover:bg-white md:hover:text-black"
-                          )}>
-                            {t.viewCollection}
-                          </span>
-                        </div>
-                      </div>
+                  {/* Minimalist Content */}
+                  <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-10 z-10">
+                    <div className="space-y-1 md:space-y-2">
+                      <h3 className="text-xl md:text-5xl font-black text-white uppercase tracking-tighter leading-tight drop-shadow-xl">
+                        {cat.name}
+                      </h3>
+                      <div className="w-10 md:w-16 h-1 bg-accent-secondary rounded-full transform origin-left transition-transform duration-500 scale-x-50 md:group-hover:scale-x-100" />
                     </div>
                   </div>
-
                 </Link>
               </Card>
             );
