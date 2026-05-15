@@ -20,7 +20,7 @@ export default function AdminLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { theme, toggleTheme, isMounted } = useAppStore();
+  const { theme, toggleTheme, isMounted, isAdminSidebarCollapsed } = useAppStore();
   useTheme();
 
   const isChatRoute = pathname?.startsWith("/admin/chat");
@@ -45,8 +45,11 @@ export default function AdminLayout({ children }) {
       <div className="flex h-screen bg-background transition-colors duration-700">
         {/* Sidebar Skeleton */}
         {!isFullPage && (
-          <div className="hidden lg:flex w-72 flex-col border-r border-border p-8 space-y-8">
-            <Skeleton className="h-10 w-40 rounded-xl" />
+          <div className={cn(
+            "hidden lg:flex flex-col border-r border-border p-8 space-y-8 transition-all duration-500",
+            isAdminSidebarCollapsed ? "w-24" : "w-72"
+          )}>
+            <Skeleton className="h-10 w-10 rounded-xl" />
             <div className="space-y-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <Skeleton key={i} className="h-12 w-full rounded-2xl" />
@@ -98,7 +101,7 @@ export default function AdminLayout({ children }) {
   return (
     <div className="flex h-screen bg-background text-foreground transition-colors duration-700 overflow-hidden">
       {/* 🖥️ Desktop Sidebar */}
-      {!isFullPage && <Sidebar className="hidden lg:flex w-72 shrink-0" />}
+      {!isFullPage && <Sidebar className="hidden lg:flex shrink-0 border-r border-sidebar-border" />}
 
       <div className="flex-1 flex flex-col min-w-0 relative h-full">
         {/* 🛰️ Top Header Bar */}

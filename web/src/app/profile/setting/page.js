@@ -8,12 +8,12 @@ import ProfileSecurity from "@/components/profile/ProfileSecurity";
 
 const DICTIONARY = {
   en: {
-    secTitle: "Security Protocol",
-    secSub: "Manage your cryptographic access credentials.",
+    secTitle: "Security & Password",
+    secSub: "Manage your password and keep your account secure.",
   },
   bn: {
-    secTitle: "নিরাপত্তা প্রোটোকল",
-    secSub: "আপনার ক্রিপ্টোগ্রাফিক অ্যাক্সেস শংসাপত্র পরিচালনা করুন।",
+    secTitle: "নিরাপত্তা ও পাসওয়ার্ড",
+    secSub: "আপনার পাসওয়ার্ড পরিবর্তন করুন এবং অ্যাকাউন্ট নিরাপদ রাখুন।",
   },
 };
 
@@ -37,13 +37,13 @@ export default function SettingsPage() {
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
       });
-      toast.success("Protocol Secured", {
-        description: "Cryptographic credentials updated. All other sessions terminated."
+      toast.success("Password Updated", {
+        description: "Your password has been changed successfully."
       });
       return true;
     } catch (err) {
-      toast.error("Security Breach", {
-        description: err.message || "Credential update failed."
+      toast.error("Error", {
+        description: err.message || "Failed to update password."
       });
       return false;
     } finally {

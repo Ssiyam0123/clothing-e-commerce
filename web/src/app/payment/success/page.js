@@ -15,6 +15,7 @@ import {
   FileText
 } from "lucide-react";
 import { useProductStore } from "@/store/productStore";
+import { useTrackingStore } from "@/store/trackingStore";
 import { getTranslation } from "@/utils/typography/handler";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -57,16 +58,21 @@ function SuccessContent() {
 
   const { orderDetails: order, orderDetailsLoading: isLoading } = useOrders(orderId);
   const { clearCart } = useProductStore();
+  const trackPurchase = useTrackingStore((state) => state.trackPurchase);
 
   useEffect(() => {
     if (order && !isLoading) {
+      // 🚀 Track Purchase for Meta (Pixel + CAPI)
+      const productIds = order.orderItems?.map(item => item.product?._id || item.product) || [];
+      trackPurchase(order._id, order.totalPrice, productIds);
+
       if (order.isDirectBuy) {
         clearCart("direct");
       } else {
         clearCart("all");
       }
     }
-  }, [order, isLoading, clearCart]);
+  }, [order, isLoading, clearCart, trackPurchase]);
 
   if (isLoading) return <SuccessSkeleton />;
 

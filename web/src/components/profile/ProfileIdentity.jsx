@@ -54,7 +54,7 @@ export default function ProfileIdentity({ user, ui, onUpdate, loading }) {
               <div className="h-32 w-32 rounded-3xl overflow-hidden bg-accent/20 border-2 border-border shadow-xl relative z-10">
                 <img 
                   src={avatarPreview} 
-                  alt="Identity Preview" 
+                  alt="Profile Preview" 
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                 />
               </div>
@@ -68,7 +68,7 @@ export default function ProfileIdentity({ user, ui, onUpdate, loading }) {
             </div>
             
             <div className="space-y-1">
-               <p className="text-[10px] font-black uppercase tracking-widest">Protocol Image</p>
+               <p className="text-[10px] font-black uppercase tracking-widest">Profile Photo</p>
                <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{ui.picSub}</p>
             </div>
 
@@ -130,7 +130,7 @@ export default function ProfileIdentity({ user, ui, onUpdate, loading }) {
           <Textarea 
             {...register("bio")}
             rows={4}
-            placeholder="Identity bio Sequence..."
+            placeholder="Tell us a bit about yourself..."
             className="rounded-[2rem] bg-accent/5 border-border/50 focus:border-accent-secondary/50 transition-all font-medium p-6 min-h-[150px]"
           />
         </div>

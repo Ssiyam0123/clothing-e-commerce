@@ -76,27 +76,27 @@ export default function CategoryGrid({ categories }) {
                 )} />
 
                 {/* Content Container */}
-                <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 z-10">
-                  <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                    <div className="inline-flex items-center gap-2 mb-3">
-                      <span className={cn("w-8 h-[1px]", cat.slug === 'on-sale' ? "bg-rose-500" : "bg-accent-secondary")} />
+                <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-14 z-10">
+                  <div className="translate-y-6 group-hover:translate-y-0 transition-all duration-700 ease-out">
+                    <div className="inline-flex items-center gap-3 mb-6 bg-black/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/5 shadow-inner">
+                      <span className={cn("w-10 h-[1px]", cat.slug === 'on-sale' ? "bg-rose-500" : "bg-accent-secondary")} />
                       <span className={cn(
-                        "text-[8px] md:text-[10px] font-black tracking-[0.4em]",
+                        "text-[9px] md:text-[11px] font-black tracking-[0.5em] uppercase",
                         cat.slug === 'on-sale' ? "text-rose-500" : "text-accent-secondary"
                       )}>
-                        {cat.slug === 'on-sale' ? "Limited Offer" : "Syndicate"}
+                        {cat.slug === 'on-sale' ? "Limited Offer" : "Collection"}
                       </span>
                     </div>
                     
                     <div className="relative">
-                      <h3 className="text-2xl md:text-5xl font-black text-white tracking-tighter leading-[0.85] italic mb-4 drop-shadow-2xl">
+                      <h3 className="text-3xl md:text-6xl font-black text-white tracking-tighter leading-[0.8] italic mb-6 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
                         {cat.name}
                       </h3>
                       
                       {/* Interactive Button-like text */}
-                      <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 translate-x--4 group-hover:translate-x-0 transition-all duration-500 delay-100">
-                        <span className="text-[10px] font-black text-white tracking-widest bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-                          View Collection
+                      <div className="flex items-center gap-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-700 delay-100">
+                        <span className="text-[10px] font-black text-white tracking-[0.3em] uppercase bg-white/10 backdrop-blur-xl px-6 py-3 rounded-2xl border border-white/10 shadow-2xl hover:bg-accent-secondary hover:border-accent-secondary transition-all">
+                          Explore Catalog
                         </span>
                       </div>
                     </div>

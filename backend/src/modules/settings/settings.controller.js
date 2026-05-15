@@ -1,6 +1,8 @@
 import PageSetting from './settings.model.js';
+import ApiKey from './apiKey.model.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { uploadImage } from '../../services/imageUploadService.js';
+import { encrypt, decrypt } from '../../utils/encryption.js';
 
 export const getSettings = asyncHandler(async (req, res) => {
     let settings = await PageSetting.findOne();
@@ -11,7 +13,37 @@ export const getSettings = asyncHandler(async (req, res) => {
             paymentOptions: { cod: true, online: true, bkash: true }
         });
     }
-    res.status(200).json(settings);
+
+    // Fetch API Keys from separate collection
+    let apiKeys = await ApiKey.findOne();
+    if (!apiKeys) {
+        apiKeys = await ApiKey.create({});
+    }
+
+    // Decrypt all fields and categorize them
+    const apiKeysObj = apiKeys.toObject();
+    const categories = {
+        marketing: ['fbPixelId', 'fbAccessToken', 'fbTestEventCode', 'gtmId', 'tiktokPixelId', 'tiktokAccessToken', 'snapPixelId', 'pinterestTagId', 'googleAdsId', 'clarityId'],
+        payment: ['sslStoreId', 'sslStorePassword', 'sslIsTest', 'bkashAppKey', 'bkashAppSecret', 'bkashUsername', 'bkashPassword', 'bkashIsTest'],
+        smtp: ['mailHost', 'mailPort', 'mailUser', 'mailPass', 'mailFrom'],
+        sms: ['smsApiKey', 'smsSenderId']
+    };
+
+    const response = { ...settings.toObject() };
+
+    Object.keys(categories).forEach(cat => {
+        response[cat] = {};
+        categories[cat].forEach(key => {
+            const val = apiKeysObj[key];
+            if (typeof val === 'string' && val !== "") {
+                response[cat][key] = decrypt(val);
+            } else {
+                response[cat][key] = val || (typeof val === 'boolean' ? val : "");
+            }
+        });
+    });
+
+    res.status(200).json(response);
 });
 
 export const updateSettings = asyncHandler(async (req, res) => {
@@ -33,6 +65,33 @@ export const updateSettings = asyncHandler(async (req, res) => {
     if (req.body.socialLinks) updateData.socialLinks = parseField('socialLinks');
     if (req.body.contact) updateData.contact = parseField('contact');
     if (req.body.paymentOptions) updateData.paymentOptions = parseField('paymentOptions');
+    
+    // Handle API Keys / Credentials (Encrypted)
+    const credentialFields = ['marketing', 'smtp', 'payment', 'sms'];
+    let combinedCredentials = {};
+    let hasCredentials = false;
+
+    for (const field of credentialFields) {
+        const fieldData = parseField(field);
+        if (fieldData) {
+            hasCredentials = true;
+            Object.keys(fieldData).forEach(key => {
+                // Skip system fields
+                if (!['_id', 'createdAt', 'updatedAt', '__v'].includes(key)) {
+                    // Encrypt string values, keep others (like booleans) as is
+                    if (typeof fieldData[key] === 'string' && fieldData[key].trim() !== "") {
+                        combinedCredentials[key] = encrypt(fieldData[key]);
+                    } else {
+                        combinedCredentials[key] = fieldData[key];
+                    }
+                }
+            });
+        }
+    }
+
+    if (hasCredentials) {
+        await ApiKey.findOneAndUpdate({}, combinedCredentials, { upsert: true, new: true });
+    }
 
     // Handle Image Uploads
     const currentSettings = await PageSetting.findOne();

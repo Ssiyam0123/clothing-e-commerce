@@ -91,7 +91,7 @@ export default function UserAuditPage() {
                  "text-[8px] font-black uppercase tracking-widest border-none px-3 py-0.5 rounded-full",
                  userData?.role?.name === "admin" ? "bg-amber-500/10 text-amber-500" : "bg-blue-500/10 text-blue-500"
                )}>
-                 {userData?.role?.name === "admin" ? "★ Vanguard Admin" : "Syndicate Member"}
+                 {userData?.role?.name === "admin" ? "★ Vanguard Admin" : "Vanguard Member"}
                </Badge>
             </div>
           </div>

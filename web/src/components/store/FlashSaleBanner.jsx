@@ -89,10 +89,11 @@ export default function FlashSaleBanner({ flashSale, onExpire }) {
       {flashSale.bannerImage && (
         <div className="absolute inset-0 z-0">
           <Image
-            src={getImageUrl(flashSale.bannerImage, 1920, 800)}
+            src={flashSale.bannerImage}
             alt={flashSale.name}
             fill
             priority
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b lg:bg-gradient-to-r from-black via-black/90 lg:via-black/70 to-transparent" />
         </div>

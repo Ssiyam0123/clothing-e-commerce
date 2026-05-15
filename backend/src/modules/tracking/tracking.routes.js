@@ -1,5 +1,5 @@
 import express from 'express';
-import { sendFacebookEvent } from '../../services/facebookCapiService.js';
+import { sendUnifiedCapiEvent } from '../../services/tracking/multiPlatformCapiService.js';
 import { optionalAuth } from '../../middleware/auth.js';
 
 const router = express.Router();
@@ -18,6 +18,10 @@ router.post('/', optionalAuth, async (req, res) => {
     const fbp = req.cookies._fbp;
     const fbc = req.cookies._fbc;
 
+    // Extract IP and User Agent for better matching
+    const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'];
+
     // Merge user data from the request (authenticated or guest) with cookies
     const finalUserData = {
       ...(req.user?.email && { email: req.user.email }),
@@ -26,9 +30,11 @@ router.post('/', optionalAuth, async (req, res) => {
       ...userData,
       ...(fbp && { fbp }),
       ...(fbc && { fbc }),
+      ip,
+      userAgent,
     };
 
-    await sendFacebookEvent({
+    await sendUnifiedCapiEvent({
       eventName,
       eventId, 
       userData: finalUserData,

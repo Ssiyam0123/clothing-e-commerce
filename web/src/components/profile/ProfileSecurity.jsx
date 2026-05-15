@@ -43,13 +43,13 @@ export default function ProfileSecurity({ ui, onUpdate, loading }) {
             className="h-14 rounded-2xl bg-accent/5 border-border/50 focus:border-accent-secondary/50 transition-all font-bold"
           />
           {errors.currentPassword && (
-            <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest">{errors.currentPassword.message}</p>
+            <p className="text-[9px] font-black text-destructive uppercase tracking-widest">{errors.currentPassword.message}</p>
           )}
         </div>
 
         <div className="space-y-4">
           <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-            <KeyRound size={12} /> New Protocol Password
+            <KeyRound size={12} /> New Password
           </Label>
           <Input 
             type="password"
@@ -61,13 +61,13 @@ export default function ProfileSecurity({ ui, onUpdate, loading }) {
             className="h-14 rounded-2xl bg-accent/5 border-border/50 focus:border-accent-secondary/50 transition-all font-bold"
           />
           {errors.newPassword && (
-            <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest">{errors.newPassword.message}</p>
+            <p className="text-[9px] font-black text-destructive uppercase tracking-widest">{errors.newPassword.message}</p>
           )}
         </div>
 
         <div className="space-y-4">
           <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-            <KeyRound size={12} /> Confirm Credentials
+            <KeyRound size={12} /> Confirm Password
           </Label>
           <Input 
             type="password"
@@ -76,7 +76,7 @@ export default function ProfileSecurity({ ui, onUpdate, loading }) {
             className="h-14 rounded-2xl bg-accent/5 border-border/50 focus:border-accent-secondary/50 transition-all font-bold"
           />
           {errors.confirmPassword && (
-            <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest">{errors.confirmPassword.message}</p>
+            <p className="text-[9px] font-black text-destructive uppercase tracking-widest">{errors.confirmPassword.message}</p>
           )}
         </div>
 
@@ -89,9 +89,9 @@ export default function ProfileSecurity({ ui, onUpdate, loading }) {
             {loading ? (
               <>
                 <RefreshCcw className="mr-3 h-4 w-4 animate-spin" />
-                Processing...
+                Updating...
               </>
-            ) : "Update Security"}
+            ) : "Save Changes"}
           </Button>
         </div>
       </form>

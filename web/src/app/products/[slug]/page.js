@@ -5,6 +5,7 @@ import StarRating from "@/components/store/StarRating";
 import ProductImageGallery from "@/components/products/ProductImageGallery";
 import WishlistButtonClient from "@/components/products/WishlistButtonClient";
 import ProductActionsClient from "@/components/products/ProductActionsClient";
+import ProductViewTracker from "@/components/products/ProductViewTracker";
 import RelatedProducts from "@/components/products/RelatedProducts";
 import ReviewSectionWrapper from "@/components/products/ReviewSectionWrapper";
 import { Badge } from "@/components/ui/badge";
@@ -109,23 +110,67 @@ export default async function ProductPage({ params }) {
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: product.name,
-    description: product.description,
-    image: product.images?.map((img) =>
+    "name": product.name,
+    "description": product.description,
+    "image": product.images?.map((img) =>
       img.startsWith("http") ? img : `${SITE_URL}${img}`,
     ),
-    sku: product.sku || product._id,
-    brand: { "@type": "Brand", name: siteName },
-    offers: {
+    "sku": product.sku || product._id,
+    "gtin13": product.gtin || "",
+    "brand": { "@type": "Brand", name: siteName },
+    "material": product.material || "Premium Fabric",
+    "color": product.color || "",
+    "offers": {
       "@type": "Offer",
-      url: `${SITE_URL}/products/${slug}`,
-      priceCurrency: "BDT",
-      price: discountedPrice,
-      availability: isAvailable
+      "url": `${SITE_URL}/products/${slug}`,
+      "priceCurrency": "BDT",
+      "price": discountedPrice,
+      "priceValidUntil": "2026-12-31",
+      "availability": isAvailable
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
-      itemCondition: "https://schema.org/NewCondition",
-    },
+      "itemCondition": "https://schema.org/NewCondition",
+      "seller": { "@type": "Organization", "name": siteName }
+    }
+  };
+
+  if (product.totalReviews > 0) {
+    productSchema.aggregateRating = {
+      "@type": "AggregateRating",
+      "ratingValue": product.averageRating || 0,
+      "reviewCount": product.totalReviews
+    };
+  }
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What is the material of ${product.name}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": t.compositionDesc
+        }
+      },
+      {
+        "@type": "Question",
+        "name": `How to care for ${product.name}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": t.maintenanceDesc
+        }
+      },
+      {
+        "@type": "Question",
+        "name": `Is the ${product.name} authentic?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": t.authenticityDesc
+        }
+      }
+    ]
   };
 
   const breadcrumbSchema = {
@@ -155,9 +200,14 @@ export default async function ProductPage({ params }) {
 
   return (
     <main className="min-h-screen bg-background text-foreground transition-colors duration-700">
+      <ProductViewTracker product={product} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <script
         type="application/ld+json"
@@ -233,32 +283,41 @@ export default async function ProductPage({ params }) {
                 </p>
 
                 {/* Core USP Items */}
-                <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-4 lg:pt-8">
-                   <div className="flex flex-col items-center gap-3 text-center group/usp p-3 sm:p-4 rounded-[1.5rem] sm:rounded-[2rem] hover:bg-accent/20 transition-all duration-500">
-                     <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl glass flex items-center justify-center text-accent-secondary group-hover/usp:scale-110 group-hover/usp:rotate-6 transition-all duration-500 shadow-lg">
-                        <ShieldCheck size={20} className="sm:w-6 sm:h-6" />
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 lg:pt-8">
+                   <div className="flex flex-col items-center gap-3 text-center group/usp p-3 rounded-2xl hover:bg-accent/10 transition-all duration-500 border border-border/5">
+                     <div className="w-10 h-10 rounded-xl glass flex items-center justify-center text-accent-secondary group-hover/usp:scale-110 group-hover/usp:rotate-6 transition-all duration-500 shadow-md">
+                        <ShieldCheck size={18} />
                      </div>
                      <div className="space-y-0.5">
-                        <span className="block text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-foreground">{t.certified}</span>
-                        <span className="block text-[7px] sm:text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">{t.qualityLock}</span>
+                        <span className="block text-[9px] font-black uppercase tracking-widest text-foreground">{t.authenticity}</span>
+                        <span className="block text-[7px] font-medium tracking-tight text-muted-foreground/60 leading-tight">{t.authenticityDesc}</span>
                      </div>
                    </div>
-                   <div className="flex flex-col items-center gap-3 text-center group/usp p-3 sm:p-4 rounded-[1.5rem] sm:rounded-[2rem] hover:bg-accent/20 transition-all duration-500">
-                     <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl glass flex items-center justify-center text-accent-secondary group-hover/usp:scale-110 group-hover/usp:-rotate-6 transition-all duration-500 shadow-lg">
-                        <Truck size={20} className="sm:w-6 sm:h-6" />
+                   <div className="flex flex-col items-center gap-3 text-center group/usp p-3 rounded-2xl hover:bg-accent/10 transition-all duration-500 border border-border/5">
+                     <div className="w-10 h-10 rounded-xl glass flex items-center justify-center text-accent-secondary group-hover/usp:scale-110 group-hover/usp:-rotate-6 transition-all duration-500 shadow-md">
+                        <Truck size={18} />
                      </div>
                      <div className="space-y-0.5">
-                        <span className="block text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-foreground">{t.express}</span>
-                        <span className="block text-[7px] sm:text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">{t.globalTransit}</span>
+                        <span className="block text-[9px] font-black uppercase tracking-widest text-foreground">{t.express}</span>
+                        <span className="block text-[7px] font-medium tracking-tight text-muted-foreground/60 leading-tight">{t.globalTransit}</span>
                      </div>
                    </div>
-                   <div className="flex flex-col items-center gap-3 text-center group/usp p-3 sm:p-4 rounded-[1.5rem] sm:rounded-[2rem] hover:bg-accent/20 transition-all duration-500">
-                     <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl glass flex items-center justify-center text-accent-secondary group-hover/usp:scale-110 group-hover/usp:rotate-12 transition-all duration-500 shadow-lg">
-                        <RotateCcw size={20} className="sm:w-6 sm:h-6" />
+                   <div className="flex flex-col items-center gap-3 text-center group/usp p-3 rounded-2xl hover:bg-accent/10 transition-all duration-500 border border-border/5">
+                     <div className="w-10 h-10 rounded-xl glass flex items-center justify-center text-accent-secondary group-hover/usp:scale-110 group-hover/usp:rotate-12 transition-all duration-500 shadow-md">
+                        <RotateCcw size={18} />
                      </div>
                      <div className="space-y-0.5">
-                        <span className="block text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-foreground">{t.recovery}</span>
-                        <span className="block text-[7px] sm:text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">{t.secureReturns}</span>
+                        <span className="block text-[9px] font-black uppercase tracking-widest text-foreground">{t.recovery}</span>
+                        <span className="block text-[7px] font-medium tracking-tight text-muted-foreground/60 leading-tight">{t.secureReturns}</span>
+                     </div>
+                   </div>
+                   <div className="flex flex-col items-center gap-3 text-center group/usp p-3 rounded-2xl hover:bg-accent/10 transition-all duration-500 border border-border/5">
+                     <div className="w-10 h-10 rounded-xl glass flex items-center justify-center text-accent-secondary group-hover/usp:scale-110 group-hover/usp:-rotate-12 transition-all duration-500 shadow-md">
+                        <Star size={18} />
+                     </div>
+                     <div className="space-y-0.5">
+                        <span className="block text-[9px] font-black uppercase tracking-widest text-foreground">{t.expertCuration}</span>
+                        <span className="block text-[7px] font-medium tracking-tight text-muted-foreground/60 leading-tight">{t.expertCurationDesc}</span>
                      </div>
                    </div>
                 </div>
@@ -266,15 +325,30 @@ export default async function ProductPage({ params }) {
                 <Separator className="bg-border/30" />
 
                 {/* AEO / FAQ Section */}
-                <div className="space-y-6 lg:space-y-8">
-                  <div itemScope itemType="https://schema.org/Question" className="space-y-2">
-                    <h3 itemProp="name" className="text-[9px] font-black uppercase tracking-[0.4em] text-accent-secondary">
-                      {t.composition}
-                    </h3>
-                    <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                      <p itemProp="text" className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-medium">
-                        {t.compositionDesc}
-                      </p>
+                <div className="space-y-8">
+                  <div className="grid sm:grid-cols-2 gap-8">
+                    <div itemScope itemType="https://schema.org/Question" className="space-y-3">
+                      <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-secondary flex items-center gap-2">
+                        <div className="w-1 h-1 bg-accent-secondary rounded-full" />
+                        {t.composition}
+                      </h3>
+                      <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                        <p itemProp="text" className="text-xs text-muted-foreground leading-relaxed font-medium">
+                          {t.compositionDesc}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div itemScope itemType="https://schema.org/Question" className="space-y-3">
+                      <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-secondary flex items-center gap-2">
+                        <div className="w-1 h-1 bg-accent-secondary rounded-full" />
+                        {t.maintenance}
+                      </h3>
+                      <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                        <p itemProp="text" className="text-xs text-muted-foreground leading-relaxed font-medium">
+                          {t.maintenanceDesc}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>

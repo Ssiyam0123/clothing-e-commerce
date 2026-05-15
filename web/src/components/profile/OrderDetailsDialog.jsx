@@ -8,8 +8,8 @@ import { Loader2, Package, MapPin, CreditCard, Calendar, Truck, Printer, Downloa
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
-export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui }) {
-  const { orderDetails: order, orderDetailsLoading: loading } = useOrders(orderId);
+export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui, phone = null }) {
+  const { orderDetails: order, orderDetailsLoading: loading } = useOrders(orderId, phone);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

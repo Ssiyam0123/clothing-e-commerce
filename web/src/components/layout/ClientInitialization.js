@@ -20,8 +20,10 @@ export default function ClientInitialization({ initialSettings, initialLang, ini
     } else {
       initApp();
     }
+    
+    // 🛡️ Only check session once on initial mount to prevent loops
     checkSession();
-  }, [initialSettings, setSettings, initApp, checkSession]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return <SupportChat />;
 }

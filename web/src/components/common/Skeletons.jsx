@@ -158,3 +158,73 @@ export function FlashBannerSkeleton() {
     </div>
   );
 }
+
+export function ProductDetailSkeleton() {
+  return (
+    <div className="grid lg:grid-cols-12 gap-10 lg:gap-20 xl:gap-32 max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-12 pt-10 lg:pt-24">
+      <div className="lg:col-span-7">
+        <Skeleton className="aspect-square w-full rounded-[3rem]" />
+        <div className="grid grid-cols-4 gap-4 mt-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="aspect-square rounded-2xl" />
+          ))}
+        </div>
+      </div>
+      <div className="lg:col-span-5 space-y-10">
+        <div className="space-y-4">
+          <Skeleton className="h-6 w-32 rounded-full" />
+          <Skeleton className="h-20 w-full rounded-2xl" />
+          <Skeleton className="h-10 w-48 rounded-lg" />
+        </div>
+        <Skeleton className="h-32 w-full rounded-3xl" />
+        <div className="space-y-6">
+          <Skeleton className="h-14 w-full rounded-2xl" />
+          <div className="grid grid-cols-2 gap-4">
+            <Skeleton className="h-16 rounded-full" />
+            <Skeleton className="h-16 rounded-full" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function BlogCardSkeleton() {
+  return (
+    <div className="flex flex-col gap-6 p-6 rounded-[2.5rem] border border-border/5 bg-accent/5">
+      <Skeleton className="aspect-video w-full rounded-3xl" />
+      <div className="space-y-4">
+        <Skeleton className="h-4 w-24 rounded-full" />
+        <Skeleton className="h-10 w-full rounded-xl" />
+        <Skeleton className="h-16 w-full rounded-xl" />
+        <div className="flex justify-between items-center pt-4">
+          <Skeleton className="h-5 w-32 rounded-full" />
+          <Skeleton className="h-5 w-20 rounded-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function ProfileSkeleton() {
+  return (
+    <div className="space-y-12">
+      <div className="flex flex-col md:flex-row gap-8 items-center p-8 rounded-[3rem] glass border border-border/10">
+        <Skeleton className="w-32 h-32 rounded-full shrink-0" />
+        <div className="space-y-4 flex-1">
+          <Skeleton className="h-10 w-64 rounded-xl" />
+          <Skeleton className="h-5 w-48 rounded-full" />
+          <div className="flex gap-4">
+            <Skeleton className="h-8 w-24 rounded-full" />
+            <Skeleton className="h-8 w-24 rounded-full" />
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-40 rounded-[2.5rem]" />
+        ))}
+      </div>
+    </div>
+  );
+}

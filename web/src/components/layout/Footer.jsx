@@ -73,15 +73,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-20">
           {/* Brand Engine */}
           <div className="lg:col-span-5 space-y-8">
-            <Link href="/" className="flex items-center gap-3 group">
+            <Link href="/" className="flex items-center gap-3 group relative">
+               <div className="absolute -inset-4 bg-accent-secondary/10 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                {branding.logo || branding.logoDark ? (
                  <img 
                    src={getImageUrl(theme === 'dark' ? (branding.logoDark || branding.logo) : (branding.logo || branding.logoDark))} 
                    alt={branding.siteName} 
-                   className="h-8 md:h-10 w-auto object-contain transition-transform group-hover:scale-105 duration-500" 
+                   className="h-8 md:h-10 w-auto object-contain transition-transform group-hover:scale-105 duration-500 relative z-10" 
                  />
                ) : (
-                 <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background shadow-2xl">
+                 <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background shadow-2xl relative z-10">
                     <Sparkles size={20} />
                  </div>
                )}

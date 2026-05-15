@@ -217,6 +217,13 @@ function UnifiedSettlementContent() {
     }
   }, [user]);
 
+  const trackInitiateCheckout = useTrackingStore((state) => state.trackInitiateCheckout);
+  useEffect(() => {
+    if (items.length > 0) {
+      trackInitiateCheckout();
+    }
+  }, [items.length, trackInitiateCheckout]);
+
   const paymentOptions = useMemo(
     () => ({
       ssl: settings?.paymentOptions?.online ?? true,

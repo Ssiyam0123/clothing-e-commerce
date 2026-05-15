@@ -2,11 +2,11 @@ import { GridSkeleton } from "@/components/common/Skeletons";
 
 export default function WishlistLoading() {
   return (
-    <div className="min-h-screen pt-32 pb-20">
-      <div className="container mx-auto px-6">
-        <div className="mb-16">
-          <div className="h-12 w-64 bg-elevated dark:bg-elevated rounded-full mb-4 animate-pulse" />
-          <div className="h-4 w-48 bg-elevated dark:bg-elevated rounded-full animate-pulse" />
+    <div className="min-h-screen pt-24 md:pt-32 pb-32">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10">
+        <div className="mb-16 space-y-4">
+          <div className="h-14 w-64 skeleton rounded-2xl" />
+          <div className="h-4 w-48 skeleton rounded-full" />
         </div>
         <GridSkeleton count={8} />
       </div>

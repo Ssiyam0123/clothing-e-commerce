@@ -20,7 +20,7 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
 
   return (
     <section
-      className="relative h-[35vh] min-h-[250px] md:h-[85vh] md:min-h-[700px] overflow-hidden bg-background"
+      className="relative aspect-[16/9] md:aspect-[16/7] overflow-hidden bg-black"
       aria-label="Hero section"
     >
       <div className="relative h-full w-full group">
@@ -33,13 +33,13 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
         ) : (
           <>
             <Image
-              src={getImageUrl(slide.image, 1200, 80)}
+              src={getImageUrl(slide.image, 1920, 100)}
               alt={slide.title || "Campaign banner"}
               fill
               priority
               sizes="100vw"
               className="object-cover object-center transition-transform duration-[15s] ease-out group-hover:scale-105"
-              quality={80}
+              quality={100}
             />
             {showHeader && (
               <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 z-[5] transition-opacity duration-700" />
@@ -48,12 +48,12 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
         )}
 
         {showHeader && (
-          <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 lg:px-24 pb-12 md:pb-28 z-10">
-            <div className="max-w-4xl space-y-6">
+          <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-16 lg:px-24 pb-4 md:pb-16 z-10">
+            <div className="max-w-4xl space-y-3 md:space-y-6">
               
               {slide.title && (
                 <h1 className={cn(
-                  "text-4xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[0.9]",
+                  "text-2xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[0.9]",
                   mounted && "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100"
                 )}>
                   {slide.title}
@@ -62,7 +62,7 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
               
               {slide.subtitle && (
                 <p className={cn(
-                  "text-sm md:text-xl text-zinc-200 font-medium tracking-wide max-w-2xl",
+                  "text-[10px] md:text-xl text-zinc-200 font-medium tracking-wide max-w-2xl line-clamp-2",
                   mounted && "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200"
                 )}>
                   {slide.subtitle}
@@ -70,11 +70,11 @@ export default function HeroSection({ slides = [], ui = {}, lang = "en", showHea
               )}
               
               {slide.link && ui.heroBtn && (
-                <div className={cn(mounted && "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 pt-4")}>
+                <div className={cn(mounted && "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 pt-1 md:pt-4")}>
                   <Button
                     asChild
                     className={cn(
-                      "inline-flex items-center justify-center bg-white text-black px-10 py-6 md:px-12 md:py-8 rounded-theme font-black text-[10px] md:text-xs tracking-[0.2em] hover:bg-zinc-100 hover:scale-105 transition-all active:scale-95 shadow-2xl border-none h-auto",
+                      "inline-flex items-center justify-center bg-white text-black px-6 py-3 md:px-12 md:py-8 rounded-theme font-black text-[8px] md:text-xs tracking-[0.2em] hover:bg-zinc-100 hover:scale-105 transition-all active:scale-95 shadow-2xl border-none h-auto",
                       isBn && "font-sans font-bold"
                     )}
                   >

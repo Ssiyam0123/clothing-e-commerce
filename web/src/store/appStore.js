@@ -15,6 +15,7 @@ const initialState = {
   identityTheme: (isClient && getCookie("vanguard-identity-theme")) || "executive",
   lang: (isClient && getCookie("vanguard-lang")) || "en",
   isChatOpen: false,
+  isAdminSidebarCollapsed: false,
 };
 
 export const useAppStore = create((set, get) => ({
@@ -91,4 +92,7 @@ export const useAppStore = create((set, get) => ({
     set({ theme: newTheme });
     setCookie("vanguard-theme-mode", newTheme);
   },
+
+  toggleAdminSidebar: () => set((state) => ({ isAdminSidebarCollapsed: !state.isAdminSidebarCollapsed })),
+  setAdminSidebarCollapsed: (isCollapsed) => set({ isAdminSidebarCollapsed: isCollapsed }),
 }));

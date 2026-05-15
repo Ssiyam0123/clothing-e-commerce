@@ -316,5 +316,22 @@
   .success-total-row {
     @apply flex justify-between items-center pt-4 text-lg font-black uppercase tracking-tighter border-t border-border/10 mt-6;
   }
+
+  /* 💀 Global Skeleton System */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded-md relative overflow-hidden;
+  }
+
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent;
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
 }
 

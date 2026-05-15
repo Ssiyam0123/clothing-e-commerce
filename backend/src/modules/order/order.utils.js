@@ -1,6 +1,7 @@
 import Product from "../product/product.model.js";
 import Coupon from "../coupon/coupon.model.js";
 import Cart from "../cart/cart.model.js";
+import { sendOrderConfirmationEmail } from "../../services/email.service.js";
 
 export const calculateValidatedOrder = async (orderItems, couponCode, shippingPrice = 60) => {
     let itemsPrice = 0;
@@ -109,5 +110,13 @@ export const finalizeOrderProcessing = async (order, session = null) => {
         { $set: { items: [] } },
         { session }
       );
+    }
+
+    // 🚀 AUTOMATED ORDER CONFIRMATION EMAIL
+    try {
+        await sendOrderConfirmationEmail(order);
+        console.log(`📧 Order confirmation email sent to ${order.shippingAddress.email}`);
+    } catch (error) {
+        console.error("❌ Failed to send order confirmation email:", error);
     }
 };

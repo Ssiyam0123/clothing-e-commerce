@@ -9,16 +9,17 @@ import { cn } from "@/lib/utils";
 export const StandardLayout = ({ children, settings }) => {
   const pathname = usePathname();
   const isFullPageChat = pathname === "/live-support";
-  const isHome = pathname === "/" || pathname === "/en" || pathname === "/bn";
-  const isBlogDetails = pathname.startsWith("/blog/") && pathname !== "/blog";
+  const isProfile = pathname.startsWith("/profile");
+  const showNavbarFooter = !isFullPageChat;
+  const showFooter = showNavbarFooter && !isProfile;
 
   return (
     <div className="identity-standard bg-background text-foreground transition-colors duration-500">
-      {!isFullPageChat && <Navbar settings={settings} />}
+      {showNavbarFooter && <Navbar settings={settings} />}
       <main className="min-h-screen pt-0">
         {children}
       </main>
-      {!isFullPageChat && <Footer settings={settings} />}
+      {showFooter && <Footer settings={settings} />}
     </div>
   );
 };

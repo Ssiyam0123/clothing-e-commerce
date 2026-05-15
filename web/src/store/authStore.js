@@ -64,8 +64,13 @@ export const useAuthStore = create(
 
           await useProductStore.getState().syncWithServer();
         } catch (error) {
-          console.error("Session expired or invalid");
-          get().logout();
+          console.error("Session check failed:", error.message);
+          // Only logout if it's a clear authentication error (401 or 403)
+          if (error.response && [401, 403].includes(error.response.status)) {
+            get().logout();
+          } else {
+            set({ isLoading: false });
+          }
         }
       },
 
@@ -133,6 +138,7 @@ export const useAuthStore = create(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
+        token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
     },

@@ -10,13 +10,12 @@
     "liveSupport": "Live Chat",
     "logout": "Logout",
     "login": "Login",
-    "menuTitle": "Spectacular Menu",
+    "menuTitle": "MENU",
     "directory": "Browse",
     "accountControl": "Account Settings",
     "authorization": "Sign In",
     "initLogin": "Get Started",
-    "categories": "Collections",
-    "version": "Spectacular v1.0"
+    "categories": "Collections"
   },
   "bn": {
     "home": "হোম",
@@ -30,11 +29,10 @@
     "liveSupport": "লাইভ চ্যাট",
     "logout": "লগ আউট",
     "login": "লগইন",
-    "menuTitle": "স্পেক্টাকুলার মেনু",
+    "menuTitle": "MENU",
     "directory": "ব্রাউজ করুন",
     "accountControl": "অ্যাকাউন্ট সেটিংস",
     "authorization": "সাইন ইন",
-    "initLogin": "শুরু করুন",
-    "version": "স্পেক্টাকুলার v1.0"
+    "initLogin": "শুরু করুন"
   }
 }

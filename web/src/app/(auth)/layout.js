@@ -29,7 +29,7 @@ export default function AuthLayout({ children }) {
             transition={{ delay: 0.5, duration: 0.8 }}
           >
             <h2 className="text-6xl font-black text-primary uppercase tracking-tighter italic leading-none">
-              Vanguard <br /> Syndicate
+              Vanguard <br /> Collective
             </h2>
             <p className="text-muted mt-4 uppercase text-[10px] font-black tracking-[0.4em]">
               The Architecture of Style

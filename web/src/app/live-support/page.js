@@ -21,23 +21,32 @@ const ChatMessage = ({ message, isMe }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      className={cn("flex w-full mb-4", isMe ? "justify-end" : "justify-start")}
+      initial={{ opacity: 0, x: isMe ? 20 : -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      className={cn("flex w-full mb-6", isMe ? "justify-end" : "justify-start")}
     >
       <div className={cn(
-        "relative px-4 py-2.5 max-w-[85%] sm:max-w-[70%] shadow-md",
-        isMe 
-          ? "bg-accent-secondary text-white rounded-2xl rounded-tr-none" 
-          : "bg-white dark:bg-[#202c33] text-foreground rounded-2xl rounded-tl-none border border-border/10"
+        "relative max-w-[85%] sm:max-w-[65%]",
+        isMe ? "items-end" : "items-start"
       )}>
-        <p className="text-[14px] leading-relaxed whitespace-pre-wrap break-words pr-8">
-          {message.text}
-        </p>
-        <div className="flex items-center justify-end mt-1 opacity-60">
-          <span className="text-[10px] font-bold tracking-tighter">
+        <div className={cn(
+          "px-5 py-3.5 shadow-2xl transition-all duration-500",
+          isMe 
+            ? "bg-gradient-to-br from-accent-secondary to-accent-secondary/80 text-white rounded-[1.5rem] rounded-tr-none border border-white/10" 
+            : "bg-background/40 backdrop-blur-2xl text-foreground rounded-[1.5rem] rounded-tl-none border border-border/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)]"
+        )}>
+          <p className="text-[13px] md:text-[14px] leading-relaxed font-medium whitespace-pre-wrap break-words">
+            {message.text}
+          </p>
+        </div>
+        <div className={cn(
+          "flex items-center gap-2 mt-2 px-2 opacity-40",
+          isMe ? "justify-end" : "justify-start"
+        )}>
+          <span className="text-[8px] font-black uppercase tracking-widest">
             {timeStr}
           </span>
+          {isMe && <div className="w-1 h-1 rounded-full bg-accent-secondary" />}
         </div>
       </div>
     </motion.div>

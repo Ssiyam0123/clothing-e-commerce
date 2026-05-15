@@ -5,7 +5,7 @@ import { getGuestId } from "@/utils/guestId";
 import { swalError } from "@/utils/swal";
 import { useAuthStore } from "@/store/authStore";
 
-export const useOrders = (orderId = null) => {
+export const useOrders = (orderId = null, phone = null) => {
   const queryClient = useQueryClient();
   const { user, isLoading: authLoading } = useAuthStore();
   const guestId = getGuestId();
@@ -22,12 +22,13 @@ export const useOrders = (orderId = null) => {
   });
 
   const { data: orderDetails, isLoading: orderDetailsLoading } = useQuery({
-    queryKey: ["order", orderId, userId],
+    queryKey: ["order", orderId, userId, phone],
     queryFn: async () => {
-      const { data } = await api.get(`/orders/${orderId}`);
+      const url = phone ? `/orders/${orderId}?phone=${phone}` : `/orders/${orderId}`;
+      const { data } = await api.get(url);
       return data;
     },
-    enabled: !!orderId && !authLoading,
+    enabled: !!orderId,
   });
 
   const initOrder = useMutation({

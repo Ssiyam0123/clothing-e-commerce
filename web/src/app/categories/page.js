@@ -94,7 +94,7 @@ export default async function CategoriesPage() {
                           "text-[7px] md:text-[10px] font-black tracking-[0.4em] uppercase",
                           isOnSale ? "text-rose-500" : "text-accent-secondary"
                         )}>
-                          {isOnSale ? "Offer" : "Syndicate"}
+                          {isOnSale ? "Offer" : "Collection"}
                         </span>
                       </div>
                       

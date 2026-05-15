@@ -1,53 +1,25 @@
 import { create } from 'zustand';
-import api from '@/lib/api';
-
-const getFacebookCookies = () => {
-  if (typeof window === 'undefined') return {};
-  const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    return null;
-  };
-  return {
-    fbp: getCookie('_fbp'),
-    fbc: getCookie('_fbc'),
-  };
-};
+import { trackEvent } from '@/lib/tracking/tracker';
 
 export const useTrackingStore = create((set, get) => ({
   eventsHistory: [],
 
   sendEvent: async (eventName, eventData = {}, userData = {}, customEventId = null) => {
-    const { fbp, fbc } = getFacebookCookies();
-    const eventId = customEventId || "ev_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-
-    if (typeof window !== 'undefined' && window.fbq) {
-      window.fbq('track', eventName, eventData, { eventID: eventId });
-    }
-
-    const payload = {
-      eventName,
-      eventData,
-      eventId,
-      userData: {
-        ...userData,
-        ...(fbp && { fbp }),
-        ...(fbc && { fbc }),
-      },
-    };
-
-    try {
-      await api.post('/track', payload);
-      set((state) => ({
-        eventsHistory: [...state.eventsHistory, { eventName, eventData, userData, eventId, timestamp: Date.now() }],
-      }));
-    } catch (error) {
-      console.error(`Failed to track ${eventName}:`, error);
-    }
+    // Use the unified tracker
+    await trackEvent(eventName, eventData, userData, customEventId);
+    
+    // Maintain local history
+    set((state) => ({
+      eventsHistory: [...state.eventsHistory, { 
+        eventName, 
+        eventData, 
+        userData, 
+        eventId: customEventId || 'recorded', 
+        timestamp: Date.now() 
+      }],
+    }));
   },
 
-  // 🚀 SENIOR FIX: The Standard Search Event
   trackSearch: (searchString = null, categoryName = null, userData = {}) => {
     const eventData = {};
     if (searchString) eventData.search_string = searchString;

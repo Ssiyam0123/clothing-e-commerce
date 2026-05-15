@@ -32,14 +32,16 @@ const getHomeData = cache(async () => {
         fetch(`${API_URL}/products?limit=24`, fetchOptions),
         fetch(`${API_URL}/categories`, fetchOptions),
         fetch(`${API_URL}/flash-sales/active`, fetchOptions),
-        fetch(`${API_URL}/banner-campaigns`, fetchOptions),
+        fetch(`${API_URL}/banner-campaigns/active`, fetchOptions),
         fetch(`${API_URL}/products?limit=200`, fetchOptions),
         fetch(`${API_URL}/home-layouts/active`, fetchOptions),
       ]);
 
-    const [layoutData, campaigns, productData, categoryData, flashSaleData, allProductsData] = await Promise.all([
+    const bannerData = bannerRes.ok ? await bannerRes.json() : null;
+    const campaigns = Array.isArray(bannerData) ? bannerData : (bannerData ? [bannerData] : []);
+
+    const [layoutData, productData, categoryData, flashSaleData, allProductsData] = await Promise.all([
       layoutRes.ok ? layoutRes.json() : null,
-      bannerRes.ok ? bannerRes.json() : [],
       productsRes.ok ? productsRes.json() : { products: [] },
       categoriesRes.ok ? categoriesRes.json() : [],
       flashSalesRes.ok ? flashSalesRes.json() : null,
@@ -50,7 +52,7 @@ const getHomeData = cache(async () => {
       products: productData.products || [],
       categories: categoryData,
       flashSales: flashSaleData,
-      activeCampaign: campaigns.find(c => c.isActive) || null,
+      activeCampaign: campaigns.find(c => c.isActive) || campaigns[0] || null,
       allCampaigns: campaigns,
       allProducts: allProductsData.products || [],
       layout: layoutData?.sections || [],

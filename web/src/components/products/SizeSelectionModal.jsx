@@ -192,9 +192,7 @@ export default function SizeSelectionModal({ product, isOpen, onOpenChange, mode
                   )}
                 </Button>
                 
-                <p className="text-[8px] font-bold text-center text-muted-foreground uppercase tracking-[0.4em] animate-pulse">
-                  Secure Terminal Transfer v4.0.1
-                </p>
+           
               </div>
             </div>
           </ScrollArea>

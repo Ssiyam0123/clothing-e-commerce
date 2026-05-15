@@ -9,6 +9,7 @@ import {
   finalizeOrderProcessing
 } from "../order.utils.js";
 import pathaoService from '../../../services/pathao.service.js';
+import { sendOrderStatusUpdateEmail } from '../../../services/email.service.js';
 
 export const getOrders = asyncHandler(async (req, res) => {
   const { search, status, user, sort, page = 1, limit = 30 } = req.query;
@@ -184,7 +185,19 @@ export const updateOrder = asyncHandler(async (req, res) => {
     order.paymentResult = { ...order.paymentResult, ...req.body.paymentResult };
   }
 
+  const oldStatus = order.orderStatus;
   await order.save();
+
+  // 📧 TRIGGER STATUS UPDATE EMAIL
+  if (req.body.orderStatus && req.body.orderStatus !== oldStatus) {
+    try {
+      await sendOrderStatusUpdateEmail(order);
+      console.log(`📧 Status update email sent to ${order.shippingAddress.email} (${order.orderStatus})`);
+    } catch (error) {
+      console.error("❌ Failed to send status update email:", error);
+    }
+  }
+
   const updatedOrder = await Order.findById(order._id)
     .populate({ path: "user", select: "name email avatar role", populate: { path: "role" } })
     .populate("orderItems.product", "name images slug");

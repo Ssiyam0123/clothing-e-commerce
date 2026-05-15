@@ -11,7 +11,8 @@ import {
   Palette,
   ArrowLeft,
   Settings2,
-  Cpu
+  Cpu,
+  MessageSquare
 } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/api";
@@ -40,7 +41,10 @@ export default function SettingsPage() {
     { id: "theme", label: "Style", desc: "Colors & Fonts", icon: Palette },
     { id: "socials", label: "Social", desc: "Social Media Links", icon: Share2 },
     { id: "contact", label: "Support", desc: "Contact Details", icon: Mail },
-    { id: "payment", label: "Payments", desc: "Payment Methods", icon: Settings2 },
+    { id: "payment", label: "Payments", desc: "Gateways & Keys", icon: Settings2 },
+    { id: "marketing", label: "Marketing", desc: "Pixel IDs & Tracking", icon: Cpu },
+    { id: "smtp", label: "Email", desc: "SMTP Configuration", icon: Mail },
+    { id: "sms", label: "SMS", desc: "Gateway Settings", icon: MessageSquare },
   ];
 
   const [formData, setFormData] = useState({
@@ -66,6 +70,39 @@ export default function SettingsPage() {
       cod: true,
       online: true,
       bkash: true,
+    },
+    marketing: {
+      fbPixelId: "",
+      fbAccessToken: "",
+      fbTestEventCode: "",
+      gtmId: "",
+      tiktokPixelId: "",
+      tiktokAccessToken: "",
+      snapPixelId: "",
+      pinterestTagId: "",
+      googleAdsId: "",
+      clarityId: ""
+    },
+    payment: {
+      sslStoreId: "",
+      sslStorePassword: "",
+      sslIsTest: true,
+      bkashAppKey: "",
+      bkashAppSecret: "",
+      bkashUsername: "",
+      bkashPassword: "",
+      bkashIsTest: true,
+    },
+    smtp: {
+      mailHost: "",
+      mailPort: "",
+      mailUser: "",
+      mailPass: "",
+      mailFrom: "",
+    },
+    sms: {
+      smsApiKey: "",
+      smsSenderId: "",
     }
   });
 
@@ -86,6 +123,10 @@ export default function SettingsPage() {
             socialLinks: data.socialLinks || [],
             contact: { ...formData.contact, ...data.contact },
             paymentOptions: { ...formData.paymentOptions, ...data.paymentOptions },
+            marketing: { ...formData.marketing, ...data.marketing },
+            payment: { ...formData.payment, ...data.payment },
+            smtp: { ...formData.smtp, ...data.smtp },
+            sms: { ...formData.sms, ...data.sms },
           });
         }
       } catch (error) {
@@ -98,35 +139,41 @@ export default function SettingsPage() {
     fetchSettings();
   }, []);
 
-  const handleSubmit = async (e) => {
-    if (e) e.preventDefault();
+  const handleSave = async (type) => {
     setLoading(true);
 
     try {
       const payload = new FormData();
       
-      // Append JSON strings for nested objects
-      // Clean social links: Only keep recognized platforms and valid URLs
-      const allowedPlatforms = ["facebook", "instagram", "twitter", "linkedin", "tiktok"];
-      const cleanedSocialLinks = (formData.socialLinks || []).filter(link => 
-        allowedPlatforms.includes(link.platform?.toLowerCase()) && link.url?.trim() !== ""
-      );
-
-      payload.append("branding", JSON.stringify(formData.branding));
-      payload.append("socialLinks", JSON.stringify(cleanedSocialLinks));
-      payload.append("contact", JSON.stringify(formData.contact));
-      payload.append("paymentOptions", JSON.stringify(formData.paymentOptions));
-
-      // Append Files
-      if (files.logo) payload.append("logo", files.logo);
-      if (files.logoDark) payload.append("logoDark", files.logoDark);
-      if (files.favicon) payload.append("favicon", files.favicon);
+      if (type === "branding") {
+        payload.append("branding", JSON.stringify(formData.branding));
+        if (files.logo) payload.append("logo", files.logo);
+        if (files.logoDark) payload.append("logoDark", files.logoDark);
+        if (files.favicon) payload.append("favicon", files.favicon);
+      } else if (type === "socials") {
+        const allowedPlatforms = ["facebook", "instagram", "twitter", "linkedin", "tiktok"];
+        const cleanedSocialLinks = (formData.socialLinks || []).filter(link => 
+          allowedPlatforms.includes(link.platform?.toLowerCase()) && link.url?.trim() !== ""
+        );
+        payload.append("socialLinks", JSON.stringify(cleanedSocialLinks));
+      } else if (type === "contact") {
+        payload.append("contact", JSON.stringify(formData.contact));
+      } else if (type === "payment") {
+        payload.append("paymentOptions", JSON.stringify(formData.paymentOptions));
+        payload.append("payment", JSON.stringify(formData.payment));
+      } else if (type === "marketing") {
+        payload.append("marketing", JSON.stringify(formData.marketing));
+      } else if (type === "smtp") {
+        payload.append("smtp", JSON.stringify(formData.smtp));
+      } else if (type === "sms") {
+        payload.append("sms", JSON.stringify(formData.sms));
+      }
 
       await api.put("/settings", payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      toast.success("Settings Updated Successfully");
+      toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} settings updated!`);
       
       // 🚀 Sync Global Store & Revalidate SSR Cache
       await initApp();
@@ -134,7 +181,7 @@ export default function SettingsPage() {
       
     } catch (error) {
       console.error("Update Error:", error);
-      toast.error("Update failed. Please try again.");
+      toast.error(`Failed to update ${type}. Please try again.`);
     } finally {
       setLoading(false);
     }
@@ -165,14 +212,13 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        <Button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="bg-foreground text-background hover:bg-accent-secondary hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group relative z-10 w-full md:w-auto"
-        >
-          <Save size={18} className={cn("mr-3", loading && "animate-pulse")} />
-          {loading ? "Saving..." : "Save Changes"}
-        </Button>
+        <div className="hidden md:flex items-center gap-4 bg-background/50 px-6 py-3 rounded-2xl border border-border/10 shadow-inner relative z-10">
+          <div className="flex flex-col items-end">
+            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">System Status</span>
+            <span className="text-[10px] font-black uppercase tracking-tighter text-emerald-500 italic">Operational</span>
+          </div>
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+        </div>
       </header>
 
       <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 md:gap-12">
@@ -274,6 +320,17 @@ export default function SettingsPage() {
                         currentImage={formData.branding?.favicon}
                         onImageChange={(f) => setFiles({ ...files, favicon: f })}
                       />
+                    </div>
+
+                    <div className="pt-12 border-t border-border/5 flex justify-end">
+                      <Button
+                        onClick={() => handleSave("branding")}
+                        disabled={loading}
+                        className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
+                      >
+                        <Save size={16} className={cn("mr-2", loading && "animate-pulse")} />
+                        {loading ? "Updating Identity..." : "Save Identity"}
+                      </Button>
                     </div>
                   </motion.div>
                 )}
@@ -407,6 +464,17 @@ export default function SettingsPage() {
                         ))}
                       </div>
                     </section>
+
+                    <div className="pt-16 border-t border-border/5 flex justify-end">
+                      <Button
+                        onClick={() => handleSave("branding")}
+                        disabled={loading}
+                        className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
+                      >
+                        <Save size={16} className={cn("mr-2", loading && "animate-pulse")} />
+                        {loading ? "Updating Styles..." : "Save Styles"}
+                      </Button>
+                    </div>
                   </motion.div>
                 )}
 
@@ -447,6 +515,17 @@ export default function SettingsPage() {
                           placeholder={platform.placeholder}
                         />
                       ))}
+                    </div>
+
+                    <div className="pt-12 border-t border-border/5 flex justify-end">
+                      <Button
+                        onClick={() => handleSave("socials")}
+                        disabled={loading}
+                        className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
+                      >
+                        <Save size={16} className={cn("mr-2", loading && "animate-pulse")} />
+                        {loading ? "Updating Socials..." : "Save Social Links"}
+                      </Button>
                     </div>
                   </motion.div>
                 )}
@@ -491,6 +570,17 @@ export default function SettingsPage() {
                         value={formData.contact?.address}
                         placeholder="e.g. Sector 7, Uttara, Dhaka"
                       />
+                    </div>
+
+                    <div className="pt-12 border-t border-border/5 flex justify-end">
+                      <Button
+                        onClick={() => handleSave("contact")}
+                        disabled={loading}
+                        className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
+                      >
+                        <Save size={16} className={cn("mr-2", loading && "animate-pulse")} />
+                        {loading ? "Updating Support..." : "Save Support Info"}
+                      </Button>
                     </div>
                   </motion.div>
                 )}
@@ -556,6 +646,320 @@ export default function SettingsPage() {
                         ))}
                       </div>
                     </section>
+
+                    <section className="space-y-12 pt-16 border-t border-border/5">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        {/* SSLCommerz */}
+                        <div className="space-y-8">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-black uppercase tracking-widest italic text-primary">SSLCommerz Settings</h3>
+                            <button 
+                              onClick={() => setFormData({...formData, payment: {...formData.payment, sslIsTest: !formData.payment?.sslIsTest}})}
+                              className={cn("px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest transition-all", formData.payment?.sslIsTest ? "bg-orange-500/20 text-orange-500" : "bg-emerald-500/20 text-emerald-500")}
+                            >
+                              {formData.payment?.sslIsTest ? "Sandbox Mode" : "Live Mode"}
+                            </button>
+                          </div>
+                          <FormInput
+                            label="Store ID"
+                            name="sslStoreId"
+                            register={() => ({ value: formData.payment?.sslStoreId, onChange: (e) => setFormData({...formData, payment: {...formData.payment, sslStoreId: e.target.value}}) })}
+                            errors={{}}
+                            value={formData.payment?.sslStoreId}
+                            placeholder="Store ID"
+                          />
+                          <FormInput
+                            label="Store Password"
+                            name="sslStorePassword"
+                            register={() => ({ value: formData.payment?.sslStorePassword, onChange: (e) => setFormData({...formData, payment: {...formData.payment, sslStorePassword: e.target.value}}) })}
+                            errors={{}}
+                            value={formData.payment?.sslStorePassword}
+                            placeholder="Store Password"
+                          />
+                        </div>
+
+                        {/* bKash */}
+                        <div className="space-y-8">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-black uppercase tracking-widest italic text-primary">bKash Settings</h3>
+                            <button 
+                              onClick={() => setFormData({...formData, payment: {...formData.payment, bkashIsTest: !formData.payment?.bkashIsTest}})}
+                              className={cn("px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest transition-all", formData.payment?.bkashIsTest ? "bg-orange-500/20 text-orange-500" : "bg-emerald-500/20 text-emerald-500")}
+                            >
+                              {formData.payment?.bkashIsTest ? "Sandbox Mode" : "Live Mode"}
+                            </button>
+                          </div>
+                          <FormInput
+                            label="App Key"
+                            name="bkashAppKey"
+                            register={() => ({ value: formData.payment?.bkashAppKey, onChange: (e) => setFormData({...formData, payment: {...formData.payment, bkashAppKey: e.target.value}}) })}
+                            errors={{}}
+                            value={formData.payment?.bkashAppKey}
+                            placeholder="App Key"
+                          />
+                          <FormInput
+                            label="App Secret"
+                            name="bkashAppSecret"
+                            register={() => ({ value: formData.payment?.bkashAppSecret, onChange: (e) => setFormData({...formData, payment: {...formData.payment, bkashAppSecret: e.target.value}}) })}
+                            errors={{}}
+                            value={formData.payment?.bkashAppSecret}
+                            placeholder="App Secret"
+                          />
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormInput
+                              label="Username"
+                              name="bkashUsername"
+                              register={() => ({ value: formData.payment?.bkashUsername, onChange: (e) => setFormData({...formData, payment: {...formData.payment, bkashUsername: e.target.value}}) })}
+                              errors={{}}
+                              value={formData.payment?.bkashUsername}
+                              placeholder="Username"
+                            />
+                            <FormInput
+                              label="Password"
+                              name="bkashPassword"
+                              register={() => ({ value: formData.payment?.bkashPassword, onChange: (e) => setFormData({...formData, payment: {...formData.payment, bkashPassword: e.target.value}}) })}
+                              errors={{}}
+                              value={formData.payment?.bkashPassword}
+                              placeholder="Password"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+
+                    <div className="pt-16 border-t border-border/5 flex justify-end">
+                      <Button
+                        onClick={() => handleSave("payment")}
+                        disabled={loading}
+                        className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
+                      >
+                        <Save size={16} className={cn("mr-2", loading && "animate-pulse")} />
+                        {loading ? "Updating Payments..." : "Save Payment Options"}
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
+                {activeTab === "marketing" && (
+                  <motion.div
+                    key="marketing"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="space-y-12"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                      {/* Meta / Facebook */}
+                      <div className="col-span-full border-b border-border/10 pb-4 mb-4">
+                        <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Meta (Facebook) Tracking</h3>
+                      </div>
+                      <FormInput
+                        label="Facebook Pixel ID"
+                        name="fbPixelId"
+                        register={() => ({ value: formData.marketing?.fbPixelId, onChange: (e) => setFormData({...formData, marketing: {...formData.marketing, fbPixelId: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.marketing?.fbPixelId}
+                        placeholder="e.g. 1234567890"
+                      />
+                      <FormInput
+                        label="Facebook Access Token (CAPI)"
+                        name="fbAccessToken"
+                        register={() => ({ value: formData.marketing?.fbAccessToken, onChange: (e) => setFormData({...formData, marketing: {...formData.marketing, fbAccessToken: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.marketing?.fbAccessToken}
+                        placeholder="EAAB..."
+                      />
+                      <FormInput
+                        label="Test Event Code (Optional)"
+                        name="fbTestEventCode"
+                        register={() => ({ value: formData.marketing?.fbTestEventCode, onChange: (e) => setFormData({...formData, marketing: {...formData.marketing, fbTestEventCode: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.marketing?.fbTestEventCode}
+                        placeholder="TEST12345"
+                      />
+
+                      {/* Google */}
+                      <div className="col-span-full border-b border-border/10 pb-4 mt-8 mb-4">
+                        <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Google Analytics & GTM</h3>
+                      </div>
+                      <FormInput
+                        label="GTM ID"
+                        name="gtmId"
+                        register={() => ({ value: formData.marketing?.gtmId, onChange: (e) => setFormData({...formData, marketing: {...formData.marketing, gtmId: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.marketing?.gtmId}
+                        placeholder="GTM-XXXXXXX"
+                      />
+                      <FormInput
+                        label="Google Ads ID"
+                        name="googleAdsId"
+                        register={() => ({ value: formData.marketing?.googleAdsId, onChange: (e) => setFormData({...formData, marketing: {...formData.marketing, googleAdsId: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.marketing?.googleAdsId}
+                        placeholder="AW-XXXXXXXXX"
+                      />
+
+                      {/* TikTok */}
+                      <div className="col-span-full border-b border-border/10 pb-4 mt-8 mb-4">
+                        <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">TikTok Ads</h3>
+                      </div>
+                      <FormInput
+                        label="TikTok Pixel ID"
+                        name="tiktokPixelId"
+                        register={() => ({ value: formData.marketing?.tiktokPixelId, onChange: (e) => setFormData({...formData, marketing: {...formData.marketing, tiktokPixelId: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.marketing?.tiktokPixelId}
+                        placeholder="CXXXXXXXXXXXXXXXXXXX"
+                      />
+                      <FormInput
+                        label="TikTok Access Token"
+                        name="tiktokAccessToken"
+                        register={() => ({ value: formData.marketing?.tiktokAccessToken, onChange: (e) => setFormData({...formData, marketing: {...formData.marketing, tiktokAccessToken: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.marketing?.tiktokAccessToken}
+                        placeholder="Access Token..."
+                      />
+
+                      {/* Others */}
+                      <div className="col-span-full border-b border-border/10 pb-4 mt-8 mb-4">
+                        <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Other Platforms</h3>
+                      </div>
+                      <FormInput
+                        label="Snapchat Pixel ID"
+                        name="snapPixelId"
+                        register={() => ({ value: formData.marketing?.snapPixelId, onChange: (e) => setFormData({...formData, marketing: {...formData.marketing, snapPixelId: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.marketing?.snapPixelId}
+                      />
+                      <FormInput
+                        label="Pinterest Tag ID"
+                        name="pinterestTagId"
+                        register={() => ({ value: formData.marketing?.pinterestTagId, onChange: (e) => setFormData({...formData, marketing: {...formData.marketing, pinterestTagId: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.marketing?.pinterestTagId}
+                      />
+                      <FormInput
+                        label="Microsoft Clarity ID"
+                        name="clarityId"
+                        register={() => ({ value: formData.marketing?.clarityId, onChange: (e) => setFormData({...formData, marketing: {...formData.marketing, clarityId: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.marketing?.clarityId}
+                      />
+                    </div>
+
+                    <div className="pt-12 border-t border-border/5 flex justify-end">
+                      <Button
+                        onClick={() => handleSave("marketing")}
+                        disabled={loading}
+                        className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
+                      >
+                        <Save size={16} className={cn("mr-2", loading && "animate-pulse")} />
+                        {loading ? "Updating Marketing..." : "Save Marketing Keys"}
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "smtp" && (
+                  <motion.div
+                    key="smtp"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="space-y-12"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                      <FormInput
+                        label="SMTP Host"
+                        name="mailHost"
+                        register={() => ({ value: formData.smtp?.mailHost, onChange: (e) => setFormData({...formData, smtp: {...formData.smtp, mailHost: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.smtp?.mailHost}
+                        placeholder="e.g. smtp.gmail.com"
+                      />
+                      <FormInput
+                        label="SMTP Port"
+                        name="mailPort"
+                        register={() => ({ value: formData.smtp?.mailPort, onChange: (e) => setFormData({...formData, smtp: {...formData.smtp, mailPort: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.smtp?.mailPort}
+                        placeholder="e.g. 587"
+                      />
+                      <FormInput
+                        label="SMTP User / Email"
+                        name="mailUser"
+                        register={() => ({ value: formData.smtp?.mailUser, onChange: (e) => setFormData({...formData, smtp: {...formData.smtp, mailUser: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.smtp?.mailUser}
+                        placeholder="e.g. info@yourstore.com"
+                      />
+                      <FormInput
+                        label="SMTP Password / App Pass"
+                        name="mailPass"
+                        register={() => ({ value: formData.smtp?.mailPass, onChange: (e) => setFormData({...formData, smtp: {...formData.smtp, mailPass: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.smtp?.mailPass}
+                        placeholder="SMTP Password"
+                      />
+                      <FormInput
+                        label="Mail From Name"
+                        name="mailFrom"
+                        register={() => ({ value: formData.smtp?.mailFrom, onChange: (e) => setFormData({...formData, smtp: {...formData.smtp, mailFrom: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.smtp?.mailFrom}
+                        placeholder="e.g. Vanguard Store"
+                      />
+                    </div>
+
+                    <div className="pt-12 border-t border-border/5 flex justify-end">
+                      <Button
+                        onClick={() => handleSave("smtp")}
+                        disabled={loading}
+                        className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
+                      >
+                        <Save size={16} className={cn("mr-2", loading && "animate-pulse")} />
+                        {loading ? "Updating Email..." : "Save Email Config"}
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "sms" && (
+                  <motion.div
+                    key="sms"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="space-y-12"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                      <FormInput
+                        label="SMS Gateway API Key"
+                        name="smsApiKey"
+                        register={() => ({ value: formData.sms?.smsApiKey, onChange: (e) => setFormData({...formData, sms: {...formData.sms, smsApiKey: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.sms?.smsApiKey}
+                        placeholder="API Key"
+                      />
+                      <FormInput
+                        label="SMS Sender ID / Masking"
+                        name="smsSenderId"
+                        register={() => ({ value: formData.sms?.smsSenderId, onChange: (e) => setFormData({...formData, sms: {...formData.sms, smsSenderId: e.target.value}}) })}
+                        errors={{}}
+                        value={formData.sms?.smsSenderId}
+                        placeholder="e.g. VANGUARD"
+                      />
+                    </div>
+
+                    <div className="pt-12 border-t border-border/5 flex justify-end">
+                      <Button
+                        onClick={() => handleSave("sms")}
+                        disabled={loading}
+                        className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
+                      >
+                        <Save size={16} className={cn("mr-2", loading && "animate-pulse")} />
+                        {loading ? "Updating SMS..." : "Save SMS Gateway"}
+                      </Button>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>

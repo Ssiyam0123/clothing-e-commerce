@@ -13,6 +13,8 @@ import {
 } from "../order.gateway.js";
 import bkashService from '../../../services/bkash.service.js';
 import PageSetting from "../../settings/settings.model.js";
+import ApiKey from "../../settings/apiKey.model.js";
+import { decrypt } from "../../../utils/encryption.js";
 
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
@@ -48,6 +50,7 @@ export const initPayment = asyncHandler(async (req, res) => {
 
   const isRegisteredUser = mongoose.Types.ObjectId.isValid(userId);
   const settings = await PageSetting.findOne();
+  const apiKeys = await ApiKey.findOne();
   
   if (!settings) {
      console.error("❌ SETTINGS NOT INITIALIZED");
@@ -55,13 +58,13 @@ export const initPayment = asyncHandler(async (req, res) => {
   }
 
   const sslCreds = {
-    storeId: process.env.SSL_STORE_ID,
-    storePassword: process.env.SSL_STORE_PASSWORD
+    storeId: apiKeys?.sslStoreId || process.env.SSL_STORE_ID,
+    storePassword: apiKeys?.sslStorePassword ? decrypt(apiKeys.sslStorePassword) : process.env.SSL_STORE_PASSWORD
   };
 
   const bkashCreds = {
-    appKey: process.env.BKASH_APP_KEY,
-    appSecret: process.env.BKASH_APP_SECRET
+    appKey: apiKeys?.bkashAppKey || process.env.BKASH_APP_KEY,
+    appSecret: apiKeys?.bkashAppSecret ? decrypt(apiKeys.bkashAppSecret) : process.env.BKASH_APP_SECRET
   };
 
   try {
@@ -132,9 +135,10 @@ export const paymentSuccess = asyncHandler(async (req, res) => {
 export const bkashSuccess = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { paymentID, status } = req.query;
+  const apiKeys = await ApiKey.findOne();
   const bkashCreds = {
-    appKey: process.env.BKASH_APP_KEY,
-    appSecret: process.env.BKASH_APP_SECRET
+    appKey: apiKeys?.bkashAppKey || process.env.BKASH_APP_KEY,
+    appSecret: apiKeys?.bkashAppSecret ? decrypt(apiKeys.bkashAppSecret) : process.env.BKASH_APP_SECRET
   };
   const order = await Order.findById(orderId);
 
@@ -199,9 +203,10 @@ export const getMyOrders = asyncHandler(async (req, res) => {
   res.json(orders);
 });
 
+
 export const getOrderById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log("🔍 FETCHING ORDER DETAILS", { orderId: id });
+  const { phone } = req.query; // Used for guest tracking verification
 
   if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid Order ID protocol." });
 
@@ -211,29 +216,17 @@ export const getOrderById = asyncHandler(async (req, res) => {
     .populate("orderItems.size", "name");
 
   if (!order) {
-    console.warn("❌ ORDER NOT FOUND IN DB:", id);
     return res.status(404).json({ message: "Protocol not found." });
   }
 
   const currentUserId = getUserIdFromReq(req); 
   const orderUserId = order.user?._id ? order.user._id.toString() : order.user?.toString();
   
-  console.log("👤 IDENTITY AUDIT", {
-    requestUserId: currentUserId,
-    orderOwnerId: orderUserId,
-    isGuestOrder: order.isGuest,
-    hasToken: !!req.headers.authorization
-  });
-
-  const isOwner = (order.user && orderUserId === currentUserId) || (order.isGuest && !order.user); 
   const isAdmin = req.user?.role?.name === 'admin' || req.user?.role?.name === 'superadmin';
+  const isRegisteredOwner = order.user && orderUserId === currentUserId;
 
-  if (!isOwner && !isAdmin) {
-    console.error("🚫 ACCESS DENIED: Identity mismatch", {
-        expected: orderUserId,
-        received: currentUserId
-    });
-    return res.status(401).json({ message: "Access Denied. Unauthorized Protocol." });
+  if (!isRegisteredOwner && !isAdmin) {
+    return res.status(401).json({ message: "Access Denied. Identity mismatch." });
   }
 
   res.json(order);

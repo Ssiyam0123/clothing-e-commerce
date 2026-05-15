@@ -215,7 +215,6 @@ function UsersContent() {
             suggestionKey="users"
             entityType="user"
             sortOptions={[
-              { label: "Default", value: "-createdAt" },
               { label: "Newest Joined", value: "-createdAt" },
               { label: "Oldest Joined", value: "createdAt" },
               { label: "Alphabetical (A-Z)", value: "name" },

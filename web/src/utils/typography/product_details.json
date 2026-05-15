@@ -19,7 +19,15 @@
     "addedToCart": "Added to cart",
     "outOfStock": "Out of stock",
     "featuredProduct": "Featured Product",
-    "off": "OFF"
+    "off": "OFF",
+    "authenticity": "100% Authentic",
+    "authenticityDesc": "Sourced directly from certified manufacturers.",
+    "paymentSecure": "Secure Checkout",
+    "paymentSecureDesc": "End-to-end encrypted payment gateway.",
+    "maintenance": "Care Instructions",
+    "maintenanceDesc": "Machine wash cold with similar colors. Do not bleach. Tumble dry low.",
+    "expertCuration": "Expertly Curated",
+    "expertCurationDesc": "Selected by our fashion experts for style and longevity."
   },
   "bn": {
     "about": "বিবরণ",

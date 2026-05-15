@@ -168,29 +168,29 @@ export default function Navbar() {
             )}
           </Button>
 
-          <Link href="/products" className="hidden md:inline-flex flex-shrink-0">
-             <Button variant="ghost" size="icon" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30" aria-label="Search">
+          <Link href="/products" className="inline-flex flex-shrink-0">
+             <Button variant="ghost" size="icon" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30" aria-label="Search">
                <Search size={16} className="sm:size-[18px]" />
              </Button>
           </Link>
 
-          <Link href="/wishlist" className="hidden md:inline-flex relative flex-shrink-0">
-            <Button variant="ghost" size="icon" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30" aria-label="Wishlist">
+          <Link href="/wishlist" className="inline-flex relative flex-shrink-0">
+            <Button variant="ghost" size="icon" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30" aria-label="Wishlist">
               <Heart size={16} className="sm:size-[18px]" />
             </Button>
             {wishlistCount > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-4 min-w-[16px] bg-accent-secondary text-white border-none text-[7px] font-black rounded-full px-1 flex items-center justify-center">
+              <Badge className="absolute -top-1 -right-1 h-3.5 min-w-[14px] sm:h-4 sm:min-w-[16px] bg-accent-secondary text-white border-none text-[6px] sm:text-[7px] font-black rounded-full px-1 flex items-center justify-center">
                 {wishlistCount}
               </Badge>
             )}
           </Link>
 
-          <Link href="/cart" className="hidden md:inline-flex relative flex-shrink-0">
-            <Button variant="ghost" size="icon" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30" aria-label="Shopping Cart">
+          <Link href="/cart" className="inline-flex relative flex-shrink-0">
+            <Button variant="ghost" size="icon" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full hover:bg-accent/30" aria-label="Shopping Cart">
               <ShoppingBag size={16} className="sm:size-[18px]" />
             </Button>
             {cartCount > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-4 min-w-[16px] bg-accent-secondary text-white border-none text-[7px] font-black rounded-full px-1 flex items-center justify-center">
+              <Badge className="absolute -top-1 -right-1 h-3.5 min-w-[14px] sm:h-4 sm:min-w-[16px] bg-accent-secondary text-white border-none text-[6px] sm:text-[7px] font-black rounded-full px-1 flex items-center justify-center">
                 {cartCount}
               </Badge>
             )}
@@ -201,49 +201,68 @@ export default function Navbar() {
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="hidden md:inline-flex relative h-9 w-9 sm:h-10 sm:w-10 rounded-full p-0 overflow-hidden border-2 border-accent/20 flex-shrink-0">
-                  <Avatar className="h-full w-full">
+                <Button variant="ghost" className="relative h-10 w-10 sm:h-12 sm:w-12 rounded-full p-0 overflow-hidden border-2 border-white/10 ring-1 ring-white/5 shadow-2xl transition-all duration-500 hover:ring-accent-secondary/50 hover:border-accent-secondary/30 group flex-shrink-0">
+                  <Avatar className="h-full w-full transition-transform duration-500 group-hover:scale-110">
                     <AvatarImage src={getImageUrl(user?.avatar)} alt={user?.name} />
-                    <AvatarFallback className="bg-accent font-black text-[10px]">
+                    <AvatarFallback className="bg-foreground text-background font-black text-xs">
                       {user?.name?.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-64 rounded-[2rem] p-3 bg-background/95 backdrop-blur-xl border-border/20 shadow-2xl mt-4 animate-in fade-in zoom-in-95 duration-300" align="end">
-                <DropdownMenuLabel className="font-black text-[10px] uppercase tracking-[0.4em] text-muted-foreground px-5 py-3 opacity-50">
-                  {mounted ? t.tacticalIdentity : "TACTICAL IDENTITY"}
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-border/5 mx-2" />
-                
-                <DropdownMenuItem asChild>
-                  <Link href="/profile" className="flex items-center gap-3 rounded-2xl p-4 font-black text-[11px] uppercase tracking-widest cursor-pointer hover:bg-accent/50 group transition-all">
-                    <User size={16} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-                    {mounted ? t.profile : "Profile"}
-                  </Link>
-                </DropdownMenuItem>
-                
-                <DropdownMenuItem asChild>
-                  <Link href="/live-support" className="flex items-center gap-3 rounded-2xl p-4 font-black text-[11px] uppercase tracking-widest cursor-pointer text-blue-500 bg-blue-500/5 hover:bg-blue-500/10 group transition-all">
-                    <LifeBuoy size={16} className="group-hover:rotate-45 transition-transform" />
-                    {mounted ? t.liveSupport : "Support"}
-                  </Link>
-                </DropdownMenuItem>
+              <DropdownMenuContent className="w-72 rounded-[2.5rem] p-2 bg-background/40 backdrop-blur-3xl border-white/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] mt-4 animate-in fade-in zoom-in-95 duration-500" align="end">
+                {/* User Info Header */}
+                <div className="px-6 py-8 mb-2 bg-gradient-to-br from-white/[0.08] to-transparent rounded-[2rem] border border-white/5 shadow-inner">
+                  <div className="flex flex-col items-center gap-4 text-center">
+                    <Avatar className="h-20 w-20 ring-4 ring-accent-secondary/20 shadow-2xl">
+                      <AvatarImage src={getImageUrl(user?.avatar)} alt={user?.name} />
+                      <AvatarFallback className="bg-foreground text-background font-black text-2xl">
+                        {user?.name?.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="space-y-1">
+                      <h4 className="font-black text-lg uppercase tracking-tighter leading-none italic">{user?.name}</h4>
+                      <p className="text-[10px] font-medium text-muted-foreground tracking-widest opacity-60 truncate max-w-[200px]">{user?.email}</p>
+                    </div>
+                  </div>
+                </div>
 
-                <DropdownMenuSeparator className="bg-border/5 mx-2" />
-                
-                <DropdownMenuItem 
-                  onClick={logout}
-                  className="flex items-center gap-3 rounded-2xl p-4 font-black text-[11px] uppercase tracking-widest cursor-pointer text-accent-secondary hover:bg-accent-secondary/10 focus:bg-accent-secondary/10 group transition-all"
-                >
-                  <LogOut size={16} className="group-hover:translate-x-1 transition-transform" />
-                  {mounted ? t.logout : "LOGOUT"}
-                </DropdownMenuItem>
+                <div className="space-y-1 p-2">
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile" className="flex items-center gap-4 rounded-2xl px-5 py-4 font-black text-[10px] uppercase tracking-[0.3em] cursor-pointer hover:bg-white/10 hover:text-accent-secondary group transition-all duration-300">
+                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-accent-secondary/10 transition-all">
+                        <User size={14} className="text-muted-foreground group-hover:text-accent-secondary transition-colors" />
+                      </div>
+                      {mounted ? t.profile : "Profile"}
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem asChild>
+                    <Link href="/live-support" className="flex items-center gap-4 rounded-2xl px-5 py-4 font-black text-[10px] uppercase tracking-[0.3em] cursor-pointer hover:bg-white/10 hover:text-blue-500 group transition-all duration-300">
+                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-500/10 transition-all">
+                        <LifeBuoy size={14} className="text-muted-foreground group-hover:text-blue-500 group-hover:rotate-45 transition-all" />
+                      </div>
+                      {mounted ? t.liveSupport : "Support"}
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <div className="h-px bg-white/5 mx-4 my-2" />
+                  
+                  <DropdownMenuItem 
+                    onClick={logout}
+                    className="flex items-center gap-4 rounded-2xl px-5 py-4 font-black text-[10px] uppercase tracking-[0.3em] cursor-pointer text-accent-secondary hover:bg-accent-secondary/10 focus:bg-accent-secondary/10 group transition-all duration-300"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-accent-secondary/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-accent-secondary/20 transition-all">
+                      <LogOut size={14} className="group-hover:translate-x-1 transition-all" />
+                    </div>
+                    {mounted ? t.logout : "LOGOUT"}
+                  </DropdownMenuItem>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link href="/login" className="hidden md:block flex-shrink-0">
-              <Button size="sm" className="rounded-full bg-foreground text-background font-black text-[8px] uppercase tracking-widest px-4 h-8 sm:px-5 sm:h-9 hover:bg-accent-secondary hover:text-white transition-all shadow-xl shadow-foreground/5">
+            <Link href="/login" className="flex-shrink-0">
+              <Button size="sm" className="rounded-full bg-foreground text-background font-black text-[7px] sm:text-[8px] uppercase tracking-widest px-3 h-7 sm:px-5 sm:h-9 hover:bg-accent-secondary hover:text-white transition-all shadow-xl shadow-foreground/5">
                 {mounted ? t.login : "Login"}
               </Button>
             </Link>
@@ -260,9 +279,6 @@ export default function Navbar() {
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="w-full border-r border-border/10 p-0 flex flex-col bg-background/95 backdrop-blur-3xl">
-              <SheetHeader className="text-left p-6 border-b border-border/5">
-                 <SheetTitle className="text-base font-black uppercase tracking-widest italic">{mounted ? t.menuTitle : "MENU"}</SheetTitle>
-              </SheetHeader>
               <div className="flex flex-wrap items-center gap-2 px-6 py-4 border-b border-border/5">
                 <Button
                   variant="ghost"
@@ -362,11 +378,11 @@ export default function Navbar() {
                       </Button>
                     </div>
                   ) : (
-                    <div className="space-y-6">
-                       <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-4">{mounted ? t.authorization : "AUTH"}</p>
-                       <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full h-14 rounded-[2rem] bg-foreground text-background font-black uppercase tracking-widest text-[10px] shadow-2xl hover:bg-accent-secondary hover:text-white transition-all">
-                          {mounted ? t.initLogin : "Login"}
+                    <div className="mt-4 px-6">
+                      <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                        <Button className="w-full h-14 rounded-2xl bg-foreground text-background font-black uppercase tracking-widest text-[10px] shadow-2xl hover:bg-accent-secondary hover:text-white transition-all flex items-center justify-center gap-3">
+                          <User size={14} />
+                          {mounted ? t.login : "SIGN IN"}
                         </Button>
                       </Link>
                     </div>
@@ -375,9 +391,6 @@ export default function Navbar() {
               </ScrollArea>
               
               <div className="p-6 border-t border-border/5 bg-accent/5">
-                 <p className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground text-center">
-                   {t.version}
-                 </p>
               </div>
             </SheetContent>
           </Sheet>

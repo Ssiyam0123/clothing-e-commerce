@@ -24,110 +24,56 @@ import { cookies, headers } from "next/headers";
 import { getSettings } from "@/lib/settings";
 import { getImageUrl } from "@/utils/imageUtils";
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  "https://clothing-e-commerce-web.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://clothing-e-commerce-web.vercel.app";
 
 export async function generateMetadata() {
   const settings = await getSettings();
   const branding = settings?.branding || {};
   const siteName = branding.siteName || "VANGUARD";
   const siteTitle = branding.siteTitle || siteName;
-  const favicon = branding.favicon
-    ? getImageUrl(branding.favicon)
-    : "/favicon.ico";
-  const description =
-    branding.description ||
-    `Discover the latest premium apparel at ${siteName}.`;
-  
-  // Use logoDark as primary OG image if available, otherwise logo
-  const ogImage = (branding.logoDark || branding.logo)
-    ? getImageUrl(branding.logoDark || branding.logo)
-    : "/og-image.jpg";
+  const favicon = branding.favicon ? getImageUrl(branding.favicon) : "/favicon.ico";
+  const description = branding.description || `Discover the latest premium apparel at ${siteName}. Experience, expertise, and quality you can trust.`;
+  const ogImage = (branding.logoDark || branding.logo) ? getImageUrl(branding.logoDark || branding.logo) : "/og-image.jpg";
 
   return {
     metadataBase: new URL(SITE_URL),
-    title: {
-      default: siteTitle,
-      template: `%s | ${siteName}`,
-    },
+    title: { default: siteTitle, template: `%s | ${siteName}` },
     description,
-    keywords: [
-      "streetwear",
-      "urban fashion",
-      "sustainable clothing",
-      siteName,
-      "premium apparel",
-      "ethical fashion",
-    ],
-    authors: [{ name: `${siteName} Team` }],
-    creator: `${siteName} Team`,
-    publisher: siteName,
-    icons: {
-      icon: [
-        { url: favicon },
-        { url: favicon, sizes: "32x32", type: "image/png" },
-      ],
-      shortcut: favicon,
-      apple: favicon,
-    },
-    formatDetection: {
-      email: false,
-      address: false,
-      telephone: false,
-    },
-    openGraph: {
-      title: `${siteName} – The Architecture of Style`,
-      description,
-      url: SITE_URL,
-      siteName: siteName,
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: `${siteName} Premium Collection`,
-        },
-      ],
-      locale: "en_US",
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${siteName} | Premium Urban Apparel`,
-      description,
-      images: [ogImage],
-      site: `@${siteName.toLowerCase()}`,
-      creator: `@${siteName.toLowerCase()}`,
-    },
+    keywords: ["streetwear", "urban fashion", siteName, "premium apparel", "sustainable fashion", "limited drops"],
+    icons: { icon: [{ url: favicon }] },
     robots: {
       index: true,
       follow: true,
       googleBot: {
         index: true,
         follow: true,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
       },
-    },
-    verification: {
-      google: process.env.GOOGLE_VERIFICATION,
     },
     alternates: {
       canonical: SITE_URL,
-      languages: {
-        "en-US": "/en",
-        "bn-BD": "/bn",
-      },
     },
-    other: {
-      "facebook-domain-verification": process.env.FB_DOMAIN_VERIFICATION || "",
+    openGraph: {
+      title: `${siteName} – Premium Urban Apparel`,
+      description,
+      url: SITE_URL,
+      siteName: siteName,
+      locale: 'en_US',
+      type: 'website',
+      images: [{ url: ogImage, width: 1200, height: 630, alt: siteName }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: siteTitle,
+      description,
+      images: [ogImage],
+      creator: '@vanguard_store',
     },
   };
 }
 
-// Separate viewport export (required for Next.js 14+)
 export const viewport = {
   width: "device-width",
   initialScale: 1,
@@ -139,18 +85,16 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ClientInitialization from "@/components/layout/ClientInitialization";
 import ThemeProvider from "./ThemeProvider";
-
 import LayoutResolver from "@/components/layout/LayoutResolver";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import PixelManager, { GTMNoScript } from "@/lib/tracking/PixelManager";
 
 export default async function RootLayout({ children }) {
   const settings = await getSettings();
   const cookieStore = await cookies();
   const branding = settings?.branding || {};
   
-  // Extract theme and lang from cookies for SSR sync
-  // We use the same keys as in appStore.js
   const identityTheme = cookieStore.get("vanguard-identity-theme")?.value || branding.activeTheme || "executive";
   const colorMode = cookieStore.get("vanguard-theme-mode")?.value || branding.defaultTheme || "dark";
   const lang = cookieStore.get("vanguard-lang")?.value || branding.defaultLanguage || "en";
@@ -160,81 +104,84 @@ export default async function RootLayout({ children }) {
 
   const contact = settings?.contact || {};
   const siteName = branding.siteName || "Store";
-  const SITE_URL =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://clothing-e-commerce-web.vercel.app";
+  const isMaintenance = settings?.config?.maintenanceMode && !pathname.startsWith("/admin");
+  const socialLinks = settings?.socialLinks?.filter(l => l.isActive).map(l => l.url) || [];
 
-  // Maintenance Mode Check - Skip for admin routes
-  const isAdminRoute = pathname.startsWith("/admin");
-  const isMaintenance = settings?.config?.maintenanceMode && !isAdminRoute;
-
-  const localBusinessSchema = {
-    "@context": "https://schema.org",
-    "@type": "ClothingStore",
-    name: siteName,
-    image: branding.headerLogo || `${SITE_URL}/og-image.jpg`,
-    "@id": `${SITE_URL}/#vanguard`,
-    url: SITE_URL,
-    telephone: contact.phone || "+8801234567890",
-    priceRange: "$$",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: contact.address || "Gulshan Avenue",
-      addressLocality: "Dhaka",
-      postalCode: "1212",
-      addressCountry: "BD",
+  const schemas = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": siteName,
+      "url": SITE_URL,
+      "logo": branding.logo ? getImageUrl(branding.logo) : `${SITE_URL}/logo.png`,
+      "sameAs": socialLinks,
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": contact.phone || "",
+        "contactType": "customer service"
+      }
     },
-    sameAs: settings?.socialLinks?.map((l) => l.url) || [],
-  };
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": siteName,
+      "url": SITE_URL,
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": `${SITE_URL}/products?search={search_term_string}`,
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ClothingStore",
+      "name": siteName,
+      "url": SITE_URL,
+      "logo": branding.logo ? getImageUrl(branding.logo) : `${SITE_URL}/logo.png`,
+      "image": branding.logoDark ? getImageUrl(branding.logoDark) : "",
+      "description": branding.description || "",
+      "telephone": contact.phone || "",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": contact.address || "",
+        "addressLocality": "Dhaka",
+        "addressCountry": "BD"
+      }
+    }
+  ];
 
   return (
     <html 
       lang={lang} 
       className={`${inter.variable} ${roboto.variable} ${outfit.variable} ${playfair.variable} ${montserrat.variable} ${spaceGrotesk.variable} ${poppins.variable} ${syncopate.variable} ${colorMode}`} 
       data-theme={identityTheme}
-      data-color-mode={colorMode}
       suppressHydrationWarning
     >
       <head>
-        <link rel="preconnect" href="https://res.cloudinary.com" />
-        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
-        <link rel="preconnect" href={process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(localBusinessSchema),
-          }}
-        />
+        {schemas.map((schema, i) => (
+          <script 
+            key={i}
+            type="application/ld+json" 
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} 
+          />
+        ))}
       </head>
       <body suppressHydrationWarning>
+        <GTMNoScript marketing={settings?.marketing} />
         <QueryProvider>
           <TooltipProvider>
-            <ClientInitialization 
-              initialSettings={settings} 
-              initialLang={lang}
-              initialTheme={colorMode}
-            />
+            <ClientInitialization initialSettings={settings} initialLang={lang} initialTheme={colorMode} />
             <ThemeProvider>
               {isMaintenance ? (
-                <div className="min-h-screen bg-page flex flex-col items-center justify-center text-center p-6">
-                  <h1 className="text-6xl font-black text-primary uppercase italic tracking-tighter mb-4">
-                    Under Maintenance
-                  </h1>
-                  <p className="text-secondary uppercase tracking-[0.3em] text-[10px]">
-                    We are upgrading the protocol. Check back soon.
-                  </p>
-                  <div className="mt-10 w-20 h-[2px] bg-accent-secondary animate-pulse" />
-                </div>
+                <div className="min-h-screen flex items-center justify-center">Maintenance Mode</div>
               ) : (
                 <div className="layout-root">
-                  <LayoutResolver theme={identityTheme}>
-                    {children}
-                  </LayoutResolver>
+                  <LayoutResolver theme={identityTheme}>{children}</LayoutResolver>
                 </div>
-                
               )}
             </ThemeProvider>
-            <Toaster position="top-right" expand={false} richColors />
+            <Toaster position="top-right" richColors />
+            <PixelManager marketing={settings?.marketing} />
           </TooltipProvider>
         </QueryProvider>
       </body>
