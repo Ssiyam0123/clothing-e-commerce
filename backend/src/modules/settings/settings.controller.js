@@ -65,6 +65,7 @@ export const updateSettings = asyncHandler(async (req, res) => {
     if (req.body.socialLinks) updateData.socialLinks = parseField('socialLinks');
     if (req.body.contact) updateData.contact = parseField('contact');
     if (req.body.paymentOptions) updateData.paymentOptions = parseField('paymentOptions');
+    if (req.body.shipping) updateData.shipping = parseField('shipping');
     
     // Handle API Keys / Credentials (Encrypted)
     const credentialFields = ['marketing', 'smtp', 'payment', 'sms'];

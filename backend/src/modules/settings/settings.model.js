@@ -34,6 +34,10 @@ const pageSettingSchema = new mongoose.Schema({
         cod: { type: Boolean, default: true },
         online: { type: Boolean, default: true },
         bkash: { type: Boolean, default: true }
+    },
+    shipping: {
+        insideDhaka: { type: Number, default: 60 },
+        outsideDhaka: { type: Number, default: 120 }
     }
 }, { timestamps: true });
 

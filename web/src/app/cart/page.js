@@ -241,10 +241,11 @@ function UnifiedSettlementContent() {
     }
   }, [paymentOptions, settingsLoading]);
 
-  const shippingCharge = useMemo(
-    () => (deliveryZone === "dhaka" ? 60 : 120),
-    [deliveryZone],
-  );
+  const shippingCharge = useMemo(() => {
+    const inside = settings?.shipping?.insideDhaka ?? 60;
+    const outside = settings?.shipping?.outsideDhaka ?? 120;
+    return deliveryZone === "dhaka" ? inside : outside;
+  }, [deliveryZone, settings]);
   const finalTotal =
     subtotal - (appliedCoupon?.discountAmount || 0) + shippingCharge;
 
@@ -302,6 +303,7 @@ function UnifiedSettlementContent() {
           ...shippingInfo,
         },
         shippingPrice: shippingCharge,
+        deliveryZone,
         paymentMethod,
         couponCode: appliedCoupon?.coupon?.code,
         isDirectBuy,

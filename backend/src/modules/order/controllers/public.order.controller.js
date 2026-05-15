@@ -37,6 +37,7 @@ export const initPayment = asyncHandler(async (req, res) => {
     isDirectBuy,
     couponCode,
     shippingPrice,
+    deliveryZone,
     paymentMethod = "ssl",
   } = req.body;
   
@@ -72,7 +73,8 @@ export const initPayment = asyncHandler(async (req, res) => {
     const orderData = await calculateValidatedOrder(
       orderItems,
       couponCode,
-      shippingPrice
+      shippingPrice,
+      deliveryZone
     );
 
     const order = new Order({

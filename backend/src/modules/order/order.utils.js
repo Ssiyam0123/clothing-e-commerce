@@ -1,9 +1,13 @@
 import Product from "../product/product.model.js";
 import Coupon from "../coupon/coupon.model.js";
 import Cart from "../cart/cart.model.js";
+import PageSetting from "../settings/settings.model.js";
 import { sendOrderConfirmationEmail } from "../../services/email.service.js";
 
-export const calculateValidatedOrder = async (orderItems, couponCode, shippingPrice = 60) => {
+export const calculateValidatedOrder = async (orderItems, couponCode, shippingPrice, deliveryZone) => {
+    const settings = await PageSetting.findOne();
+    const defaultInside = settings?.shipping?.insideDhaka || 60;
+    const defaultOutside = settings?.shipping?.outsideDhaka || 120;
     let itemsPrice = 0;
     const validatedItems = [];
     
@@ -45,8 +49,14 @@ export const calculateValidatedOrder = async (orderItems, couponCode, shippingPr
             image: product.images?.[0] || "",
         });
     }
-    // Use provided shipping price or default to 60
-    const finalShippingPrice = Number(shippingPrice) || 60;
+    // Use provided shipping price or calculate from settings based on zone
+    let finalShippingPrice;
+    if (deliveryZone) {
+        finalShippingPrice = deliveryZone === "dhaka" ? defaultInside : defaultOutside;
+    } else {
+        finalShippingPrice = Number(shippingPrice) || defaultInside;
+    }
+
     let discountAmount = 0, finalCoupon = null;
     if (couponCode) {
         const coupon = await Coupon.findOne({ code: couponCode.toUpperCase(), isActive: true });
