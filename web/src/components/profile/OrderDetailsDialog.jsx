@@ -27,7 +27,7 @@ export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui, ph
                     <DialogTitle className="text-2xl sm:text-4xl font-black uppercase tracking-tighter italic">
                       Order_Report
                     </DialogTitle>
-                    <div className="hidden sm:flex gap-2">
+                    <div className="flex gap-2">
                         <button className="p-2 rounded-full hover:bg-accent/10 transition-colors text-muted-foreground" onClick={() => window.print()}><Printer size={16}/></button>
                         <button className="p-2 rounded-full hover:bg-accent/10 transition-colors text-muted-foreground" onClick={handleDownload}><Download size={16}/></button>
                     </div>
