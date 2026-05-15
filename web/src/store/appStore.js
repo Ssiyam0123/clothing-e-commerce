@@ -9,11 +9,11 @@ const initialState = {
   user: null,
   isMounted: false,
   settings: null,
-  theme: (isClient && getCookie("vanguard-theme-mode")) || "dark",
-  themeColor: (isClient && getCookie("vanguard-theme-color")) || "Zinc",
-  themeFont: (isClient && getCookie("vanguard-theme-font")) || "Inter",
-  identityTheme: (isClient && getCookie("vanguard-identity-theme")) || "executive",
-  lang: (isClient && getCookie("vanguard-lang")) || "en",
+  theme: "dark", 
+  themeColor: "Zinc",
+  themeFont: "Inter",
+  identityTheme: "executive",
+  lang: "en",
   isChatOpen: false,
   isAdminSidebarCollapsed: false,
 };
@@ -21,10 +21,22 @@ const initialState = {
 export const useAppStore = create((set, get) => ({
   ...initialState,
   
+  initFromCookies: () => {
+    if (typeof window === 'undefined') return;
+    const theme = getCookie("vanguard-theme-mode") || "dark";
+    const themeColor = getCookie("vanguard-theme-color") || "Zinc";
+    const themeFont = getCookie("vanguard-theme-font") || "Inter";
+    const identityTheme = getCookie("vanguard-identity-theme") || "executive";
+    const lang = getCookie("vanguard-lang") || "en";
+    
+    set({ theme, themeColor, themeFont, identityTheme, lang });
+  },
+
   setUser: (user) => set({ user }),
   logout: () => set({ user: null }),
   
   setTheme: (theme) => {
+    if (!theme) return;
     set({ theme });
     setCookie("vanguard-theme-mode", theme);
   },

@@ -15,6 +15,9 @@ export default function ClientInitialization({ initialSettings, initialLang, ini
   const checkSession = useAuthStore((state) => state.checkSession);
 
   useEffect(() => {
+    // 🌍 Sync store with cookies first
+    useAppStore.getState().initFromCookies();
+
     if (initialSettings) {
       setSettings(initialSettings, { lang: initialLang, theme: initialTheme });
     } else {

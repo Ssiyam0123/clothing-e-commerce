@@ -24,23 +24,26 @@ export function useTheme() {
 
   useEffect(() => {
     const applyTheme = (targetTheme, targetColor, targetFont) => {
+      if (typeof window === "undefined") return;
       const root = document.documentElement;
       
-      // ✅ Handle Color Mode
-      root.classList.remove("light", "dark");
+      // 1️⃣ Determine Mode
       const resolvedMode = targetTheme === "system" 
         ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-        : targetTheme;
+        : (targetTheme || "dark");
 
-      if (resolvedMode) {
-        root.classList.add(resolvedMode);
-        root.setAttribute("data-color-mode", resolvedMode);
-      }
-
-      // ✅ Apply Global Color Theme (Zinc, Rose, etc.)
+      // 2️⃣ Sync Classes
+      // Force remove all potential mode classes to avoid hybrid states
+      root.classList.remove("light", "dark");
+      root.classList.add(resolvedMode);
+      
+      // 3️⃣ Sync Data Attributes (for CSS selectors)
+      root.setAttribute("data-color-mode", resolvedMode);
+      
+      // 4️⃣ Apply Global Color Theme (Zinc, Rose, etc.)
       setGlobalColorTheme(resolvedMode, targetColor);
 
-      // ✅ Apply Theme Font
+      // 5️⃣ Apply Theme Font
       if (targetFont) {
         const fontValue = FONT_MAPPING[targetFont] || "var(--font-inter)";
         root.style.setProperty("--font-theme", `${fontValue}, sans-serif`);

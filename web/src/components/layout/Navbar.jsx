@@ -38,7 +38,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const { user, logout, isAuthenticated } = useAuthStore();
-  const { theme, setTheme, lang, setLang, settings } = useAppStore();
+  const { theme, toggleTheme, lang, setLang, settings } = useAppStore();
   const branding = settings?.branding || {};
   const { cart, wishlistItems } = useProductStore();
   const [scrolled, setScrolled] = useState(false);
@@ -80,8 +80,8 @@ export default function Navbar() {
   };
 
   const handleThemeToggle = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
+    // Sync with centralized store method to resolve ReferenceErrors
+    toggleTheme();
   };
 
   const isHome = pathname === "/" || pathname === "/en" || pathname === "/bn";
@@ -279,6 +279,9 @@ export default function Navbar() {
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="w-full border-r border-border/10 p-0 flex flex-col bg-background/95 backdrop-blur-3xl">
+              <SheetHeader className="sr-only">
+                <SheetTitle>Navigation Menu</SheetTitle>
+              </SheetHeader>
               <div className="flex flex-wrap items-center gap-2 px-6 py-4 border-b border-border/5">
                 <Button
                   variant="ghost"

@@ -119,7 +119,7 @@ export default function ReviewSection({ productId, onReviewChange }) {
     totalReviews,
     total,
     pages,
-    loading,
+    isLoading,
     createReview,
     updateReview,
     deleteReview,
@@ -488,7 +488,7 @@ export default function ReviewSection({ productId, onReviewChange }) {
       </AnimatePresence>
 
       {/* Global Archive Feed */}
-      {loading ? (
+      {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {[...Array(4)].map((_, i) => (
             <ReviewSkeleton key={i} />

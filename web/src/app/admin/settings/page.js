@@ -196,7 +196,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="admin-page-container">
+    <div className="admin-page-container pb-40">
       <div className="mb-8" />
 
       {/* 🛰️ Tactical Header */}
@@ -221,44 +221,10 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 md:gap-12">
-        {/* 📟 Navigation Tabs (Responsive) */}
-        <aside className="lg:col-span-3">
-          <div className="hidden lg:block p-6 mb-4">
-            <p className="text-[8px] font-black uppercase tracking-[0.5em] text-muted-foreground opacity-50">Settings Menu</p>
-          </div>
-          <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar gap-2 pb-4 lg:pb-0">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "settings-sidebar-item shrink-0 lg:shrink",
-                  activeTab === tab.id
-                    ? "settings-sidebar-item-active"
-                    : "settings-sidebar-item-inactive"
-                )}
-              >
-                <div className="flex items-center gap-4 relative z-10 mb-1">
-                  <tab.icon size={16} className={cn(activeTab === tab.id ? "text-background" : "text-foreground/50")} />
-                  <span className="font-black uppercase text-[10px] md:text-[11px] tracking-[0.2em] whitespace-nowrap">{tab.label}</span>
-                </div>
-                <p className={cn(
-                  "hidden lg:block text-[9px] uppercase tracking-widest opacity-60 ml-8",
-                  activeTab === tab.id ? "text-background/70" : "text-muted-foreground"
-                )}>
-                  {tab.desc}
-                </p>
-                {activeTab === tab.id && (
-                  <motion.div layoutId="tab-indicator" className="absolute inset-0 bg-gradient-to-r from-accent-secondary/0 via-accent-secondary/20 to-accent-secondary/0 opacity-50" />
-                )}
-              </button>
-            ))}
-          </div>
-        </aside>
+      <div className="flex flex-col gap-8 md:gap-12">
 
         {/* 🖥️ Command Console */}
-        <main className="lg:col-span-9">
+        <main className="w-full">
           <Card className="rounded-[2rem] md:rounded-[3rem] border-border/10 bg-card/30 backdrop-blur-2xl shadow-2xl overflow-hidden min-h-[400px] md:min-h-[600px]">
             <CardContent className="p-6 md:p-16">
               <AnimatePresence mode="wait">
@@ -966,6 +932,51 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </main>
+      </div>
+      {/* 📱 Unified Bottom Navigation - For all devices */}
+      <div className="fixed bottom-6 left-4 right-4 z-50">
+        <nav className="max-w-4xl mx-auto bg-background/80 backdrop-blur-2xl border border-border/10 p-2 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center overflow-x-auto no-scrollbar relative group">
+          <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-accent-secondary/5 -z-10" />
+          
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "relative flex flex-col items-center gap-1.5 py-3 px-6 rounded-2xl transition-all duration-500 min-w-[100px] md:min-w-[120px] flex-1",
+                activeTab === tab.id 
+                  ? "text-foreground" 
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {activeTab === tab.id && (
+                <motion.div
+                  layoutId="unifiedActiveAdminTab"
+                  className="absolute inset-0 bg-accent/10 -z-10 rounded-2xl"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              
+              <tab.icon className={cn(
+                "w-4 h-4 md:w-5 md:h-5 transition-all duration-500",
+                activeTab === tab.id ? "text-accent-secondary scale-110" : "group-hover:scale-110"
+              )} />
+              <span className={cn(
+                "text-[7px] md:text-[9px] font-black uppercase tracking-widest",
+                activeTab === tab.id ? "opacity-100" : "opacity-60"
+              )}>
+                {tab.label}
+              </span>
+
+              {activeTab === tab.id && (
+                <motion.div 
+                  layoutId="unifiedActiveAdminIndicator"
+                  className="absolute -bottom-1 w-1 h-1 bg-accent-secondary rounded-full" 
+                />
+              )}
+            </button>
+          ))}
+        </nav>
       </div>
     </div>
   );
