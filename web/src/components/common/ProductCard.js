@@ -127,24 +127,24 @@ export default function ProductCard({ product, className }) {
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <Button
                 onClick={(e) => triggerModal(e, "buy-now")}
                 variant="outline"
                 size="sm"
-                className="h-12 md:h-14 px-4 sm:px-6 text-xs md:text-sm font-black tracking-tight gap-2 rounded-2xl border-foreground/10 hover:bg-foreground hover:text-background transition-all active:scale-95 shadow-lg shadow-black/5"
+                className="h-9 sm:h-10 px-3 sm:px-4 text-[10px] sm:text-xs font-black tracking-tight gap-1.5 rounded-xl border-foreground/10 hover:bg-foreground hover:text-background transition-all active:scale-95 shadow-sm"
                 aria-label={`Buy ${product.name} now`}
               >
-                <Zap size={16} className="fill-current" />
+                <Zap size={14} className="fill-current" />
                 <span className="hidden xs:inline">{t.buyNow || "Buy"}</span>
               </Button>
               <Button
                 onClick={(e) => triggerModal(e, "cart")}
                 size="sm"
-                className="h-12 md:h-14 px-4 sm:px-6 text-xs md:text-sm font-black tracking-tight gap-2 rounded-2xl bg-accent-secondary text-white hover:brightness-110 transition-all active:scale-95 shadow-lg shadow-accent-secondary/20"
+                className="h-9 sm:h-10 px-3 sm:px-4 text-[10px] sm:text-xs font-black tracking-tight gap-1.5 rounded-xl bg-accent-secondary text-white hover:brightness-110 transition-all active:scale-95 shadow-sm shadow-accent-secondary/10"
                 aria-label={`Add ${product.name} to cart`}
               >
-                <ShoppingCart size={16} />
+                <ShoppingCart size={14} />
                 <span className="hidden xs:inline">{t.addToCart || "Add"}</span>
               </Button>
             </div>
