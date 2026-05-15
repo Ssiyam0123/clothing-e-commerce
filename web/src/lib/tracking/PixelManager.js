@@ -16,7 +16,9 @@ const PixelManagerContent = ({ marketing = {} }) => {
     pinterestTagId,
     googleAdsId,
     clarityId
-  } = marketing;
+  } = Object.fromEntries(
+    Object.entries(marketing).map(([key, val]) => [key, typeof val === 'string' ? val.trim() : val])
+  );
 
   useEffect(() => {
     // 🔵 Facebook PageView
@@ -58,18 +60,6 @@ const PixelManagerContent = ({ marketing = {} }) => {
         </Script>
       )}
 
-      {/* 🔴 GTM */}
-      {gtmId && (
-        <Script id="gtm-script" strategy="afterInteractive">
-          {`
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','${gtmId}');
-          `}
-        </Script>
-      )}
 
       {/* 🎵 TikTok */}
       {tiktokPixelId && (
@@ -156,7 +146,7 @@ export default function PixelManager({ marketing }) {
 }
 
 export const GTMNoScript = ({ marketing = {} }) => {
-  const { gtmId } = marketing;
+  const gtmId = marketing.gtmId?.trim();
   if (!gtmId) return null;
   return (
     <noscript>

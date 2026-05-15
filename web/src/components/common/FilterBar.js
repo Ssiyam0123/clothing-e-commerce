@@ -32,7 +32,7 @@ export default function FilterBar({
   sort,
   onSortChange,
   sortOptions,
-  searchPlaceholder = "Search artifacts...",
+  searchPlaceholder = "Search items...",
   sortLabel = "Sort By:",
   liveSearch = true,
   debounceMs = 300,
@@ -41,7 +41,6 @@ export default function FilterBar({
   const router = useRouter();
   const [inputValue, setInputValue] = useState(search || "");
   const [isFocused, setIsFocused] = useState(false);
-  const [open, setOpen] = useState(false); // Legacy support for other components
 
   const debouncedInput = useDebounce(inputValue, debounceMs);
   const onSearchChangeRef = useRef(onSearchChange);
@@ -73,36 +72,26 @@ export default function FilterBar({
     if (onSearchChange) onSearchChange("");
   };
 
-  const getEntityIcon = () => {
-    if (entityType === "user") return <UserIcon size={16} />;
-    if (entityType === "blog") return <FileText size={16} />;
-    return <Package size={16} />;
-  };
-
   return (
-    <div className="bg-card/80 backdrop-blur-2xl rounded-[3rem] shadow-2xl border border-border p-3 flex flex-col md:flex-row gap-4 items-center justify-between relative z-50 transition-all w-full">
-      {/* Search Input - Simplified for performance and no glitches */}
+    <div className="bg-card/40 backdrop-blur-3xl rounded-3xl shadow-xl border border-border/10 p-2 md:p-3 flex flex-col md:flex-row gap-3 items-center justify-between relative z-50 transition-all w-full">
+      {/* Search Input */}
       <div className="w-full md:w-1/2 relative group">
         <div className="relative w-full">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-all group-focus-within:text-primary z-10" />
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-all group-focus-within:text-primary z-10" />
           <input
             type="text"
             placeholder={searchPlaceholder}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onFocus={() => {
-              setIsFocused(true);
-            }}
-            onBlur={() => {
-              setIsFocused(false);
-            }}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 if (onSearchSubmit) onSearchSubmit(inputValue);
                 if (onSearchChange) onSearchChange(inputValue);
               }
             }}
-            className="w-full pl-14 pr-12 py-5 bg-muted/50 border border-transparent rounded-full outline-none font-black text-foreground transition-all placeholder:text-muted-foreground/30 text-[10px] uppercase tracking-[0.2em] relative z-10 hover:bg-muted focus:ring-2 focus:ring-primary/20 focus:border-border"
+            className="w-full pl-14 pr-12 py-4 bg-muted/30 border border-transparent rounded-2xl outline-none font-bold text-foreground transition-all placeholder:text-muted-foreground/40 text-[11px] uppercase tracking-wider relative z-10 hover:bg-muted/50 focus:ring-2 focus:ring-primary/20 focus:border-primary/20"
           />
           {inputValue && (
             <button
@@ -116,23 +105,23 @@ export default function FilterBar({
         </div>
       </div>
 
-      {/* Sort Dropdown with Shadcn Select */}
-      <div className="w-full md:w-auto flex items-center pr-2 group gap-4">
+      {/* Sort Dropdown */}
+      <div className="w-full md:w-auto flex items-center group gap-4 px-2">
         {sortLabel && (
-          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] hidden lg:block shrink-0 transition-colors group-hover:text-foreground">
+          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest hidden lg:block shrink-0 transition-colors group-hover:text-foreground">
             {sortLabel}
           </span>
         )}
         <Select value={sort || "all"} onValueChange={onSortChange}>
-          <SelectTrigger className="w-full md:min-w-[200px] md:max-w-[300px] h-20 bg-muted/50 border border-transparent rounded-full px-8 font-black text-[10px] uppercase tracking-widest hover:bg-muted transition-all shadow-sm focus:ring-2 focus:ring-primary/20">
-            <SelectValue placeholder="SORT SEQUENCE" />
+          <SelectTrigger className="w-full md:min-w-[180px] h-12 bg-muted/30 border border-transparent rounded-2xl px-6 font-bold text-[10px] uppercase tracking-widest hover:bg-muted/50 transition-all shadow-sm focus:ring-2 focus:ring-primary/20">
+            <SelectValue placeholder="Sort Items" />
           </SelectTrigger>
-          <SelectContent className="bg-card/95 backdrop-blur-3xl border border-border shadow-2xl rounded-[2rem] p-2">
+          <SelectContent className="bg-card/95 backdrop-blur-3xl border border-border/10 shadow-2xl rounded-2xl p-1">
             {sortOptions?.map((opt) => (
               <SelectItem
                 key={opt.value}
                 value={opt.value}
-                className="rounded-2xl py-3 px-6 font-black text-[10px] uppercase tracking-widest focus:bg-primary focus:text-primary-foreground cursor-pointer"
+                className="rounded-xl py-2.5 px-4 font-bold text-[10px] uppercase tracking-widest focus:bg-primary focus:text-primary-foreground cursor-pointer"
               >
                 {opt.label}
               </SelectItem>

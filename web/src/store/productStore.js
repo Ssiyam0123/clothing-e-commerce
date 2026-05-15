@@ -297,6 +297,15 @@ export const useProductStore = create(
           });
         },
 
+        updateBuyNowQuantity: (qty) => {
+          set((state) => {
+            if (!state.buyNowItem) return state;
+            return {
+              buyNowItem: { ...state.buyNowItem, quantity: qty }
+            };
+          });
+        },
+
         clearCart: (type = "all") => {
           if (type === "direct") {
             set({ buyNowItem: null });

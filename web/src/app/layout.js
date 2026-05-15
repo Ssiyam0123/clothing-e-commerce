@@ -23,6 +23,7 @@ const syncopate = Syncopate({ weight: ["400", "700"], subsets: ["latin"], variab
 import { cookies, headers } from "next/headers";
 import { getSettings } from "@/lib/settings";
 import { getImageUrl } from "@/utils/imageUtils";
+import Script from "next/script";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://clothing-e-commerce-web.vercel.app";
 
@@ -165,6 +166,15 @@ export default async function RootLayout({ children }) {
             dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} 
           />
         ))}
+        {settings?.marketing?.gtmId && (
+          <Script
+            id="gtm-script"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${settings.marketing.gtmId.trim()}');`,
+            }}
+          />
+        )}
       </head>
       <body suppressHydrationWarning>
         <GTMNoScript marketing={settings?.marketing} />

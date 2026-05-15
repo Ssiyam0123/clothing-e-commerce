@@ -11,13 +11,33 @@ import { useAppStore } from "@/store/appStore";
 import { getTranslation } from "@/utils/typography/handler";
 import { getImageUrl } from "@/utils/imageUtils";
 
+// Custom Social SVGs to avoid library version issues
+const FacebookIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+);
+const InstagramIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+);
+const TwitterIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-1 2.17-2.41 3.06a8.84 8.84 0 0 1-16.58 5.48A10.74 10.74 0 0 0 12 12a10.74 10.74 0 0 1-7.14 7.64 8.84 8.84 0 0 0 16.58-5.48A10.74 10.74 0 0 0 22 4z"/></svg>
+);
+const LinkedinIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+);
+const TikTokIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+);
+
 const PLATFORM_ICONS = {
-  facebook: Share2,
-  instagram: Activity,
-  twitter: Send,
-  x: Send,
-  linkedin: Globe,
-  tiktok: Activity,
+  facebook: FacebookIcon,
+  fb: FacebookIcon,
+  instagram: InstagramIcon,
+  insta: InstagramIcon,
+  twitter: TwitterIcon,
+  x: TwitterIcon,
+  linkedin: LinkedinIcon,
+  tiktok: TikTokIcon,
+  "tik-tok": TikTokIcon,
   youtube: Globe,
   globe: Globe,
 };
@@ -29,7 +49,7 @@ export default function Footer() {
   const t = useMemo(() => getTranslation('footer', lang), [lang]);
 
   const activeSocials = useMemo(() => 
-    socialLinks.filter(link => link.isActive), 
+    socialLinks.filter(link => link.isActive && link.url), 
     [socialLinks]
   );
 

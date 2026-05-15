@@ -17,7 +17,7 @@ export const revalidate = 60;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-// 🚀 Request-level Memoization + High Performance Fetching
+// Request-level Memoization + High Performance Fetching
 const getHomeData = cache(async () => {
   try {
     const fetchOptions = {

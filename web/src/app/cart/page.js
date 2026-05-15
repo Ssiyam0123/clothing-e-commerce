@@ -94,7 +94,7 @@ function SizeEditModal({ isOpen, onClose, item, isAuth, t }) {
           <div className="p-10 sm:p-14 space-y-10">
             <div className="space-y-3 text-center">
               <Badge variant="outline" className="text-[8px] font-black uppercase tracking-[0.4em] border-accent-secondary/30 text-accent-secondary bg-accent-secondary/5 mb-4">
-                 {t.manifest || "Modification Protocol"}
+                 {t.manifest || "Update Item"}
               </Badge>
               <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter italic text-gradient leading-none">
                 {t.modifyAttribute || "Adjust Size"}
@@ -147,7 +147,7 @@ function SizeEditModal({ isOpen, onClose, item, isAuth, t }) {
                 variant="ghost" 
                 className="w-full h-16 rounded-[1.5rem] font-black uppercase tracking-[0.3em] text-[10px] hover:bg-white/5 text-muted-foreground transition-all"
               >
-                {t.abortModification || "Abort Protocol"}
+                {t.abortModification || "Cancel"}
               </Button>
             </div>
           </div>
@@ -165,7 +165,7 @@ function UnifiedSettlementContent() {
   // Stores
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStore();
   const { lang } = useAppStore();
-  const { cart, buyNowItem, updateCartItem, removeFromCart, clearCart } =
+  const { cart, buyNowItem, updateCartItem, updateBuyNowQuantity, removeFromCart, clearCart } =
     useProductStore();
   const { settings, isLoading: settingsLoading } = useSettings();
   const { initOrder } = useOrders();
@@ -203,6 +203,10 @@ function UnifiedSettlementContent() {
       (sum, i) => sum + (i.discountedPrice || 0) * (i.quantity || 0),
       0,
     );
+  }, [items]);
+  const totalQuantity = useMemo(() => {
+    if (!items.length) return 0;
+    return items.reduce((sum, i) => sum + (i.quantity || 0), 0);
   }, [items]);
 
   // Sync User Data
@@ -251,14 +255,25 @@ function UnifiedSettlementContent() {
 
   const handleQuantityChange = (productId, sizeId, currentQty, delta) => {
     const newQty = currentQty + delta;
-    if (newQty < 1) handleRemove(productId, sizeId);
-    else updateCartItem(productId, sizeId, newQty, isAuthenticated);
+    if (newQty < 1) {
+      if (isDirectBuy) {
+        router.push("/products");
+      } else {
+        handleRemove(productId, sizeId);
+      }
+    } else {
+      if (isDirectBuy) {
+        updateBuyNowQuantity(newQty);
+      } else {
+        updateCartItem(productId, sizeId, newQty, isAuthenticated);
+      }
+    }
   };
 
   const handleRemove = async (productId, sizeId) => {
     const confirmed = await swalConfirm(
-      t.purgeArtifact || "Purge Artifact?",
-      t.removeDescription || "This item will be removed from your manifest.",
+      t.purgeArtifact || "Remove Item?",
+      t.removeDescription || "Are you sure you want to remove this item?",
     );
     if (confirmed) removeFromCart(productId, sizeId, isAuthenticated);
   };
@@ -272,10 +287,10 @@ function UnifiedSettlementContent() {
       });
       if (data.valid) {
         setAppliedCoupon(data);
-        swalToast(t.syncCode || "Voucher Synced", "success");
+        swalToast(t.syncCode || "Coupon Applied", "success");
       }
     } catch (err) {
-      swalError(t.protocolDenied || "Protocol Denied", t.voucherUnrecognized || "Voucher code not recognized.");
+      swalError(t.protocolDenied || "Invalid Coupon", t.voucherUnrecognized || "The coupon code is invalid.");
     }
   };
 
@@ -286,8 +301,8 @@ function UnifiedSettlementContent() {
       !shippingInfo.name
     ) {
       return swalError(
-        t.manifestIncomplete || "Manifest Incomplete",
-        t.provideLogistics || "Please provide name, phone and address.",
+        t.manifestIncomplete || "Information Missing",
+        t.provideLogistics || "Please provide your name, phone and address.",
       );
     }
 
@@ -356,7 +371,7 @@ function UnifiedSettlementContent() {
                   <p className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">{t.selectedArtifacts}</p>
                 </div>
                 <Badge className="bg-foreground text-background font-black px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[8px] sm:text-[10px] uppercase tracking-widest">
-                  {items.length} {items.length === 1 ? t.unit : t.units}
+                  {totalQuantity} {totalQuantity === 1 ? t.unit : t.units}
                 </Badge>
               </div>
 
@@ -431,7 +446,6 @@ function UnifiedSettlementContent() {
                                  <Button
                                     variant="ghost"
                                     size="icon"
-                                    disabled={isDirectBuy}
                                     onClick={() => handleQuantityChange(item.product._id, item.size._id, item.quantity, -1)}
                                     className="h-7 w-7 sm:h-9 sm:w-9 rounded-md sm:rounded-xl hover:bg-accent-secondary hover:text-white transition-all disabled:opacity-30"
                                  >
@@ -443,7 +457,6 @@ function UnifiedSettlementContent() {
                                  <Button
                                     variant="ghost"
                                     size="icon"
-                                    disabled={isDirectBuy}
                                     onClick={() => handleQuantityChange(item.product._id, item.size._id, item.quantity, 1)}
                                     className="h-7 w-7 sm:h-9 sm:w-9 rounded-md sm:rounded-xl hover:bg-accent-secondary hover:text-white transition-all disabled:opacity-30"
                                  >
@@ -590,7 +603,7 @@ function UnifiedSettlementContent() {
 
             {/* Payment Method Selector */}
             <div className="space-y-2 sm:space-y-3">
-               <Label className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] ml-2 text-muted-foreground">Settlement Protocol</Label>
+               <Label className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] ml-2 text-muted-foreground">Select Payment Method</Label>
                <RadioGroup 
                   value={paymentMethod} 
                   onValueChange={setPaymentMethod}
@@ -599,7 +612,7 @@ function UnifiedSettlementContent() {
                  {paymentOptions.ssl && (
                    <PaymentMethodItem 
                       id="ssl" 
-                      title="Digital Settlement" 
+                      title="Online Payment" 
                       icon={<CreditCard size={16} />} 
                       active={paymentMethod === "ssl"} 
                    />
@@ -607,7 +620,7 @@ function UnifiedSettlementContent() {
                  {paymentOptions.bkash && (
                    <PaymentMethodItem 
                       id="bkash" 
-                      title="bKash Neural Wallet" 
+                      title="bKash Payment" 
                       icon={<Wallet size={16} />} 
                       active={paymentMethod === "bkash"} 
                    />
@@ -615,7 +628,7 @@ function UnifiedSettlementContent() {
                  {paymentOptions.cod && (
                    <PaymentMethodItem 
                       id="cod" 
-                      title="Tactile Handover (COD)" 
+                      title="Cash on Delivery (COD)" 
                       icon={<Truck size={16} />} 
                       active={paymentMethod === "cod"} 
                    />
@@ -638,10 +651,6 @@ function UnifiedSettlementContent() {
               )}
             </Button>
 
-            <div className="flex items-center justify-center gap-2 opacity-30 text-[7px] font-black uppercase tracking-[0.3em] italic pt-4">
-              <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-              ENCRYPTED PROTOCOL / VANGUARD SECURITY
-            </div>
           </div>
         </div>
       </div>
