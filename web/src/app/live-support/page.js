@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { useChat } from "@/hooks/useChat";
 import { useAuthStore } from "@/store/authStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Lock, MessageSquare, Shield, Clock, Zap, ArrowLeft, Headphones, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Send, Lock, MessageSquare, Shield, Clock, Zap, ArrowLeft, Headphones, Image as ImageIcon, Loader2, Check, CheckCheck } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -60,7 +60,9 @@ const ChatMessage = ({ message, isMe }) => {
           <span className="text-[9px] font-bold uppercase tracking-widest">
             {timeStr}
           </span>
-          {isMe && <div className="w-1 h-1 rounded-full bg-[#0084ff]" />}
+          {isMe && (
+            message.isRead ? <CheckCheck size={12} className="text-[#0084ff]" /> : <Check size={12} />
+          )}
         </div>
       </div>
     </motion.div>

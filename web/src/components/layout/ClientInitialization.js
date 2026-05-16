@@ -17,7 +17,7 @@ export default function ClientInitialization({ initialSettings, initialLang, ini
   const { token, isAuthenticated } = useAuthStore();
   const initSocket = useChatStore((state) => state.initSocket);
   const disconnectSocket = useChatStore((state) => state.disconnectSocket);
-  const fetchConversations = useChatStore((state) => state.fetchConversations);
+  const fetchUnreadCount = useChatStore((state) => state.fetchUnreadCount);
 
   useEffect(() => {
     // 🌍 Sync store with cookies first
@@ -36,11 +36,11 @@ export default function ClientInitialization({ initialSettings, initialLang, ini
   useEffect(() => {
     if (isAuthenticated && token) {
       initSocket(token);
-      fetchConversations();
+      fetchUnreadCount();
     } else {
       disconnectSocket();
     }
-  }, [isAuthenticated, token, initSocket, disconnectSocket, fetchConversations]);
+  }, [isAuthenticated, token, initSocket, disconnectSocket, fetchUnreadCount]);
 
   return <SupportChat />;
 }

@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { useChatStore } from "@/store/chatStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Send, X, Plus, Loader2, ArrowUpCircle } from "lucide-react";
+import { MessageSquare, Send, X, Plus, Loader2, ArrowUpCircle, Check, CheckCheck } from "lucide-react";
 import api from "@/lib/api";
 import { getImageUrl } from "@/utils/imageUtils";
 import Link from "next/link";
@@ -14,7 +14,7 @@ import Link from "next/link";
 export default function SupportChat() {
   const { user } = useAuthStore();
   const { isChatOpen: isOpen, setChatOpen: setIsOpen } = useAppStore();
-  const resetUnread = useChatStore((state) => state.resetUnread);
+
   const pathname = usePathname();
 
   const { 
@@ -31,12 +31,7 @@ export default function SupportChat() {
   const [input, setInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
-  // 🧹 Reset unread count when opening chat
-  useEffect(() => {
-    if (isOpen) {
-      resetUnread();
-    }
-  }, [isOpen, resetUnread]);
+
 
   const scrollRef = useRef();
   const topObserverRef = useRef();
@@ -158,13 +153,20 @@ export default function SupportChat() {
                           )}
                         </div>
 
-                        <div className={`rounded-2xl text-[11px] font-bold shadow-sm leading-relaxed overflow-hidden ${isMe ? "bg-accent-primary text-primary rounded-tr-none" : "bg-blue-600 text-primary rounded-tl-none shadow-lg shadow-blue-500/20"}`}>
+                        <div className={`relative rounded-2xl text-[11px] font-bold shadow-sm leading-relaxed overflow-hidden ${isMe ? "bg-accent-primary text-primary rounded-tr-none" : "bg-blue-600 text-primary rounded-tl-none shadow-lg shadow-blue-500/20"}`}>
                           {msg.image && (
                             <div className="w-full max-w-[200px]">
                               <img src={getImageUrl(msg.image)} alt="Attachment" className="w-full h-auto object-cover border-b border-white/10" />
                             </div>
                           )}
-                          {msg.text && <div className="p-4">{msg.text}</div>}
+                          {msg.text && <div className="p-3 md:p-4">{msg.text}</div>}
+                          
+                          <div className={`flex items-center gap-1 px-3 pb-2 opacity-50 ${isMe ? "justify-end text-primary" : "justify-start text-primary"}`}>
+                             <span className="text-[9px] uppercase tracking-widest">{msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</span>
+                             {isMe && (
+                               msg.isRead ? <CheckCheck size={12} className="text-[#53bdeb]" /> : <Check size={12} />
+                             )}
+                          </div>
                         </div>
                       </div>
                     </div>

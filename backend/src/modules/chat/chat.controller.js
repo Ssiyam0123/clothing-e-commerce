@@ -68,16 +68,46 @@ export const getAllConversations = asyncHandler(async (req, res) => {
  * @route   POST /api/chat/mark-read
  */
 export const markMessagesAsRead = asyncHandler(async (req, res) => {
-  const conversation = await Conversation.findOne({
-    participants: req.user._id,
-    type: "support",
-  });
+  const userId = req.user._id;
+  const userRoleName = req.user.role?.name || req.user.role;
+  const isAdmin = userRoleName === "superadmin" || (userRoleName !== "customer" && userRoleName);
+  const { conversationId } = req.body;
+  const io = req.app.get("io");
 
-  if (conversation) {
-    await Message.updateMany(
-      { conversationId: conversation._id, isRead: false },
-      { $set: { isRead: true } }
-    );
+  const query = { isRead: false, sender: { $ne: userId } };
+  if (conversationId) {
+    query.conversationId = conversationId;
+  }
+
+  if (isAdmin) {
+    // 🛡️ Admin marks messages as read (either all or specific conversation)
+    await Message.updateMany(query, { $set: { isRead: true } });
+    
+    if (conversationId && io) {
+      const conv = await Conversation.findById(conversationId);
+      if (conv) {
+         const customer = conv.participants.find(p => p.toString() !== userId.toString());
+         if (customer) io.to(customer.toString()).emit("messages_seen", { conversationId: conversationId.toString() });
+      }
+    }
+  } else {
+    // 🛒 Customer marks messages as read
+    const conversation = await Conversation.findOne({
+      participants: userId,
+      type: "support",
+      ...(conversationId ? { _id: conversationId } : {})
+    });
+
+    if (conversation) {
+      await Message.updateMany(
+        { conversationId: conversation._id, isRead: false, sender: { $ne: userId } },
+        { $set: { isRead: true } }
+      );
+      
+      if (io) {
+        io.to("admin_support_room").emit("messages_seen", { conversationId: conversation._id.toString() });
+      }
+    }
   }
 
   res.json({ success: true });

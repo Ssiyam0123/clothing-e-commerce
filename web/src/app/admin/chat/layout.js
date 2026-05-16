@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { getImageUrl } from "@/utils/imageUtils";
 import { ChatProvider, useChat } from "./ChatContext";
 import api from "@/lib/api";
+import { useChatStore } from "@/store/chatStore";
 
 export default function ChatLayout({ children }) {
   return (
@@ -25,7 +26,9 @@ export default function ChatLayout({ children }) {
 function ChatContent({ children }) {
   const router = useRouter();
   const { conversations, startConversation } = useChat();
+  const { resetUnread } = useChatStore();
   const { id } = useParams();
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [globalUsers, setGlobalUsers] = useState([]);
   const [isSearching, setIsSearching] = useState(false);

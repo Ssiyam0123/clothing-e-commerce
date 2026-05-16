@@ -48,6 +48,7 @@ mongoose.connect(process.env.MONGO_URI)
     
     // 🛰️ Initialize Chat Events
     initSocketEvents(io);
+    app.set('io', io);
 
     server.listen(PORT, () => console.log(`🚀 System Live & Socket Ready: ${PORT}`));
   });

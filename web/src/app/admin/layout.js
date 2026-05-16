@@ -22,7 +22,7 @@ export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { theme, toggleTheme, isMounted, isAdminSidebarCollapsed } = useAppStore();
-  const { initSocket, disconnectSocket, fetchConversations } = useChatStore();
+  const { initSocket, disconnectSocket, fetchUnreadCount } = useChatStore();
   useTheme();
 
   const isChatRoute = pathname?.startsWith("/admin/chat");
@@ -38,13 +38,13 @@ export default function AdminLayout({ children }) {
 
     if (user && hasAdminAccess && token) {
       initSocket(token);
-      fetchConversations();
+      fetchUnreadCount();
     }
 
     return () => {
       disconnectSocket();
     };
-  }, [user, authLoading, router, token, initSocket, disconnectSocket, fetchConversations]);
+  }, [user, authLoading, router, token, initSocket, disconnectSocket, fetchUnreadCount]);
 
   const handleLogout = () => {
     logout();

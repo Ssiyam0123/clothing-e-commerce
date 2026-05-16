@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useAuthStore } from "@/store/authStore";
+import { useChatStore } from "@/store/chatStore";
 import { useChat } from "../ChatContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, MoreVertical, Phone, Video, Search, User, Check, CheckCheck, Image as ImageIcon, Loader2 } from "lucide-react";
@@ -70,7 +71,7 @@ const ChatMessage = ({ message, isMe, showStatus }) => {
 export default function AdminChatPage() {
   const { id } = useParams();
   const { user } = useAuthStore();
-  const { socket, conversations } = useChat();
+  const { socket, conversations, fetchConversations } = useChat();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
@@ -89,6 +90,13 @@ export default function AdminChatPage() {
 
   useEffect(() => {
     if (!id) return;
+    
+    // Mark messages as read when opening the conversation
+    const { resetUnread } = useChatStore.getState();
+    resetUnread(id).then(() => {
+      if(fetchConversations) fetchConversations();
+    });
+
     const fetchMessages = async () => {
       try {
         const res = await api.get(`/chat/conversations/${id}/messages`);
@@ -107,10 +115,25 @@ export default function AdminChatPage() {
             if (exists) return prev;
             return [...prev, data.message];
           });
+          
+          // Instantly mark as read if the conversation is currently active on screen
+          resetUnread(id).then(() => {
+            if(fetchConversations) fetchConversations();
+          });
         }
       };
+      const seenHandler = (data) => {
+        if (data.conversationId === id) {
+          setMessages(prev => prev.map(m => ({ ...m, isRead: true })));
+        }
+      };
+
       socket.on("new_message", handler);
-      return () => socket.off("new_message", handler);
+      socket.on("messages_seen", seenHandler);
+      return () => {
+        socket.off("new_message", handler);
+        socket.off("messages_seen", seenHandler);
+      };
     }
   }, [id, socket]);
 

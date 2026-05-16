@@ -5,7 +5,7 @@ import api from "@/lib/api";
 
 export const useChat = (isOpen) => {
   const { token, user } = useAuthStore();
-  const { socket, fetchConversations } = useChatStore();
+  const { socket, fetchUnreadCount } = useChatStore();
   
   const [messages, setMessages] = useState([]);
   const [conversationId, setConversationId] = useState(null);
@@ -50,6 +50,14 @@ export const useChat = (isOpen) => {
     }
   }, [isOpen, token, fetchMessages]);
 
+  // 🧹 Reset unread count when chat is open and conversation exists
+  useEffect(() => {
+    if (isOpen && conversationId) {
+      const { resetUnread } = useChatStore.getState();
+      resetUnread(conversationId);
+    }
+  }, [isOpen, conversationId]);
+
   const loadMore = () => {
     if (hasMore && !isLoadingMore) {
       const nextPage = page + 1;
@@ -64,16 +72,24 @@ export const useChat = (isOpen) => {
     const handleNewMessage = (data) => {
       if (isOpen) {
         setMessages((prev) => [...prev, data.message]);
-        fetchConversations();
+        fetchUnreadCount();
+        const { resetUnread } = useChatStore.getState();
+        resetUnread();
       }
     };
 
     const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
+    
+    const handleMessagesSeen = (data) => {
+      // If the backend broadcasts this conversation was seen, mark all local messages as read
+      setMessages(prev => prev.map(m => ({ ...m, isRead: true })));
+    };
 
     socket.on("new_message", handleNewMessage);
     socket.on("connect", handleConnect);
     socket.on("disconnect", handleDisconnect);
+    socket.on("messages_seen", handleMessagesSeen);
     
     setIsConnected(socket.connected);
 
@@ -81,8 +97,9 @@ export const useChat = (isOpen) => {
       socket.off("new_message", handleNewMessage);
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
+      socket.off("messages_seen", handleMessagesSeen);
     };
-  }, [socket, isOpen, fetchConversations]);
+  }, [socket, isOpen, fetchUnreadCount]);
 
   const sendMessage = (payload) => {
     const data = typeof payload === "string" ? { text: payload } : payload;

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import api from '@/lib/api';
 import { io } from 'socket.io-client';
 import { useAppStore } from './appStore';
+import { useAuthStore } from './authStore';
 
 export const useChatStore = create((set, get) => ({
   conversations: [],
@@ -9,7 +10,7 @@ export const useChatStore = create((set, get) => ({
   socket: null,
   isLoading: false,
 
-  fetchConversations: async () => {
+  fetchUnreadCount: async () => {
     set({ isLoading: true });
     try {
       const res = await api.get('/chat/unread-count');
@@ -28,11 +29,12 @@ export const useChatStore = create((set, get) => ({
 
   incrementUnread: () => set((state) => ({ unreadCount: state.unreadCount + 1 })),
   
-  resetUnread: async () => {
-    set({ unreadCount: 0 });
-    // Optional: Call backend to mark all as read
+  resetUnread: async (conversationId) => {
     try {
-      await api.post('/chat/mark-read');
+      await api.post('/chat/mark-read', { conversationId });
+      // Dynamically refetch the most accurate count
+      const res = await api.get('/chat/unread-count');
+      set({ unreadCount: res.data.count });
     } catch (err) {
       console.error('Failed to mark messages as read', err);
     }
@@ -49,12 +51,26 @@ export const useChatStore = create((set, get) => ({
 
     socket.on('new_message', (data) => {
       const { isChatOpen } = useAppStore.getState();
-      
+      const currentUser = useAuthStore.getState().user;
+      if (!currentUser) return;
+
+      const currentUserRole = currentUser?.role?.name || currentUser?.role;
+      const isCurrentUserAdmin = currentUserRole === 'superadmin' || (currentUserRole !== 'customer' && currentUserRole);
+
       const senderRole = data.message?.sender?.role?.name || data.message?.sender?.role;
       const isFromAdmin = senderRole === 'superadmin' || (senderRole !== 'customer' && senderRole);
+
+      // Do not increment if the message is sent by the current user themselves
+      if (data.message?.sender?._id === currentUser._id || data.message?.sender === currentUser._id) {
+        return;
+      }
+
+      // If admin, notify on customer messages. If customer, notify on admin messages when chat is closed.
+      const shouldNotify = isCurrentUserAdmin ? !isFromAdmin : (isFromAdmin && !isChatOpen);
       
-      if (isFromAdmin && !isChatOpen) {
-        get().incrementUnread();
+      if (shouldNotify) {
+        // Refetch total unread count from server for 100% precision
+        get().fetchUnreadCount();
       }
     });
 
