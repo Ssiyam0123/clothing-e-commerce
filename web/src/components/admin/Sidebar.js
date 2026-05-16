@@ -6,12 +6,14 @@ import { useAppStore } from "@/store/appStore";
 import { navGroups } from "@/utils/adminRoutes";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
+import { useChatStore } from "@/store/chatStore";
 import { hasPermission } from "@/utils/rbacUtils";
 
 
 export default function Sidebar({ className, onItemClick }) {
   const pathname = usePathname();
   const { user } = useAuthStore();
+  const { unreadCount } = useChatStore();
   const { settings, isAdminSidebarCollapsed, toggleAdminSidebar } = useAppStore();
   const branding = settings?.branding || {};
   const siteName = branding.siteName || "Store";
@@ -93,7 +95,19 @@ export default function Sidebar({ className, onItemClick }) {
                         {item.icon}
                       </span>
                       {!isAdminSidebarCollapsed && (
-                        <span className="animate-in fade-in slide-in-from-left-2 duration-500">{item.name}</span>
+                        <div className="flex-1 flex items-center justify-between animate-in fade-in slide-in-from-left-2 duration-500">
+                          <span>{item.name}</span>
+                          {item.href === "/admin/chat" && unreadCount > 0 && (
+                            <span className="flex h-5 min-w-[20px] px-1.5 items-center justify-center rounded-full bg-destructive text-[10px] font-black text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] animate-in zoom-in duration-500">
+                              {unreadCount > 99 ? "99+" : unreadCount}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {isAdminSidebarCollapsed && item.href === "/admin/chat" && unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-destructive text-[8px] font-black text-white border-2 border-sidebar shadow-lg">
+                          {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
                       )}
                     </Link>
                   </li>

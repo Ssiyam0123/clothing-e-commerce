@@ -65,7 +65,7 @@ export default function LiveSupportPage() {
 
   const handleSend = () => {
     if (input.trim() && isConnected) {
-      sendMessage(input);
+      sendMessage({ text: input });
       setInput("");
     }
   };

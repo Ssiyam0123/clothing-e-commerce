@@ -40,13 +40,11 @@ export const useChat = (isOpen) => {
 
   useEffect(() => {
     if (isOpen && token && !socketRef.current) {
-      socketRef.current = io(
-        process.env.NEXT_PUBLIC_API_URL.replace("/api", ""),
-        {
-          auth: { token },
-          transports: ["websocket"],
-        },
-      );
+      const socketUrl = process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, "");
+      socketRef.current = io(socketUrl, {
+        auth: { token },
+        // transports: ["websocket"], // Allow fallback to polling for better reliability
+      });
 
       socketRef.current.on("connect", () => setIsConnected(true));
       socketRef.current.on("disconnect", () => setIsConnected(false));
@@ -64,13 +62,21 @@ export const useChat = (isOpen) => {
     };
   }, [isOpen, token]);
 
-  const sendMessage = (text) => {
-    if (socketRef.current && isConnected && text.trim()) {
+  const sendMessage = (payload) => {
+    // 🛡️ Backward Compatibility: If payload is a string, convert to object
+    const data = typeof payload === "string" ? { text: payload } : payload;
+    const { text, image } = data;
+
+    console.log("🚀 Socket Emit Attempt:", { text, image, isConnected: socketRef.current?.connected });
+    if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit("send_message", {
-        text,
+        text: text?.trim(),
+        image,
         recipientId: "admin_room",
-        conversationId, // Include conversationId for backend routing
+        conversationId: conversationId,
       });
+    } else {
+      console.warn("🚨 Socket not connected or socketRef missing");
     }
   };
 

@@ -14,29 +14,38 @@ export const initSocketEvents = (io) => {
     // 🏠 Join a private room for personal transmissions
     socket.join(userId);
 
-    // 🛡️ Admin Protocol: Join a dedicated support room if needed
-    if (userRole?.name === "admin") {
+    const isAdmin = userRole?.name === "admin" || 
+                    userRole?.name === "superadmin" || 
+                    (typeof userRole === "string" && (userRole === "admin" || userRole === "superadmin")) ||
+                    userRole?.permissions?.includes("all") || 
+                    userRole?.permissions?.includes("chat:view");
+
+    const isCustomer = userRole?.name === "customer" || userRole === "customer" || !isAdmin;
+
+    // 🛡️ Admin Protocol: Join a dedicated support room if authorized
+    if (isAdmin) {
       socket.join("admin_support_room");
     }
 
     /**
      * @event send_message
-     * @payload { recipientId, text }
+     * @payload { recipientId, text, image }
      */
-    socket.on("send_message", async ({ text, recipientId }) => {
+    socket.on("send_message", async ({ text, recipientId, image }) => {
       try {
         const { user } = socket;
         const senderId = user._id.toString();
 
-        if (!text) return;
+        if (!text && !image) return;
 
         let conversation;
-        if (user.role?.name === "customer") {
-          // Find or create a conversation for this customer (without a specific admin)
+        if (isCustomer) {
+          // Simple logic for customers: always find/create conversation for themselves
           conversation = await Conversation.findOne({
-            participants: { $in: [senderId] },
+            participants: senderId,
             type: "support",
           });
+
           if (!conversation) {
             conversation = await Conversation.create({
               participants: [senderId],
@@ -44,30 +53,32 @@ export const initSocketEvents = (io) => {
               messages: [],
             });
           }
-          // Broadcast to all admins (admin_support_room)
+
           const message = { 
             sender: senderId, 
-            text: text.trim(), 
+            text: text?.trim(), 
+            image: image,
             isRead: false, 
             createdAt: new Date() 
           };
           
           conversation.messages.push(message);
-          conversation.lastMessage = text.trim();
+          conversation.lastMessage = image ? "📷 Photo" : text?.trim();
           await conversation.save();
 
-          const broadcastData = {
+          io.to("admin_support_room").emit("new_message", {
             conversationId: conversation._id,
             customerId: senderId,
             customerName: user.name,
             message,
-          };
-
-          io.to("admin_support_room").emit("new_message", broadcastData);
-          // Also echo back to sender (for UI consistency)
-          io.to(senderId).emit("new_message", broadcastData);
+          });
+          
+          socket.emit("new_message", {
+            conversationId: conversation._id,
+            message,
+          });
         } 
-        else if (user.role?.name === "admin") {
+        else if (isAdmin) {
           // Admin replying to a specific customer
           if (!recipientId) return;
           
@@ -85,13 +96,14 @@ export const initSocketEvents = (io) => {
 
           const message = { 
             sender: senderId, 
-            text: text.trim(), 
+            text: text?.trim(), 
+            image: image,
             isRead: true, 
             createdAt: new Date() 
           };
           
           conversation.messages.push(message);
-          conversation.lastMessage = text.trim();
+          conversation.lastMessage = image ? "📷 Photo" : text?.trim();
           await conversation.save();
 
           const broadcastData = { 

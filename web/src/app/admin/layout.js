@@ -9,6 +9,7 @@ import Sidebar from "@/components/admin/Sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/store/appStore";
 import { useAuthStore } from "@/store/authStore";
+import { useChatStore } from "@/store/chatStore";
 import { Menu, Globe, Sun, Moon, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -16,11 +17,12 @@ import { useTheme } from "@/hooks/useTheme";
 import { hasPermission, hasAnyAdminPermission } from "@/utils/rbacUtils";
 
 export default function AdminLayout({ children }) {
-  const { user, isLoading: authLoading, logout } = useAuthStore();
+  const { user, token, isLoading: authLoading, logout } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { theme, toggleTheme, isMounted, isAdminSidebarCollapsed } = useAppStore();
+  const { initSocket, disconnectSocket, fetchConversations } = useChatStore();
   useTheme();
 
   const isChatRoute = pathname?.startsWith("/admin/chat");
@@ -33,7 +35,16 @@ export default function AdminLayout({ children }) {
     if (!authLoading && (!user || !hasAdminAccess)) {
       router.replace("/");
     }
-  }, [user, authLoading, router]);
+
+    if (user && hasAdminAccess && token) {
+      initSocket(token);
+      fetchConversations();
+    }
+
+    return () => {
+      disconnectSocket();
+    };
+  }, [user, authLoading, router, token, initSocket, disconnectSocket, fetchConversations]);
 
   const handleLogout = () => {
     logout();

@@ -5,7 +5,9 @@ import { useChat } from "@/hooks/useChat";
 import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Send, X, Zap, Shield, Lock } from "lucide-react";
+import { MessageSquare, Send, X, Zap, Shield, Lock, Plus, ImageIcon, Loader2 } from "lucide-react";
+import api from "@/lib/api";
+import { getImageUrl } from "@/utils/imageUtils";
 import Link from "next/link";
 
 export default function SupportChat() {
@@ -13,12 +15,31 @@ export default function SupportChat() {
   const { isChatOpen: isOpen, setChatOpen: setIsOpen } = useAppStore();
   const pathname = usePathname();
 
-  const { messages, isConnected, sendMessage } = useChat(isOpen && !!user);
+  const { messages, isConnected, sendMessage, conversationId } = useChat(isOpen && !!user);
+  const [localMessages, setLocalMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+
+  console.log("🛠️ Chat State:", { isConnected, msgCount: messages.length, localCount: localMessages.length, conversationId });
   const scrollRef = useRef();
+  const fileInputRef = useRef();
+
+  // Merge server messages and local (optimistic) messages
+  const allMessages = [...messages, ...localMessages].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [allMessages]);
+
+  // Sync local messages: if a server message arrives that matches a local one, remove local
+  useEffect(() => {
+    if (messages.length > 0) {
+      setLocalMessages(prev => prev.filter(local => 
+        !messages.some(msg => 
+          (msg.text === local.text && msg.image === local.image && Math.abs(new Date(msg.createdAt) - new Date(local.createdAt)) < 5000)
+        )
+      ));
+    }
   }, [messages]);
 
   if (pathname.startsWith("/admin")) return null;
@@ -96,13 +117,13 @@ export default function SupportChat() {
                     </p>
                   </div>
                 )}
-                {messages.map((msg, i) => {
+                {allMessages.map((msg, i) => {
                   const myId = user?._id || user?.id;
                   const senderId =
                     typeof msg.sender === "string"
                       ? msg.sender
                       : msg.sender?._id || msg.sender?.id;
-                  const isMe = senderId === myId;
+                  const isMe = senderId === myId || !msg.sender; // Handle optimistic messages as "Me"
                   const senderAvatar = msg.sender?.avatar;
                   return (
                     <div
@@ -127,13 +148,26 @@ export default function SupportChat() {
                         </div>
 
                         <div
-                          className={`p-4 rounded-2xl text-[11px] font-bold shadow-sm leading-relaxed ${
+                          className={`rounded-2xl text-[11px] font-bold shadow-sm leading-relaxed overflow-hidden ${
                             isMe
                               ? "bg-accent-primary text-primary  rounded-tr-none"
                               : "bg-blue-600 text-primary rounded-tl-none shadow-lg shadow-blue-500/20"
                           }`}
                         >
-                          {msg.text}
+                          {msg.image && (
+                            <div className="w-full max-w-[200px]">
+                              <img 
+                                src={getImageUrl(msg.image)} 
+                                alt="Attachment" 
+                                className="w-full h-auto object-cover border-b border-white/10"
+                              />
+                            </div>
+                          )}
+                          {msg.text && (
+                            <div className="p-4">
+                              {msg.text}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -144,27 +178,76 @@ export default function SupportChat() {
             )}
 
             {user && (
-              <div className="p-4 bg-surface dark:bg-accent-primary/50 border-t flex gap-2">
+              <div className="p-4 bg-surface dark:bg-accent-primary/50 border-t flex items-center gap-2">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    setIsUploading(true);
+                    const formData = new FormData();
+                    formData.append("image", file);
+                    try {
+                      const res = await api.post("/chat/upload", formData);
+                      if (res.data.success) {
+                        sendMessage({ image: res.data.url });
+                      }
+                    } catch (err) {
+                      console.error("Upload failed", err);
+                    } finally {
+                      setIsUploading(false);
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    }
+                  }}
+                  className="hidden"
+                  accept="image/*"
+                />
+                
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="p-3 bg-elevated text-secondary rounded-xl hover:text-primary transition-colors disabled:opacity-50"
+                >
+                  {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+                </button>
+
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) =>
-                    e.key === "Enter" &&
-                    input.trim() &&
-                    (sendMessage(input), setInput(""))
-                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && input.trim()) {
+                      const tempMsg = {
+                        sender: user?._id || user?.id,
+                        text: input,
+                        createdAt: new Date().toISOString(),
+                        isRead: false
+                      };
+                      setLocalMessages(prev => [...prev, tempMsg]);
+                      sendMessage({ text: input });
+                      setInput("");
+                    }
+                  }}
                   placeholder="TRANSMIT MESSAGE..."
                   className="flex-1 bg-elevated text-[10px] font-black uppercase outline-none px-4 py-3 rounded-xl  placeholder:text-secondary"
+                  disabled={isUploading}
                 />
                 <button
                   onClick={() => {
                     if (input.trim()) {
-                      sendMessage(input);
+                      const tempMsg = {
+                        sender: user?._id || user?.id,
+                        text: input,
+                        createdAt: new Date().toISOString(),
+                        isRead: false
+                      };
+                      setLocalMessages(prev => [...prev, tempMsg]);
+                      sendMessage({ text: input });
                       setInput("");
                     }
                   }}
-                  className="p-3 bg-accent-primary text-primary  rounded-xl hover:scale-105 active:scale-95 transition-all shadow-lg"
-                  aria-label="Send message"
+                  className="p-3 bg-accent-primary text-primary  rounded-xl hover:scale-105 active:scale-95 transition-all shadow-lg disabled:opacity-50"
+                  disabled={!input.trim() || isUploading}
                 >
                   <Send size={16} />
                 </button>

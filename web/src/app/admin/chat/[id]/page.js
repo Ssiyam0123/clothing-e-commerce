@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { getImageUrl } from "@/utils/imageUtils";
+import { Plus, ImageIcon, X, Loader2 } from "lucide-react";
 
 const ChatMessage = ({ message, isMe, showStatus }) => {
   const timeStr = useMemo(
@@ -23,26 +24,51 @@ const ChatMessage = ({ message, isMe, showStatus }) => {
     [message.createdAt]
   );
 
+  const senderName = message.sender?.name;
+  const isAdmin = message.sender?.role?.name === "admin" || message.sender?.role?.name === "superadmin";
+
   return (
     <div className={cn("flex w-full", isMe ? "justify-end" : "justify-start")}>
       <div
         className={cn(
-          "relative px-3 py-2 max-w-[85%] lg:max-w-[65%] shadow-sm break-words",
+          "relative p-1.5 max-w-[85%] lg:max-w-[65%] shadow-sm",
           isMe
             ? "bg-[#d9fdd3] dark:bg-[#005c4b] rounded-lg rounded-tr-none"
             : "bg-white dark:bg-[#202c33] rounded-lg rounded-tl-none"
         )}
       >
-        <p className="text-[14.2px] leading-relaxed whitespace-pre-wrap break-words pr-12">
-          {message.text}
-        </p>
-        <div className="flex items-center justify-end gap-1 mt-1">
-          <span className="text-[11px] text-[#667781] dark:text-[#8696a0]">
-            {timeStr}
-          </span>
-          {isMe && showStatus && (
-            message.isRead ? <CheckCheck size={14} className="text-[#53bdeb]" /> : <Check size={14} className="text-[#8696a0]" />
+        {isAdmin && senderName && !isMe && (
+          <p className="text-[10px] font-bold text-accent-secondary mb-1 px-1.5 opacity-80 uppercase tracking-tighter">
+            {senderName}
+          </p>
+        )}
+        
+        {message.image && (
+          <div className="relative group mb-1 overflow-hidden rounded-md cursor-pointer bg-muted/20">
+             <img 
+               src={getImageUrl(message.image)} 
+               alt="Attachment" 
+               className="max-h-[300px] w-full object-cover transition-all group-hover:brightness-90"
+               loading="lazy"
+             />
+          </div>
+        )}
+
+        <div className="px-1.5 pb-0.5">
+          {message.text && (
+            <p className="text-[14.2px] leading-relaxed whitespace-pre-wrap break-words pr-12">
+              {message.text}
+            </p>
           )}
+          
+          <div className="flex items-center justify-end gap-1 mt-1">
+            <span className="text-[11px] text-[#667781] dark:text-[#8696a0]">
+              {timeStr}
+            </span>
+            {isMe && showStatus && (
+              message.isRead ? <CheckCheck size={14} className="text-[#53bdeb]" /> : <Check size={14} className="text-[#8696a0]" />
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -58,7 +84,9 @@ export default function ActiveChatPage() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const activeConv = useMemo(() => conversations.find((c) => c._id === id), [conversations, id]);
   const customer = useMemo(() => activeConv?.participants?.find((p) => p.role?.name === "customer"), [activeConv]);
@@ -112,7 +140,36 @@ export default function ActiveChatPage() {
     });
     setInput("");
     setIsSending(false);
-  }, [input, socket, customer, id, user, isSending]);
+  }, [input, socket, customer, id, isSending]);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !socket || !customer) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      // Use newly created chat upload endpoint
+      const res = await api.post("/chat/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.data.success) {
+        socket.emit("send_message", {
+          image: res.data.url,
+          recipientId: customer._id,
+          conversationId: id,
+        });
+      }
+    } catch (err) {
+      console.error("Image transmission failed", err);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -188,7 +245,7 @@ export default function ActiveChatPage() {
             messages.map((msg, idx) => {
               const myId = user?._id || user?.id;
               const senderId = typeof msg.sender === "string" ? msg.sender : msg.sender?._id || msg.sender?.id;
-              const isMe = msg.sender?.role?.name === "admin" || senderId === myId;
+              const isMe = msg.sender?.role?.name === "admin" || msg.sender?.role?.name === "superadmin" || senderId === myId;
               const showStatus = idx === messages.length - 1 && isMe;
               return <ChatMessage key={msg._id || idx} message={msg} isMe={isMe} showStatus={showStatus} />;
             })
@@ -200,6 +257,30 @@ export default function ActiveChatPage() {
       {/* Input Bar */}
       <div className="bg-[#f0f2f5] dark:bg-[#202c33] px-2 md:px-4 py-2 md:py-3 shrink-0 z-10 border-t border-border/5">
         <div className="flex items-center gap-2 md:gap-3 max-w-5xl mx-auto">
+          {/* Attachment Button */}
+          <div className="relative">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              accept="image/*"
+              className="hidden"
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-black/5 dark:hover:bg-white/5 h-10 w-10 shrink-0"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <Loader2 size={20} className="text-[#54656f] dark:text-[#aebac1] animate-spin" />
+              ) : (
+                <Plus size={22} className="text-[#54656f] dark:text-[#aebac1]" />
+              )}
+            </Button>
+          </div>
+
           <div className="flex-1 relative">
             <Input
               value={input}
@@ -207,12 +288,12 @@ export default function ActiveChatPage() {
               onKeyDown={handleKeyDown}
               placeholder="Message..."
               className="w-full h-10 md:h-11 bg-white dark:bg-[#2a3942] border-none rounded-xl px-3 md:px-4 py-1.5 md:py-2 text-[14px] md:text-[15px] focus-visible:ring-0 shadow-sm"
-              disabled={isSending}
+              disabled={isSending || isUploading}
             />
           </div>
           <Button
             onClick={handleSendMessage}
-            disabled={!input.trim() || isSending}
+            disabled={!input.trim() || isSending || isUploading}
             size="icon"
             className={cn(
               "rounded-xl h-10 w-10 md:h-11 md:w-11 shadow-lg transition-all duration-300",
