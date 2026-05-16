@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getActiveCampaign,
+  getPublicCampaignById,
   getAllCampaigns,
   createCampaign,
   updateCampaign,
@@ -14,6 +15,7 @@ import upload from '../../middleware/upload.js';
 const router = express.Router();
 
 router.get('/active', getActiveCampaign);
+router.get('/:id/public', getPublicCampaignById);
 
 // Admin routes
 router.route('/')

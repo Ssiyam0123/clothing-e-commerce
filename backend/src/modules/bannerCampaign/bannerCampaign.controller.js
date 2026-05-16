@@ -16,6 +16,12 @@ export const getActiveCampaign = asyncHandler(async (req, res) => {
   res.json(campaign);
 });
 
+export const getPublicCampaignById = asyncHandler(async (req, res) => {
+  const campaign = await BannerCampaign.findById(req.params.id);
+  if (!campaign) return res.status(404).json({ message: 'Campaign not found' });
+  res.json(campaign);
+});
+
 export const getAllCampaigns = asyncHandler(async (req, res) => {
   const { page = 1, limit = 30 } = req.query;
   const total = await BannerCampaign.countDocuments({});

@@ -37,7 +37,7 @@ export default function CategoryGrid({ categories }) {
             spaceBetween: 24,
           },
         }}
-        className="category-swiper"
+        className="category-swiper [&_.swiper-slide]:!w-[55%] sm:[&_.swiper-slide]:!w-[45%] md:[&_.swiper-slide]:!w-[31%] lg:[&_.swiper-slide]:!w-[23%]"
       >
         {categories.filter(cat => cat.slug !== 'on-sale').map((cat, idx) => (
           <SwiperSlide key={cat._id || idx}>

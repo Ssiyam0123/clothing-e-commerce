@@ -100,6 +100,13 @@ export const getAdminProducts = asyncHandler(async (req, res) => {
     // Separate Featured filter from category query if provided directly
     if (isFeatured === 'true') matchStage.isFeatured = true;
 
+    if (req.query.ids) {
+        const idList = req.query.ids.split(',').filter(id => mongoose.Types.ObjectId.isValid(id));
+        if (idList.length > 0) {
+            matchStage._id = { $in: idList.map(id => new mongoose.Types.ObjectId(id)) };
+        }
+    }
+
     if (category && category !== 'all') {
         if (category === 'isFeatured') {
             matchStage.isFeatured = true;

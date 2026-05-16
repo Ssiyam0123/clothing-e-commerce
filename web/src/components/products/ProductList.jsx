@@ -7,7 +7,7 @@ import Pagination from "@/components/common/Pagination";
 
 export default function ProductList({ initialData, t }) {
   const { products, pagination, setPage, isLoading, isFetching } = useProducts(
-    { limit: 30 },
+    { limit: 24 },
     initialData,
   );
 

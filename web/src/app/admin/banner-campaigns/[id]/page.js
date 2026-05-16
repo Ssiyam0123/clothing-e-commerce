@@ -47,8 +47,8 @@ export default function BannerCampaignForm() {
           name: campaign.name,
           description: campaign.description || "",
           slides: campaign.slides.length > 0 
-            ? campaign.slides.slice(0, 1).map((s) => ({ ...s, _id: s._id }))
-            : [{ tempId: 'default', title: "", subtitle: "", link: "", image: "", order: 0 }],
+            ? campaign.slides.map((s) => ({ ...s, _id: s._id }))
+            : [{ tempId: 'default-' + Date.now(), title: "", subtitle: "", link: "", image: "", order: 0 }],
           isActive: campaign.isActive,
         });
         setLoadingForm(false);
@@ -59,7 +59,7 @@ export default function BannerCampaignForm() {
       // Initialize with one empty slide for NEW campaigns
       setFormData(prev => ({
         ...prev,
-        slides: [{ tempId: 'default', title: "", subtitle: "", link: "", image: "", order: 0 }]
+        slides: [{ tempId: 'default-' + Date.now(), title: "", subtitle: "", link: "", image: "", order: 0 }]
       }));
       setLoadingForm(false);
     }
@@ -72,6 +72,25 @@ export default function BannerCampaignForm() {
       return slide;
     });
     setFormData({ ...formData, slides: newSlides });
+  };
+
+  const addSlide = () => {
+    const newSlide = {
+      tempId: 'new-' + Date.now(),
+      title: "",
+      subtitle: "",
+      link: "",
+      image: "",
+      order: formData.slides.length
+    };
+    setFormData(prev => ({ ...prev, slides: [...prev.slides, newSlide] }));
+  };
+
+  const removeSlide = (slideId) => {
+    setFormData(prev => ({
+      ...prev,
+      slides: prev.slides.filter(s => (s._id || s.tempId) !== slideId)
+    }));
   };
 
   const handleSlideImage = (slideId, file) => {
@@ -204,11 +223,20 @@ export default function BannerCampaignForm() {
 
         {/* Visual Artifact */}
         <div className="space-y-8">
-          <div className="px-4">
-            <h3 className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3">
-              <FileImage size={18} className="text-muted-foreground" /> Banner Image
-            </h3>
-            <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Upload an image and set your text</p>
+          <div className="px-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3">
+                <FileImage size={18} className="text-muted-foreground" /> Banner Slides
+              </h3>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Add one or more images for this campaign</p>
+            </div>
+            <Button 
+              type="button" 
+              onClick={addSlide}
+              className="rounded-xl px-6 font-black text-[9px] uppercase tracking-widest bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg"
+            >
+              <Plus size={14} className="mr-2" /> Add New Slide
+            </Button>
           </div>
 
           {formData.slides.map((slide) => {
@@ -216,8 +244,17 @@ export default function BannerCampaignForm() {
             return (
               <div
                 key={slideId}
-                className="admin-table-form group hover:border-indigo-600/20 transition-all p-8 md:p-10"
+                className="admin-table-form group hover:border-indigo-600/20 transition-all p-8 md:p-10 relative"
               >
+                {formData.slides.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeSlide(slideId)}
+                    className="absolute top-4 right-4 w-8 h-8 rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-white flex items-center justify-center transition-all"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                )}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                   {/* Media Hub */}
                   <div className="lg:col-span-5">

@@ -46,7 +46,11 @@ import {
   ShieldCheck,
   List,
   Copy,
-  LayoutTemplate
+  LayoutTemplate,
+  Search,
+  X,
+  Check,
+  Layers
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { notify } from "@/utils/swal";
@@ -83,7 +87,9 @@ function SortableSection({ section, onToggleVisibility, onRemove, onUpdateConfig
       case 'SALE_PRODUCTS': return <Tag size={18} />;
       case 'FEATURED_CATEGORY_SECTION': return <Layout size={18} />;
       case 'PROMO_BANNER': return <Maximize2 size={18} />;
+      case 'BANNER_SLIDER': return <Layers size={18} />;
       case 'HEADER': return <Type size={18} />;
+      case 'CUSTOM_PRODUCTS': return <ShoppingBag size={18} />;
       default: return <Layout size={18} />;
     }
   };
@@ -118,7 +124,7 @@ function SortableSection({ section, onToggleVisibility, onRemove, onUpdateConfig
               <Badge variant="outline" className="hidden sm:inline-flex text-[8px] font-bold h-4 bg-muted/50 shrink-0">
                 {section.config.categoryName || 
                  section.config.campaignName || 
-                 section.config.saleName + (section.config.subcategoryId ? ` (${subcategories.find(s => s._id === section.config.subcategoryId)?.name || 'Filtered'})` : '')}
+                 section.config.saleName}
               </Badge>
             )}
           </h4>
@@ -191,59 +197,280 @@ function SortableSection({ section, onToggleVisibility, onRemove, onUpdateConfig
 
             {section.type === 'FLASH_SALE' && (
               <div className="pt-2">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Filter by Subcategory (Optional)</label>
-                  <select
-                    value={section.config?.subcategoryId || ""}
-                    onChange={(e) => onUpdateConfig(section.id, { subcategoryId: e.target.value })}
-                    className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none appearance-none"
-                  >
-                    <option value="">All Products in Sale</option>
-                    {subcategories.map(sub => (
-                      <option key={sub._id} value={sub._id}>
-                        {sub.category?.name} &rsaquo; {sub.name}
-                      </option>
-                    ))}
-                  </select>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest italic">
+                  This section will automatically display all active products from the selected Flash Sale campaign.
+                </p>
+              </div>
+            )}
+
+            {(section.type === 'PROMO_BANNER' || section.type === 'HERO' || section.type === 'BANNER_SLIDER') && (
+              <div className="space-y-6 pt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Action Link</label>
+                    <input
+                      type="text"
+                      value={section.actionLink || ''}
+                      onChange={(e) => onUpdateConfig(section.id, { actionLink: e.target.value }, true)}
+                      className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
+                      placeholder="/products?category=..."
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Button Text</label>
+                    <input
+                      type="text"
+                      value={section.buttonText || ''}
+                      onChange={(e) => onUpdateConfig(section.id, { buttonText: e.target.value }, true)}
+                      className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
+                      placeholder="Shop Now"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-primary">Banner Images (Multi-Slide)</label>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="h-7 px-3 text-[8px] font-black uppercase tracking-widest rounded-lg border-primary/20 text-primary hover:bg-primary/5"
+                      onClick={() => {
+                        const newImages = [...(section.images || []), ""];
+                        onUpdateConfig(section.id, { images: newImages }, true);
+                      }}
+                    >
+                      <Plus size={10} className="mr-1" /> Add Slide
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-3">
+                    {(section.images || []).length === 0 && (
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-bold uppercase text-muted-foreground opacity-60">Single Image Fallback (Legacy)</label>
+                        <input
+                          type="text"
+                          value={section.imageUrl || ''}
+                          onChange={(e) => onUpdateConfig(section.id, { imageUrl: e.target.value }, true)}
+                          className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
+                          placeholder="Enter Image URL"
+                        />
+                      </div>
+                    )}
+                    {(section.images || []).map((imgObj, idx) => {
+                      const isObject = typeof imgObj === 'object' && imgObj !== null;
+                      const imgSrc = isObject ? imgObj.image : imgObj;
+                      const imgLink = isObject ? imgObj.link : "";
+
+                      return (
+                        <div key={idx} className="space-y-2 p-4 rounded-2xl bg-muted/20 border border-border/50 animate-in fade-in slide-in-from-left-2 duration-300">
+                          <div className="flex items-center justify-between mb-2">
+                             <span className="text-[10px] font-black uppercase text-primary">Slide {idx + 1}</span>
+                             <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-6 w-6 text-destructive hover:bg-destructive/10 rounded-lg"
+                              onClick={() => {
+                                const newImages = section.images.filter((_, i) => i !== idx);
+                                onUpdateConfig(section.id, { images: newImages }, true);
+                              }}
+                            >
+                              <Trash2 size={12} />
+                            </Button>
+                          </div>
+                          <div className="grid grid-cols-1 gap-3">
+                            <div className="space-y-1">
+                              <label className="text-[8px] font-bold uppercase text-muted-foreground ml-1">Image URL</label>
+                              <input
+                                type="text"
+                                value={imgSrc}
+                                onChange={(e) => {
+                                  const newImages = [...section.images];
+                                  newImages[idx] = { image: e.target.value, link: imgLink };
+                                  onUpdateConfig(section.id, { images: newImages }, true);
+                                }}
+                                className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
+                                placeholder="Enter Image URL"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[8px] font-bold uppercase text-muted-foreground ml-1">Action Link</label>
+                              <input
+                                type="text"
+                                value={imgLink}
+                                onChange={(e) => {
+                                  const newImages = [...section.images];
+                                  newImages[idx] = { image: imgSrc, link: e.target.value };
+                                  onUpdateConfig(section.id, { images: newImages }, true);
+                                }}
+                                className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
+                                placeholder="/products/category-name"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
 
-            {section.type === 'PROMO_BANNER' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 pt-2">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Manual Image Override</label>
-                  <input
-                    type="text"
-                    value={section.imageUrl || ''}
-                    onChange={(e) => onUpdateConfig(section.id, { imageUrl: e.target.value }, true)}
-                    className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
-                    placeholder="https://..."
+            {section.type === 'CUSTOM_PRODUCTS' && (
+               <div className="space-y-6 pt-2">
+                  <ProductPicker 
+                    selectedIds={section.config?.productIds || []} 
+                    onUpdate={(ids) => onUpdateConfig(section.id, { productIds: ids })} 
                   />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Action Link</label>
-                  <input
-                    type="text"
-                    value={section.actionLink || ''}
-                    onChange={(e) => onUpdateConfig(section.id, { actionLink: e.target.value }, true)}
-                    className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
-                    placeholder="/category/..."
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Button Text</label>
-                  <input
-                    type="text"
-                    value={section.buttonText || ''}
-                    onChange={(e) => onUpdateConfig(section.id, { buttonText: e.target.value }, true)}
-                    className="w-full bg-background border border-border/50 rounded-xl px-4 py-2 text-[11px] font-bold focus:border-primary/40 outline-none"
-                    placeholder="Shop Now"
-                  />
-                </div>
-              </div>
+               </div>
             )}
 
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * 🔍 Product Picker for Custom Collections
+ */
+function ProductPicker({ selectedIds = [], onUpdate }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [results, setResults] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isLoadingSelected, setIsLoadingSelected] = useState(false);
+
+  const searchProducts = useCallback(async (term) => {
+    if (!term || term.length < 2) {
+      setResults([]);
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const { data } = await api.get('/admin/products', { 
+        params: { search: term, limit: 10 } 
+      });
+      setResults(data.products || []);
+    } catch (error) {
+      console.error("Search failed", error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // 🛍️ Fetch details for selected products
+  useEffect(() => {
+    const fetchSelected = async () => {
+      if (selectedIds.length === 0) {
+        setSelectedProducts([]);
+        return;
+      }
+      setIsLoadingSelected(true);
+      try {
+        const { data } = await api.get('/admin/products', { 
+          params: { ids: selectedIds.join(','), limit: 100 } 
+        });
+        setSelectedProducts(data.products || []);
+      } catch (error) {
+        console.error("Failed to fetch selected products", error);
+      } finally {
+        setIsLoadingSelected(false);
+      }
+    };
+    fetchSelected();
+  }, [selectedIds]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => searchProducts(searchTerm), 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm, searchProducts]);
+
+  const toggleProduct = (productId) => {
+    const newIds = selectedIds.includes(productId)
+      ? selectedIds.filter(id => id !== productId)
+      : [...selectedIds, productId];
+    onUpdate(newIds);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+        <input
+          type="text"
+          placeholder="Search products to add..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full bg-background border border-border/50 rounded-xl pl-12 pr-4 py-3 text-[11px] font-bold focus:border-primary/40 outline-none"
+        />
+        {isSearching && (
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+      </div>
+
+      {results.length > 0 && (
+        <div className="bg-background border border-border/50 rounded-2xl overflow-hidden shadow-xl max-h-60 overflow-y-auto">
+          {results.map(product => (
+            <div 
+              key={product._id} 
+              onClick={() => toggleProduct(product._id)}
+              className="flex items-center gap-3 p-3 hover:bg-accent/50 cursor-pointer border-b border-border/10 last:border-0 transition-colors"
+            >
+              <div className="w-10 h-10 rounded-lg bg-muted overflow-hidden shrink-0 border border-border/50">
+                <img src={product.images?.[0] || '/placeholder.png'} alt="" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-bold truncate">{product.name}</p>
+                <p className="text-[8px] text-muted-foreground font-medium uppercase tracking-tighter">{product.category?.name} • ৳{product.price}</p>
+              </div>
+              <div className={cn(
+                "w-5 h-5 rounded-full flex items-center justify-center border transition-all",
+                selectedIds.includes(product._id) ? "bg-primary border-primary text-primary-foreground" : "border-border"
+              )}>
+                {selectedIds.includes(product._id) && <Check size={12} />}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {selectedIds.length > 0 && (
+        <div className="space-y-4 pt-4 border-t border-border/50">
+          <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+            Selected Products <Badge variant="secondary" className="text-[8px] h-4">{selectedIds.length}</Badge>
+          </p>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+             {selectedProducts.map(product => (
+                <div key={product._id} className="group relative flex items-center gap-3 p-2 rounded-xl bg-background border border-border/50 hover:border-primary/30 transition-all">
+                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted border border-border/50">
+                      <img src={product.images?.[0] || '/placeholder.png'} alt="" className="w-full h-full object-cover" />
+                   </div>
+                   <div className="flex-1 min-w-0">
+                      <p className="text-[9px] font-bold truncate">{product.name}</p>
+                      <p className="text-[7px] text-muted-foreground font-black uppercase tracking-tighter">৳{product.price}</p>
+                   </div>
+                   <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleProduct(product._id);
+                      }}
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                   >
+                      <X size={10} />
+                   </button>
+                </div>
+             ))}
+             {isLoadingSelected && (
+                <div className="flex items-center gap-2 p-2">
+                   <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                   <span className="text-[8px] font-bold text-muted-foreground uppercase">Refreshing selections...</span>
+                </div>
+             )}
           </div>
         </div>
       )}
@@ -424,6 +651,7 @@ export default function LayoutBuilderPage() {
       imageUrl: config.imageUrl || "",
       actionLink: config.actionLink || "",
       isVisible: true,
+      images: [],
       config: config
     };
     setLayout(prev => [...prev, newSection]);
@@ -579,7 +807,9 @@ export default function LayoutBuilderPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
               {[
                 { type: 'HEADER', label: 'Typography Block', desc: 'Custom Title & Subtitle' },
+                { type: 'BANNER_SLIDER', label: 'Premium Banner Slider', desc: 'Auto-sliding multi-image banner' },
                 { type: 'CATEGORY_GRID', label: 'Category Matrix', desc: 'Curated groups' },
+                { type: 'CUSTOM_PRODUCTS', label: 'Custom Collection', desc: 'Pick specific products' },
               ].map((comp) => (
                 <button key={comp.type} onClick={() => addNewSection(comp.type)} className="group flex items-center gap-4 p-4 rounded-2xl border border-border/50 bg-muted/20 hover:bg-primary/5 hover:border-primary/30 transition-all text-left">
                   <div className="shrink-0 w-10 h-10 rounded-xl bg-background border border-border/50 flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">

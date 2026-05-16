@@ -13,13 +13,23 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
         maxPrice,
         sort,
         page = 1,
-        limit = 12,
+        limit = 24,
         isFeatured,
+        ids,
     } = req.query;
 
-    const matchStage = { isActive: true }; // Only active products for public
+    const itemsLimit = Math.max(1, Number(limit));
+    const skip = (Math.max(1, Number(page)) - 1) * itemsLimit;
+    const matchStage = { isActive: true };
 
     if (isFeatured === 'true') matchStage.isFeatured = true;
+
+    if (ids) {
+        const idList = ids.split(',').filter(id => mongoose.Types.ObjectId.isValid(id));
+        if (idList.length > 0) {
+            matchStage._id = { $in: idList.map(id => new mongoose.Types.ObjectId(id)) };
+        }
+    }
 
     if (category && category !== 'all') {
         if (category === 'on-sale') {
@@ -29,6 +39,8 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
             if (featCats.length > 0) {
                 matchStage.category = { $in: featCats.map(c => new mongoose.Types.ObjectId(c._id)) };
             } else return res.json({ success: true, total: 0, pages: 0, products: [] });
+        } else if (mongoose.Types.ObjectId.isValid(category)) {
+            matchStage.category = new mongoose.Types.ObjectId(category);
         } else {
             const catDoc = await Category.findOne({ slug: category }).select('_id');
             if (catDoc) matchStage.category = new mongoose.Types.ObjectId(catDoc._id);
@@ -37,9 +49,13 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
     }
 
     if (subcategory && subcategory !== 'all') {
-        const subDoc = await Subcategory.findOne({ slug: subcategory }).select('_id');
-        if (subDoc) matchStage.subcategory = new mongoose.Types.ObjectId(subDoc._id);
-        else return res.json({ success: true, total: 0, pages: 0, products: [] });
+        if (mongoose.Types.ObjectId.isValid(subcategory)) {
+            matchStage.subcategory = new mongoose.Types.ObjectId(subcategory);
+        } else {
+            const subDoc = await Subcategory.findOne({ slug: subcategory }).select('_id');
+            if (subDoc) matchStage.subcategory = new mongoose.Types.ObjectId(subDoc._id);
+            else return res.json({ success: true, total: 0, pages: 0, products: [] });
+        }
     }
 
     if (search) {
@@ -58,115 +74,91 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
         if (maxPrice) matchStage.price.$lte = Number(maxPrice);
     }
 
-    const pipeline = [{ $match: matchStage }];
-    
-    // Add totalStock for display purposes
-    pipeline.push({
-        $addFields: { totalStock: { $sum: '$sizes.stock' } }
-    });
-
-    const countPipeline = [...pipeline, { $count: 'total' }];
-    const countResult = await Product.aggregate(countPipeline);
-    const total = countResult.length > 0 ? countResult[0].total : 0;
-
-    let sortObj = { createdAt: -1 };
-    if (sort === 'price') sortObj = { price: 1 };
-    else if (sort === '-price') sortObj = { price: -1 };
-
-    pipeline.push({ $sort: sortObj });
-    const itemsLimit = Math.max(1, Number(limit));
-    const skip = (Math.max(1, Number(page)) - 1) * itemsLimit;
-    pipeline.push({ $skip: skip }, { $limit: itemsLimit });
-
-    // Populate Category & Subcategory
-    pipeline.push(
+    // Advanced Aggregation Matrix
+    const pipeline = [
+        { $match: matchStage },
         {
-            $lookup: { from: 'categories', localField: 'category', foreignField: '_id', as: 'category' }
-        },
-        { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
-        {
-            $lookup: { from: 'subcategories', localField: 'subcategory', foreignField: '_id', as: 'subcategory' }
-        },
-        { $unwind: { path: '$subcategory', preserveNullAndEmptyArrays: true } }
-    );
-
-    // 🚀 STRICT PROJECTION FOR PUBLIC CONSUMPTION
-    pipeline.push({
-        $project: {
-            name: 1,
-            slug: 1,
-            price: 1,
-            discount: 1,
-            images: { $slice: ['$images', 1] }, // Only 1st image for card
-            category: { name: 1, slug: 1, _id: 1 },
-            subcategory: { name: 1, slug: 1, _id: 1 },
-            sizes: 1,
-            totalStock: 1,
-            isFeatured: 1,
-            showReviews: 1,
-            averageRating: 1,
-            totalReviews: 1
-        }
-    });
-
-    // 🚀 POPULATE SIZES IN AGGREGATION
-    pipeline.push(
-        { $unwind: { path: '$sizes', preserveNullAndEmptyArrays: true } },
-        {
-            $lookup: {
-                from: 'sizes',
-                let: { sizeId: '$sizes.size' },
-                pipeline: [
+            $facet: {
+                metadata: [{ $count: 'total' }],
+                data: [
+                    { $addFields: { totalStock: { $sum: '$sizes.stock' } } },
                     { 
-                        $match: { 
-                            $expr: { 
-                                $and: [
-                                    { $ne: ['$$sizeId', null] },
-                                    { $ne: ['$$sizeId', ''] },
-                                    { $eq: ['$_id', { $toObjectId: '$$sizeId' }] }
-                                ]
-                            } 
-                        } 
+                        $sort: sort === 'price' ? { price: 1 } : 
+                               sort === '-price' ? { price: -1 } : 
+                               { createdAt: -1 } 
                     },
-                    { $project: { name: 1 } }
-                ],
-                as: 'sizes.size'
-            }
-        },
-        { $unwind: { path: '$sizes.size', preserveNullAndEmptyArrays: true } },
-        {
-            $group: {
-                _id: '$_id',
-                root: { $first: '$$ROOT' },
-                sizes: { $push: '$sizes' }
-            }
-        },
-        {
-            $replaceRoot: {
-                newRoot: {
-                    $mergeObjects: [
-                        '$root',
-                        {
-                            sizes: {
-                                $filter: {
-                                    input: '$sizes',
-                                    as: 's',
-                                    cond: { 
-                                        $and: [
-                                            { $ne: ['$$s', {}] },
-                                            { $ne: ['$$s.size', null] }
-                                        ]
+                    { $skip: skip },
+                    { $limit: itemsLimit },
+                    // Join Category & Subcategory after pagination for performance
+                    {
+                        $lookup: { from: 'categories', localField: 'category', foreignField: '_id', as: 'category' }
+                    },
+                    { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+                    {
+                        $lookup: { from: 'subcategories', localField: 'subcategory', foreignField: '_id', as: 'subcategory' }
+                    },
+                    { $unwind: { path: '$subcategory', preserveNullAndEmptyArrays: true } },
+                    // Size Population Sub-Pipeline
+                    { $unwind: { path: '$sizes', preserveNullAndEmptyArrays: true } },
+                    {
+                        $lookup: {
+                            from: 'sizes',
+                            let: { sizeId: '$sizes.size' },
+                            pipeline: [
+                                { $match: { $expr: { $eq: ['$_id', { $toObjectId: '$$sizeId' }] } } },
+                                { $project: { name: 1 } }
+                            ],
+                            as: 'sizes.size'
+                        }
+                    },
+                    { $unwind: { path: '$sizes.size', preserveNullAndEmptyArrays: true } },
+                    {
+                        $group: {
+                            _id: '$_id',
+                            root: { $first: '$$ROOT' },
+                            sizes: { $push: '$sizes' }
+                        }
+                    },
+                    {
+                        $replaceRoot: {
+                            newRoot: {
+                                $mergeObjects: [
+                                    '$root',
+                                    {
+                                        sizes: {
+                                            $filter: {
+                                                input: '$sizes',
+                                                as: 's',
+                                                cond: { $ne: ['$$s.size', null] }
+                                            }
+                                        }
                                     }
-                                }
+                                ]
                             }
                         }
-                    ]
-                }
+                    },
+                    // Final Clean Projection
+                    {
+                        $project: {
+                            name: 1, slug: 1, price: 1, discount: 1, isFeatured: 1,
+                            images: { $slice: ['$images', 1] },
+                            category: { name: 1, slug: 1, _id: 1 },
+                            subcategory: { name: 1, slug: 1, _id: 1 },
+                            sizes: 1,
+                            totalStock: 1,
+                            showReviews: 1,
+                            averageRating: 1,
+                            totalReviews: 1
+                        }
+                    }
+                ]
             }
         }
-    );
+    ];
 
-    const products = await Product.aggregate(pipeline);
+    const result = await Product.aggregate(pipeline);
+    const total = result[0].metadata[0]?.total || 0;
+    const products = result[0].data;
 
     res.json({
         success: true,

@@ -16,7 +16,7 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
       category: searchParams.get("category") || initialFilters.category || "all",
       subcategory: searchParams.get("subcategory") || initialFilters.subcategory || "",
       page: Number(searchParams.get("page")) || initialFilters.page || 1,
-      limit: initialFilters.limit || 30,
+      limit: initialFilters.limit || 24,
     }),
     [searchParams, initialFilters],
   );

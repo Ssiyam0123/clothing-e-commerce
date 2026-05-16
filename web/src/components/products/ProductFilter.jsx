@@ -115,10 +115,7 @@ export default function ProductFilter({ initialCategories, t }) {
             exit={{ opacity: 0, y: -10 }}
             className="space-y-4"
           >
-            <div className="flex items-center gap-2 px-2">
-               <div className="h-1 w-1 rounded-full bg-primary" />
-               <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60">Refine Collection</span>
-            </div>
+
             
             <ScrollArea className="w-full whitespace-nowrap pb-2">
               <div className="flex w-max gap-3 px-2">

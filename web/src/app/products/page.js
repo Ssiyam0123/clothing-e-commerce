@@ -80,7 +80,7 @@ async function getInitialProducts(searchParams) {
   const params = new URLSearchParams(searchParams);
   // Default values to match hook's initial state
   if (!params.has("page")) params.set("page", "1");
-  if (!params.has("limit")) params.set("limit", "12");
+  if (!params.has("limit")) params.set("limit", "24");
   if (!params.has("category")) params.set("category", "all");
 
   const apiParams = new URLSearchParams();

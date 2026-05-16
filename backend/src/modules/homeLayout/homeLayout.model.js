@@ -16,7 +16,9 @@ const sectionSchema = new mongoose.Schema({
       'FEATURED_CATEGORY_SECTION', 
       'CATEGORY_COLLECTION',
       'PROMO_BANNER',
-      'HEADER'
+      'BANNER_SLIDER',
+      'HEADER',
+      'CUSTOM_PRODUCTS'
     ]
   },
   title: { type: String, default: '' },
@@ -24,6 +26,7 @@ const sectionSchema = new mongoose.Schema({
   titleBn: { type: String, default: '' },
   subtitleBn: { type: String, default: '' },
   imageUrl: { type: String, default: '' },
+  images: [{ type: String }],
   actionLink: { type: String, default: '' },
   isVisible: { type: Boolean, default: true },
   config: { type: mongoose.Schema.Types.Mixed, default: {} },
