@@ -19,7 +19,8 @@ import {
   Phone,
   Ticket,
   Check,
-  ImageOff
+  ImageOff,
+  Edit2
 } from "lucide-react";
 
 // Stores & Hooks
