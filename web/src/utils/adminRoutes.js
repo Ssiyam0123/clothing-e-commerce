@@ -40,7 +40,6 @@ export const navGroups = [
     label: "Settings & Users",
     items: [
       { name: "Users", href: "/admin/users", icon: <Users size={18} />, permission: "users:view" },
-      { name: "Roles", href: "/admin/roles", icon: <Shield size={18} />, permission: "roles:view" },
       { name: "Profile", href: "/admin/profile", icon: <User size={18} /> }, 
       { name: "Settings", href: "/admin/settings", icon: <Settings size={18} />, permission: "settings:view" },
     ]

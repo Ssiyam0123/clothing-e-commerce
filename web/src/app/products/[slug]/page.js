@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
+import { Suspense } from "react";
 import { Share2, Star, ShieldCheck, Truck, RotateCcw } from "lucide-react";
 import StarRating from "@/components/store/StarRating";
 import ProductImageGallery from "@/components/products/ProductImageGallery";
@@ -12,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getTranslation } from "@/utils/typography/handler";
+import { GridSkeleton } from "@/components/common/Skeletons";
 
 import { getSettings } from "@/lib/settings";
 
@@ -85,7 +87,7 @@ export default async function ProductPage({ params }) {
 
   try {
     const res = await fetch(`${API_URL}/products/details/${slug}`, {
-      cache: "no-store",
+      next: { revalidate: 3600, tags: [`product-${slug}`] }
     });
     if (!res.ok) {
       if (res.status === 404) notFound();
@@ -367,19 +369,19 @@ export default async function ProductPage({ params }) {
       <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-12 mt-20 lg:mt-32 pb-24 lg:pb-32 space-y-20 lg:space-y-32">
         {/* Reviews */}
         {product.showReviews !== false && (
-          <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
+          <Suspense fallback={<div className="h-40 animate-pulse bg-muted rounded-3xl" />}>
              <ReviewSectionWrapper productId={product._id} />
-          </div>
+          </Suspense>
         )}
 
         {/* Related Products */}
-        <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <Suspense fallback={<GridSkeleton count={4} />}>
           <RelatedProducts
             categorySlug={product.category?.slug}
             currentProductId={product._id}
             title={t.related}
           />
-        </div>
+        </Suspense>
       </div>
     </main>
   );

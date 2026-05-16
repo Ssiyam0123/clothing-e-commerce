@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { 
   Globe, Palette, Share2, Mail, Settings2, 
   Cpu, MessageSquare, Layout as LayoutIcon, 
-  ChevronRight, Save, Truck
+  ChevronRight, Save, Truck, Shield
 } from "lucide-react";
 
 export default function SettingsLayout({ children }) {
@@ -22,6 +22,7 @@ export default function SettingsLayout({ children }) {
     { id: "contact", label: "Support", href: "/admin/settings/contact", icon: Mail },
     { id: "payment", label: "Payments", href: "/admin/settings/payment", icon: Settings2 },
     { id: "marketing", label: "Marketing", href: "/admin/settings/marketing", icon: Cpu },
+    { id: "roles", label: "Access", href: "/admin/settings/roles", icon: Shield },
     { id: "smtp", label: "Email", href: "/admin/settings/smtp", icon: Mail },
     { id: "sms", label: "SMS", href: "/admin/settings/sms", icon: MessageSquare },
   ];
