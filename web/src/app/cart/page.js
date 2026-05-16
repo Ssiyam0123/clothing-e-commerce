@@ -18,8 +18,8 @@ import {
   User,
   Phone,
   Ticket,
-  Edit2,
-  Check
+  Check,
+  ImageOff
 } from "lucide-react";
 
 // Stores & Hooks
@@ -394,12 +394,18 @@ function UnifiedSettlementContent() {
                       <Card className="group border-none glass-card overflow-hidden transition-all duration-500 rounded-2xl sm:rounded-[2rem]">
                         <CardContent className="p-4 sm:p-6 flex gap-4 sm:gap-8">
                           <div className="relative w-20 sm:w-28 aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden shrink-0 shadow-lg sm:shadow-xl">
-                            <Image
-                              src={getImageUrl(item.product.images?.[0], 300, 100)}
-                              alt={item.product.name}
-                              fill
-                              className="object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
+                            {item.product.images && item.product.images.length > 0 ? (
+                              <Image
+                                src={getImageUrl(item.product.images[0], 300, 100)}
+                                alt={item.product.name}
+                                fill
+                                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-accent/10 text-muted-foreground/30">
+                                <ImageOff size={24} strokeWidth={1.5} />
+                              </div>
+                            )}
                           </div>
                           <div className="flex-1 flex flex-col justify-between py-1">
                             <div className="flex justify-between items-start gap-4">

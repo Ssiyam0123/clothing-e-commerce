@@ -2,19 +2,15 @@ import { GridSkeleton, FilterSkeleton } from "@/components/common/Skeletons";
 
 export default function Loading() {
   return (
-    <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-12 pt-24 md:pt-32 pb-32">
-      <div className="flex flex-col lg:flex-row gap-12">
-        <aside className="lg:w-80 hidden lg:block">
-          <FilterSkeleton />
-        </aside>
-        <main className="flex-1">
-          <div className="flex justify-between items-center mb-12">
-             <div className="h-6 w-48 skeleton" />
-             <div className="h-10 w-40 skeleton rounded-full" />
+    <main className="min-h-screen bg-page pt-10 transition-colors duration-700">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="w-full">
+          <div className="mb-10">
+            <FilterSkeleton />
           </div>
-          <GridSkeleton count={9} />
-        </main>
+          <GridSkeleton count={12} />
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

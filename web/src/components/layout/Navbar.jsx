@@ -206,9 +206,9 @@ export default function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 sm:h-12 sm:w-12 rounded-full p-0 overflow-hidden border-2 border-white/10 ring-1 ring-white/5 shadow-2xl transition-all duration-500 hover:ring-accent-secondary/50 hover:border-accent-secondary/30 group flex-shrink-0">
                   <Avatar className="h-full w-full transition-transform duration-500 group-hover:scale-110">
-                    <AvatarImage src={getImageUrl(user?.avatar)} alt={user?.name} />
+                    <AvatarImage src={user?.avatar ? getImageUrl(user.avatar) : undefined} alt={user?.name} />
                     <AvatarFallback className="bg-foreground text-background font-black text-xs">
-                      {user?.name?.slice(0, 2).toUpperCase()}
+                      <User size={16} />
                     </AvatarFallback>
                   </Avatar>
                   {unreadCount > 0 && (
@@ -221,9 +221,9 @@ export default function Navbar() {
                 <div className="px-6 py-8 mb-2 bg-gradient-to-br from-white/[0.08] to-transparent rounded-[2rem] border border-white/5 shadow-inner">
                   <div className="flex flex-col items-center gap-4 text-center">
                     <Avatar className="h-20 w-20 ring-4 ring-accent-secondary/20 shadow-2xl">
-                      <AvatarImage src={getImageUrl(user?.avatar)} alt={user?.name} />
+                      <AvatarImage src={user?.avatar ? getImageUrl(user.avatar) : undefined} alt={user?.name} />
                       <AvatarFallback className="bg-foreground text-background font-black text-2xl">
-                        {user?.name?.slice(0, 2).toUpperCase()}
+                        <User size={32} />
                       </AvatarFallback>
                     </Avatar>
                     <div className="space-y-1">

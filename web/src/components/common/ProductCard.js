@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, ShoppingCart, Zap } from "lucide-react";
+import { Star, ShoppingCart, Zap, ImageOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getImageUrl } from "@/utils/imageUtils";
@@ -45,13 +45,19 @@ export default function ProductCard({ product, className }) {
         {/* Image Section */}
         <div className="relative aspect-square w-full overflow-hidden bg-accent/5">
           <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10">
-            <Image
-              src={getImageUrl(product.images?.[0], 600, 75)}
-              alt={product.name}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            />
+            {product.images && product.images.length > 0 ? (
+              <Image
+                src={getImageUrl(product.images[0], 600, 75)}
+                alt={product.name}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-accent/5 text-muted-foreground/30 group-hover:bg-accent/10 transition-colors duration-500">
+                <ImageOff size={48} strokeWidth={1} />
+              </div>
+            )}
           </Link>
 
           {/* Badges */}

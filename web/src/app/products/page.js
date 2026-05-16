@@ -70,8 +70,10 @@ export async function generateMetadata({ searchParams }) {
 }
 
 const ProductsPageSkeleton = () => (
-  <div className="space-y-12">
-    <FilterSkeleton />
+  <div className="w-full">
+    <div className="mb-10">
+      <FilterSkeleton />
+    </div>
     <GridSkeleton count={12} />
   </div>
 );

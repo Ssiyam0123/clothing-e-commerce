@@ -5,6 +5,7 @@ import Image from "next/image";
 import { getImageUrl } from "@/utils/imageUtils";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { ImageOff } from "lucide-react";
 
 export default function ProductImageGallery({ images, name, discount, isFeatured }) {
   const [selectedImage, setSelectedImage] = useState(0);
@@ -14,15 +15,21 @@ export default function ProductImageGallery({ images, name, discount, isFeatured
       <div className="lg:sticky lg:top-32 w-full">
         {/* Main Display Engine */}
         <div className="relative aspect-[4/5] overflow-hidden rounded-[3rem] bg-accent/20 shadow-2xl group cursor-crosshair">
-          <Image
-            key={selectedImage}
-            src={getImageUrl(images?.[selectedImage], 1200, 85)}
-            alt={name}
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
-            className="object-cover transition-all duration-1000 group-hover:scale-110"
-          />
+          {images && images.length > 0 ? (
+            <Image
+              key={selectedImage}
+              src={getImageUrl(images[selectedImage], 1200, 85)}
+              alt={name}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
+              className="object-cover transition-all duration-1000 group-hover:scale-110"
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-accent/5 text-muted-foreground/30">
+              <ImageOff size={64} strokeWidth={1} />
+            </div>
+          )}
           
           {/* Glass Overlay Elements */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
