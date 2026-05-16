@@ -1,6 +1,7 @@
 import BannerCampaign from './bannerCampaign.model.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { uploadImage, deleteImage, uploadMultipleImages } from '../../services/imageUploadService.js';
+import { clearCache } from '../../middleware/cacheMiddleware.js';
 
 const parseSlidesData = (slidesString) => {
   try {
@@ -62,6 +63,11 @@ export const createCampaign = asyncHandler(async (req, res) => {
     slides: finalSlides,
     isActive: isActive === 'true' || isActive === true,
   });
+
+  // Clear caches
+  clearCache('cache:/api/banner-campaigns*');
+  clearCache('cache:/api/home-layout*');
+
   res.status(201).json(campaign);
 });
 
@@ -100,6 +106,11 @@ export const updateCampaign = asyncHandler(async (req, res) => {
   if (isActive !== undefined) campaign.isActive = isActive === 'true' || isActive === true;
   
   await campaign.save();
+
+  // Clear caches
+  clearCache('cache:/api/banner-campaigns*');
+  clearCache('cache:/api/home-layout*');
+
   res.json(campaign);
 });
 
@@ -114,6 +125,11 @@ export const deleteCampaign = asyncHandler(async (req, res) => {
   }
   
   await campaign.deleteOne();
+
+  // Clear caches
+  clearCache('cache:/api/banner-campaigns*');
+  clearCache('cache:/api/home-layout*');
+
   res.json({ message: 'Campaign and its assets deleted' });
 });
 
@@ -122,5 +138,10 @@ export const toggleActive = asyncHandler(async (req, res) => {
   if (!campaign) return res.status(404).json({ message: 'Campaign not found' });
   campaign.isActive = !campaign.isActive;
   await campaign.save();
+
+  // Clear caches
+  clearCache('cache:/api/banner-campaigns*');
+  clearCache('cache:/api/home-layout*');
+
   res.json(campaign);
 });

@@ -31,10 +31,12 @@ import roleRoutes from "./modules/role/role.routes.js";
 // 🛡️ Middleware Imports
 import { errorHandler } from "./middleware/errorHandler.js";
 import { handleFileError } from "./middleware/cleanup.js";
-
+import compression from "compression";
 import contextMiddleware from "./middleware/context.js";
 
 const app = express();
+
+app.use(compression());
 
 app.set("trust proxy", 1);
 

@@ -1,6 +1,7 @@
 import Category from '../category.model.js';
 import { asyncHandler } from '../../../middleware/asyncHandler.js';
 import { uploadImage, deleteImage } from '../../../services/imageUploadService.js';
+import { clearCache } from '../../../middleware/cacheMiddleware.js';
 
 export const createCategory = asyncHandler(async (req, res) => {
     let imageUrl = null;
@@ -13,6 +14,12 @@ export const createCategory = asyncHandler(async (req, res) => {
         description: req.body.description,
         image: imageUrl,
     });
+
+    // Clear caches
+    clearCache('cache:/api/categories*');
+    clearCache('cache:/api/products*');
+    clearCache('cache:/api/home-layout*');
+
     res.status(201).json(category);
 });
 
@@ -37,6 +44,12 @@ export const updateCategory = asyncHandler(async (req, res) => {
         updateData,
         { new: true, runValidators: true }
     );
+
+    // Clear caches
+    clearCache('cache:/api/categories*');
+    clearCache('cache:/api/products*');
+    clearCache('cache:/api/home-layout*');
+
     res.json(updated);
 });
 
@@ -46,6 +59,12 @@ export const deleteCategory = asyncHandler(async (req, res) => {
 
     if (category.image) await deleteImage(category.image);
     await category.deleteOne();
+
+    // Clear caches
+    clearCache('cache:/api/categories*');
+    clearCache('cache:/api/products*');
+    clearCache('cache:/api/home-layout*');
+
     res.json({ message: 'Category purged.' });
 });
 

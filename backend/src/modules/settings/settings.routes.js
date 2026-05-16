@@ -3,10 +3,12 @@ import { getSettings, updateSettings } from './settings.controller.js';
 import { requireAuth, admin } from '../../middleware/auth.js';
 import upload from '../../middleware/upload.js';
 
+import { cacheMiddleware } from '../../middleware/cacheMiddleware.js';
+
 const router = express.Router();
 
 
-router.get('/', getSettings);
+router.get('/', cacheMiddleware(3600), getSettings); // Cache for 1 hour
 
 
 router.put('/', requireAuth, admin, upload.fields([

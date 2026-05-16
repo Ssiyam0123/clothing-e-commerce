@@ -3,6 +3,7 @@ import Product from '../product.model.js';
 import Order from '../../order/order.model.js';
 import Category from '../../category/category.model.js';
 import { asyncHandler } from '../../../middleware/asyncHandler.js';
+import { clearCache } from '../../../middleware/cacheMiddleware.js';
 import { uploadMultipleImages, deleteImage } from '../../../services/imageUploadService.js';
 import { createProductSchema, updateProductSchema } from '../validators/product.validator.js';
 import { ZodError } from 'zod';
@@ -68,6 +69,12 @@ export const createProduct = asyncHandler(async (req, res) => {
     try {
         const validatedData = createProductSchema.parse(parsedData);
         const product = await Product.create(validatedData);
+        
+        // Clear caches
+        clearCache('cache:/api/products*');
+        clearCache('cache:/api/home-layout*');
+        clearCache('cache:/api/flash-sales*');
+
         res.status(201).json(product);
     } catch (error) {
         if (imageUrls.length) await Promise.all(imageUrls.map(url => deleteImage(url)));
@@ -265,6 +272,12 @@ export const updateProduct = asyncHandler(async (req, res) => {
             { $set: validatedData },
             { returnDocument: 'after', runValidators: true }
         );
+
+        // Clear caches
+        clearCache('cache:/api/products*');
+        clearCache('cache:/api/home-layout*');
+        clearCache('cache:/api/flash-sales*');
+
         res.json(product);
     } catch (error) {
         if (error instanceof ZodError) return handleZodError(error, res);
@@ -278,6 +291,12 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
     if (product.images?.length) await Promise.all(product.images.map(img => deleteImage(img)));
     await product.deleteOne();
+
+    // Clear caches
+    clearCache('cache:/api/products*');
+    clearCache('cache:/api/home-layout*');
+    clearCache('cache:/api/flash-sales*');
+
     res.json({ message: 'Product purged.' });
 });
 

@@ -54,13 +54,33 @@ export const getAllConversations = asyncHandler(async (req, res) => {
     const unreadCount = await Message.countDocuments({
       conversationId: conv._id,
       isRead: false,
-      sender: { $in: conv.participants.filter(p => p.role?.name === "customer").map(p => p._id) }
+      sender: { $in: conv.participants.filter(p => (p.role?.name || p.role) === "customer").map(p => p._id) }
     });
 
     return { ...conv, unreadCount };
   }));
 
   res.json({ success: true, conversations });
+});
+
+/**
+ * @desc    Mark all messages in user's support conversation as read
+ * @route   POST /api/chat/mark-read
+ */
+export const markMessagesAsRead = asyncHandler(async (req, res) => {
+  const conversation = await Conversation.findOne({
+    participants: req.user._id,
+    type: "support",
+  });
+
+  if (conversation) {
+    await Message.updateMany(
+      { conversationId: conversation._id, isRead: false },
+      { $set: { isRead: true } }
+    );
+  }
+
+  res.json({ success: true });
 });
 
 /**
@@ -170,4 +190,40 @@ export const startConversation = asyncHandler(async (req, res) => {
   }
 
   res.json({ success: true, conversation });
+});
+
+/**
+ * @desc    Get unread message count for the logged-in user
+ * @route   GET /api/chat/unread-count
+ */
+export const getUnreadCount = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const userRoleName = req.user.role?.name || req.user.role;
+  const isAdmin = userRoleName === "superadmin" || (userRoleName !== "customer" && userRoleName);
+
+  console.log(`[ChatDebug] Fetching unread for user: ${userId} (${userRoleName}), isAdmin: ${isAdmin}`);
+
+  let count = 0;
+
+  if (isAdmin) {
+    count = await Message.countDocuments({
+      isRead: false,
+      sender: { $ne: userId } 
+    });
+  } else {
+    const conversation = await Conversation.findOne({
+      participants: userId,
+      type: "support"
+    }).lean();
+
+    if (conversation) {
+      count = await Message.countDocuments({
+        conversationId: conversation._id,
+        isRead: false,
+        sender: { $ne: userId }
+      });
+    }
+  }
+
+  res.json({ success: true, count });
 });

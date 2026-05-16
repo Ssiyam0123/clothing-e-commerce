@@ -9,14 +9,10 @@ import { Button } from "@/components/ui/button";
 import { getImageUrl } from "@/utils/imageUtils";
 import { cn } from "@/lib/utils";
 import WishlistButtonClient from "@/components/products/WishlistButtonClient";
-import dynamic from "next/dynamic";
+import SizeSelectionModal from "@/components/products/SizeSelectionModal";
 import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { getTranslation } from "@/utils/typography/handler";
-
-const SizeSelectionModal = dynamic(() => import("@/components/products/SizeSelectionModal"), {
-  ssr: false
-});
 
 export default function ProductCard({ product, className }) {
   const { isAuthenticated } = useAuthStore();

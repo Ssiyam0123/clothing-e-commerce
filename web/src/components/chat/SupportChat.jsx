@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useChat } from "@/hooks/useChat";
 import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
+import { useChatStore } from "@/store/chatStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, Send, X, Plus, Loader2, ArrowUpCircle } from "lucide-react";
 import api from "@/lib/api";
@@ -13,6 +14,7 @@ import Link from "next/link";
 export default function SupportChat() {
   const { user } = useAuthStore();
   const { isChatOpen: isOpen, setChatOpen: setIsOpen } = useAppStore();
+  const resetUnread = useChatStore((state) => state.resetUnread);
   const pathname = usePathname();
 
   const { 
@@ -28,6 +30,13 @@ export default function SupportChat() {
   const [localMessages, setLocalMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+
+  // 🧹 Reset unread count when opening chat
+  useEffect(() => {
+    if (isOpen) {
+      resetUnread();
+    }
+  }, [isOpen, resetUnread]);
 
   const scrollRef = useRef();
   const topObserverRef = useRef();

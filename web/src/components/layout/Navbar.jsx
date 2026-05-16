@@ -9,6 +9,7 @@ import { Search, ShoppingBag, User, Menu, X, Sun, Moon, Sparkles, Heart, Chevron
 import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { useProductStore } from "@/store/productStore";
+import { useChatStore } from "@/store/chatStore";
 import { hasAnyAdminPermission } from "@/utils/rbacUtils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,9 +39,10 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const { user, logout, isAuthenticated } = useAuthStore();
-  const { theme, toggleTheme, lang, setLang, settings } = useAppStore();
+  const { theme, toggleTheme, lang, setLang, settings, setChatOpen } = useAppStore();
   const branding = settings?.branding || {};
   const { cart, wishlistItems } = useProductStore();
+  const { unreadCount } = useChatStore();
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -209,6 +211,9 @@ export default function Navbar() {
                       {user?.name?.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0 right-0 h-3 w-3 bg-red-500 rounded-full border-2 border-background animate-pulse" />
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-72 rounded-[2.5rem] p-2 bg-background/40 backdrop-blur-3xl border-white/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] mt-4 animate-in fade-in zoom-in-95 duration-500" align="end">
@@ -239,11 +244,27 @@ export default function Navbar() {
                   </DropdownMenuItem>
                   
                   <DropdownMenuItem asChild>
-                    <Link href="/live-support" className="flex items-center gap-4 rounded-2xl px-5 py-4 font-black text-[10px] uppercase tracking-[0.3em] cursor-pointer hover:bg-white/10 hover:text-blue-500 group transition-all duration-300">
-                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-500/10 transition-all">
+                    <Link 
+                      href={(user?.role?.name === "superadmin" || user?.role === "superadmin") ? "/admin/chat" : "/live-support"} 
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-4 rounded-2xl px-5 py-4 font-black text-[10px] uppercase tracking-[0.3em] cursor-pointer hover:bg-white/10 hover:text-blue-500 group transition-all duration-300"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-500/10 transition-all relative">
                         <LifeBuoy size={14} className="text-muted-foreground group-hover:text-blue-500 group-hover:rotate-45 transition-all" />
+                        {unreadCount > 0 && (
+                          <span className="absolute -top-1 -right-1 h-2.5 w-2.5 bg-red-500 rounded-full border border-background" />
+                        )}
                       </div>
-                      {mounted ? t.liveSupport : "Support"}
+                      <div className="flex-1 flex items-center justify-between">
+                        <span>
+                          {(user?.role?.name === "superadmin" || user?.role === "superadmin") ? "Support Panel" : (mounted ? t.liveSupport : "Support")}
+                        </span>
+                        {unreadCount > 0 && (
+                          <Badge className="bg-red-500 hover:bg-red-600 text-[8px] font-black h-5 min-w-[20px] flex items-center justify-center rounded-full">
+                            {unreadCount}
+                          </Badge>
+                        )}
+                      </div>
                     </Link>
                   </DropdownMenuItem>
 
@@ -367,9 +388,20 @@ export default function Navbar() {
                           {mounted ? t.profile : "Profile"}
                           <ChevronRight size={16} />
                         </Link>
-                        <Link href="/live-support" onClick={() => setIsMenuOpen(false)} className="text-lg font-bold uppercase tracking-tight flex items-center justify-between text-blue-500 group">
-                          {mounted ? t.liveSupport : "Support"}
-                          <ChevronRight size={16} />
+                        <Link 
+                          href={(user?.role?.name === "superadmin" || user?.role === "superadmin") ? "/admin/chat" : "/live-support"} 
+                          onClick={() => setIsMenuOpen(false)} 
+                          className="text-lg font-bold uppercase tracking-tight flex items-center justify-between text-blue-500 group"
+                        >
+                          {(user?.role?.name === "superadmin" || user?.role === "superadmin") ? "Support Panel" : (mounted ? t.liveSupport : "Support")}
+                          <div className="flex items-center gap-2">
+                            {unreadCount > 0 && (
+                              <Badge className="bg-red-500 text-[8px] h-5 min-w-[20px] rounded-full">
+                                {unreadCount}
+                              </Badge>
+                            )}
+                            <ChevronRight size={16} />
+                          </div>
                         </Link>
                       </div>
                       

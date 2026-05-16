@@ -1,5 +1,5 @@
 import express from "express";
-import { getChatHistory, getAllConversations, getConversationMessages, getMyConversation, searchUsers, startConversation } from "./chat.controller.js";
+import { getChatHistory, getAllConversations, getConversationMessages, getMyConversation, searchUsers, startConversation, markMessagesAsRead, getUnreadCount } from "./chat.controller.js";
 import { requireAuth, admin } from "../../middleware/auth.js";
 import upload from "../../middleware/upload.js";
 import { uploadImage } from "../../services/imageUploadService.js";
@@ -29,5 +29,7 @@ router.post("/upload", requireAuth, upload.single("image"), async (req, res) => 
 
 // 🛒 কাস্টমার নিজের সাপোর্ট কনভারসেশন দেখতে পারবে
 router.get("/my-conversation", requireAuth, getMyConversation);
+router.get("/unread-count", requireAuth, getUnreadCount);
+router.post("/mark-read", requireAuth, markMessagesAsRead);
 
 export default router;

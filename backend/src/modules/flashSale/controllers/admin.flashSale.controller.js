@@ -1,5 +1,6 @@
 import FlashSale from '../flashSale.model.js';
 import { asyncHandler } from '../../../middleware/asyncHandler.js';
+import { clearCache } from '../../../middleware/cacheMiddleware.js';
 
 const populatedProductsConfig = {
   path: 'products',
@@ -41,6 +42,11 @@ export const createFlashSale = asyncHandler(async (req, res) => {
     startImmediately: startImmediately === true || startImmediately === 'true',
   });
 
+  // Clear caches
+  clearCache('cache:/api/flash-sales*');
+  clearCache('cache:/api/products*');
+  clearCache('cache:/api/home-layout*');
+
   res.status(201).json(flashSale);
 });
 
@@ -72,6 +78,11 @@ export const updateFlashSale = asyncHandler(async (req, res) => {
     { returnDocument: 'after', runValidators: true }
   ).populate(populatedProductsConfig);
 
+  // Clear caches
+  clearCache('cache:/api/flash-sales*');
+  clearCache('cache:/api/products*');
+  clearCache('cache:/api/home-layout*');
+
   res.json(updatedSale);
 });
 
@@ -99,6 +110,12 @@ export const getAllFlashSales = asyncHandler(async (req, res) => {
 
 export const deleteFlashSale = asyncHandler(async (req, res) => {
   await FlashSale.findByIdAndDelete(req.params.id);
+
+  // Clear caches
+  clearCache('cache:/api/flash-sales*');
+  clearCache('cache:/api/products*');
+  clearCache('cache:/api/home-layout*');
+
   res.json({ message: 'Campaign Terminated' });
 });
 

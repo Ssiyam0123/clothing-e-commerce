@@ -31,18 +31,21 @@ export default function SizeSelectionModal({ product, isOpen, onOpenChange, mode
 
   const t = useMemo(() => getTranslation('product_details', lang), [lang]);
 
-  if (!product) return null;
-
   const discountedPrice = product.price - (product.price * (product.discount || 0)) / 100;
   const sizes = product.sizes || [];
 
-  // 🚀 DEBUG: Examine the artifact structure
-  console.log("Size Protocol Diagnostic:", {
-    productId: product._id,
-    sizesLength: sizes.length,
-    firstSizeEntry: sizes[0],
-    isPopulated: typeof sizes[0]?.size === 'object'
-  });
+  // 🚀 Lightning Fast Selection Strategy: Auto-select first available size
+  useMemo(() => {
+    if (sizes.length > 0 && !selectedSizeId) {
+      const firstAvailable = sizes.find(s => s.stock > 0);
+      if (firstAvailable) {
+        const id = String(firstAvailable.size._id || firstAvailable.size.id || firstAvailable.size);
+        setSelectedSizeId(id);
+      }
+    }
+  }, [sizes, selectedSizeId]);
+
+  if (!product) return null;
 
   const handleConfirm = () => {
     if (!selectedSizeId) {

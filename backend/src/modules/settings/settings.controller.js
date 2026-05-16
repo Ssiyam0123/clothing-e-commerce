@@ -3,6 +3,7 @@ import ApiKey from './apiKey.model.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { uploadImage } from '../../services/imageUploadService.js';
 import { encrypt, decrypt } from '../../utils/encryption.js';
+import { clearCache } from '../../middleware/cacheMiddleware.js';
 
 export const getSettings = asyncHandler(async (req, res) => {
     let settings = await PageSetting.findOne();
@@ -122,6 +123,10 @@ export const updateSettings = asyncHandler(async (req, res) => {
         { $set: updateData }, 
         { new: true, upsert: true, runValidators: true }
     );
+
+    // Clear settings cache after update (Non-blocking)
+    clearCache('cache:/api/settings*');
+
     res.status(200).json({
         message: "Site protocol updated successfully.",
         settings

@@ -1,19 +1,18 @@
-"use client";
-
 import { useEffect, useState, useRef, useCallback } from "react";
-import { io } from "socket.io-client";
 import { useAuthStore } from "@/store/authStore";
-import axios from "axios";
+import { useChatStore } from "@/store/chatStore";
+import api from "@/lib/api";
 
 export const useChat = (isOpen) => {
   const { token, user } = useAuthStore();
+  const { socket, fetchConversations } = useChatStore();
+  
   const [messages, setMessages] = useState([]);
   const [conversationId, setConversationId] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const socketRef = useRef(null);
 
   // 🚀 Fetch initial or more messages
   const fetchMessages = useCallback(async (pageNum = 1) => {
@@ -22,12 +21,7 @@ export const useChat = (isOpen) => {
     try {
       if (pageNum > 1) setIsLoadingMore(true);
       
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/chat/my-conversation?page=${pageNum}&limit=20`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await api.get(`/chat/my-conversation?page=${pageNum}&limit=20`);
 
       const conversation = res.data;
       if (conversation) {
@@ -37,11 +31,9 @@ export const useChat = (isOpen) => {
         if (pageNum === 1) {
           setMessages(newMessages);
         } else {
-          // Prepend older messages
           setMessages(prev => [...newMessages, ...prev]);
         }
 
-        // Check if more messages exist
         setHasMore(newMessages.length === 20);
       }
     } catch (err) {
@@ -67,34 +59,37 @@ export const useChat = (isOpen) => {
   };
 
   useEffect(() => {
-    if (isOpen && token && !socketRef.current) {
-      const socketUrl = process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, "");
-      socketRef.current = io(socketUrl, {
-        auth: { token },
-      });
+    if (!socket) return;
 
-      socketRef.current.on("connect", () => setIsConnected(true));
-      socketRef.current.on("disconnect", () => setIsConnected(false));
-
-      socketRef.current.on("new_message", (data) => {
+    const handleNewMessage = (data) => {
+      if (isOpen) {
         setMessages((prev) => [...prev, data.message]);
-      });
-    }
-
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
+        fetchConversations();
       }
     };
-  }, [isOpen, token]);
+
+    const handleConnect = () => setIsConnected(true);
+    const handleDisconnect = () => setIsConnected(false);
+
+    socket.on("new_message", handleNewMessage);
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+    
+    setIsConnected(socket.connected);
+
+    return () => {
+      socket.off("new_message", handleNewMessage);
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+    };
+  }, [socket, isOpen, fetchConversations]);
 
   const sendMessage = (payload) => {
     const data = typeof payload === "string" ? { text: payload } : payload;
     const { text, image } = data;
 
-    if (socketRef.current && socketRef.current.connected) {
-      socketRef.current.emit("send_message", {
+    if (socket && socket.connected) {
+      socket.emit("send_message", {
         text: text?.trim(),
         image,
         recipientId: "admin_room",

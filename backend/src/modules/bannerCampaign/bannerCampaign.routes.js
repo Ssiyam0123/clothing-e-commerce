@@ -12,10 +12,12 @@ import { protect } from '../../middleware/auth.js';
 import { authorize } from '../../middleware/rbac.js';
 import upload from '../../middleware/upload.js';
 
+import { cacheMiddleware } from '../../middleware/cacheMiddleware.js';
+
 const router = express.Router();
 
-router.get('/active', getActiveCampaign);
-router.get('/:id/public', getPublicCampaignById);
+router.get('/active', cacheMiddleware(600), getActiveCampaign);
+router.get('/:id/public', cacheMiddleware(600), getPublicCampaignById);
 
 // Admin routes
 router.route('/')

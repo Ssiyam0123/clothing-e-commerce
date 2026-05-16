@@ -12,9 +12,8 @@ export const initSocketEvents = (io) => {
     console.log(`📡 Satellite Link Established: ${socket.user.name} [${userRole?.name || userRole}]`);
     socket.join(userId);
 
-    const isAdmin = userRole?.name === "admin" || 
-                    userRole?.name === "superadmin" || 
-                    (typeof userRole === "string" && (userRole === "admin" || userRole === "superadmin"));
+    const userRoleName = userRole?.name || (typeof userRole === "string" ? userRole : "");
+    const isAdmin = userRoleName === "superadmin" || (userRoleName !== "customer" && userRoleName);
 
     if (isAdmin) {
       socket.join("admin_support_room");
@@ -72,7 +71,11 @@ export const initSocketEvents = (io) => {
         });
 
         const broadcastData = {
-          message: await Message.findById(newMessage._id).populate("sender", "name avatar role"),
+          message: await Message.findById(newMessage._id).populate({
+            path: "sender",
+            select: "name avatar role",
+            populate: { path: "role", select: "name" }
+          }),
           conversationId: conversation._id
         };
 

@@ -10,11 +10,13 @@ import {
 import { protect } from '../../middleware/auth.js';
 import { authorize } from '../../middleware/rbac.js';
 
+import { cacheMiddleware } from '../../middleware/cacheMiddleware.js';
+
 const router = express.Router();
 
-// Public: Get active layout
-router.get('/', getActiveLayout);
-router.get('/active', getActiveLayout);
+// Public: Get active layout (Cached for 30 mins)
+router.get('/', cacheMiddleware(1800), getActiveLayout);
+router.get('/active', cacheMiddleware(1800), getActiveLayout);
 
 // Admin: Manage architectures
 router.get('/all', protect, authorize('homeLayout:view'), getAllLayouts);
