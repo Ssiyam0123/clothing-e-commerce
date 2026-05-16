@@ -15,6 +15,7 @@ import UspSection from "./UspSection";
 import FlashSaleTeaser from "./FlashSaleTeaser";
 import CategoryGrid from "./CategoryGrid";
 import ProductSection from "./ProductSection";
+import BannerSlider from "./BannerSlider";
 import Newsletter from "./Newsletter";
 import { GridSkeleton, HeroSkeleton } from "../common/Skeletons";
 import { ArrowRight, Sparkles } from "lucide-react";
@@ -29,7 +30,7 @@ const sectionVariants = {
   },
 };
 
-// 🏛️ Refined Header: Zero redundant margins
+//  Refined Header: Zero redundant margins
 const SectionHeader = ({ title, subtitle, badge }) => (
   <div className="flex flex-col gap-1.5 md:gap-2">
     {badge && (
@@ -82,11 +83,10 @@ export default function HomeClient() {
         {bannerLoading ? (
           <HeroSkeleton />
         ) : (
-          <HeroSection
+          <BannerSlider
             slides={
               activeCampaign?.slides?.sort((a, b) => a.order - b.order) || []
             }
-            ui={ui}
             lang={lang}
           />
         )}
@@ -144,6 +144,7 @@ export default function HomeClient() {
               title={ui.featTitle}
               subtitle="Masterpieces Crafted within the Foundry"
             />
+            <Link
               href="/products"
               className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-secondary hover:text-accent-secondary transition-all pb-1 border-b-2 border-transparent hover:border-accent-secondary"
             >

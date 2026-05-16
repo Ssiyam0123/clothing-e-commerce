@@ -6,9 +6,6 @@ import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation, EffectFade } from "swiper/modules";
 import { getImageUrl } from "@/utils/imageUtils";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
 
 // Swiper Styles
 import "swiper/css";
@@ -16,10 +13,6 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "swiper/css/effect-fade";
 
-/**
- * 🎨 Premium Banner Slider Component
- * Supports multiple images with auto-sliding, fade effects, and interactive overlays.
- */
 export default function BannerSlider({ slides = [], buttonText = "Shop Now", lang = "en", showHeader = false }) {
   const [mounted, setMounted] = useState(false);
 
@@ -27,9 +20,24 @@ export default function BannerSlider({ slides = [], buttonText = "Shop Now", lan
     setMounted(true);
   }, []);
 
+  // Hydration fallback matches the new auto-height structure
   if (!mounted) {
+    const firstSlide = slides[0];
     return (
-      <div className="relative aspect-[16/9] md:aspect-[21/9] lg:aspect-[21/7] overflow-hidden bg-zinc-900" />
+      <div className="w-full bg-zinc-900">
+        {firstSlide && (
+          <Image
+            src={getImageUrl(firstSlide.image, 1920)}
+            alt={firstSlide.title || "Banner Image"}
+            width={0}
+            height={0}
+            sizes="100vw"
+            style={{ width: "100%", height: "auto" }}
+            priority
+            className="w-full h-auto"
+          />
+        )}
+      </div>
     );
   }
 
@@ -43,6 +51,7 @@ export default function BannerSlider({ slides = [], buttonText = "Shop Now", lan
         effect="fade"
         fadeEffect={{ crossFade: true }}
         speed={1000}
+        autoHeight={true} // Crucial for variable image heights
         autoplay={{
           delay: 2000,
           disableOnInteraction: false,
@@ -59,32 +68,36 @@ export default function BannerSlider({ slides = [], buttonText = "Shop Now", lan
         }}
         loop={slides.length > 1}
         grabCursor={true}
-        className="banner-swiper h-full"
+        className="banner-swiper w-full"
       >
         {slides.map((slide, idx) => (
           <SwiperSlide key={idx}>
-            <div className="relative aspect-[16/9] md:aspect-[21/9] lg:aspect-[21/7] overflow-hidden bg-black">
+            <div className="w-full bg-black overflow-hidden flex justify-center items-center">
               {slide.link ? (
-                <Link href={slide.link} className="block w-full h-full">
+                <Link href={slide.link} className="block w-full">
                   <Image
                     src={getImageUrl(slide.image, 1920, 100)}
                     alt={slide.title || "Banner Image"}
-                    fill
-                    priority={idx === 0}
+                    width={0}
+                    height={0}
                     sizes="100vw"
-                    className="object-cover object-center transition-transform duration-[10s] ease-out group-hover/slider:scale-105"
+                    style={{ width: "100%", height: "auto" }}
+                    priority={idx === 0}
                     quality={100}
+                    className="transition-transform duration-[10s] ease-out group-hover/slider:scale-105"
                   />
                 </Link>
               ) : (
                 <Image
                   src={getImageUrl(slide.image, 1920, 100)}
                   alt={slide.title || "Banner Image"}
-                  fill
-                  priority={idx === 0}
+                  width={0}
+                  height={0}
                   sizes="100vw"
-                  className="object-cover object-center transition-transform duration-[10s] ease-out group-hover/slider:scale-105"
+                  style={{ width: "100%", height: "auto" }}
+                  priority={idx === 0}
                   quality={100}
+                  className="transition-transform duration-[10s] ease-out group-hover/slider:scale-105"
                 />
               )}
             </div>
@@ -113,30 +126,7 @@ export default function BannerSlider({ slides = [], buttonText = "Shop Now", lan
           width: 40px !important;
           border-radius: 4px !important;
         }
-        @keyframes fadeInScale {
-          from { opacity: 0; transform: scale(0.9); }
-          to { opacity: 1; transform: scale(1); }
-        }
       `}</style>
     </section>
-  );
-}
-
-function ArrowRight({ size, className }) {
-  return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="3" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </svg>
   );
 }

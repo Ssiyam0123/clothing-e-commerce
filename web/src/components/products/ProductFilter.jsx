@@ -98,7 +98,7 @@ export default function ProductFilter({ initialCategories, t }) {
                 isSelected={filters.category === cat.slug}
                 onClick={() => handleCategoryUpdate(cat.slug, cat.name)}
                 label={cat.name}
-                image={getImageUrl(cat.image, 200, 200)}
+                image={cat.slug === 'on-sale' ? "/images/sale-banner.png" : getImageUrl(cat.image, 200, 200)}
               />
             ))}
           </div>

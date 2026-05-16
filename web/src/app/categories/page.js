@@ -66,7 +66,7 @@ export default async function CategoriesPage() {
                   {/* Simple Background Image */}
                   <div className="absolute inset-0 overflow-hidden">
                     <img
-                      src={getImageUrl(cat.image || "/placeholder-cat.jpg", 800, 80)}
+                      src={isOnSale ? "/images/sale-banner.png" : getImageUrl(cat.image || "/placeholder-cat.jpg", 800, 80)}
                       alt={cat.name}
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 md:group-hover:scale-105"
                       loading="lazy"

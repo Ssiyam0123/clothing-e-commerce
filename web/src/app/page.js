@@ -3,7 +3,6 @@ import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { getTranslation } from "@/utils/typography/handler";
-import HeroSectionServer from "@/components/home/HeroSectionServer";
 import UspSection from "@/components/home/UspSection";
 import FlashSaleTeaserServer from "@/components/home/FlashSaleTeaserServer";
 import CategoryGrid from "@/components/home/CategoryGrid";
@@ -65,16 +64,6 @@ export default async function HomePage() {
           const standardMargin = isFollowingHeader ? "mt-3 md:mt-12" : "mt-12 md:mt-24 lg:mt-32";
 
           switch (section.type) {
-            case 'HERO':
-              return (
-                <section key={section.id} className="w-full" aria-label="Main Hero Slider">
-                  <HeroSectionServer 
-                    campaign={{ slides: section.config?.slides || [] }} 
-                    lang={lang} 
-                    ui={{ ...t, heroBtn: section.buttonText }} 
-                  />
-                </section>
-              );
             case 'USP':
               return (
                 <section key={section.id} className={cn("w-full", idx > 0 && standardMargin)} aria-label="Trust Markers">
