@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 import { useAuthStore } from "@/store/authStore";
 import axios from "axios";
@@ -10,40 +10,67 @@ export const useChat = (isOpen) => {
   const [messages, setMessages] = useState([]);
   const [conversationId, setConversationId] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const socketRef = useRef(null);
+
+  // 🚀 Fetch initial or more messages
+  const fetchMessages = useCallback(async (pageNum = 1) => {
+    if (!token) return;
+    
+    try {
+      if (pageNum > 1) setIsLoadingMore(true);
+      
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/chat/my-conversation?page=${pageNum}&limit=20`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const conversation = res.data;
+      if (conversation) {
+        setConversationId(conversation._id);
+        const newMessages = conversation.messages || [];
+        
+        if (pageNum === 1) {
+          setMessages(newMessages);
+        } else {
+          // Prepend older messages
+          setMessages(prev => [...newMessages, ...prev]);
+        }
+
+        // Check if more messages exist
+        setHasMore(newMessages.length === 20);
+      }
+    } catch (err) {
+      console.error("🚨 Chat Fetch Failed", err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [token]);
 
   useEffect(() => {
     if (isOpen && token) {
-      const fetchHistory = async () => {
-        try {
-          const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_API_URL}/chat/my-conversation`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            },
-          );
-          if (res.data?.success) {
-            setMessages(res.data.conversation?.messages || []);
-            setConversationId(res.data.conversation?._id);
-          } else {
-            // Fallback for different API structure
-            setMessages(res.data?.messages || []);
-            setConversationId(res.data?._id || res.data?.conversationId);
-          }
-        } catch (err) {
-          console.error("🚨 History Sync Failed", err);
-        }
-      };
-      fetchHistory();
+      setPage(1);
+      fetchMessages(1);
     }
-  }, [isOpen, token]);
+  }, [isOpen, token, fetchMessages]);
+
+  const loadMore = () => {
+    if (hasMore && !isLoadingMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchMessages(nextPage);
+    }
+  };
 
   useEffect(() => {
     if (isOpen && token && !socketRef.current) {
       const socketUrl = process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, "");
       socketRef.current = io(socketUrl, {
         auth: { token },
-        // transports: ["websocket"], // Allow fallback to polling for better reliability
       });
 
       socketRef.current.on("connect", () => setIsConnected(true));
@@ -63,22 +90,18 @@ export const useChat = (isOpen) => {
   }, [isOpen, token]);
 
   const sendMessage = (payload) => {
-    // 🛡️ Backward Compatibility: If payload is a string, convert to object
     const data = typeof payload === "string" ? { text: payload } : payload;
     const { text, image } = data;
 
-    console.log("🚀 Socket Emit Attempt:", { text, image, isConnected: socketRef.current?.connected });
     if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit("send_message", {
         text: text?.trim(),
         image,
         recipientId: "admin_room",
-        conversationId: conversationId,
+        conversationId,
       });
-    } else {
-      console.warn("🚨 Socket not connected or socketRef missing");
     }
   };
 
-  return { messages, isConnected, sendMessage, conversationId };
+  return { messages, isConnected, sendMessage, conversationId, loadMore, hasMore, isLoadingMore };
 };

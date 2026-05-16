@@ -45,8 +45,34 @@ export function ChatProvider({ children }) {
     }
   };
 
+  const startConversation = async (participantId) => {
+    try {
+      // Find if conversation already exists in our local state
+      const existing = conversations.find(c => 
+        c.participants.some(p => p._id === participantId)
+      );
+
+      if (existing) return existing._id;
+
+      // If not in local state (might be filtered out because no messages), 
+      // request backend to find or create
+      const res = await api.post("/chat/conversations/start", { participantId });
+      if (res.data.success) {
+        await fetchConversations();
+        return res.data.conversation._id;
+      }
+    } catch (err) {
+      console.error("Failed to start conversation", err);
+    }
+  };
+
   return (
-    <ChatContext.Provider value={{ conversations, socket: socketRef.current, fetchConversations }}>
+    <ChatContext.Provider value={{ 
+      conversations, 
+      socket: socketRef.current, 
+      fetchConversations,
+      startConversation 
+    }}>
       {children}
     </ChatContext.Provider>
   );

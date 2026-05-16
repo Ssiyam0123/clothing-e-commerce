@@ -2,6 +2,8 @@ import 'dotenv/config';
 import mongoose from 'mongoose';
 import http from 'http';
 import { Server } from 'socket.io';
+import { createAdapter } from "@socket.io/redis-adapter";
+import Redis from "ioredis";
 import app from './app.js';
 import { socketAuth } from './middleware/socketAuth.js'; 
 import { initSocketEvents } from './modules/chat/chat.socket.js'; 
@@ -20,6 +22,14 @@ const io = new Server(server, {
     credentials: true
   }
 });
+
+// 🚀 Horizontal Scaling: Redis Adapter
+if (process.env.REDIS_URL) {
+  const pubClient = new Redis(process.env.REDIS_URL);
+  const subClient = pubClient.duplicate();
+  io.adapter(createAdapter(pubClient, subClient));
+  console.log('📡 Redis Adapter Linked: Horizontal Scaling Enabled');
+}
 
 // 🛡️ Socket Middleware
 io.use(socketAuth);
