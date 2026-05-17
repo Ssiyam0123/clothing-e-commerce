@@ -1,8 +1,8 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useUsers } from "@/hooks/useUsers";
-import { useRoles } from "@/hooks/useRoles";
+import { useUsers } from "@/modules/client/auth/lib/useUsers";
+import { useRoles } from "@/modules/client/auth/lib/useRoles";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Loader from "@/components/common/Loader";

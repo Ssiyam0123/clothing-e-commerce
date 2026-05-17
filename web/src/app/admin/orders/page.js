@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useCallback, Suspense, useMemo } from "react";
-import { useAdminOrders } from "@/hooks/admin/useAdminOrders";
-import { useFilters } from "@/hooks/useFilters";
-import DataTable from "@/components/admin/DataTable";
+import { useAdminOrders } from "@/modules/admin/hooks/useAdminOrders";
+import { useFilters } from "@/modules/client/common/lib/useFilters";
+import DataTable from "@/modules/admin/components/DataTable";
 import TableSkeleton from "@/components/common/TableSkeleton";
 import FilterBar from "@/components/common/FilterBar";
 import Pagination from "@/components/common/Pagination";
-import StatusBadge from "@/components/admin/StatusBadge";
+import StatusBadge from "@/modules/admin/components/StatusBadge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, ShoppingBag, Edit2, Eye } from "lucide-react";

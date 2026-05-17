@@ -2,9 +2,9 @@
 
 import { useState, useMemo, useCallback, Suspense } from "react";
 import Link from "next/link";
-import { useUsers } from "@/hooks/useUsers";
-import { useFilters } from "@/hooks/useFilters";
-import DataTable from "@/components/admin/DataTable";
+import { useUsers } from "@/modules/client/auth/lib/useUsers";
+import { useFilters } from "@/modules/client/common/lib/useFilters";
+import DataTable from "@/modules/admin/components/DataTable";
 import TableSkeleton from "@/components/common/TableSkeleton";
 import FilterBar from "@/components/common/FilterBar";
 import Pagination from "@/components/common/Pagination";

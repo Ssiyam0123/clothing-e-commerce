@@ -1,8 +1,8 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useUsers } from "@/hooks/useUsers";
-import { useAdminOrders } from "@/hooks/admin/useAdminOrders";
+import { useUsers } from "@/modules/client/auth/lib/useUsers";
+import { useAdminOrders } from "@/modules/admin/hooks/useAdminOrders";
 import { useMemo } from "react";
 import Loader from "@/components/common/Loader";
 import Link from "next/link";
@@ -25,7 +25,7 @@ import { getImageUrl } from "@/utils/imageUtils";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/modules/client/common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
 export default function UserAuditPage() {

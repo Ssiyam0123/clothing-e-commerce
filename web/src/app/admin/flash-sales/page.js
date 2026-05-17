@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useAdminFlashSales } from "@/hooks/admin/useAdminFlashSales";
+import { useAdminFlashSales } from "@/modules/admin/hooks/useAdminFlashSales";
 import Link from "next/link";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
-import CountdownTimer from "@/components/store/CountdownTimer";
+import CountdownTimer from "@/modules/client/common/components/CountdownTimer";
 import { 
   Plus, 
   Trash2, 
@@ -42,7 +42,7 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/modules/client/common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
 export default function AdminFlashSales() {

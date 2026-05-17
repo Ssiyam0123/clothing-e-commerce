@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
+import { useAdminCategories } from "@/modules/admin/hooks/useAdminCategories";
 import { getImageUrl } from "@/utils/imageUtils";
 import { swalToast, swalError } from "@/utils/swal";
 import { Input } from "@/components/ui/input";

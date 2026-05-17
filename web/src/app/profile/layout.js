@@ -1,8 +1,9 @@
 "use client";
 
 import { useAppStore } from "@/store/appStore";
-import { useAuthStore } from "@/store/authStore";
-import ProfileHeader from "@/components/profile/ProfileHeader";
+import { useAuthStore } from "@/modules/client/auth/lib/authStore";
+import ProfileHeader from "@/modules/client/profile/components/ProfileHeader";
+import ProfileMobileNav from "@/modules/client/profile/components/ProfileMobileNav";
 import Loader from "@/components/common/Loader";
 import { useMemo, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -116,50 +117,7 @@ export default function ProfileLayout({ children }) {
       </div>
 
       {/* 📱 Universal Floating Navigation - App-like experience */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-lg">
-        <nav className="bg-background/80 backdrop-blur-2xl border border-border/10 p-2 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center justify-around overflow-hidden relative group">
-          <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-accent-secondary/5 -z-10" />
-          
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "relative flex flex-col items-center gap-1.5 py-3 px-5 rounded-2xl transition-all duration-500 flex-1",
-                item.active 
-                  ? "text-foreground" 
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {item.active && (
-                <motion.div
-                  layoutId="mobileActiveNav"
-                  className="absolute inset-0 bg-accent/10 -z-10"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                />
-              )}
-              
-              <item.icon className={cn(
-                "w-5 h-5 transition-all duration-500",
-                item.active ? "text-accent-secondary scale-110" : "group-hover:scale-110"
-              )} />
-              <span className={cn(
-                "text-[8px] font-black uppercase tracking-widest",
-                item.active ? "opacity-100" : "opacity-60"
-              )}>
-                {item.label.split(' ')[1] || item.label}
-              </span>
-
-              {item.active && (
-                <motion.div 
-                  layoutId="activeIndicator"
-                  className="absolute -bottom-1 w-1 h-1 bg-accent-secondary rounded-full" 
-                />
-              )}
-            </Link>
-          ))}
-        </nav>
-      </div>
+      <ProfileMobileNav navItems={navItems} />
     </div>
   );
 }

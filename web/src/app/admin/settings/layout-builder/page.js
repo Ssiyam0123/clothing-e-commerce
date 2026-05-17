@@ -55,7 +55,7 @@ import {
 import { cn } from "@/lib/utils";
 import { notify } from "@/utils/swal";
 import api from "@/lib/api";
-import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
+import { useAdminCategories } from "@/modules/admin/hooks/useAdminCategories";
 
 /**
  * 🏗️ Architect Sortable Section Item

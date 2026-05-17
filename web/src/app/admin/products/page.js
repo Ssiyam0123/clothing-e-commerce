@@ -2,12 +2,12 @@
 
 import { Suspense } from "react";
 import Link from "next/link";
-import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
-import DataTable from "@/components/admin/DataTable";
+import { useAdminProducts } from "@/modules/admin/hooks/useAdminProducts";
+import DataTable from "@/modules/admin/components/DataTable";
 import TableSkeleton from "@/components/common/TableSkeleton";
 import Pagination from "@/components/common/Pagination";
-import AdminProductFilter from "@/components/admin/AdminProductFilter";
-import StatusBadge from "@/components/admin/StatusBadge";
+import AdminProductFilter from "@/modules/admin/components/AdminProductFilter";
+import StatusBadge from "@/modules/admin/components/StatusBadge";
 import { getImageUrl } from "@/utils/imageUtils";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import { Skeleton } from "@/components/ui/skeleton";

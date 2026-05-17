@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useCoupons } from "@/hooks/useCoupons";
+import { useCoupons } from "@/modules/client/common/lib/useCoupons";
 import Loader from "@/components/common/Loader";
 import { Badge } from "@/components/ui/badge";
 import { swalToast, swalError } from "@/utils/swal";

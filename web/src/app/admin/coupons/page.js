@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCoupons } from "@/hooks/useCoupons";
-import DataTable from "@/components/admin/DataTable";
+import { useCoupons } from "@/modules/client/common/lib/useCoupons";
+import DataTable from "@/modules/admin/components/DataTable";
 import TableSkeleton from "@/components/common/TableSkeleton";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import { 
@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/modules/client/common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
 export default function CouponArchive() {

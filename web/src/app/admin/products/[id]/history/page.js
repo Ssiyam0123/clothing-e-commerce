@@ -1,7 +1,7 @@
 "use client";
 
 import { use } from "react";
-import { useProductHistory } from "@/hooks/admin/useProductHistory";
+import { useProductHistory } from "@/modules/admin/hooks/useProductHistory";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { 
@@ -16,8 +16,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { getImageUrl } from "@/utils/imageUtils";
-import DataTable from "@/components/admin/DataTable";
-import StatusBadge from "@/components/admin/StatusBadge";
+import DataTable from "@/modules/admin/components/DataTable";
+import StatusBadge from "@/modules/admin/components/StatusBadge";
 import { cn } from "@/lib/utils";
 import Pagination from "@/components/common/Pagination";
 import { useState } from "react";

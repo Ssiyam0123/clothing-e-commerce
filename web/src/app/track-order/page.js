@@ -14,11 +14,11 @@ import {
   Phone,
   FileText
 } from "lucide-react";
-import { useOrders } from "@/hooks/client/useOrders";
+import { useOrders } from "@/modules/client/common/lib/useOrders";
 import { getImageUrl } from "@/utils/imageUtils";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import OrderDetailsDialog from "@/components/profile/OrderDetailsDialog";
+import OrderDetailsDialog from "@/modules/client/profile/components/OrderDetailsDialog";
 import { useRouter } from "next/navigation";
 
 export default function TrackOrderPage() {

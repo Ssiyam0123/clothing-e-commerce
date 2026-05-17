@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useBlogs } from "@/hooks/useBlogs";
-import RichTextEditor from "@/components/admin/RichTextEditor";
+import { useBlogs } from "@/modules/client/common/lib/useBlogs";
+import RichTextEditor from "@/modules/admin/components/RichTextEditor";
 import Loader from "@/components/common/Loader";
 import { ShieldCheck, ArrowLeft, RefreshCcw, ImageIcon, Globe, Save, Trash2, Plus, Zap } from "lucide-react";
 import { getImageUrl } from "@/utils/imageUtils";

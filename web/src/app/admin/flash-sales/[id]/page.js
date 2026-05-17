@@ -3,8 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { useAdminFlashSales } from "@/hooks/admin/useAdminFlashSales";
-import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
+import { useAdminFlashSales } from "@/modules/admin/hooks/useAdminFlashSales";
+import { useAdminProducts } from "@/modules/admin/hooks/useAdminProducts";
 import { useDebounce } from "@/hooks/useDebounce";
 import Loader from "@/components/common/Loader";
 import { getImageUrl } from "@/utils/imageUtils";

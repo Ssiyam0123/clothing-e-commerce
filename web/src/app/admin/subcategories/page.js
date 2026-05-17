@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useSubcategories } from "@/hooks/useSubcategories";
-import DataTable from "@/components/admin/DataTable";
+import { useSubcategories } from "@/modules/client/common/lib/useSubcategories";
+import DataTable from "@/modules/admin/components/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,7 +14,7 @@ import {
 import { swalConfirm, swalToast } from "@/utils/swal";
 import { cn } from "@/lib/utils";
 
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/modules/client/common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
 export default function Subcategories() {

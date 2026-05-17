@@ -3,8 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { useAdminOrders } from "@/hooks/admin/useAdminOrders";
-import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
+import { useAdminOrders } from "@/modules/admin/hooks/useAdminOrders";
+import { useAdminProducts } from "@/modules/admin/hooks/useAdminProducts";
 import { getImageUrl } from "@/utils/imageUtils";
 import { swalToast, swalError } from "@/utils/swal";
 import Loader from "@/components/common/Loader";

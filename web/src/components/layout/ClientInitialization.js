@@ -2,11 +2,11 @@
 
 import { useEffect } from "react";
 import { useAppStore } from "@/store/appStore";
-import { useAuthStore } from "@/store/authStore";
-import { useChatStore } from "@/store/chatStore";
+import { useAuthStore } from "@/modules/client/auth/lib/authStore";
+import { useChatStore } from "@/modules/client/chat/lib/chatStore";
 import dynamic from "next/dynamic";
 
-const SupportChat = dynamic(() => import("@/components/chat/SupportChat"), {
+const SupportChat = dynamic(() => import("@/modules/client/chat/components/SupportChat"), {
   ssr: false
 });
 

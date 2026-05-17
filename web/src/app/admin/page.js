@@ -2,44 +2,44 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { useAdminDashboard } from "@/hooks/useAdminDashboard";
-import { AdminHeader } from "@/components/admin/dashboard/AdminHeader";
-import { StatsCards } from "@/components/admin/dashboard/StatsCards";
+import { useAdminDashboard } from "@/modules/admin/hooks/useAdminDashboard";
+import { AdminHeader } from "@/modules/admin/components/dashboard/AdminHeader";
+import { StatsCards } from "@/modules/admin/components/dashboard/StatsCards";
 import { hasPermission } from "@/utils/rbacUtils";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/modules/client/auth/lib/authStore";
 import { getFirstAllowedRoute } from "@/utils/adminRoutes";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/common/Loader";
 
 // Dynamically import heavy components for better first load performance
-const RevenueChart = dynamic(() => import("@/components/admin/dashboard/RevenueChart").then(mod => mod.RevenueChart), {
+const RevenueChart = dynamic(() => import("@/modules/admin/components/dashboard/RevenueChart").then(mod => mod.RevenueChart), {
   ssr: false,
   loading: () => <div className="min-h-[300px] md:min-h-[480px] w-full bg-card animate-pulse rounded-[3rem] border border-border" />
 });
 
-const CategoryPie = dynamic(() => import("@/components/admin/dashboard/CategoryPie").then(mod => mod.CategoryPie), {
+const CategoryPie = dynamic(() => import("@/modules/admin/components/dashboard/CategoryPie").then(mod => mod.CategoryPie), {
   ssr: false,
   loading: () => <div className="min-h-[300px] md:min-h-[400px] w-full bg-card animate-pulse rounded-[3rem] border border-border" />
 });
 
-const RecentOrders = dynamic(() => import("@/components/admin/dashboard/RecentOrders").then(mod => mod.RecentOrders), {
+const RecentOrders = dynamic(() => import("@/modules/admin/components/dashboard/RecentOrders").then(mod => mod.RecentOrders), {
   ssr: false
 });
 
-const InventoryAlerts = dynamic(() => import("@/components/admin/dashboard/InventoryAlerts").then(mod => mod.InventoryAlerts), {
+const InventoryAlerts = dynamic(() => import("@/modules/admin/components/dashboard/InventoryAlerts").then(mod => mod.InventoryAlerts), {
   ssr: false
 });
 
-const TopSellingCategories = dynamic(() => import("@/components/admin/dashboard/TopSellingCategories").then(mod => mod.TopSellingCategories), {
+const TopSellingCategories = dynamic(() => import("@/modules/admin/components/dashboard/TopSellingCategories").then(mod => mod.TopSellingCategories), {
   ssr: false
 });
 
-const UserGrowthChart = dynamic(() => import("@/components/admin/dashboard/UserGrowthChart").then(mod => mod.UserGrowthChart), {
+const UserGrowthChart = dynamic(() => import("@/modules/admin/components/dashboard/UserGrowthChart").then(mod => mod.UserGrowthChart), {
   ssr: false
 });
 
-const UsersTable = dynamic(() => import("@/components/admin/dashboard/UsersTable").then(mod => mod.UsersTable), {
+const UsersTable = dynamic(() => import("@/modules/admin/components/dashboard/UsersTable").then(mod => mod.UsersTable), {
   ssr: false
 });
 

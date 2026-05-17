@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/modules/client/auth/lib/authStore";
 import { 
   Shield, 
   Plus, 

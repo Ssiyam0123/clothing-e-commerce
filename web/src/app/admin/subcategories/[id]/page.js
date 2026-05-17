@@ -3,8 +3,8 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { useSubcategories } from "@/hooks/useSubcategories";
-import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
+import { useSubcategories } from "@/modules/client/common/lib/useSubcategories";
+import { useAdminCategories } from "@/modules/admin/hooks/useAdminCategories";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";

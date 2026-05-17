@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
-import { useSubcategories } from "@/hooks/useSubcategories";
-import { useSizes } from "@/hooks/useSizes";
+import { useAdminCategories } from "@/modules/admin/hooks/useAdminCategories";
+import { useSubcategories } from "@/modules/client/common/lib/useSubcategories";
+import { useSizes } from "@/modules/client/common/lib/useSizes";
 import { getImageUrl } from "@/utils/imageUtils";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit2, Trash2, Layers, Maximize2, Hash, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/modules/client/common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
 export default function CategoryMasterControl() {

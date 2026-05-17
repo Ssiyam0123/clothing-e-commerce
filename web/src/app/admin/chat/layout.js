@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { getImageUrl } from "@/utils/imageUtils";
 import { ChatProvider, useChat } from "./ChatContext";
 import api from "@/lib/api";
-import { useChatStore } from "@/store/chatStore";
+import { useChatStore } from "@/modules/client/chat/lib/chatStore";
 
 export default function ChatLayout({ children }) {
   return (

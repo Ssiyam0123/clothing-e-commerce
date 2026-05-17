@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useAdminBannerCampaigns } from "@/hooks/useAdminBannerCampaigns";
+import { useAdminBannerCampaigns } from "@/modules/admin/hooks/useAdminBannerCampaigns";
 import { getImageUrl } from "@/utils/imageUtils";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import { 
@@ -24,7 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/modules/client/common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
 export default function AdminBannerCampaigns() {

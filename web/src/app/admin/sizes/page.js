@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useSizes } from "@/hooks/useSizes";
-import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
-import DataTable from "@/components/admin/DataTable";
+import { useSizes } from "@/modules/client/common/lib/useSizes";
+import { useAdminCategories } from "@/modules/admin/hooks/useAdminCategories";
+import DataTable from "@/modules/admin/components/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,7 +17,7 @@ import {
 import { swalConfirm, swalToast } from "@/utils/swal";
 import { cn } from "@/lib/utils";
 
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/modules/client/common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
 export default function Sizes() {

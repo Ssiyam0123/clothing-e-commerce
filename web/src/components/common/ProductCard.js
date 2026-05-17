@@ -8,9 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getImageUrl } from "@/utils/imageUtils";
 import { cn } from "@/lib/utils";
-import WishlistButtonClient from "@/components/products/WishlistButtonClient";
-import SizeSelectionModal from "@/components/products/SizeSelectionModal";
-import { useAuthStore } from "@/store/authStore";
+import WishlistButton from "@/modules/client/wishlist/components/WishlistButton";
+import QuickSelectModal from "@/modules/client/products/components/QuickSelectModal";
+import { useAuthStore } from "@/modules/client/auth/lib/authStore";
 import { useAppStore } from "@/store/appStore";
 import { getTranslation } from "@/utils/typography/handler";
 
@@ -81,7 +81,7 @@ export default function ProductCard({ product, className }) {
 
           {/* Wishlist Button */}
           <div className="absolute top-2 right-2 z-20">
-            <WishlistButtonClient product={product} />
+            <WishlistButton product={product} lang={lang} />
           </div>
         </div>
 
@@ -155,11 +155,12 @@ export default function ProductCard({ product, className }) {
       </div>
 
       {isModalOpen && (
-        <SizeSelectionModal 
+        <QuickSelectModal 
           product={product}
           isOpen={isModalOpen}
-          onOpenChange={setIsModalOpen}
+          onClose={() => setIsModalOpen(false)}
           mode={modalMode}
+          lang={lang}
         />
       )}
     </>

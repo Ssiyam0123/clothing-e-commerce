@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useBlogs } from "@/hooks/useBlogs";
-import RichTextEditor from "@/components/admin/RichTextEditor";
+import { useBlogs } from "@/modules/client/common/lib/useBlogs";
+import RichTextEditor from "@/modules/admin/components/RichTextEditor";
 import {
   ShieldCheck,
   ArrowLeft,

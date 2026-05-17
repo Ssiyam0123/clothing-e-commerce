@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
-import { useCoupons } from "@/hooks/useCoupons";
+import { useCoupons } from "@/modules/client/common/lib/useCoupons";
 import Loader from "@/components/common/Loader";
 import Link from "next/link";
 import { 

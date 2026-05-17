@@ -3,10 +3,10 @@
 import { useParams, useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { useEffect, useState, useMemo } from "react";
-import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
-import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
-import { useSubcategories } from "@/hooks/useSubcategories";
-import { useSizes } from "@/hooks/useSizes";
+import { useAdminProducts } from "@/modules/admin/hooks/useAdminProducts";
+import { useAdminCategories } from "@/modules/admin/hooks/useAdminCategories";
+import { useSubcategories } from "@/modules/client/common/lib/useSubcategories";
+import { useSizes } from "@/modules/client/common/lib/useSizes";
 import Loader from "@/components/common/Loader";
 import { getImageUrl } from "@/utils/imageUtils";
 import { swalToast, swalError } from "@/utils/swal";

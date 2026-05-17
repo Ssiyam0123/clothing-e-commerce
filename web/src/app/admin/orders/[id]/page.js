@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { useAdminOrders } from "@/hooks/admin/useAdminOrders";
+import { useAdminOrders } from "@/modules/admin/hooks/useAdminOrders";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import Loader from "@/components/common/Loader";
 import { getImageUrl } from "@/utils/imageUtils";

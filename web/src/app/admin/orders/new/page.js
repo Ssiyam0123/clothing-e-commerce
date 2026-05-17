@@ -2,11 +2,11 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAdminOrders } from "@/hooks/admin/useAdminOrders";
-import { useProducts } from "@/hooks/client/useProducts";
-import { useUsers } from "@/hooks/useUsers";
-import { usePathao } from "@/hooks/usePathao";
-import { useCoupons } from "@/hooks/useCoupons";
+import { useAdminOrders } from "@/modules/admin/hooks/useAdminOrders";
+import { useProducts } from "@/modules/client/common/lib/useProducts";
+import { useUsers } from "@/modules/client/auth/lib/useUsers";
+import { usePathao } from "@/modules/client/checkout/lib/usePathao";
+import { useCoupons } from "@/modules/client/common/lib/useCoupons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 

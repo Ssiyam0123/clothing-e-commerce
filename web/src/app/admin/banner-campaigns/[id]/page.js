@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useAdminBannerCampaigns } from "@/hooks/useAdminBannerCampaigns";
+import { useAdminBannerCampaigns } from "@/modules/admin/hooks/useAdminBannerCampaigns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";

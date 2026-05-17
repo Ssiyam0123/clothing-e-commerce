@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { swalToast, swalError } from "@/utils/swal";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/modules/client/auth/lib/authStore";
 import { useAppStore } from "@/store/appStore";
 import { getTranslation } from "@/utils/typography/handler";
 

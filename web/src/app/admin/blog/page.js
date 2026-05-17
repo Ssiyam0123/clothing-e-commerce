@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useBlogs } from "@/hooks/useBlogs";
+import { useBlogs } from "@/modules/client/common/lib/useBlogs";
 import {
   Plus,
   Search,
@@ -50,7 +50,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/modules/client/common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
 export default function AdminBlogDashboard() {
