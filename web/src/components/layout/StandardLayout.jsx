@@ -2,7 +2,7 @@
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import SupportChat from "@/modules/client/chat/components/SupportChat";
+import SupportChat from "@/app/_chat/components/SupportChat";
 import { useSettings } from "@/hooks/useSettings";
 
 export default function StandardLayout({ children }) {

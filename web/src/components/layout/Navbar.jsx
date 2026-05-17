@@ -6,10 +6,10 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 
 import { Search, ShoppingBag, User, Menu, X, Sun, Moon, Sparkles, Heart, ChevronRight, Shield, LifeBuoy, LogOut, Languages } from "lucide-react";
-import { useAuthStore } from "@/modules/client/auth/lib/authStore";
+import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
-import { useProductStore } from "@/modules/client/common/lib/productStore";
-import { useChatStore } from "@/modules/client/chat/lib/chatStore";
+import { useProductStore } from "@/store/productStore";
+import { useChatStore } from "@/store/chatStore";
 import { hasAnyAdminPermission } from "@/utils/rbacUtils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

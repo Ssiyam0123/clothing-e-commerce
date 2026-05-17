@@ -6,9 +6,9 @@ import { getImageUrl } from "@/utils/imageUtils";
 import api from "@/lib/api";
 import Alert from "@/components/common/Alert";
 import Loader from "@/components/common/Loader";
-import ProtectedRoute from "@/modules/admin/components/ProtectedRoute";
+import ProtectedRoute from "@/app/admin/_components/ProtectedRoute";
 import AdminLayout from "../layout";
-import { useAuthStore } from "@/modules/client/auth/lib/authStore";
+import { useAuthStore } from "@/store/authStore";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { 

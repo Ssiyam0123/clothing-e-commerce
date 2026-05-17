@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useAppStore } from "@/store/appStore";
-import { useAuthStore } from "@/modules/client/auth/lib/authStore";
+import { useAuthStore } from "@/store/authStore";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import SupportChat from "@/modules/client/chat/components/SupportChat";
+import SupportChat from "@/app/_chat/components/SupportChat";
 
 export default function ClientWrapper({ children }) {
   const [mounted, setMounted] = useState(false);

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
-import { useAuthStore } from "@/modules/client/auth/lib/authStore";
+import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 
 const ChatContext = createContext();

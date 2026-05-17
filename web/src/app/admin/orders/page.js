@@ -1,10 +1,10 @@
-import OrdersPage from "@/modules/admin/orders/pages/OrdersPage";
+import OrdersPageClient from "./components/OrdersPageClient";
 
 export const metadata = {
   title: "Admin Orders | Vanguard",
   description: "Manage orders",
 };
 
-export default function Page() {
-  return <OrdersPage />;
+export default function Page(props) {
+  return <OrdersPageClient {...props} />;
 }

@@ -1,9 +1,9 @@
 "use client";
 
 import { useAppStore } from "@/store/appStore";
-import { useAuthStore } from "@/modules/client/auth/lib/authStore";
-import ProfileHeader from "@/modules/client/profile/components/ProfileHeader";
-import ProfileMobileNav from "@/modules/client/profile/components/ProfileMobileNav";
+import { useAuthStore } from "@/store/authStore";
+import ProfileHeader from "@/app/profile/components/ProfileHeader";
+import ProfileMobileNav from "@/app/profile/components/ProfileMobileNav";
 import Loader from "@/components/common/Loader";
 import { useMemo, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";

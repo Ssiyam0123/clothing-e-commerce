@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import api from "@/lib/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import FormInput from "@/modules/admin/components/FormInput";
+import FormInput from "@/app/admin/_components/FormInput";
 import { cn } from "@/lib/utils";
 
 export default function SMTPPage() {

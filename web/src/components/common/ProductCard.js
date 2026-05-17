@@ -8,9 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getImageUrl } from "@/utils/imageUtils";
 import { cn } from "@/lib/utils";
-import WishlistButton from "@/modules/client/wishlist/components/WishlistButton";
-import QuickSelectModal from "@/modules/client/products/components/QuickSelectModal";
-import { useAuthStore } from "@/modules/client/auth/lib/authStore";
+import WishlistButton from "@/app/wishlist/components/WishlistButton";
+import QuickSelectModal from "@/app/products/components/QuickSelectModal";
+import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { getTranslation } from "@/utils/typography/handler";
 

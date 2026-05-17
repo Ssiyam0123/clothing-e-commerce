@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useOrders } from "@/modules/client/common/lib/useOrders";
+import { useOrders } from "@/app/_common/lib/useOrders";
 import { getImageUrl } from "@/utils/imageUtils";
 import { motion } from "framer-motion";
 import {
@@ -15,7 +15,7 @@ import {
   FileText,
   Download
 } from "lucide-react";
-import { useProductStore } from "@/modules/client/common/lib/productStore";
+import { useProductStore } from "@/store/productStore";
 import { useTrackingStore } from "@/store/trackingStore";
 import { getTranslation } from "@/utils/typography/handler";
 import { Skeleton } from "@/components/ui/skeleton";

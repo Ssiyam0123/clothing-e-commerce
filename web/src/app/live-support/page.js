@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
-import { useChat } from "@/modules/client/chat/lib/useChat";
-import { useAuthStore } from "@/modules/client/auth/lib/authStore";
+import { useChat } from "@/app/_chat/lib/useChat";
+import { useAuthStore } from "@/store/authStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Lock, MessageSquare, Shield, Clock, Zap, ArrowLeft, Headphones, Image as ImageIcon, Loader2, Check, CheckCheck } from "lucide-react";
 import Link from "next/link";

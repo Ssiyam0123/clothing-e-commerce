@@ -1,5 +1,3 @@
-import ProfileDetailsPage from "@/modules/client/profile/pages/ProfileDetailsPage";
+import ProfileDetailsPage from "../page";
 
-export default function Page() {
-  return <ProfileDetailsPage />;
-}
+export default ProfileDetailsPage;
