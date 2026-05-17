@@ -132,16 +132,3 @@ export const deleteCampaign = asyncHandler(async (req, res) => {
 
   res.json({ message: 'Campaign and its assets deleted' });
 });
-
-export const toggleActive = asyncHandler(async (req, res) => {
-  const campaign = await BannerCampaign.findById(req.params.id);
-  if (!campaign) return res.status(404).json({ message: 'Campaign not found' });
-  campaign.isActive = !campaign.isActive;
-  await campaign.save();
-
-  // Clear caches
-  clearCache('cache:/api/banner-campaigns*');
-  clearCache('cache:/api/home-layout*');
-
-  res.json(campaign);
-});

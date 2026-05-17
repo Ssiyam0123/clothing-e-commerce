@@ -86,6 +86,10 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  banner: {
+    image: String,
+    link: String,
+  },
 }, { timestamps: true });
 
 // Text index for search

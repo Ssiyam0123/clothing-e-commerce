@@ -22,14 +22,19 @@ const FlashSaleSkeleton = () => (
   </div>
 );
 
-export default async function FlashSalePage() {
-  const initialData = await getFlashSales();
+export default function FlashSalePage() {
+  const dataPromise = getFlashSales();
 
   return (
     <main className="min-h-screen bg-page transition-colors duration-700">
       <Suspense fallback={<FlashSaleSkeleton />}>
-        <FlashSaleView initialData={initialData} />
+        <FlashSaleDataWrapper dataPromise={dataPromise} />
       </Suspense>
     </main>
   );
+}
+
+async function FlashSaleDataWrapper({ dataPromise }) {
+  const initialData = await dataPromise;
+  return <FlashSaleView initialData={initialData} />;
 }

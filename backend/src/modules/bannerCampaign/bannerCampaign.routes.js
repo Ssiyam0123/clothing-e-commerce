@@ -6,7 +6,6 @@ import {
   createCampaign,
   updateCampaign,
   deleteCampaign,
-  toggleActive,
 } from './bannerCampaign.controller.js';
 import { protect } from '../../middleware/auth.js';
 import { authorize } from '../../middleware/rbac.js';
@@ -27,7 +26,5 @@ router.route('/')
 router.route('/:id')
   .put(protect, authorize('banner-campaigns:update'), upload.array('slideImages', 20), updateCampaign)
   .delete(protect, authorize('banner-campaigns:delete'), deleteCampaign);
-
-router.patch('/:id/toggle', protect, authorize('banner-campaigns:update'), toggleActive);
 
 export default router;

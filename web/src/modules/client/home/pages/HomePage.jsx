@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { getTranslation } from "@/utils/typography/handler";
 import { getLayoutData } from "@/modules/client/home/lib/homeApi";
 import UspSection from "@/modules/client/home/components/UspSection";
-import { GridSkeleton, HeroSkeleton } from "@/components/common/Skeletons";
+import { GridSkeleton, HeroSkeleton, FlashBannerSkeleton } from "@/components/common/Skeletons";
 import SectionHeader from "@/components/common/SectionHeader";
 import { cn } from "@/lib/utils";
 
@@ -118,7 +118,7 @@ export default async function HomePage() {
             case "PROMO_BANNER": {
               return (
                 <section className={cn("w-full", idx > 0 && standardMargin)} key={section.id} aria-label="Campaign Banner">
-                  <Suspense fallback={<HeroSkeleton />}>
+                  <Suspense fallback={<FlashBannerSkeleton />}>
                     <PromoBannerSection {...sectionProps} />
                   </Suspense>
                 </section>

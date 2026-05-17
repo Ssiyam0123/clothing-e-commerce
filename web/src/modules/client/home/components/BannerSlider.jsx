@@ -20,28 +20,49 @@ export default function BannerSlider({ slides = [], buttonText = "Shop Now", lan
     setMounted(true);
   }, []);
 
-  // Hydration fallback matches the new auto-height structure
+  if (!slides || slides.length === 0) return null;
+
+  const firstSlide = slides[0];
+
+  // Hydration fallback matches the actual Swiper DOM structure and exact image parameters
   if (!mounted) {
-    const firstSlide = slides[0];
     return (
-      <div className="w-full bg-zinc-900">
-        {firstSlide && (
-          <Image
-            src={getImageUrl(firstSlide.image, 1920)}
-            alt={firstSlide.title || "Banner Image"}
-            width={0}
-            height={0}
-            sizes="100vw"
-            style={{ width: "100%", height: "auto" }}
-            priority
-            className="w-full h-auto"
-          />
-        )}
-      </div>
+      <section className="relative w-full overflow-hidden group/slider" aria-label="Main Banner Slider Placeholder">
+        <div className="w-full bg-black overflow-hidden flex justify-center items-center">
+          {firstSlide && (
+            firstSlide.link ? (
+              <Link href={firstSlide.link} className="block w-full">
+                <Image
+                  src={getImageUrl(firstSlide.image, 1920, 100)}
+                  alt={firstSlide.title || "Banner Image"}
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  style={{ width: "100%", height: "auto" }}
+                  priority
+                  quality={100}
+                  className="w-full h-auto"
+                />
+              </Link>
+            ) : (
+              <Image
+                src={getImageUrl(firstSlide.image, 1920, 100)}
+                alt={firstSlide.title || "Banner Image"}
+                width={0}
+                height={0}
+                sizes="100vw"
+                style={{ width: "100%", height: "auto" }}
+                priority
+                quality={100}
+                className="w-full h-auto"
+              />
+            )
+          )}
+        </div>
+      </section>
     );
   }
 
-  if (!slides || slides.length === 0) return null;
 
   return (
     <section className="relative w-full overflow-hidden group/slider" aria-label="Main Banner Slider">

@@ -82,7 +82,7 @@ export const normalizeShippingAddress = (addr) => ({
     name: addr.name, 
     email: addr.email, 
     phone: addr.phone,
-    address: addr.address
+    address: addr.address || [addr.street, addr.city].filter(Boolean).join(", ")
 });
 
 export const finalizeOrderProcessing = async (order, session = null) => {
