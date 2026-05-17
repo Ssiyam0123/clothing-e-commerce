@@ -1,10 +1,35 @@
-import BlogFormPageClient from "./components/BlogFormPageClient";
+"use client";
 
-export const metadata = {
-  title: "Initialize Narrative | Admin Panel",
-  description: "Create a new narrative sequence in the journal archives.",
-};
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAdminBlogs } from "@/app/admin/blog/lib/useAdminBlogs";
+import { swalError, swalToast } from "@/utils/swal";
+import BlogForm from "../components/BlogForm";
 
-export default function Page(props) {
-  return <BlogFormPageClient {...props} />;
+export default function BlogCreatePage() {
+  const router = useRouter();
+  const { createBlog } = useAdminBlogs();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (formData) => {
+    setIsSubmitting(true);
+    try {
+      await createBlog.mutateAsync(formData);
+      swalToast("Narrative deployed successfully!", "success");
+      router.push("/admin/blog");
+    } catch (err) {
+      const message = err.response?.data?.message || "Deployment failed. Check your inputs.";
+      swalError("Publication Failed", message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <BlogForm
+      onSubmit={handleSubmit}
+      isSubmitting={isSubmitting}
+      mode="create"
+    />
+  );
 }

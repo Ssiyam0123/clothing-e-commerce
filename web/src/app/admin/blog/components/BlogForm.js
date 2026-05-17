@@ -2,18 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAdminBlogs } from "@/app/admin/blog/lib/useAdminBlogs";
-import RichTextEditor from "@/app/admin/_components/RichTextEditor";
-import {
-  ArrowLeft,
-  Globe,
-  ImageIcon,
-  Loader2,
-  Plus,
-  Save,
-  Zap
-} from "lucide-react";
-import { swalError, swalToast } from "@/utils/swal";
+import RichTextEditor from "./RichTextEditor";
+import { ArrowLeft, Globe, ImageIcon, Loader2, Plus, Save, Zap } from "lucide-react";
+import { swalError } from "@/utils/swal";
+import { getImageUrl } from "@/utils/imageUtils";
 
 // Shadcn UI Imports
 import { Button } from "@/components/ui/button";
@@ -26,20 +18,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-export default function BlogFormPage() {
+export default function BlogForm({ blog = null, onSubmit, isSubmitting, mode = "create" }) {
   const router = useRouter();
-  const { createBlog } = useAdminBlogs();
 
-  const [imagePreview, setImagePreview] = useState(null);
+  const isEdit = mode === "edit";
+
+  const [imagePreview, setImagePreview] = useState(
+    isEdit && blog ? getImageUrl(blog.featuredImage) : null
+  );
   const [imageFile, setImageFile] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
-    title: "",
-    content: "",
-    category: "LIFESTYLE",
-    status: "PUBLISHED",
-    isFeatured: false,
-    seo: { metaTitle: "", metaDescription: "" },
+    title: blog?.title || "",
+    content: blog?.content || "",
+    category: blog?.category || "LIFESTYLE",
+    status: blog?.status || "PUBLISHED",
+    isFeatured: blog?.isFeatured || false,
+    seo: {
+      metaTitle: blog?.seo?.metaTitle || "",
+      metaDescription: blog?.seo?.metaDescription || "",
+    },
   });
 
   const handleImageChange = (e) => {
@@ -53,20 +51,15 @@ export default function BlogFormPage() {
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
 
-    if (!imageFile) {
+    if (!isEdit && !imageFile) {
       return swalError("Visual Missing", "Please select a featured image.");
     }
     if (!formData.title.trim()) {
       return swalError("Missing Title", "The narrative needs a title.");
     }
     if (!formData.content.trim()) {
-      return swalError(
-        "Empty Content",
-        "Please write something before publishing.",
-      );
+      return swalError("Empty Content", "Please write something before publishing.");
     }
-
-    setIsSubmitting(true);
 
     const data = new FormData();
     data.append("title", formData.title);
@@ -75,19 +68,12 @@ export default function BlogFormPage() {
     data.append("status", formData.status);
     data.append("isFeatured", formData.isFeatured);
     data.append("seo", JSON.stringify(formData.seo));
-    data.append("image", imageFile);
-
-    try {
-      await createBlog.mutateAsync(data);
-      swalToast("Narrative deployed successfully!", "success");
-      router.push("/admin/blog");
-    } catch (err) {
-      const message =
-        err.response?.data?.message || "Deployment failed. Check your inputs.";
-      swalError("Publication Failed", message);
-    } finally {
-      setIsSubmitting(false);
+    
+    if (imageFile) {
+      data.append("image", imageFile);
     }
+
+    onSubmit(data);
   };
 
   return (
@@ -108,10 +94,12 @@ export default function BlogFormPage() {
           <div>
             <div className="flex items-center gap-3 mb-2">
                <Badge className="text-[9px] font-black uppercase tracking-widest bg-rose-600/10 text-rose-600 border-none px-3 py-1">Admin Node</Badge>
-               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">/ INITIALIZE_SEQUENCE</span>
+               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">
+                 / {isEdit ? "Archive_Edit" : "INITIALIZE_SEQUENCE"}
+               </span>
             </div>
             <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter italic leading-none">
-              New <span className="text-rose-600">Narrative</span>
+              {isEdit ? <>Edit <span className="text-rose-600">Sequence</span></> : <>New <span className="text-rose-600">Narrative</span></>}
             </h1>
           </div>
         </div>
@@ -131,10 +119,12 @@ export default function BlogFormPage() {
            >
             {isSubmitting ? (
               <Loader2 className="animate-spin mr-3" size={16} />
+            ) : isEdit ? (
+              <Save className="mr-3 transition-transform group-hover/btn:scale-125" size={16} />
             ) : (
               <Zap className="mr-3 transition-transform group-hover/btn:scale-125" size={16} />
             )}
-            Authorize Sequence
+            {isEdit ? "Push to Archive" : "Authorize Sequence"}
            </Button>
         </div>
       </header>
@@ -322,6 +312,3 @@ export default function BlogFormPage() {
     </div>
   );
 }
-
-
-
