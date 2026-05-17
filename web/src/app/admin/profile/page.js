@@ -6,7 +6,7 @@ import { getImageUrl } from "@/utils/imageUtils";
 import api from "@/lib/api";
 import Alert from "@/components/common/Alert";
 import Loader from "@/components/common/Loader";
-import ProtectedRoute from "@/components/admin/ProtectedRoute";
+import ProtectedRoute from "@/app/admin/_components/ProtectedRoute";
 import AdminLayout from "../layout";
 import { useAuthStore } from "@/store/authStore";
 import { Badge } from "@/components/ui/badge";

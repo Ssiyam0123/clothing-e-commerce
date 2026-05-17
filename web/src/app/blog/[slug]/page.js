@@ -54,6 +54,7 @@ export async function generateMetadata({ params }) {
 export default async function BlogPage({ params }) {
   const { slug } = await params;
   let blog = null;
+  let relatedPosts = [];
 
   try {
     const res = await fetch(`${API_URL}/blogs/${slug}`, {
@@ -64,6 +65,17 @@ export default async function BlogPage({ params }) {
       throw new Error(`HTTP ${res.status}`);
     }
     blog = await res.json();
+    // fetch related posts by category (exclude current slug)
+    try {
+      const relatedRes = await fetch(`${API_URL}/blogs?category=${encodeURIComponent(blog.category || '')}&fields=title,slug,featuredImage,category,readingTime,author,createdAt&limit=6`, { next: { revalidate: 3600 } });
+      if (relatedRes.ok) {
+        const relatedData = await relatedRes.json();
+        const relatedList = Array.isArray(relatedData.blogs) ? relatedData.blogs : (Array.isArray(relatedData) ? relatedData : []);
+        relatedPosts = relatedList.filter(p => p.slug !== slug).slice(0,4);
+      }
+    } catch (e) {
+      console.error('Related posts fetch failed', e);
+    }
   } catch (err) {
     console.error("Blog fetch error:", err);
     notFound();
@@ -128,7 +140,7 @@ export default async function BlogPage({ params }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <BlogDetails blog={blog} />
+      <BlogDetails blog={blog} relatedPosts={relatedPosts} siteUrl={SITE_URL} />
     </>
   );
 }

@@ -2,99 +2,28 @@ import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { Share2, Star, ShieldCheck, Truck, RotateCcw } from "lucide-react";
-import StarRating from "@/components/store/StarRating";
-import ProductImageGallery from "@/components/products/ProductImageGallery";
-import WishlistButtonClient from "@/components/products/WishlistButtonClient";
-import ProductActionsClient from "@/components/products/ProductActionsClient";
-import ProductViewTracker from "@/components/products/ProductViewTracker";
-import RelatedProducts from "@/components/products/RelatedProducts";
-import ReviewSectionWrapper from "@/components/products/ReviewSectionWrapper";
+import StarRating from "./components/StarRating";
+import ProductImageGallery from "@/app/products/[slug]/components/ProductImageGallery";
+import WishlistButton from "@/app/wishlist/components/WishlistButton";
+import ProductActionsClient from "@/app/products/[slug]/components/ProductActionsClient";
+import ProductViewTracker from "@/app/products/[slug]/components/ProductViewTracker";
+import RelatedProducts from "@/app/products/[slug]/components/RelatedProducts";
+import ReviewSectionWrapper from "./components/ReviewSectionWrapper";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getTranslation } from "@/utils/typography/handler";
 import { GridSkeleton } from "@/components/common/Skeletons";
-
+import { getProductDetails } from "@/app/products/[slug]/lib/productDetailsApi";
 import { getSettings } from "@/lib/settings";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  "https://clothing-e-commerce-web.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://clothing-e-commerce-web.vercel.app";
 
-export async function generateMetadata({ params }) {
+export default async function ProductDetailsPage({ params }) {
   const { slug } = await params;
-  try {
-    const [res, settings] = await Promise.all([
-      fetch(`${API_URL}/products/details/${slug}`, { next: { revalidate: 3600 } }),
-      getSettings()
-    ]);
-    
-    if (!res.ok) throw new Error("Product not found");
-    const product = await res.json();
-    const branding = settings?.branding || {};
-    const siteName = branding.siteName || "Store";
-
-    const discountedPrice =
-      product.price - (product.price * (product.discount || 0)) / 100;
-    const isAvailable = product.sizes?.some((s) => s.stock > 0);
-    const imageUrl = product.images?.[0]
-      ? product.images[0].startsWith("http")
-        ? product.images[0]
-        : `${SITE_URL}${product.images[0]}`
-      : `${SITE_URL}/og-image.jpg`;
-
-    return {
-      title: `${product.name} | ${siteName} Collection`,
-      description:
-        product.description?.slice(0, 160) ||
-        `Shop ${product.name} – premium apparel from ${siteName}.`,
-      keywords: [
-        product.name,
-        product.category?.name,
-        "premium",
-        siteName,
-      ],
-      openGraph: {
-        title: product.name,
-        description: product.description?.slice(0, 160),
-        images: [
-          { url: imageUrl, width: 1200, height: 630, alt: product.name },
-        ],
-        type: "website",
-        siteName: siteName,
-        url: `${SITE_URL}/products/${slug}`,
-        "og:price:amount": discountedPrice.toString(),
-        "og:price:currency": "BDT",
-        "og:availability": isAvailable ? "instock" : "oos",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: product.name,
-        description: product.description?.slice(0, 160),
-        images: [imageUrl],
-      },
-    };
-  } catch (error) {
-    const settings = await getSettings();
-    return { title: `Product Not Found | ${settings?.branding?.siteName || "Store"}` };
-  }
-}
-
-export default async function ProductPage({ params }) {
-  const { slug } = await params;
-  let product = null;
-
-  try {
-    const res = await fetch(`${API_URL}/products/details/${slug}`, {
-      next: { revalidate: 3600, tags: [`product-${slug}`] }
-    });
-    if (!res.ok) {
-      if (res.status === 404) notFound();
-      throw new Error(`HTTP ${res.status}`);
-    }
-    product = await res.json();
-  } catch (err) {
+  
+  const product = await getProductDetails(slug);
+  if (product.error) {
     notFound();
   }
 
@@ -256,8 +185,9 @@ export default async function ProductPage({ params }) {
                   )}
                 </div>
                 <div className="flex items-center gap-3">
-                  <WishlistButtonClient 
+                  <WishlistButton 
                     product={product} 
+                    lang={lang}
                     className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
                   />
                   <Button variant="ghost" size="icon" className="w-10 h-10 sm:w-12 sm:h-12 rounded-full glass hover:bg-accent-secondary hover:text-white transition-all">
@@ -385,4 +315,64 @@ export default async function ProductPage({ params }) {
       </div>
     </main>
   );
+}
+
+
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  try {
+    const [res, settings] = await Promise.all([
+      fetch(`${API_URL}/products/details/${slug}`, { next: { revalidate: 3600 } }),
+      getSettings()
+    ]);
+    
+    if (!res.ok) throw new Error("Product not found");
+    const product = await res.json();
+    const branding = settings?.branding || {};
+    const siteName = branding.siteName || "Store";
+
+    const discountedPrice =
+      product.price - (product.price * (product.discount || 0)) / 100;
+    const isAvailable = product.sizes?.some((s) => s.stock > 0);
+    const imageUrl = product.images?.[0]
+      ? product.images[0].startsWith("http")
+        ? product.images[0]
+        : `${SITE_URL}${product.images[0]}`
+      : `${SITE_URL}/og-image.jpg`;
+
+    return {
+      title: `${product.name} | ${siteName} Collection`,
+      description:
+        product.description?.slice(0, 160) ||
+        `Shop ${product.name} – premium apparel from ${siteName}.`,
+      keywords: [
+        product.name,
+        product.category?.name,
+        "premium",
+        siteName,
+      ],
+      openGraph: {
+        title: product.name,
+        description: product.description?.slice(0, 160),
+        images: [
+          { url: imageUrl, width: 1200, height: 630, alt: product.name },
+        ],
+        type: "website",
+        siteName: siteName,
+        url: `${SITE_URL}/products/${slug}`,
+        "og:price:amount": discountedPrice.toString(),
+        "og:price:currency": "BDT",
+        "og:availability": isAvailable ? "instock" : "oos",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: product.name,
+        description: product.description?.slice(0, 160),
+        images: [imageUrl],
+      },
+    };
+  } catch (error) {
+    const settings = await getSettings();
+    return { title: `Product Not Found | ${settings?.branding?.siteName || "Store"}` };
+  }
 }

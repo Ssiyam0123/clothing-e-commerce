@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
-import { useCoupons } from "@/hooks/useCoupons";
+import { useAdminCoupons } from "@/app/admin/coupons/lib/useAdminCoupons";
 import Loader from "@/components/common/Loader";
 import Link from "next/link";
 import { 
@@ -13,7 +13,6 @@ import {
   Clock, 
   TrendingUp,
   History,
-  ShieldCheck,
   Edit3,
   Users,
   Box,
@@ -27,15 +26,13 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Pagination from "@/components/common/Pagination";
 
-export default function CouponAuditPage() {
+export default function CouponDetailPage() {
   const { id } = useParams();
   const [usagePage, setUsagePage] = useState(1);
-  const { getCoupon, updateCoupon } = useCoupons();
+  const { getCoupon, updateCoupon } = useAdminCoupons();
   const { data: coupon, isLoading: isCouponLoading, isFetching } = getCoupon(id, { page: usagePage, limit: 10 });
 
   const totalSaved = useMemo(() => {
-    // If using the generated orders, we can approximate or use a better metric.
-    // For now, let's just show a realistic number based on usedCount.
     return (coupon?.usedCount || 0) * (coupon?.discountType === 'fixed' ? coupon.discountValue : 100); 
   }, [coupon]);
 
@@ -60,23 +57,23 @@ export default function CouponAuditPage() {
                 <Tag size={20} />
              </div>
              <div className="flex flex-col">
-               <h1 className="text-3xl font-black uppercase tracking-tighter italic">
-                  Voucher: {coupon?.code}
-               </h1>
-               <div className="flex items-center gap-2 mt-1">
-                 <Badge 
-                   variant="outline" 
-                   className={cn(
-                     "px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border-none",
-                     coupon?.isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-500"
-                   )}
-                 >
-                   {coupon?.isActive ? "System Active" : "Logic Suspended"}
-                 </Badge>
-                 <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground">
-                    // Deployment_ID: {id.slice(-8).toUpperCase()}
-                 </span>
-               </div>
+                <h1 className="text-3xl font-black uppercase tracking-tighter italic">
+                   Voucher: {coupon?.code}
+                </h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge 
+                    variant="outline" 
+                    className={cn(
+                      "px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border-none",
+                      coupon?.isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-500"
+                    )}
+                  >
+                    {coupon?.isActive ? "System Active" : "Logic Suspended"}
+                  </Badge>
+                  <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                     // Deployment_ID: {id?.slice(-8).toUpperCase()}
+                  </span>
+                </div>
              </div>
           </div>
         </div>
@@ -276,3 +273,6 @@ export default function CouponAuditPage() {
     </div>
   );
 }
+
+
+

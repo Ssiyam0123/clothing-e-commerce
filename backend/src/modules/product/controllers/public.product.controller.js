@@ -105,7 +105,22 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
                             from: 'sizes',
                             let: { sizeId: '$sizes.size' },
                             pipeline: [
-                                { $match: { $expr: { $eq: ['$_id', { $toObjectId: '$$sizeId' }] } } },
+                                { 
+                                    $match: { 
+                                        $expr: { 
+                                            $eq: [
+                                                '$_id', 
+                                                { 
+                                                    $cond: { 
+                                                        if: { $eq: [{ $type: '$$sizeId' }, 'string'] }, 
+                                                        then: { $toObjectId: '$$sizeId' }, 
+                                                        else: '$$sizeId' 
+                                                    } 
+                                                }
+                                            ] 
+                                        } 
+                                    } 
+                                },
                                 { $project: { name: 1 } }
                             ],
                             as: 'sizes.size'

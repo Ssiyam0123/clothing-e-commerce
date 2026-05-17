@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useAuthStore } from "@/store/authStore";
+import { useProfile } from "@/app/profile/lib/useProfile";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
-import ProfileSecurity from "@/components/profile/ProfileSecurity";
+import ProfileSecurity from "@/app/profile/components/ProfileSecurity";
 
 const DICTIONARY = {
   en: {
@@ -17,8 +17,8 @@ const DICTIONARY = {
   },
 };
 
-export default function SettingsPage() {
-  const { changePassword } = useAuthStore();
+export default function ProfileSettingsPage() {
+  const { changePassword } = useProfile();
   const { lang } = useAppStore();
   const [secLoading, setSecLoading] = useState(false);
 
@@ -61,3 +61,6 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+
+

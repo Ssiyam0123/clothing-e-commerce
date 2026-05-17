@@ -3,8 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { useAdminFlashSales } from "@/hooks/admin/useAdminFlashSales";
-import { useAdminProducts } from "@/hooks/admin/useAdminProducts";
+import { useAdminFlashSales } from "@/app/admin/flash-sales/lib/useAdminFlashSales";
+import { useAdminProducts } from "@/app/admin/_hooks/useAdminProducts";
 import { useDebounce } from "@/hooks/useDebounce";
 import Loader from "@/components/common/Loader";
 import { getImageUrl } from "@/utils/imageUtils";
@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function FlashSaleForm() {
+export default function FlashSaleFormPage() {
   const { id } = useParams();
   const router = useRouter();
   const isEdit = id !== "new";
@@ -366,3 +366,6 @@ export default function FlashSaleForm() {
     </div>
   );
 }
+
+
+

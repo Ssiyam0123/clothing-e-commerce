@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useCoupons } from "@/hooks/useCoupons";
+import { useAdminCoupons } from "@/app/admin/coupons/lib/useAdminCoupons";
 import Loader from "@/components/common/Loader";
 import { Badge } from "@/components/ui/badge";
 import { swalToast, swalError } from "@/utils/swal";
@@ -11,23 +11,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
   Tag, 
-  ArrowLeft, 
-  ShieldCheck, 
+  ChevronLeft, 
   Save,
   ShieldAlert,
-  History,
-  AlertCircle,
-  ChevronLeft,
   ArrowRight,
-  Settings,
-  Zap,
-  Target
+  History
 } from "lucide-react";
 
 export default function CouponEditPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { getCoupon, updateCoupon } = useCoupons();
+  const { getCoupon, updateCoupon } = useAdminCoupons();
   const { data: coupon, isLoading: isCouponLoading } = getCoupon(id);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -53,7 +47,7 @@ export default function CouponEditPage() {
   const onUpdateLogic = async (data) => {
     setIsSubmitting(true);
     try {
-      await updateCoupon.mutateAsync({ id, data });
+      await updateCoupon({ id, data });
       swalToast("Voucher Logic Synchronized", "success");
       router.push("/admin/coupons");
     } catch (err) {
@@ -96,7 +90,7 @@ export default function CouponEditPage() {
                 Refine <span className="text-muted-foreground/30">Voucher</span>
               </h1>
               <p className="admin-subtitle">
-                Protocol: {coupon?.code} // ID: {id.slice(-8).toUpperCase()}
+                Protocol: {coupon?.code} // ID: {id?.slice(-8).toUpperCase()}
               </p>
            </div>
         </div>
@@ -223,3 +217,6 @@ export default function CouponEditPage() {
     </div>
   );
 }
+
+
+

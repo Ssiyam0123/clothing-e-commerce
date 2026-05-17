@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getImageUrl } from "@/utils/imageUtils";
 import { usePathname } from "next/navigation";
-import Sidebar from "@/components/admin/Sidebar";
+import Sidebar from "@/app/admin/_components/Sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/store/appStore";
 import { useAuthStore } from "@/store/authStore";

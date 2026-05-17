@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCoupons } from "@/hooks/useCoupons";
-import DataTable from "@/components/admin/DataTable";
+import { useAdminCoupons } from "@/app/admin/coupons/lib/useAdminCoupons";
+import DataTable from "@/app/admin/_components/DataTable";
 import TableSkeleton from "@/components/common/TableSkeleton";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import { 
@@ -10,10 +10,6 @@ import {
   Trash2, 
   Edit3, 
   Ticket, 
-  Activity, 
-  BarChart, 
-  History,
-  ShieldCheck,
   Power,
   Eye
 } from "lucide-react";
@@ -21,20 +17,19 @@ import {
 // Shadcn UI Imports
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/app/_common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
-export default function CouponArchive() {
+export default function CouponListPage() {
   const { page, setPage, queryParams } = useFilters({ initialLimit: 30 });
-  const { coupons, total, pages, isLoading, deleteCoupon, updateCoupon } = useCoupons(queryParams);
+  const { coupons, total, pages, isLoading, deleteCoupon, updateCoupon } = useAdminCoupons(queryParams);
 
   const handleDelete = async (id) => {
     const confirmed = await swalConfirm(
       "Deactivate Protocol?",
-      "This coupon will be purged from the settlement engine."
+      "This coupon will be permanently deleted."
     );
     if (confirmed) {
       try {
@@ -227,3 +222,6 @@ export default function CouponArchive() {
     </div>
   );
 }
+
+
+

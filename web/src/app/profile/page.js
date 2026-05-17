@@ -2,13 +2,13 @@
 
 import { useState, useMemo } from "react";
 import { useAppStore } from "@/store/appStore";
-import { useAuthStore } from "@/store/authStore";
+import { useProfile } from "@/app/profile/lib/useProfile";
 import { getTranslation } from "@/utils/typography/handler";
 import { toast } from "sonner";
-import ProfileIdentity from "@/components/profile/ProfileIdentity";
+import ProfileIdentity from "@/app/profile/components/ProfileIdentity";
 
-export default function ProfilePage() {
-  const { user, updateProfile } = useAuthStore();
+export default function ProfileDetailsPage() {
+  const { user, updateProfile } = useProfile();
   const { lang } = useAppStore();
   const [loading, setLoading] = useState(false);
 
@@ -28,12 +28,12 @@ export default function ProfilePage() {
 
       await updateProfile(formData);
 
-      toast.success(t.identityUpdated || "Identity Updated", {
-        description: t.syncSuccess || "Your digital profile has been synchronized."
+      toast.success(t.identityUpdated || "Profile Updated", {
+        description: t.syncSuccess || "Your profile information has been updated."
       });
     } catch (err) {
-      toast.error(t.syncError || "Sync Error", {
-        description: err.message || "Failed to update protocol identity."
+      toast.error(t.syncError || "Error", {
+        description: err.message || "Failed to update profile."
       });
     } finally {
       setLoading(false);
@@ -53,3 +53,6 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+
+

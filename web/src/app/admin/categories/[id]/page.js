@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
+import { useAdminCategories } from "@/app/admin/categories/lib/useAdminCategories";
 import { getImageUrl } from "@/utils/imageUtils";
 import { swalToast, swalError } from "@/utils/swal";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import { ChevronLeft, Upload, Save, Trash2, Image as ImageIcon, ArrowRight } fro
 import { cn } from "@/lib/utils";
 import Loader from "@/components/common/Loader";
 
-export default function CategoryForm() {
+export default function CategoryFormPage() {
   const { id } = useParams();
   const router = useRouter();
   const isEdit = id !== "new";
@@ -190,3 +190,6 @@ export default function CategoryForm() {
     </div>
   );
 }
+
+
+

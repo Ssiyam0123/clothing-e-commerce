@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useOrders } from "@/hooks/client/useOrders";
+import { useOrders } from "@/app/_common/lib/useOrders";
 import { getImageUrl } from "@/utils/imageUtils";
 import { motion } from "framer-motion";
 import {

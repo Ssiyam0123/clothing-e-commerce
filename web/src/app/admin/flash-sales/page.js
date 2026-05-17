@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useAdminFlashSales } from "@/hooks/admin/useAdminFlashSales";
+import { useAdminFlashSales } from "@/app/admin/flash-sales/lib/useAdminFlashSales";
 import Link from "next/link";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
-import CountdownTimer from "@/components/store/CountdownTimer";
+import CountdownTimer from "@/app/_common/components/CountdownTimer";
 import { 
   Plus, 
   Trash2, 
@@ -42,10 +42,10 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/app/_common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
-export default function AdminFlashSales() {
+export default function FlashSaleListPage() {
   const { page, setPage, queryParams } = useFilters({ initialLimit: 30 });
   const { flashSales, total, pages, isLoading, updateFlashSale, deleteFlashSale } = useAdminFlashSales(queryParams);
 
@@ -236,3 +236,6 @@ function DataPoint({ icon, label, value }) {
     </div>
   );
 }
+
+
+

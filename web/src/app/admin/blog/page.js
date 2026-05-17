@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useBlogs } from "@/hooks/useBlogs";
+import { useAdminBlogs } from "@/app/admin/blog/lib/useAdminBlogs";
 import {
   Plus,
   Search,
@@ -10,14 +10,11 @@ import {
   Trash2,
   Eye,
   Filter,
-  MoreHorizontal,
   BookOpen,
   Clock,
   BarChart3,
   LayoutGrid,
   List,
-  ArrowRight,
-  TrendingUp,
   FileText,
   Zap,
   EyeOff
@@ -25,12 +22,12 @@ import {
 import { getImageUrl } from "@/utils/imageUtils";
 import { cn } from "@/lib/utils";
 import Loader from "@/components/common/Loader";
-import { swalConfirm, swalToast } from "@/utils/swal";
+import { swalConfirm } from "@/utils/swal";
 
 // Shadcn UI Imports
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -40,22 +37,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/app/_common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
-export default function AdminBlogDashboard() {
+export default function BlogListPage() {
   const { search, setSearch, page, setPage, queryParams } = useFilters({ initialLimit: 30 });
-  const { blogs, total, pages, isLoading, deleteBlog, toggleStatus, toggleFeatured } = useBlogs(queryParams, true);
+  const { blogs, total, pages, isLoading, deleteBlog, toggleStatus, toggleFeatured } = useAdminBlogs(queryParams, true);
 
   const filteredBlogs = blogs;
 

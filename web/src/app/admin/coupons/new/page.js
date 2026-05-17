@@ -3,14 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useCoupons } from "@/hooks/useCoupons";
+import { useAdminCoupons } from "@/app/admin/coupons/lib/useAdminCoupons";
 import Loader from "@/components/common/Loader";
 import { Badge } from "@/components/ui/badge";
 import { swalToast, swalError } from "@/utils/swal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
-  Tag, 
   ChevronLeft, 
   Save,
   ShieldAlert,
@@ -18,9 +17,9 @@ import {
   Zap
 } from "lucide-react";
 
-export default function NewCouponPage() {
+export default function CouponFormPage() {
   const router = useRouter();
-  const { createCoupon } = useCoupons();
+  const { createCoupon } = useAdminCoupons();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -196,3 +195,6 @@ export default function NewCouponPage() {
     </div>
   );
 }
+
+
+

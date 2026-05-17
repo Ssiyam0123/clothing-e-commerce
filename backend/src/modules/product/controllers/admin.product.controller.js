@@ -4,7 +4,7 @@ import Order from '../../order/order.model.js';
 import Category from '../../category/category.model.js';
 import { asyncHandler } from '../../../middleware/asyncHandler.js';
 import { clearCache } from '../../../middleware/cacheMiddleware.js';
-import { uploadMultipleImages, deleteImage } from '../../../services/imageUploadService.js';
+import { uploadMultipleImages, deleteImage, uploadImage } from '../../../services/imageUploadService.js';
 import { createProductSchema, updateProductSchema } from '../validators/product.validator.js';
 import { ZodError } from 'zod';
 
@@ -96,6 +96,7 @@ export const getAdminProducts = asyncHandler(async (req, res) => {
         stockStatus,
         isFeatured,
         subcategory,
+        flashSale,
     } = req.query;
 
     const matchStage = {};
@@ -106,6 +107,15 @@ export const getAdminProducts = asyncHandler(async (req, res) => {
 
     // Separate Featured filter from category query if provided directly
     if (isFeatured === 'true') matchStage.isFeatured = true;
+
+    if (flashSale && flashSale !== 'all' && mongoose.Types.ObjectId.isValid(flashSale)) {
+        const sale = await mongoose.model("FlashSale").findById(flashSale);
+        if (sale && sale.products && sale.products.length > 0) {
+            matchStage._id = { $in: sale.products.map(id => new mongoose.Types.ObjectId(id)) };
+        } else {
+            matchStage._id = new mongoose.Types.ObjectId();
+        }
+    }
 
     if (req.query.ids) {
         const idList = req.query.ids.split(',').filter(id => mongoose.Types.ObjectId.isValid(id));
@@ -359,4 +369,78 @@ export const getProductHistory = asyncHandler(async (req, res) => {
         },
         history
     });
+});
+
+export const updateProductBanner = asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    let bannerImage = product.banner?.image;
+
+    if (req.file) {
+        // Upload new banner
+        const newBannerUrl = await uploadImage(req.file, 'banners');
+        // Delete old banner image if it exists
+        if (product.banner?.image) {
+            await deleteImage(product.banner.image);
+        }
+        bannerImage = newBannerUrl;
+    }
+
+    product.banner = {
+        image: bannerImage,
+        link: req.body.bannerLink || ''
+    };
+
+    await product.save();
+
+    // Clear caches
+    clearCache('cache:/api/products*');
+    clearCache('cache:/api/home-layout*');
+
+    res.json(product);
+});
+
+export const deleteProductBanner = asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    if (product.banner?.image) {
+        await deleteImage(product.banner.image);
+    }
+
+    product.banner = undefined;
+    await product.save();
+
+    // Clear caches
+    clearCache('cache:/api/products*');
+    clearCache('cache:/api/home-layout*');
+
+    res.json(product);
+});
+
+export const patchProduct = asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    const whitelist = ['isFeatured', 'isActive', 'showReviews', 'featuredOrder'];
+    const updates = req.body;
+
+    let hasUpdates = false;
+    whitelist.forEach(field => {
+        if (updates[field] !== undefined) {
+            product[field] = updates[field];
+            hasUpdates = true;
+        }
+    });
+
+    if (hasUpdates) {
+        await product.save();
+        // Clear caches
+        clearCache('cache:/api/products*');
+        clearCache('cache:/api/home-layout*');
+        clearCache('cache:/api/flash-sales*');
+    }
+
+    res.json(product);
 });

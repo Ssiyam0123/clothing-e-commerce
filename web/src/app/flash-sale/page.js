@@ -1,26 +1,7 @@
-import FlashSaleClient from "./FlashSaleClient";
 import { Suspense } from "react";
+import FlashSaleView from "@/app/flash-sale/components/FlashSaleView";
 import { Skeleton } from "@/components/ui/skeleton";
-
-export const metadata = {
-  title: "Exclusive Flash Drops | Vanguard",
-  description: "Limited time premium offers and exclusive drops. High-performance streetwear artifacts.",
-};
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-
-async function getFlashSales() {
-  try {
-    const res = await fetch(`${API_URL}/flash-sales/active`, {
-      next: { revalidate: 30 }, // Revalidate every 30 seconds
-    });
-    if (!res.ok) return [];
-    return await res.json();
-  } catch (e) {
-    console.error("Flash sales fetch failed:", e);
-    return [];
-  }
-}
+import { getFlashSales } from "@/app/flash-sale/lib/flashSaleApi";
 
 const FlashSaleSkeleton = () => (
   <div className="min-h-screen bg-background pt-32 pb-40 space-y-24">
@@ -41,14 +22,25 @@ const FlashSaleSkeleton = () => (
   </div>
 );
 
-export default async function FlashSalePage() {
-  const initialData = await getFlashSales();
+export default function FlashSalePage() {
+  const dataPromise = getFlashSales();
 
   return (
     <main className="min-h-screen bg-page transition-colors duration-700">
       <Suspense fallback={<FlashSaleSkeleton />}>
-        <FlashSaleClient initialData={initialData} />
+        <FlashSaleDataWrapper dataPromise={dataPromise} />
       </Suspense>
     </main>
   );
 }
+
+async function FlashSaleDataWrapper({ dataPromise }) {
+  const initialData = await dataPromise;
+  return <FlashSaleView initialData={initialData} />;
+}
+
+
+export const metadata = {
+  title: "Exclusive Flash Drops | Vanguard",
+  description: "Limited time premium offers and exclusive drops. High-performance streetwear artifacts.",
+};

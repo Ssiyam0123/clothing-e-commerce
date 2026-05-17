@@ -6,7 +6,7 @@ import { useAppStore } from "@/store/appStore";
 import { useAuthStore } from "@/store/authStore";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import SupportChat from "@/components/chat/SupportChat";
+import SupportChat from "@/app/_chat/components/SupportChat";
 
 export default function ClientWrapper({ children }) {
   const [mounted, setMounted] = useState(false);

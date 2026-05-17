@@ -9,8 +9,8 @@ import { useAppStore } from "@/store/appStore";
 import { revalidateSettings } from "@/app/actions/revalidate";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import FormInput from "@/components/admin/FormInput";
-import ImageUpload from "@/components/admin/ImageUpload";
+import FormInput from "@/app/admin/_components/FormInput";
+import ImageUpload from "@/app/admin/_components/ImageUpload";
 import { cn } from "@/lib/utils";
 
 export default function BrandingPage() {

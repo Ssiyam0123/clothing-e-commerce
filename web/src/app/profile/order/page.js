@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useOrders } from "@/hooks/client/useOrders";
+import { useProfileOrders } from "@/app/profile/lib/useProfileOrders";
 import { useSearchParams } from "next/navigation";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
-import ProfileOrders from "@/components/profile/ProfileOrders";
-import OrderDetailsDialog from "@/components/profile/OrderDetailsDialog";
+import ProfileOrders from "@/app/profile/components/ProfileOrders";
+import OrderDetailsDialog from "@/app/profile/components/OrderDetailsDialog";
 
 const DICTIONARY = {
   en: {
@@ -25,9 +25,9 @@ const DICTIONARY = {
   },
 };
 
-export default function OrdersPage() {
+export default function ProfileOrdersPage() {
   const searchParams = useSearchParams();
-  const { myOrders, isLoading: myOrdersLoading } = useOrders();
+  const { myOrders, myOrdersLoading } = useProfileOrders();
   const { lang } = useAppStore();
   
   // Order Details Modal State
@@ -75,3 +75,6 @@ export default function OrdersPage() {
     </div>
   );
 }
+
+
+

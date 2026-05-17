@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import api from "@/lib/api";
-import { useProductStore } from "./productStore";
+import { useProductStore } from "@/store/productStore";
 
 export const useAuthStore = create(
   persist(
@@ -104,21 +104,6 @@ export const useAuthStore = create(
         }
       },
 
-      updateProfile: async (profileData) => {
-        try {
-          const isFormData = profileData instanceof FormData;
-          const { data } = await api.put("/users/profile", profileData, {
-            headers: isFormData
-              ? { "Content-Type": "multipart/form-data" }
-              : {},
-          });
-          set({ user: data });
-          return data;
-        } catch (error) {
-          throw error;
-        }
-      },
-
       forgotPassword: async (email) => {
         return (await api.post("/auth/forgot-password", { email })).data;
       },
@@ -127,10 +112,6 @@ export const useAuthStore = create(
         return (
           await api.post(`/auth/reset-password?token=${token}`, { password })
         ).data;
-      },
-
-      changePassword: async (passwords) => {
-        return (await api.put("/users/change-password", passwords)).data;
       },
     }),
     {

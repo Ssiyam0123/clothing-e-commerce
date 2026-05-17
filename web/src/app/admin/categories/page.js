@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAdminCategories } from "@/hooks/admin/useAdminCategories";
-import { useSubcategories } from "@/hooks/useSubcategories";
-import { useSizes } from "@/hooks/useSizes";
+import { useAdminCategories } from "@/app/admin/categories/lib/useAdminCategories";
+import { useSubcategories } from "@/app/_common/lib/useSubcategories";
+import { useSizes } from "@/app/_common/lib/useSizes";
 import { getImageUrl } from "@/utils/imageUtils";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
@@ -14,10 +14,10 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit2, Trash2, Layers, Maximize2, Hash, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/app/_common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
-export default function CategoryMasterControl() {
+export default function CategoryListPage() {
   const { page, setPage, queryParams } = useFilters({ initialLimit: 30 });
   const { categories, total, pages, isLoading: catLoading, deleteCategory, toggleFeatured } = useAdminCategories(queryParams);
   const {
@@ -417,3 +417,6 @@ const X = ({ size = 12, ...props }) => (
     <path d="m6 6 12 12" />
   </svg>
 );
+
+
+

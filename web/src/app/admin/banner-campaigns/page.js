@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useAdminBannerCampaigns } from "@/hooks/useAdminBannerCampaigns";
+import { useAdminBannerCampaigns } from "@/app/admin/banner-campaigns/lib/useAdminBannerCampaigns";
 import { getImageUrl } from "@/utils/imageUtils";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import { 
@@ -24,10 +24,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/app/_common/lib/useFilters";
 import Pagination from "@/components/common/Pagination";
 
-export default function AdminBannerCampaigns() {
+export default function BannerCampaignListPage() {
   const { page, setPage, queryParams } = useFilters({ initialLimit: 30 });
   const { campaigns, total, pages, isLoading, deleteCampaign } = useAdminBannerCampaigns(queryParams);
 
@@ -49,7 +49,7 @@ export default function AdminBannerCampaigns() {
 
   return (
     <div className="admin-page-container">
-      {/* 🛰️ System Header */}
+      {/* Header */}
       <div className="admin-section-header">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
@@ -73,7 +73,7 @@ export default function AdminBannerCampaigns() {
         </Button>
       </div>
 
-      {/* 📁 Visual Deck Foundry */}
+      {/* Main Grid */}
       <div className="space-y-12">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {isLoading ? (
@@ -195,3 +195,6 @@ export default function AdminBannerCampaigns() {
     </div>
   );
 }
+
+
+
