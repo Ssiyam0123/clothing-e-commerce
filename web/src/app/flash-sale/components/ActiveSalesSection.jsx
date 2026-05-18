@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ChevronRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import FlashSaleBanner from "@/app/_common/components/FlashSaleBanner";
+import FlashSaleBanner from "@/components/common/FlashSaleBanner";
 import ProductCard from "@/components/common/ProductCard";
 
 export default function ActiveSalesSection({ activeSales, upcomingSalesLength, ui }) {

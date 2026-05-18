@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Truck, Save, Info } from "lucide-react";
-import { useSettings } from "@/hooks/useSettings";
-import api from "@/lib/api";
+import { useSettings } from "@/app/admin/settings/lib/useSettings";
+import { clientUpdateSettings } from "@/app/admin/settings/lib/settings";
 import { swalToast, swalError } from "@/utils/swal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,10 +31,11 @@ export default function ShippingSettingsPage() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await api.put("/settings", {
+      await clientUpdateSettings({
         shipping: formData,
       });
       await refetch();
+
       swalToast("Shipping protocols updated", "success");
     } catch (error) {
       swalError("Sync Failure", "Could not persist shipping configurations.");

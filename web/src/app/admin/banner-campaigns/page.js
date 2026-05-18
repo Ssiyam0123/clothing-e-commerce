@@ -18,8 +18,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-import { useFilters } from "@/app/_common/lib/useFilters";
+import { useFilters } from "@/app/admin/_hooks/useFilters";
 import Pagination from "@/components/common/Pagination";
+import AdminPageHeader, { AdminHeaderButton } from "@/app/admin/_components/AdminPageHeader";
 
 export default function BannerCampaignListPage() {
   const { page, setPage, queryParams } = useFilters({ initialLimit: 30 });
@@ -43,29 +44,15 @@ export default function BannerCampaignListPage() {
 
   return (
     <div className="admin-page-container">
-      {/* Header */}
-      <div className="admin-section-header">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-indigo-600/30 text-indigo-600 bg-indigo-600/5 px-3 py-1">Banners</Badge>
-          </div>
-          <h1 className="admin-title">
-            Banner <span className="text-indigo-600">Campaigns</span>
-          </h1>
-          <p className="admin-subtitle">
-            Manage your storefront banners • Total: {total}
-          </p>
-        </div>
-
-        <Button
-          asChild
-          className="bg-foreground text-background hover:bg-indigo-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group w-full md:w-auto"
-        >
-          <Link href="/admin/banner-campaigns/new">
-            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Create Banner
-          </Link>
-        </Button>
-      </div>
+      <AdminPageHeader
+        title="Banner campaigns"
+        description={`Manage homepage banners · ${total || 0} campaigns`}
+        actions={
+          <AdminHeaderButton href="/admin/banner-campaigns/new" icon={Plus}>
+            Create campaign
+          </AdminHeaderButton>
+        }
+      />
 
       {/* Main Grid */}
       <div className="space-y-12">

@@ -1,4 +1,3 @@
-// src/hooks/client/useCategories.js
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
 
@@ -10,7 +9,7 @@ export const useCategories = (initialData = undefined) => {
   } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      // 🚀 Interfaces with the Public Storefront API
+      // Interfaces with the Public Storefront API
       const { data } = await api.get("/categories");
       return data;
     },

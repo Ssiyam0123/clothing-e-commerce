@@ -1,4 +1,3 @@
-// src/hooks/client/useProducts.js
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useMemo } from "react";
@@ -60,7 +59,7 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
   const { data, isLoading, isFetching, error } = useQuery({
     queryKey: ["products", apiParams],
     queryFn: async () => {
-      // 🚀 Interfaces with the Public Storefront API
+      // Interfaces with the Public Storefront API
       const response = await api.get("/products", { params: apiParams });
       return response.data;
     },

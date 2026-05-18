@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Clock } from "lucide-react";
 import { motion } from "framer-motion";
-import FlashSaleBanner from "@/app/_common/components/FlashSaleBanner";
+import FlashSaleBanner from "@/components/common/FlashSaleBanner";
 
 export default function UpcomingSalesSection({ upcomingSales, ui }) {
   if (upcomingSales.length === 0) return null;

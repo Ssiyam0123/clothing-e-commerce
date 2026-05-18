@@ -19,8 +19,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-import { useFilters } from "@/app/_common/lib/useFilters";
+import { useFilters } from "@/app/admin/_hooks/useFilters";
 import Pagination from "@/components/common/Pagination";
+import AdminPageHeader, { AdminHeaderButton } from "@/app/admin/_components/AdminPageHeader";
 
 export default function CouponListPage() {
   const { page, setPage, queryParams } = useFilters({ initialLimit: 30 });
@@ -167,29 +168,15 @@ export default function CouponListPage() {
 
   return (
     <div className="admin-page-container">
-      {/* 🛰️ Tactical Header */}
-      <div className="admin-section-header">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-emerald-600/30 text-emerald-600 bg-emerald-600/5 px-3 py-1">Settlement Hub</Badge>
-          </div>
-          <h1 className="admin-title">
-            Voucher <span className="text-emerald-600">Hub</span>
-          </h1>
-          <p className="admin-subtitle">
-            Logic Orchestration • Total Logs: {total}
-          </p>
-        </div>
-
-        <Button
-          asChild
-          className="bg-foreground text-background hover:bg-emerald-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group w-full md:w-auto"
-        >
-          <Link href="/admin/coupons/new">
-            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Initialize Voucher
-          </Link>
-        </Button>
-      </div>
+      <AdminPageHeader
+        title="Coupons"
+        description={`Manage discount codes · ${total || 0} coupons`}
+        actions={
+          <AdminHeaderButton href="/admin/coupons/new" icon={Plus}>
+            Add coupon
+          </AdminHeaderButton>
+        }
+      />
 
       {/* 📊 Intelligence Ledger */}
       <div className="admin-table-form">

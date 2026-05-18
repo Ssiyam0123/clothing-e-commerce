@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Save } from "lucide-react";
-import { useSettings } from "@/hooks/useSettings";
+import { useSettings } from "@/app/admin/settings/lib/useSettings";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FormInput from "@/app/admin/_components/FormInput";

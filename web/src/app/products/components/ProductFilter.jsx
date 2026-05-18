@@ -2,8 +2,8 @@
 
 import { useRef, useCallback } from "react";
 import Image from "next/image";
-import { useProducts } from "@/app/_common/lib/useProducts";
-import { useSubcategories } from "@/app/_common/lib/useSubcategories";
+import { useProducts } from "@/app/products/lib/useProducts";
+import { useSubcategories } from "@/app/products/lib/useSubcategories";
 import CategoryItem from "@/app/products/components/CategoryItem";
 import { getImageUrl } from "@/utils/imageUtils";
 import FilterBar from "@/components/common/FilterBar";
@@ -15,7 +15,7 @@ import { Sparkles, LayoutGrid, ChevronRight, Hash } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { getTranslation } from "@/utils/typography/handler";
 import { useMemo } from "react";
-import { useCategories } from "@/app/_common/lib/useCategories";
+import { useCategories } from "@/app/products/lib/useCategories";
 
 export default function ProductFilter({ initialCategories }) {
   const { lang } = useAppStore();

@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useAdminFlashSales } from "@/app/admin/flash-sales/lib/useAdminFlashSales";
 import Link from "next/link";
+import AdminPageHeader, { AdminHeaderButton } from "@/app/admin/_components/AdminPageHeader";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
-import CountdownTimer from "@/app/_common/components/CountdownTimer";
+import CountdownTimer from "@/components/common/CountdownTimer";
 import { 
   Plus, 
   Trash2, 
@@ -42,7 +43,7 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-import { useFilters } from "@/app/_common/lib/useFilters";
+import { useFilters } from "@/app/admin/_hooks/useFilters";
 import Pagination from "@/components/common/Pagination";
 
 export default function FlashSaleListPage() {
@@ -75,29 +76,15 @@ export default function FlashSaleListPage() {
 
   return (
     <div className="admin-page-container">
-      {/* 🛰️ System Header */}
-      <div className="admin-section-header">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-rose-600/30 text-rose-600 bg-rose-600/5 px-3 py-1">Sales</Badge>
-          </div>
-          <h1 className="admin-title">
-            Flash <span className="text-rose-600">Sales</span>
-          </h1>
-          <p className="admin-subtitle">
-            Manage your storefront flash sales • Total: {total}
-          </p>
-        </div>
-
-        <Button
-          asChild
-          className="bg-foreground text-background hover:bg-rose-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group w-full md:w-auto"
-        >
-          <Link href="/admin/flash-sales/new">
-            <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Create Sale
-          </Link>
-        </Button>
-      </div>
+      <AdminPageHeader
+        title="Flash sales"
+        description={`Manage limited-time sales · ${total || 0} total`}
+        actions={
+          <AdminHeaderButton href="/admin/flash-sales/new" icon={Plus}>
+            Create sale
+          </AdminHeaderButton>
+        }
+      />
 
       {/* 📊 High-Performance Grid */}
       <div className="space-y-12">

@@ -4,10 +4,9 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAdminBannerCampaigns, useAdminBannerCampaign } from "@/app/admin/banner-campaigns/lib/useAdminBannerCampaigns";
 import { swalError, swalToast } from "@/utils/swal";
-import { Button } from "@/components/ui/button";
 import Loader from "@/components/common/Loader";
-import { ChevronLeft } from "lucide-react";
 import BannerCampaignForm from "../components/BannerCampaignForm";
+import AdminPageHeader, { AdminBackLink } from "@/app/admin/_components/AdminPageHeader";
 
 export default function BannerCampaignFormPage() {
   const { id } = useParams();
@@ -111,28 +110,12 @@ export default function BannerCampaignFormPage() {
 
   return (
     <div className="admin-page-container max-w-6xl">
-      {/* 🔙 Navigation */}
-      <div className="mb-4">
-        <Button 
-          variant="ghost" 
-          onClick={() => router.push("/admin/banner-campaigns")}
-          className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground transition-all p-0 hover:bg-transparent"
-        >
-          <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
-            <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-          </div>
-          <span>Back to Banners</span>
-        </Button>
-      </div>
+      <AdminBackLink href="/admin/banner-campaigns" label="Back to banners" />
 
-      <div className="admin-section-header">
-        <div>
-          <h1 className="admin-title">
-            {isEdit ? "Edit" : "Create"} <span className="text-muted-foreground/30">Banner</span>
-          </h1>
-          <p className="admin-subtitle">Manage your banner details and visuals</p>
-        </div>
-      </div>
+      <AdminPageHeader
+        title={isEdit ? "Edit banner" : "Create banner"}
+        description="Set up slides, schedule, and visibility."
+      />
 
       <BannerCampaignForm 
         formData={formData}

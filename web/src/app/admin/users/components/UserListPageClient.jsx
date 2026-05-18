@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useAdminUsers } from "@/app/admin/users/lib/useAdminUsers";
-import { useFilters } from "@/app/_common/lib/useFilters";
+import { useFilters } from "@/app/admin/_hooks/useFilters";
 import DataTable from "@/app/admin/_components/DataTable";
 import TableSkeleton from "@/components/common/TableSkeleton";
 import FilterBar from "@/components/common/FilterBar";
@@ -14,7 +14,6 @@ import {
   Users as UsersIcon, 
   Trash2, 
   Edit3, 
-  Activity,
   Eye
 } from "lucide-react";
 
@@ -23,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import AdminPageHeader, { AdminHeaderStat } from "@/app/admin/_components/AdminPageHeader";
 
 function UsersContent() {
   const { 
@@ -171,33 +171,11 @@ function UsersContent() {
 
   return (
     <div className="admin-page-container">
-      {/* 🛰️ Tactical Header */}
-      <div className="admin-section-header">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-border/20 text-muted-foreground bg-accent/5 px-3 py-1">Users</Badge>
-          </div>
-          <h1 className="admin-title">
-            User <span className="text-muted-foreground">Directory</span>
-          </h1>
-          <p className="admin-subtitle">
-            Manage your store's users
-          </p>
-        </div>
-
-        <div className="bg-accent/5 px-6 md:px-8 py-3 md:py-5 rounded-2xl md:rounded-[2rem] border border-border/10 flex items-center justify-between md:justify-start gap-4 md:gap-6 shadow-inner w-full md:w-auto group/stat">
-           <div className="flex flex-col">
-              <span className="text-[8px] md:text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em] mb-1">Total Users</span>
-              <span className="text-xl md:text-3xl font-black text-foreground italic leading-none group-hover/stat:text-rose-600 transition-colors">
-                {total || 0}
-              </span>
-           </div>
-           <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-background flex items-center justify-center text-muted-foreground">
-              <Activity size={16} className="md:size-5 animate-pulse" />
-           </div>
-        </div>
-      </div>
-
+      <AdminPageHeader
+        title="Users"
+        description="Manage customer accounts and roles"
+        actions={<AdminHeaderStat label="Total users" value={total || 0} />}
+      />
       <div className="admin-table-form animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="p-6 md:p-8 border-b border-border/10 bg-background/20">
           <FilterBar

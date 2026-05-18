@@ -1,6 +1,6 @@
 "use client";
 
-import { useProducts } from "@/app/_common/lib/useProducts";
+import { useProducts } from "@/app/products/lib/useProducts";
 import { ProductCardSkeleton } from "@/components/common/Skeletons";
 import ProductCard from "@/components/common/ProductCard";
 import Pagination from "@/components/common/Pagination";

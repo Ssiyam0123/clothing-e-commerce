@@ -16,6 +16,7 @@ router.route("/")
 
 router.route("/:id")
   .put(protect, authorize("roles:update"), updateRole)
+  .patch(protect, authorize("roles:update"), updateRole)
   .delete(protect, authorize("roles:delete"), deleteRole);
 
 export default router;

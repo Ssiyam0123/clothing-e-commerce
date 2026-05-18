@@ -1,10 +1,16 @@
 import { create } from 'zustand';
 import { trackEvent } from '@/lib/tracking/tracker';
+import { isAdminRoute } from '@/lib/tracking/isAdminRoute';
+
+const viewContentTimestamps = new Map();
+const VIEW_CONTENT_DEDUPE_MS = 5000;
 
 export const useTrackingStore = create((set, get) => ({
   eventsHistory: [],
 
   sendEvent: async (eventName, eventData = {}, userData = {}, customEventId = null) => {
+    if (isAdminRoute()) return;
+
     // Use the unified tracker
     await trackEvent(eventName, eventData, userData, customEventId);
     
@@ -53,6 +59,14 @@ export const useTrackingStore = create((set, get) => ({
   },
 
   trackViewContent: (productId, productName, price, category, userData = {}) => {
+    if (!productId) return;
+
+    const key = String(productId);
+    const now = Date.now();
+    const last = viewContentTimestamps.get(key);
+    if (last && now - last < VIEW_CONTENT_DEDUPE_MS) return;
+    viewContentTimestamps.set(key, now);
+
     get().sendEvent('ViewContent', {
       content_ids: [productId],
       content_name: productName,
@@ -70,6 +84,15 @@ export const useTrackingStore = create((set, get) => ({
       value: price,
       currency: 'BDT',
       num_items: quantity,
+    }, userData);
+  },
+
+  trackAddToWishlist: (productId, price, userData = {}) => {
+    get().sendEvent('AddToWishlist', {
+      content_ids: [productId],
+      content_type: 'product',
+      value: price,
+      currency: 'BDT',
     }, userData);
   },
 

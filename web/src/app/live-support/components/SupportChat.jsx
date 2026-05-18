@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { useChat } from "@/app/_chat/lib/useChat";
+import { useChat } from "@/app/live-support/lib/useChat";
 import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { useChatStore } from "@/store/chatStore";
@@ -30,8 +30,6 @@ export default function SupportChat() {
   const [localMessages, setLocalMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-
-
 
   const scrollRef = useRef();
   const topObserverRef = useRef();

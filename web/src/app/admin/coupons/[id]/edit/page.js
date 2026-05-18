@@ -10,13 +10,12 @@ import { swalToast, swalError } from "@/utils/swal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
-  Tag, 
-  ChevronLeft, 
   Save,
   ShieldAlert,
   ArrowRight,
   History
 } from "lucide-react";
+import AdminPageHeader, { AdminBackLink } from "@/app/admin/_components/AdminPageHeader";
 
 export default function CouponEditPage() {
   const { id } = useParams();
@@ -66,46 +65,22 @@ export default function CouponEditPage() {
 
   return (
     <div className="admin-page-container max-w-5xl">
-      {/* 🔙 Navigation */}
-      <div className="mb-4">
-        <Button 
-          variant="ghost" 
-          onClick={() => router.back()}
-          className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground transition-all p-0 hover:bg-transparent"
-        >
-          <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
-            <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-          </div>
-          <span>Return to Vault</span>
-        </Button>
-      </div>
+      <AdminBackLink href="/admin/coupons" label="Back to coupons" />
 
-      <div className="admin-section-header">
-        <div className="flex items-center gap-6">
-           <div className="w-14 h-14 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 border border-rose-500/20">
-              <Tag size={24} />
-           </div>
-           <div className="space-y-1">
-              <h1 className="admin-title">
-                Refine <span className="text-muted-foreground/30">Voucher</span>
-              </h1>
-              <p className="admin-subtitle">
-                Protocol: {coupon?.code} // ID: {id?.slice(-8).toUpperCase()}
-              </p>
-           </div>
-        </div>
-        
-        <div className="flex items-center gap-3">
+      <AdminPageHeader
+        title="Edit coupon"
+        description={coupon?.code ? `Code: ${coupon.code}` : "Update discount rules and limits."}
+        actions={
           <Button
             variant="outline"
             onClick={() => router.push(`/admin/coupons/${id}`)}
-            className="h-12 px-6 rounded-2xl border-border/10 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-all"
+            className="h-11 rounded-xl text-sm font-medium"
           >
-            <History size={14} className="mr-2" />
-            Audit History
+            <History size={16} className="mr-2" />
+            View history
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       <form
         onSubmit={handleSubmit(onUpdateLogic)}

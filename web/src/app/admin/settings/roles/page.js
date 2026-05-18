@@ -1,8 +1,8 @@
 "use client";
-
+ 
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/api";
+import { fetchRoles, createRole, updateRole, deleteRole } from "@/app/admin/settings/lib/settings";
 import { useAuthStore } from "@/store/authStore";
 import { 
   Shield, 
@@ -71,34 +71,34 @@ export default function RolesPage() {
   // 🏛️ Fetch Roles
   const { data: roles = [], isLoading } = useQuery({
     queryKey: ["roles"],
-    queryFn: async () => (await api.get("/roles")).data,
+    queryFn: fetchRoles,
   });
 
   // 🚀 Mutations
   const createMutation = useMutation({
-    mutationFn: (data) => api.post("/roles", data),
+    mutationFn: createRole,
     onSuccess: () => {
       queryClient.invalidateQueries(["roles"]);
       checkSession(); // Refresh current user permissions
       notify.success("Role created successfully");
       setView("list");
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Failed to create role")
+    onError: (err) => notify.error(err.response?.data?.message || "Failed to create role")
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => api.put(`/roles/${id}`, data),
+    mutationFn: ({ id, data }) => updateRole(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries(["roles"]);
       checkSession(); // Refresh current user permissions
       notify.success("Role updated successfully");
       setView("list");
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Failed to update role")
+    onError: (err) => notify.error(err.response?.data?.message || "Failed to update role")
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => api.delete(`/roles/${id}`),
+    mutationFn: deleteRole,
     onSuccess: () => {
       queryClient.invalidateQueries(["roles"]);
       notify.success("Role deleted successfully");

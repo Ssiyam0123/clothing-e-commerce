@@ -1,25 +1,32 @@
 "use client";
 
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useProfileOrders } from "@/app/profile/lib/useProfileOrders";
-import { getImageUrl } from "@/utils/imageUtils";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Package, Printer, Download } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { downloadOrderReceipt } from "@/utils/orderReceipt";
+import { notify } from "@/utils/swal";
 import OrderMetadataGrid from "@/app/profile/components/OrderMetadataGrid";
 import OrderAssetList from "@/app/profile/components/OrderAssetList";
 import OrderFinancialBreakdown from "@/app/profile/components/OrderFinancialBreakdown";
 
 export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui, phone = null }) {
   const { orderDetails: order, orderDetailsLoading: loading } = useProfileOrders(orderId, phone);
-  
-  const handleDownload = () => {
-    if (!orderId) return;
-    const url = phone 
-      ? `${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/report?phone=${phone}` 
-      : `${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/report`;
-    window.open(url, '_blank');
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    if (!orderId || downloading) return;
+    setDownloading(true);
+    try {
+      await downloadOrderReceipt(orderId, phone);
+    } catch (err) {
+      notify.error("Download failed", err.message || "Could not download receipt.");
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -34,7 +41,14 @@ export default function OrderDetailsDialog({ orderId, open, onOpenChange, ui, ph
                     </DialogTitle>
                     <div className="flex gap-2">
                         <button className="p-2 rounded-full hover:bg-accent/10 transition-colors text-muted-foreground" onClick={() => window.print()}><Printer size={16}/></button>
-                        <button className="p-2 rounded-full hover:bg-accent/10 transition-colors text-muted-foreground" onClick={handleDownload}><Download size={16}/></button>
+                        <button
+                          className="p-2 rounded-full hover:bg-accent/10 transition-colors text-muted-foreground disabled:opacity-50"
+                          onClick={handleDownload}
+                          disabled={downloading}
+                          aria-label="Download receipt"
+                        >
+                          {downloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16}/>}
+                        </button>
                     </div>
                 </div>
                 <DialogDescription className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">

@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronLeft, Upload, Save, Trash2, Image as ImageIcon, ArrowRight } from "lucide-react";
+import AdminPageHeader, { AdminBackLink } from "@/app/admin/_components/AdminPageHeader";
+import { Upload, Save, Trash2, Image as ImageIcon, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Loader from "@/components/common/Loader";
 
@@ -89,28 +90,11 @@ export default function CategoryFormPage() {
 
   return (
     <div className="admin-page-container max-w-4xl">
-      {/* 🔙 Navigation */}
-      <div className="mb-4">
-        <Button 
-          variant="ghost" 
-          onClick={() => router.back()}
-          className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground transition-all p-0 hover:bg-transparent"
-        >
-          <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
-            <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-          </div>
-          <span>Back to Categories</span>
-        </Button>
-      </div>
-
-      <div className="admin-section-header">
-        <div>
-          <h1 className="admin-title">
-            {isEdit ? "Edit" : "Create"} <span className="text-muted-foreground/30">Category</span>
-          </h1>
-          <p className="admin-subtitle">Set up your category details and appearance</p>
-        </div>
-      </div>
+      <AdminBackLink href="/admin/categories" label="Back to categories" />
+      <AdminPageHeader
+        title={isEdit ? "Edit category" : "New category"}
+        description="Set up category details and appearance"
+      />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
         <div className="admin-table-form p-8 md:p-14 space-y-12">

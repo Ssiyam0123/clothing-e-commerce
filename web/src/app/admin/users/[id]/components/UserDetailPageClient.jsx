@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useAdminUsers } from "@/app/admin/users/lib/useAdminUsers";
-import { useAdminOrders } from "@/app/admin/_hooks/useAdminOrders";
+import { useAdminOrders } from "@/app/admin/orders/lib/useAdminOrders";
 import { useMemo } from "react";
 import Loader from "@/components/common/Loader";
 import Link from "next/link";
@@ -23,7 +23,7 @@ import { getImageUrl } from "@/utils/imageUtils";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useFilters } from "@/app/_common/lib/useFilters";
+import { useFilters } from "@/app/admin/_hooks/useFilters";
 import Pagination from "@/components/common/Pagination";
 
 export default function UserDetailPage() {

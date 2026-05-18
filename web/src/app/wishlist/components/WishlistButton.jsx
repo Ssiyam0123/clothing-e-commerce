@@ -6,6 +6,7 @@ import { notify } from "@/utils/swal";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "@/store/authStore";
+import { useTrackingStore } from "@/store/trackingStore";
 import { cn } from "@/lib/utils";
 
 const WishlistButton = memo(({ product, lang, className }) => {
@@ -22,12 +23,18 @@ const WishlistButton = memo(({ product, lang, className }) => {
   );
 
   const toggleWishlist = useProductStore((state) => state.toggleWishlist);
+  const trackAddToWishlist = useTrackingStore((state) => state.trackAddToWishlist);
 
   const handleToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    // ১. ক্লিক করার সাথে সাথে স্টেট আপডেট (ইন্সট্যান্ট)
+    if (!inWishlist && product?._id) {
+      const discountedPrice =
+        product.price - (product.price * (product.discount || 0)) / 100;
+      trackAddToWishlist(product._id, discountedPrice);
+    }
+
     toggleWishlist(product, isAuthenticated);
 
     // ২. মেসেজ (টোস্ট মেসেজ ব্রাউজারের থ্রেড কিছুটা ব্লক করে, তাই এটি অপশনাল রাখতে পারিস)

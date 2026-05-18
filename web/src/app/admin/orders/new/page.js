@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAdminOrders } from "@/app/admin/orders/lib/useAdminOrders";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import AdminPageHeader, { AdminBackLink } from "@/app/admin/_components/AdminPageHeader";
 import { 
-  ChevronLeft,
   Package,
   ShoppingBag,
   User as UserIcon,
@@ -197,26 +197,11 @@ export default function CreateAdminOrder() {
 
   return (
     <div className="admin-page-container">
-      {/* Navigation */}
-      <div className="mb-8">
-        <Button 
-          variant="ghost" 
-          onClick={() => router.back()}
-          className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground transition-all p-0 hover:bg-transparent"
-        >
-          <div className="w-8 h-8 rounded-full border border-border/10 flex items-center justify-center group-hover:border-foreground/20 transition-colors">
-            <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-          </div>
-          <span>Back to History</span>
-        </Button>
-      </div>
-
-      <div className="admin-section-header">
-        <div>
-          <h1 className="admin-title">Create New <span className="text-muted-foreground/50">Order</span></h1>
-          <p className="admin-subtitle text-rose-500/80">Create a manual order for a customer</p>
-        </div>
-      </div>
+      <AdminBackLink href="/admin/orders" label="Back to orders" />
+      <AdminPageHeader
+        title="New order"
+        description="Create a manual order for a customer"
+      />
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         

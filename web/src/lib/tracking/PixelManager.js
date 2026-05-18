@@ -3,6 +3,7 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, Suspense } from 'react';
 import Script from 'next/script';
+import { isAdminRoute } from '@/lib/tracking/isAdminRoute';
 
 const PixelManagerContent = ({ marketing = {} }) => {
   const pathname = usePathname();
@@ -21,6 +22,8 @@ const PixelManagerContent = ({ marketing = {} }) => {
   );
 
   useEffect(() => {
+    if (isAdminRoute(pathname)) return;
+
     // 🔵 Facebook PageView
     if (fbPixelId && window.fbq) window.fbq('track', 'PageView');
 
@@ -39,6 +42,8 @@ const PixelManagerContent = ({ marketing = {} }) => {
     if (pinterestTagId && window.pintrk && typeof window.pintrk === 'function') window.pintrk('track', 'pagevisit');
 
   }, [pathname, searchParams, fbPixelId, gtmId, tiktokPixelId, snapPixelId, pinterestTagId]);
+
+  if (isAdminRoute(pathname)) return null;
 
   return (
     <>

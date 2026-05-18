@@ -1,36 +1,27 @@
 "use client";
 
 import { Suspense } from "react";
-import Link from "next/link";
 import { useAdminProducts } from "@/app/admin/products/lib/useAdminProducts";
 import ProductFilter from "@/app/admin/products/components/ProductFilter";
 import ProductTable from "@/app/admin/products/components/ProductTable";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus } from "lucide-react";
+import AdminPageHeader, { AdminHeaderButton } from "@/app/admin/_components/AdminPageHeader";
 
 function AdminProductsContent() {
   const { pagination, isLoading } = useAdminProducts();
 
   return (
     <div className="admin-page-container">
-      {/* Header */}
-      <div className="admin-section-header">
-        <div>
-          <h1 className="admin-title">
-            Products
-          </h1>
-          <p className="admin-subtitle">
-            Manage your store's items (Total: {pagination?.total || 0})
-          </p>
-        </div>
-        <Link
-          href="/admin/products/new"
-          className="bg-foreground text-background px-8 md:px-10 py-3 md:py-4 rounded-full font-black uppercase tracking-widest text-[9px] md:text-[10px] hover:scale-105 active:scale-95 transition-all shadow-xl flex items-center justify-center gap-2 w-full md:w-auto"
-        >
-          <Plus size={16} strokeWidth={3} />
-          Add New Product
-        </Link>
-      </div>
+      <AdminPageHeader
+        title="Products"
+        description={`Manage your catalog · ${pagination?.total || 0} products`}
+        actions={
+          <AdminHeaderButton href="/admin/products/new" icon={Plus}>
+            Add product
+          </AdminHeaderButton>
+        }
+      />
 
       <div className="admin-table-form">
         <div className="p-6 md:p-8 border-b border-border/10 bg-background/20">

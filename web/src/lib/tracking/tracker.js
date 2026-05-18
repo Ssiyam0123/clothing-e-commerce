@@ -1,4 +1,5 @@
 import api from '@/lib/api';
+import { isAdminRoute } from '@/lib/tracking/isAdminRoute';
 
 const getFacebookCookies = () => {
   if (typeof window === 'undefined') return {};
@@ -19,6 +20,8 @@ const getFacebookCookies = () => {
  * Sends events to: Browser (Meta, GTM, TikTok, Snap, Pinterest) & Server (CAPI)
  */
 export const trackEvent = async (eventName, eventData = {}, userData = {}, customEventId = null) => {
+  if (isAdminRoute()) return;
+
   const { fbp, fbc } = getFacebookCookies();
   const eventId = customEventId || "ev_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
 
@@ -71,6 +74,7 @@ export const trackEvent = async (eventName, eventData = {}, userData = {}, custo
       eventName,
       eventData,
       eventId,
+      eventSourceUrl: typeof window !== 'undefined' ? window.location.href : '',
       userData: {
         ...userData,
         ...(fbp && { fbp }),

@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { useAppStore } from "@/store/appStore";
-import { useFlashSales } from "@/app/_common/lib/useFlashSale";
+import { useFlashSales } from "@/app/flash-sale/lib/useFlashSale";
 import { Skeleton } from "@/components/ui/skeleton";
 import ActiveSalesSection from "@/app/flash-sale/components/ActiveSalesSection";
 import UpcomingSalesSection from "@/app/flash-sale/components/UpcomingSalesSection";

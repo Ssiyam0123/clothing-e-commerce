@@ -2,11 +2,12 @@
 
 import { useState, useCallback } from "react";
 import { useAdminCategories } from "@/app/admin/categories/lib/useAdminCategories";
-import { useSubcategories } from "@/app/_common/lib/useSubcategories";
-import { useSizes } from "@/app/_common/lib/useSizes";
+import { useSubcategories } from "@/app/admin/subcategories/lib/useSubcategories";
+import { useSizes } from "@/app/admin/sizes/lib/useSizes";
 import { getImageUrl } from "@/utils/imageUtils";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import AdminPageHeader, { AdminHeaderButton } from "@/app/admin/_components/AdminPageHeader";
 import { swalConfirm, swalToast, swalError } from "@/utils/swal";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit2, Trash2, Layers, Maximize2, Hash, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { useFilters } from "@/app/_common/lib/useFilters";
+import { useFilters } from "@/app/admin/_hooks/useFilters";
 import Pagination from "@/components/common/Pagination";
 
 export default function CategoryListPage() {
@@ -131,22 +132,15 @@ export default function CategoryListPage() {
 
   return (
     <div className="admin-page-container">
-      {/* Header */}
-      <div className="admin-section-header">
-        <div>
-          <h1 className="admin-title">
-            Categories
-          </h1>
-          <p className="admin-subtitle">
-            Manage your store's categories, subcategories, and sizes
-          </p>
-        </div>
-        <Link href="/admin/categories/new" className="w-full md:w-auto">
-          <Button className="bg-foreground text-background hover:bg-primary hover:text-primary-foreground h-12 md:h-14 px-8 md:px-10 rounded-full font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] transition-all shadow-2xl active:scale-95 w-full">
-            <Plus className="mr-2" size={16} /> Add New Category
-          </Button>
-        </Link>
-      </div>
+      <AdminPageHeader
+        title="Categories"
+        description="Manage categories, subcategories, and sizes"
+        actions={
+          <AdminHeaderButton href="/admin/categories/new" icon={Plus}>
+            Add category
+          </AdminHeaderButton>
+        }
+      />
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 gap-12 animate-in fade-in slide-in-from-bottom-6 duration-1000">

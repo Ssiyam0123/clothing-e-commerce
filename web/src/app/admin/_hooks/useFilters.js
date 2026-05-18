@@ -1,4 +1,3 @@
-// src/hooks/useFilters.js
 import { useReducer, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 

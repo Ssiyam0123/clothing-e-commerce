@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useOrders } from "@/app/_common/lib/useOrders";
+import { useOrders } from "@/app/payment/success/lib/useOrders";
 import { getImageUrl } from "@/utils/imageUtils";
 import { motion } from "framer-motion";
 import {
@@ -20,6 +20,8 @@ import { useTrackingStore } from "@/store/trackingStore";
 import { getTranslation } from "@/utils/typography/handler";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { downloadOrderReceipt } from "@/utils/orderReceipt";
+import { notify } from "@/utils/swal";
 
 
 function SuccessSkeleton() {
@@ -60,6 +62,19 @@ function SuccessContent() {
   const { orderDetails: order, orderDetailsLoading: isLoading } = useOrders(orderId);
   const { clearCart } = useProductStore();
   const trackPurchase = useTrackingStore((state) => state.trackPurchase);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadReceipt = async () => {
+    if (!order?._id || downloading) return;
+    setDownloading(true);
+    try {
+      await downloadOrderReceipt(order._id);
+    } catch (err) {
+      notify.error("Download failed", err.message || "Could not download receipt.");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   useEffect(() => {
     if (order && !isLoading) {
@@ -148,11 +163,17 @@ function SuccessContent() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button 
-                    onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL}/orders/${order._id}/report`, '_blank')}
-                    className="p-2 rounded-xl bg-accent/5 hover:bg-accent/10 transition-colors text-muted-foreground group"
+                    onClick={handleDownloadReceipt}
+                    disabled={downloading}
+                    className="p-2 rounded-xl bg-accent/5 hover:bg-accent/10 transition-colors text-muted-foreground group disabled:opacity-50"
                     title="Download Receipt"
+                    aria-label="Download receipt"
                   >
-                    <Download size={14} className="group-hover:scale-110 transition-transform" />
+                    {downloading ? (
+                      <span className="block w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Download size={14} className="group-hover:scale-110 transition-transform" />
+                    )}
                   </button>
                   <span className="text-[10px] font-black font-mono bg-primary text-background px-4 py-1.5 rounded-full shadow-lg">
                     #{order._id?.slice(-8).toUpperCase()}

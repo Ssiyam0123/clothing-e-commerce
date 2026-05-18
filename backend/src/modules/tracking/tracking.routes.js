@@ -11,8 +11,13 @@ router.post('/', optionalAuth, async (req, res) => {
       eventData = {},
       userData = {},
       eventId, // 👈 Captured from frontend request
-      eventSourceUrl = req.headers.referer || '',
+      eventSourceUrl = req.body.eventSourceUrl || req.headers.referer || '',
     } = req.body;
+
+    const source = eventSourceUrl || req.headers.referer || '';
+    if (/\/admin(\/|$|\?)/.test(source)) {
+      return res.json({ success: true, skipped: true, reason: 'admin_route' });
+    }
 
     // Extract Facebook cookies from request headers
     const fbp = req.cookies._fbp;

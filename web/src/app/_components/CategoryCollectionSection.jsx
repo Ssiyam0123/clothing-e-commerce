@@ -1,4 +1,4 @@
-import ProductSection from "@/app/_common/components/ProductSection";
+import ProductSection from "@/components/common/ProductSection";
 import ViewMoreButton from "@/app/_components/ViewMoreButton";
 import { getSectionData } from "@/app/_lib/homeApi";
 

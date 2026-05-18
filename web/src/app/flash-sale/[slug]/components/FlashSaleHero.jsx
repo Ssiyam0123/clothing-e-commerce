@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import FlashSaleBanner from "@/app/_common/components/FlashSaleBanner";
+import FlashSaleBanner from "@/components/common/FlashSaleBanner";
 
 export default function FlashSaleHero({ sale }) {
   return (

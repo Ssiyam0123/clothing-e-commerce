@@ -53,9 +53,20 @@ import {
   Layers
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { 
+  fetchAllHomeLayouts, 
+  fetchActiveHomeLayout, 
+  updateHomeLayout, 
+  createHomeLayout, 
+  activateHomeLayout, 
+  deleteHomeLayout, 
+  fetchBannerCampaigns, 
+  fetchSubcategories, 
+  fetchAdminFlashSales, 
+  fetchAdminProducts 
+} from "@/app/admin/settings/lib/settings";
+import { useAdminCategories } from "@/app/admin/categories/lib/useAdminCategories";
 import { notify } from "@/utils/swal";
-import api from "@/lib/api";
-import { useAdminCategories } from "@/app/admin/_hooks/useAdminCategories";
 
 /**
  * 🏗️ Architect Sortable Section Item
@@ -349,9 +360,7 @@ function ProductPicker({ selectedIds = [], onUpdate }) {
     }
     setIsSearching(true);
     try {
-      const { data } = await api.get('/admin/products', { 
-        params: { search: term, limit: 10 } 
-      });
+      const data = await fetchAdminProducts({ search: term, limit: 10 });
       setResults(data.products || []);
     } catch (error) {
       console.error("Search failed", error);
@@ -369,9 +378,7 @@ function ProductPicker({ selectedIds = [], onUpdate }) {
       }
       setIsLoadingSelected(true);
       try {
-        const { data } = await api.get('/admin/products', { 
-          params: { ids: selectedIds.join(','), limit: 100 } 
-        });
+        const data = await fetchAdminProducts({ ids: selectedIds.join(','), limit: 100 });
         setSelectedProducts(data.products || []);
       } catch (error) {
         console.error("Failed to fetch selected products", error);
@@ -493,10 +500,7 @@ export default function LayoutBuilderPage() {
   // 🏛️ Fetch all architectures
   const { data: architectures = [], isLoading: isArchLoading } = useQuery({
     queryKey: ['architectures'],
-    queryFn: async () => {
-      const { data } = await api.get('/home-layouts/all');
-      return data;
-    }
+    queryFn: fetchAllHomeLayouts,
   });
 
   // 🏗️ Fetch specific selected layout
@@ -506,7 +510,7 @@ export default function LayoutBuilderPage() {
     queryFn: async () => {
       if (!selectedLayoutId) {
         // If no ID, try to get the active one directly
-        const { data } = await api.get('/home-layouts');
+        const data = await fetchActiveHomeLayout();
         return data?.sections || DEFAULT_LAYOUT;
       }
       
@@ -514,7 +518,7 @@ export default function LayoutBuilderPage() {
       const found = architectures.find(l => l._id === selectedLayoutId);
       if (found) return found.sections;
 
-      const { data: allLayouts } = await api.get('/home-layouts/all');
+      const allLayouts = await fetchAllHomeLayouts();
       const foundRemote = allLayouts.find(l => l._id === selectedLayoutId);
       return foundRemote?.sections || DEFAULT_LAYOUT;
     }
@@ -531,7 +535,7 @@ export default function LayoutBuilderPage() {
   const { data: campaigns = [], isLoading: isCampLoading } = useQuery({
     queryKey: ['campaigns'],
     queryFn: async () => {
-      const { data } = await api.get('/banner-campaigns');
+      const data = await fetchBannerCampaigns();
       return data.campaigns || [];
     }
   });
@@ -539,7 +543,7 @@ export default function LayoutBuilderPage() {
   const { data: subcategories = [], isLoading: isSubLoading } = useQuery({
     queryKey: ['subcategories'],
     queryFn: async () => {
-      const { data } = await api.get('/subcategories');
+      const data = await fetchSubcategories();
       return data.subcategories || [];
     }
   });
@@ -547,7 +551,7 @@ export default function LayoutBuilderPage() {
   const { data: flashSales = [], isLoading: isFlashLoading } = useQuery({
     queryKey: ['admin-flash-sales'],
     queryFn: async () => {
-      const { data } = await api.get('/admin/flash-sales');
+      const data = await fetchAdminFlashSales();
       return data.flashSales || [];
     }
   });
@@ -555,7 +559,7 @@ export default function LayoutBuilderPage() {
   const updateMutation = useMutation({
     mutationFn: async (sections) => {
         if (!selectedLayoutId) return;
-        return await api.put(`/home-layouts/${selectedLayoutId}`, { sections });
+        return await updateHomeLayout(selectedLayoutId, sections);
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['homeLayout', selectedLayoutId]);
@@ -566,16 +570,17 @@ export default function LayoutBuilderPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (name) => await api.post('/home-layouts', { name }),
+    mutationFn: createHomeLayout,
     onSuccess: (data) => {
       queryClient.invalidateQueries(['architectures']);
-      setSelectedLayoutId(data.data._id);
+      const layoutId = data?._id || data?.data?._id;
+      if (layoutId) setSelectedLayoutId(layoutId);
       notify.success("New Architecture Forged");
     }
   });
 
   const activateMutation = useMutation({
-    mutationFn: async (id) => await api.put(`/home-layouts/${id}/switch`),
+    mutationFn: activateHomeLayout,
     onSuccess: () => {
       queryClient.invalidateQueries(['architectures']);
       queryClient.invalidateQueries(['homeLayout']);
@@ -584,7 +589,7 @@ export default function LayoutBuilderPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id) => await api.delete(`/home-layouts/${id}`),
+    mutationFn: deleteHomeLayout,
     onSuccess: () => {
       queryClient.invalidateQueries(['architectures']);
       notify.info("Architecture Scrapped");

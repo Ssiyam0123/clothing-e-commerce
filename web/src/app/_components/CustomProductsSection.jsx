@@ -1,4 +1,4 @@
-import ProductSection from "@/app/_common/components/ProductSection";
+import ProductSection from "@/components/common/ProductSection";
 import { getSectionData } from "@/app/_lib/homeApi";
 
 export default async function CustomProductsSection({ lang, t, section }) {

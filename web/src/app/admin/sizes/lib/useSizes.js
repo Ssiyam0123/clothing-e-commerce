@@ -12,7 +12,7 @@ export const useSizes = (params = {}) => {
     queryKey: ["sizes", params],
     queryFn: async () => {
       const { data } = await api.get("/sizes", { params });
-      return data; // Already sorted by natural order from backend
+      return data;
     },
   });
 

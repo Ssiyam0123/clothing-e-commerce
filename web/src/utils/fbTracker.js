@@ -3,9 +3,13 @@
  * Handles both Browser (Pixel) and Server (CAPI) events with deduplication
  */
 
+import { isAdminRoute } from '@/lib/tracking/isAdminRoute';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export const trackFacebookEvent = async (eventName, eventData = {}, userData = {}) => {
+  if (isAdminRoute()) return;
+
   try {
     // 1. Generate a unique Event ID for deduplication
     const eventId = `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -16,7 +20,7 @@ export const trackFacebookEvent = async (eventName, eventData = {}, userData = {
       console.log(`[FB-Pixel] Tracked: ${eventName}`, eventData);
     }
 
-    // 3. Track via Server (Conversions API) - Sending to our backend proxy
+    // 3. Track via Server (Conversions API)
     fetch(`${API_URL}/track`, {
       method: 'POST',
       headers: {

@@ -39,8 +39,9 @@ import {
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 
-import { useFilters } from "@/app/_common/lib/useFilters";
+import { useFilters } from "@/app/admin/_hooks/useFilters";
 import Pagination from "@/components/common/Pagination";
+import AdminPageHeader, { AdminHeaderButton } from "@/app/admin/_components/AdminPageHeader";
 
 export default function BlogListPage() {
   const { search, setSearch, page, setPage, queryParams } = useFilters({ initialLimit: 30 });
@@ -50,8 +51,8 @@ export default function BlogListPage() {
 
   const handleDelete = async (id) => {
     const confirmed = await swalConfirm(
-      "Purge Narrative?",
-      "This sequence will be permanently removed from the foundry archives.",
+      "Delete post?",
+      "This post will be permanently removed.",
     );
     if (confirmed) {
       deleteBlog.mutate(id);
@@ -67,44 +68,30 @@ export default function BlogListPage() {
 
   return (
     <div className="admin-page-container">
-      {/* 🚀 System Header */}
-      <div className="admin-section-header">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-             <Badge variant="outline" className="text-[8px] md:text-[9px] uppercase tracking-widest border-rose-600/30 text-rose-600 bg-rose-600/5 px-3 py-1">Vanguard Core</Badge>
-          </div>
-          <h1 className="admin-title">
-            Journal <span className="text-rose-600">Archives</span>
-          </h1>
-          <p className="admin-subtitle">
-            Operational • Total Logs: {total}
-          </p>
-        </div>
-
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <div className="relative group w-full md:w-auto">
-            <Search
-              className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-rose-600 transition-colors"
-              size={16}
-            />
-            <Input
-              type="text"
-              placeholder="SEARCH..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="bg-background/50 border-border/10 pl-12 pr-6 h-12 md:h-16 rounded-xl md:rounded-2xl outline-none text-[10px] font-black uppercase tracking-widest w-full md:w-64 lg:w-80 focus-visible:ring-rose-600/20 focus:border-rose-600 transition-all shadow-inner"
-            />
-          </div>
-          <Button
-            asChild
-            className="bg-foreground text-background hover:bg-rose-600 hover:text-white h-12 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 group w-full md:w-auto"
-          >
-            <Link href="/admin/blog/create">
-              <Plus size={18} className="mr-3 transition-transform group-hover:rotate-90" /> Initialize Sequence
-            </Link>
-          </Button>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Blog"
+        description={`Manage blog posts · ${total || 0} posts`}
+        actions={
+          <>
+            <div className="relative w-full sm:w-64">
+              <Search
+                className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden
+              />
+              <Input
+                type="search"
+                placeholder="Search posts..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-11 w-full rounded-xl border-border bg-background pl-10"
+              />
+            </div>
+            <AdminHeaderButton href="/admin/blog/create" icon={Plus}>
+              New post
+            </AdminHeaderButton>
+          </>
+        }
+      />
 
       {/* 📊 Intelligence Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

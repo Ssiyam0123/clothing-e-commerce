@@ -2,9 +2,9 @@
 
 import { useRef, useState, useEffect } from "react";
 import { useAdminProducts } from "@/app/admin/products/lib/useAdminProducts";
-import { useAdminCategories } from "@/app/admin/_hooks/useAdminCategories";
-import { useSubcategories } from "@/app/_common/lib/useSubcategories";
-import { useAdminFlashSales } from "@/app/admin/_hooks/useAdminFlashSales";
+import { useAdminCategories } from "@/app/admin/categories/lib/useAdminCategories";
+import { useSubcategories } from "@/app/admin/subcategories/lib/useSubcategories";
+import { useAdminFlashSales } from "@/app/admin/flash-sales/lib/useAdminFlashSales";
 import { getImageUrl } from "@/utils/imageUtils";
 import FilterBar from "@/components/common/FilterBar";
 import { cn } from "@/lib/utils";

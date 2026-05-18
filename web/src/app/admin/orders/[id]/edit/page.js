@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAdminOrders } from "@/app/admin/orders/lib/useAdminOrders";
-import { useAdminProducts } from "@/app/admin/_hooks/useAdminProducts";
+import { useAdminProducts } from "@/app/admin/products/lib/useAdminProducts";
 import { swalToast, swalError } from "@/utils/swal";
 import Loader from "@/components/common/Loader";
 import { 

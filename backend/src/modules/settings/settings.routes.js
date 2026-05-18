@@ -17,4 +17,10 @@ router.put('/', requireAuth, admin, upload.fields([
     { name: 'favicon', maxCount: 1 }
 ]), updateSettings);
 
+router.patch('/', requireAuth, admin, upload.fields([
+    { name: 'logo', maxCount: 1 },
+    { name: 'logoDark', maxCount: 1 },
+    { name: 'favicon', maxCount: 1 }
+]), updateSettings);
+
 export default router;

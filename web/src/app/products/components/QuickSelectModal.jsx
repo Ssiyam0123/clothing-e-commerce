@@ -7,6 +7,7 @@ import { useProductStore } from "@/store/productStore";
 import { notify } from "@/utils/swal";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { useTrackingStore } from "@/store/trackingStore";
 import { getImageUrl } from "@/utils/imageUtils";
 import { useAppStore } from "@/store/appStore";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -22,6 +23,7 @@ export default function QuickSelectModal({ isOpen, onClose, product, lang, mode 
   const addToCart = useProductStore((state) => state.addToCart);
   const initiateBuyNow = useProductStore((state) => state.initiateBuyNow);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const trackAddToCart = useTrackingStore((state) => state.trackAddToCart);
 
   const isBn = lang === "bn";
 
@@ -71,6 +73,7 @@ export default function QuickSelectModal({ isOpen, onClose, product, lang, mode 
     } else {
       if (typeof addToCart === "function") {
         addToCart(product, selectedSize._id, quantity, isAuthenticated);
+        trackAddToCart(product._id, discountedPrice, quantity);
         notify.success(
           isBn ? "ব্যাগে যোগ করা হয়েছে" : "Added to Bag"
         );

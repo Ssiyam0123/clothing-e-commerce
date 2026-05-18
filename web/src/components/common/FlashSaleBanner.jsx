@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
-import CountdownTimer from "@/app/_common/components/CountdownTimer";
+import CountdownTimer from "@/components/common/CountdownTimer";
 import { getImageUrl } from "@/utils/imageUtils";
 import { useAppStore } from "@/store/appStore";
 import { Badge } from "@/components/ui/badge";

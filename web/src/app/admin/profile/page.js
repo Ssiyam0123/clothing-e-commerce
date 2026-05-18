@@ -20,6 +20,7 @@ import {
   ShieldCheck 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import AdminPageHeader from "@/app/admin/_components/AdminPageHeader";
 
 export default function AdminProfile() {
   const { user, isLoading: authLoading } = useAuthStore();
@@ -87,19 +88,10 @@ export default function AdminProfile() {
     <ProtectedRoute>
         <div className="admin-page-container">
           {/* 🛰️ System Header */}
-          <div className="admin-section-header">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                 <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-border/20 text-muted-foreground bg-accent/5 px-3 py-1">Identity Core</Badge>
-              </div>
-              <h1 className="admin-title">
-                Personal <span className="text-muted-foreground">Identity</span>
-              </h1>
-              <p className="admin-subtitle">
-                Personnel Credentials & Neural Profile
-              </p>
-            </div>
-          </div>
+          <AdminPageHeader
+            title="My profile"
+            description="Update your name, contact details, and password."
+          />
 
           <div className="max-w-4xl">
             <Card className="rounded-[2rem] md:rounded-[3rem] border-border/10 bg-card/30 backdrop-blur-2xl shadow-2xl overflow-hidden">

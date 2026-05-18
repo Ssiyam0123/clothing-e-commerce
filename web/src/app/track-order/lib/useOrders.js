@@ -1,12 +1,9 @@
-// src/hooks/client/useOrders.js
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { getGuestId } from "@/utils/guestId";
-import { swalError } from "@/utils/swal";
 import { useAuthStore } from "@/store/authStore";
 
 export const useOrders = (orderId = null, phone = null) => {
-  const queryClient = useQueryClient();
   const { user, isLoading: authLoading } = useAuthStore();
   const guestId = getGuestId();
   const userId = user?._id || guestId;
@@ -32,29 +29,11 @@ export const useOrders = (orderId = null, phone = null) => {
     enabled: !!orderId,
   });
 
-  const initOrder = useMutation({
-    mutationFn: async (orderData) => {
-      const { data } = await api.post("/orders/init", orderData);
-      return data;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-      if (data.url || data.redirectUrl) {
-        window.location.href = data.url || data.redirectUrl;
-      }
-    },
-    onError: (err) => {
-      swalError("Order Failed", err.response?.data?.message || "Protocol execution interrupted.");
-    },
-  });
-
   return {
     myOrders: myOrders || [],
     isLoading: myOrdersLoading,
     orderDetails,
     orderDetailsLoading,
     isError: isDetailsError,
-    initOrder: initOrder.mutateAsync,
-    isInitializing: initOrder.isPending,
   };
 };

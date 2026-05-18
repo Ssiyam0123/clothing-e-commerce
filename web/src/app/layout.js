@@ -166,7 +166,7 @@ export default async function RootLayout({ children }) {
             dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} 
           />
         ))}
-        {settings?.marketing?.gtmId && (
+        {settings?.marketing?.gtmId && !pathname.startsWith("/admin") && (
           <Script
             id="gtm-script"
             strategy="afterInteractive"
@@ -177,7 +177,7 @@ export default async function RootLayout({ children }) {
         )}
       </head>
       <body suppressHydrationWarning>
-        <GTMNoScript marketing={settings?.marketing} />
+        {!pathname.startsWith("/admin") && <GTMNoScript marketing={settings?.marketing} />}
         <QueryProvider>
           <TooltipProvider>
             <ClientInitialization initialSettings={settings} initialLang={lang} initialTheme={colorMode} />
@@ -191,7 +191,9 @@ export default async function RootLayout({ children }) {
               )}
             </ThemeProvider>
             <Toaster position="top-right" richColors />
-            <PixelManager marketing={settings?.marketing} />
+            {!pathname.startsWith("/admin") && (
+              <PixelManager marketing={settings?.marketing} />
+            )}
           </TooltipProvider>
         </QueryProvider>
       </body>

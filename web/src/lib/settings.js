@@ -1,4 +1,5 @@
 import { cache } from 'react';
+import api from './api';
 
 /**
  * 🛠️ Site Settings Server Utility
@@ -26,3 +27,9 @@ export const getSettings = cache(async () => {
     return null;
   }
 });
+
+// ==========================================
+// ⚙️ Central Client settings & layout Operations (Delegated)
+// ==========================================
+
+export * from '@/app/admin/settings/lib/settings';

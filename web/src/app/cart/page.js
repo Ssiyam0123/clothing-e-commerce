@@ -25,8 +25,8 @@ import {
 
 // Stores & Hooks
 import { useAuthStore } from "@/store/authStore";
-import { useOrders } from "@/app/_common/lib/useOrders";
-import { useCoupons } from "@/app/_common/lib/useCoupons";
+import { useOrders } from "@/app/cart/lib/useOrders";
+import { useCoupons } from "@/app/cart/lib/useCoupons";
 import { useSettings } from "@/hooks/useSettings";
 import { useAppStore } from "@/store/appStore";
 import { useTrackingStore } from "@/store/trackingStore";

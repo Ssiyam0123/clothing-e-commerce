@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import dynamic from "next/dynamic";
 
-const SupportChat = dynamic(() => import("@/app/_chat/components/SupportChat"), {
+const SupportChat = dynamic(() => import("@/app/live-support/components/SupportChat"), {
   ssr: false
 });
 
