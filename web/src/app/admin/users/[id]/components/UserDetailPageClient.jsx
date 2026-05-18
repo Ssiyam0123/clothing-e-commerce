@@ -69,7 +69,7 @@ export default function UserDetailPage() {
         <div className="flex items-center gap-6 relative z-10">
           <div className="relative">
              <Avatar className="h-24 w-24 rounded-3xl border-2 border-border/10 shadow-2xl">
-                <AvatarImage src={getImageUrl(userData?.avatar)} className="object-cover" />
+                <AvatarImage src={getImageUrl(userData?.avatar)} className="object-cover" referrerPolicy="no-referrer" />
                 <AvatarFallback className="bg-accent text-2xl font-black">{userData?.name?.[0]}</AvatarFallback>
              </Avatar>
              <div className="absolute -bottom-2 -right-2 bg-foreground text-background p-2 rounded-xl shadow-xl border border-border/10">

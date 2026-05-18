@@ -67,6 +67,7 @@ export const createCampaign = asyncHandler(async (req, res) => {
   // Clear caches
   clearCache('cache:/api/banner-campaigns*');
   clearCache('cache:/api/home-layout*');
+  clearCache('cache:/api/admin/dashboard*');
 
   res.status(201).json(campaign);
 });
@@ -110,6 +111,7 @@ export const updateCampaign = asyncHandler(async (req, res) => {
   // Clear caches
   clearCache('cache:/api/banner-campaigns*');
   clearCache('cache:/api/home-layout*');
+  clearCache('cache:/api/admin/dashboard*');
 
   res.json(campaign);
 });
@@ -129,6 +131,7 @@ export const deleteCampaign = asyncHandler(async (req, res) => {
   // Clear caches
   clearCache('cache:/api/banner-campaigns*');
   clearCache('cache:/api/home-layout*');
+  clearCache('cache:/api/admin/dashboard*');
 
   res.json({ message: 'Campaign and its assets deleted' });
 });

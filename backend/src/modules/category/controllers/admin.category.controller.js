@@ -19,6 +19,7 @@ export const createCategory = asyncHandler(async (req, res) => {
     clearCache('cache:/api/categories*');
     clearCache('cache:/api/products*');
     clearCache('cache:/api/home-layout*');
+    clearCache('cache:/api/admin/dashboard*');
 
     res.status(201).json(category);
 });
@@ -49,6 +50,7 @@ export const updateCategory = asyncHandler(async (req, res) => {
     clearCache('cache:/api/categories*');
     clearCache('cache:/api/products*');
     clearCache('cache:/api/home-layout*');
+    clearCache('cache:/api/admin/dashboard*');
 
     res.json(updated);
 });
@@ -64,6 +66,7 @@ export const deleteCategory = asyncHandler(async (req, res) => {
     clearCache('cache:/api/categories*');
     clearCache('cache:/api/products*');
     clearCache('cache:/api/home-layout*');
+    clearCache('cache:/api/admin/dashboard*');
 
     res.json({ message: 'Category purged.' });
 });

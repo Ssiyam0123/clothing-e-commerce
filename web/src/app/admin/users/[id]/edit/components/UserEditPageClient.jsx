@@ -69,7 +69,7 @@ export default function UserEditPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card/50 backdrop-blur-3xl p-8 sm:p-10 rounded-[3rem] border border-border/10 shadow-2xl">
         <div className="flex items-center gap-6">
            <Avatar className="h-16 w-16 rounded-2xl border border-border/10">
-              <AvatarImage src={getImageUrl(userData?.avatar)} />
+              <AvatarImage src={getImageUrl(userData?.avatar)} referrerPolicy="no-referrer" />
               <AvatarFallback className="bg-accent font-black">{userData?.name?.[0]}</AvatarFallback>
            </Avatar>
            <div className="space-y-1">

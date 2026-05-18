@@ -90,6 +90,48 @@ const productSchema = new mongoose.Schema({
     image: String,
     link: String,
   },
+  sku: {
+    type: String,
+    trim: true,
+    index: true,
+  },
+  gtin: {
+    type: String,
+    trim: true,
+  },
+  brand: {
+    type: String,
+    trim: true,
+  },
+  material: {
+    type: String,
+    trim: true,
+  },
+  color: {
+    type: String,
+    trim: true,
+  },
+  gender: {
+    type: String,
+    enum: ['Men', 'Women', 'Unisex', 'Kids'],
+    default: 'Unisex',
+    index: true,
+  },
+  specifications: {
+    fit: String,
+    sleeve: String,
+    pattern: String,
+    collar: String,
+  },
+  faqs: [{
+    question: String,
+    answer: String,
+  }],
+  seo: {
+    metaTitle: { type: String, default: "" },
+    metaDescription: { type: String, default: "" },
+    keywords: { type: String, default: "" }
+  }
 }, { timestamps: true });
 
 // Text index for search

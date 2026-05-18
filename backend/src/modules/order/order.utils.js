@@ -49,9 +49,15 @@ export const calculateValidatedOrder = async (orderItems, couponCode, shippingPr
             image: product.images?.[0] || "",
         });
     }
-    // Use provided shipping price or calculate from settings based on zone
+    // Use provided shipping price or calculate from settings based on zone/courier
     let finalShippingPrice;
-    if (deliveryZone) {
+    const customCourier = settings?.shipping?.couriers?.find(
+        c => c.isActive && (c._id?.toString() === deliveryZone || c.name === deliveryZone)
+    );
+
+    if (customCourier) {
+        finalShippingPrice = customCourier.charge;
+    } else if (deliveryZone) {
         finalShippingPrice = deliveryZone === "dhaka" ? defaultInside : defaultOutside;
     } else {
         finalShippingPrice = Number(shippingPrice) || defaultInside;

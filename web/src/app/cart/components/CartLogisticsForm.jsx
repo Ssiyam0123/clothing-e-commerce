@@ -6,11 +6,14 @@ import LogisticsInput from "@/app/cart/components/LogisticsInput";
 
 export default function CartLogisticsForm({
   t,
+  settings,
   shippingInfo,
   setShippingInfo,
   deliveryZone,
   setDeliveryZone
 }) {
+  const activeCouriers = settings?.shipping?.couriers?.filter(c => c.isActive) || [];
+
   return (
     <section className="space-y-8 sm:space-y-12">
       <div className="space-y-1 border-b border-border/10 pb-4 sm:pb-6">
@@ -44,23 +47,38 @@ export default function CartLogisticsForm({
         />
 
         <div className="space-y-2 sm:space-y-3">
-            <Label className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] ml-2 text-muted-foreground">{t.transitZone || "Transit Zone"}</Label>
+            <Label className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] ml-2 text-muted-foreground">{t.transitZone || "Transit Zone / Courier"}</Label>
             <RadioGroup 
               value={deliveryZone} 
               onValueChange={setDeliveryZone}
-              className="grid grid-cols-2 gap-3"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
             >
-              {["dhaka", "outside"].map((z) => (
-                <div key={z} className="relative">
-                  <RadioGroupItem value={z} id={z} className="peer sr-only" />
-                  <Label
-                    htmlFor={z}
-                    className="flex flex-col items-center justify-center h-12 sm:h-14 rounded-xl sm:rounded-2xl border-2 border-transparent bg-accent/20 peer-data-[state=checked]:border-accent-secondary peer-data-[state=checked]:bg-accent-secondary/10 peer-data-[state=checked]:text-accent-secondary cursor-pointer transition-all hover:bg-accent/40 text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-center px-2"
-                  >
-                    {t[z] || (z === 'dhaka' ? "Inside Dhaka" : "Outside Dhaka")}
-                  </Label>
-                </div>
-              ))}
+              {activeCouriers.length > 0 ? (
+                activeCouriers.map((c) => (
+                  <div key={c.name} className="relative">
+                    <RadioGroupItem value={c.name} id={c.name} className="peer sr-only" />
+                    <Label
+                      htmlFor={c.name}
+                      className="flex flex-col items-start justify-center min-h-14 sm:min-h-16 rounded-xl sm:rounded-2xl border-2 border-transparent bg-accent/20 peer-data-[state=checked]:border-accent-secondary peer-data-[state=checked]:bg-accent-secondary/10 peer-data-[state=checked]:text-accent-secondary cursor-pointer transition-all hover:bg-accent/40 text-[9px] font-black uppercase tracking-wider text-left px-4 py-2"
+                    >
+                      <span className="text-[10px] tracking-tight truncate w-full text-foreground">{c.name}</span>
+                      <span className="text-[8px] text-muted-foreground/80 mt-1 font-mono tracking-tight font-medium leading-none">BDT {c.charge} • {c.estimatedDays}</span>
+                    </Label>
+                  </div>
+                ))
+              ) : (
+                ["dhaka", "outside"].map((z) => (
+                  <div key={z} className="relative">
+                    <RadioGroupItem value={z} id={z} className="peer sr-only" />
+                    <Label
+                      htmlFor={z}
+                      className="flex flex-col items-center justify-center h-12 sm:h-14 rounded-xl sm:rounded-2xl border-2 border-transparent bg-accent/20 peer-data-[state=checked]:border-accent-secondary peer-data-[state=checked]:bg-accent-secondary/10 peer-data-[state=checked]:text-accent-secondary cursor-pointer transition-all hover:bg-accent/40 text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-center px-2"
+                    >
+                      {t[z] || (z === 'dhaka' ? "Inside Dhaka" : "Outside Dhaka")}
+                    </Label>
+                  </div>
+                ))
+              )}
             </RadioGroup>
         </div>
 

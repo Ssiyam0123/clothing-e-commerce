@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { User, Mail, Calendar } from "lucide-react";
+import { getImageUrl } from "@/utils/imageUtils";
 
 export function UsersTable({ users, isLoading }) {
   return (
@@ -47,7 +48,7 @@ export function UsersTable({ users, isLoading }) {
                 <div className="flex items-center gap-4">
                   <div className="h-10 w-10 rounded-xl bg-background border border-border flex items-center justify-center font-black text-muted-foreground group-hover:text-primary transition-all overflow-hidden">
                     {user.avatar ? (
-                      <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                      <img src={getImageUrl(user.avatar)} alt={user.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
                       <User size={18} />
                     )}

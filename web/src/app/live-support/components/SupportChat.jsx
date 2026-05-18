@@ -143,7 +143,7 @@ export default function SupportChat() {
                       <div className={`flex gap-3 max-w-[85%] ${isMe ? "flex-row-reverse" : "flex-row"}`}>
                         <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0 bg-elevated border border-light mt-1 shadow-sm">
                           {msg.sender?.avatar ? (
-                            <img src={msg.sender.avatar} alt="" className="h-full w-full object-cover" />
+                            <img src={getImageUrl(msg.sender.avatar)} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                           ) : (
                             <div className="h-full w-full flex items-center justify-center text-[8px] font-black bg-accent-primary text-primary uppercase">
                               {isMe ? "ME" : "HQ"}

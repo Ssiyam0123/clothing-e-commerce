@@ -17,9 +17,10 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FilterX, Layers, Box, Eye, CircleDollarSign, Zap } from "lucide-react";
+import { FilterX, Layers, Box, Eye, CircleDollarSign, Zap, SlidersHorizontal } from "lucide-react";
 
 export default function ProductFilter() {
+  const [showTacticalFilters, setShowTacticalFilters] = useState(false);
   const { 
     filters, 
     setSearch, 
@@ -87,27 +88,43 @@ export default function ProductFilter() {
   return (
     <div className="space-y-8">
       {/* 1. Main Search & Sort */}
-      <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center">
-        <div className="flex-1 w-full">
-           <FilterBar
-            search={filters.search}
-            onSearchChange={setSearch}
-            sort={filters.sort}
-            onSortChange={setSort}
-            sortOptions={[
-              { value: "all", label: "🌟 Default Sequence" },
-              { value: "-createdAt", label: "✨ Latest Deployments" },
-              { value: "price", label: "💵 Economy Class" },
-              { value: "-price", label: "💎 Premium Class" },
-              { value: "stockHigh", label: "📈 Maximum Density" },
-              { value: "stockLow", label: "📉 Minimum Density" },
-            ]}
-          />
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-stretch lg:items-center">
+        <div className="flex-1 w-full flex flex-col sm:flex-row gap-3">
+          <div className="flex-1 min-w-0">
+             <FilterBar
+              search={filters.search}
+              onSearchChange={setSearch}
+              sort={filters.sort}
+              onSortChange={setSort}
+              sortOptions={[
+                { value: "all", label: "🌟 Default Sequence" },
+                { value: "-createdAt", label: "✨ Latest Deployments" },
+                { value: "price", label: "💵 Economy Class" },
+                { value: "-price", label: "💎 Premium Class" },
+                { value: "stockHigh", label: "📈 Maximum Density" },
+                { value: "stockLow", label: "📉 Minimum Density" },
+              ]}
+            />
+          </div>
+          {/* Mobile Filter Toggle Button */}
+          <Button 
+            variant="outline"
+            onClick={() => setShowTacticalFilters(!showTacticalFilters)}
+            className={cn(
+              "h-14 lg:hidden rounded-full border-border/50 px-6 font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all shrink-0",
+              showTacticalFilters 
+                ? "bg-foreground text-background border-foreground shadow-lg" 
+                : "bg-background/50 hover:bg-muted"
+            )}
+          >
+            <SlidersHorizontal size={14} />
+            {showTacticalFilters ? "Hide Panel" : "Filter Panel"}
+          </Button>
         </div>
         <Button 
           variant="outline" 
           onClick={clearFilters}
-          className="h-20 px-8 rounded-full border-dashed border-muted-foreground/30 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all gap-3"
+          className="h-14 lg:h-20 w-full lg:w-auto px-8 rounded-full border-dashed border-muted-foreground/30 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all gap-3 shrink-0"
         >
           <FilterX size={16} />
           Reset All
@@ -115,7 +132,10 @@ export default function ProductFilter() {
       </div>
 
       {/* 2. Tactical Filters Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className={cn(
+        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 transition-all duration-300",
+        showTacticalFilters ? "grid animate-in slide-in-from-top-4 duration-300" : "hidden lg:grid"
+      )}>
         {/* Subcategory Filter */}
         <div className="space-y-2">
            <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-4 flex items-center gap-2">

@@ -128,6 +128,7 @@ export default function AdminProfile() {
                             src={avatarPreview}
                             alt="Profile"
                             className="w-full h-full object-cover grayscale group-hover/avatar:grayscale-0 transition-all duration-700"
+                            referrerPolicy="no-referrer"
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full text-3xl font-black text-muted-foreground italic uppercase">

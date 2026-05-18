@@ -37,6 +37,7 @@ export default function BlogForm({ blog = null, onSubmit, isSubmitting, mode = "
     seo: {
       metaTitle: blog?.seo?.metaTitle || "",
       metaDescription: blog?.seo?.metaDescription || "",
+      keywords: blog?.seo?.keywords?.join(", ") || "",
     },
   });
 
@@ -61,13 +62,19 @@ export default function BlogForm({ blog = null, onSubmit, isSubmitting, mode = "
       return swalError("Empty Content", "Please write some content before publishing.");
     }
 
+    const seoData = {
+      metaTitle: formData.seo.metaTitle,
+      metaDescription: formData.seo.metaDescription,
+      keywords: formData.seo.keywords ? formData.seo.keywords.split(",").map(k => k.trim()).filter(Boolean) : []
+    };
+
     const data = new FormData();
     data.append("title", formData.title);
     data.append("content", formData.content);
     data.append("category", formData.category);
     data.append("status", formData.status);
     data.append("isFeatured", formData.isFeatured);
-    data.append("seo", JSON.stringify(formData.seo));
+    data.append("seo", JSON.stringify(seoData));
     if (imageFile) data.append("image", imageFile);
 
     onSubmit(data);
@@ -196,18 +203,25 @@ export default function BlogForm({ blog = null, onSubmit, isSubmitting, mode = "
           </Card>
 
           <Card className="p-6 rounded-2xl border-border/10 shadow-sm bg-zinc-950 text-white">
-            <Label className="text-xs font-black uppercase tracking-widest mb-2">SEO</Label>
+            <Label className="text-xs font-black uppercase tracking-widest mb-2 text-zinc-400">SEO Suite</Label>
             <Input
-              placeholder="Meta title"
+              placeholder="Meta title (Ideal: 50-60 chars)"
               value={formData.seo.metaTitle}
               onChange={(e) => setFormData({ ...formData, seo: { ...formData.seo, metaTitle: e.target.value } })}
-              className="mb-3"
+              className="mb-3 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
             />
             <Textarea
-              placeholder="Meta description"
+              placeholder="Meta description (Ideal: 150-160 chars)"
               rows={3}
               value={formData.seo.metaDescription}
               onChange={(e) => setFormData({ ...formData, seo: { ...formData.seo, metaDescription: e.target.value } })}
+              className="mb-3 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
+            />
+            <Input
+              placeholder="Keywords (comma separated, e.g. denim, fashion)"
+              value={formData.seo.keywords}
+              onChange={(e) => setFormData({ ...formData, seo: { ...formData.seo, keywords: e.target.value } })}
+              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
             />
           </Card>
         </aside>

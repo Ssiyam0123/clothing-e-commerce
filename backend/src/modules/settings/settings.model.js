@@ -4,6 +4,7 @@ const pageSettingSchema = new mongoose.Schema({
     branding: {
         siteName: { type: String, default: "" },
         siteTitle: { type: String, default: "Premium Apparel" },
+        description: { type: String, default: "" },
         logo: { type: String }, 
         logoDark: { type: String },
         favicon: { type: String },
@@ -37,7 +38,13 @@ const pageSettingSchema = new mongoose.Schema({
     },
     shipping: {
         insideDhaka: { type: Number, default: 60 },
-        outsideDhaka: { type: Number, default: 120 }
+        outsideDhaka: { type: Number, default: 120 },
+        couriers: [{
+            name: { type: String, required: true },
+            charge: { type: Number, required: true },
+            estimatedDays: { type: String },
+            isActive: { type: Boolean, default: true }
+        }]
     }
 }, { timestamps: true });
 

@@ -2,6 +2,7 @@
 import Subcategory from './subcategory.model.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { uploadImage, deleteImage } from '../../services/imageUploadService.js';
+import { clearCache } from '../../middleware/cacheMiddleware.js';
 
 export const createSubcategory = asyncHandler(async (req, res) => {
   let imageUrl = null;
@@ -15,6 +16,13 @@ export const createSubcategory = asyncHandler(async (req, res) => {
     description: req.body.description,
     image: imageUrl,
   });
+
+  // Clear caches
+  clearCache('cache:/api/categories*');
+  clearCache('cache:/api/products*');
+  clearCache('cache:/api/home-layout*');
+  clearCache('cache:/api/admin/dashboard*');
+
   res.status(201).json(subcategory);
 });
 
@@ -38,6 +46,13 @@ export const updateSubcategory = asyncHandler(async (req, res) => {
     },
     { new: true, runValidators: true }
   );
+
+  // Clear caches
+  clearCache('cache:/api/categories*');
+  clearCache('cache:/api/products*');
+  clearCache('cache:/api/home-layout*');
+  clearCache('cache:/api/admin/dashboard*');
+
   res.json(updated);
 });
 
@@ -46,6 +61,13 @@ export const deleteSubcategory = asyncHandler(async (req, res) => {
   if (!sub) return res.status(404).json({ message: 'Subcategory not found' });
   if (sub.image) await deleteImage(sub.image);
   await sub.deleteOne();
+
+  // Clear caches
+  clearCache('cache:/api/categories*');
+  clearCache('cache:/api/products*');
+  clearCache('cache:/api/home-layout*');
+  clearCache('cache:/api/admin/dashboard*');
+
   res.json({ message: 'Subcategory removed' });
 });
 

@@ -1,9 +1,11 @@
 import Coupon from './coupon.model.js';
 import Order from '../order/order.model.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
+import { clearCache } from '../../middleware/cacheMiddleware.js';
 
 export const createCoupon = asyncHandler(async (req, res) => {
   const coupon = await Coupon.create(req.body);
+  clearCache('cache:/api/admin/dashboard*');
   res.status(201).json(coupon);
 });
 
@@ -60,11 +62,13 @@ export const getCouponById = asyncHandler(async (req, res) => {
 
 export const updateCoupon = asyncHandler(async (req, res) => {
   const coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  clearCache('cache:/api/admin/dashboard*');
   res.json(coupon);
 });
 
 export const deleteCoupon = asyncHandler(async (req, res) => {
   await Coupon.findByIdAndDelete(req.params.id);
+  clearCache('cache:/api/admin/dashboard*');
   res.json({ message: 'Coupon deleted' });
 });
 

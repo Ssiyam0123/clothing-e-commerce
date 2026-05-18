@@ -108,7 +108,7 @@ export default function Footer() {
                )}
             </Link>
             <p className="text-sm md:text-base font-medium text-foreground/80 leading-relaxed max-w-md">
-              {t.description}
+              {branding.description || t.description}
             </p>
             <div className="flex items-center gap-4">
               {activeSocials.length > 0 ? (

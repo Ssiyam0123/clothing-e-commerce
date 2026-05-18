@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +23,11 @@ import {
   Zap, 
   ArrowRight, 
   ShieldAlert, 
-  Settings 
+  Settings,
+  Globe,
+  Plus,
+  Trash2,
+  HelpCircle
 } from "lucide-react";
 
 export default function ProductForm({
@@ -43,6 +48,31 @@ export default function ProductForm({
   router,
 }) {
   const watchedCategory = watch("category");
+  const [faqsList, setFaqsList] = useState([]);
+
+  useEffect(() => {
+    const currentFaqs = watch("faqs") || [];
+    setFaqsList(currentFaqs);
+  }, [watch("faqs")]);
+
+  const handleAddFaq = () => {
+    const updated = [...faqsList, { question: "", answer: "" }];
+    setFaqsList(updated);
+    setValue("faqs", updated);
+  };
+
+  const handleFaqChange = (index, field, value) => {
+    const updated = [...faqsList];
+    updated[index][field] = value;
+    setFaqsList(updated);
+    setValue("faqs", updated);
+  };
+
+  const handleRemoveFaq = (index) => {
+    const updated = faqsList.filter((_, i) => i !== index);
+    setFaqsList(updated);
+    setValue("faqs", updated);
+  };
 
   return (
     <div className="admin-page-container max-w-6xl">
@@ -233,65 +263,281 @@ export default function ProductForm({
           )}
         </div>
 
-        {/* Visibility */}
+        {/* SEO & Specifications */}
         <div className="admin-table-form p-8 md:p-14 space-y-12">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-2xl bg-foreground/10 flex items-center justify-center border border-foreground/20">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">
+              <Globe size={20} className="text-indigo-600" />
+            </div>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em]">SEO & Specifications (AEO)</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="space-y-4">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">SKU</Label>
+              <Input 
+                {...register("sku")}
+                placeholder="e.g. VNG-TEE-BLK-L"
+                className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
+              />
+            </div>
+            <div className="space-y-4">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">GTIN / Barcode (EAN, UPC)</Label>
+              <Input 
+                {...register("gtin")}
+                placeholder="e.g. 0123456789012"
+                className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
+              />
+            </div>
+            <div className="space-y-4">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Brand</Label>
+              <Input 
+                {...register("brand")}
+                placeholder="e.g. Vanguard"
+                className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
+              />
+            </div>
+            <div className="space-y-4">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Material</Label>
+              <Input 
+                {...register("material")}
+                placeholder="e.g. 100% Cotton"
+                className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
+              />
+            </div>
+            <div className="space-y-4">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Color</Label>
+              <Input 
+                {...register("color")}
+                placeholder="e.g. Obsidian Black"
+                className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
+              />
+            </div>
+            <div className="space-y-4">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Gender / Target Group</Label>
+              <Controller
+                name="gender"
+                control={control}
+                defaultValue="Unisex"
+                render={({ field }) => (
+                  <Select value={field.value || "Unisex"} onValueChange={field.onChange}>
+                    <SelectTrigger className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-black uppercase tracking-widest">
+                      <SelectValue placeholder="Select Gender" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border rounded-2xl p-2">
+                      {['Men', 'Women', 'Unisex', 'Kids'].map((g) => (
+                        <SelectItem key={g} value={g} className="rounded-xl py-3 font-black text-[10px] uppercase tracking-widest">
+                          {g}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-border/5 space-y-8">
+            <h4 className="text-xs font-black uppercase tracking-[0.25em] text-muted-foreground">Technical Specifications</h4>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+              <div className="space-y-4">
+                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Fit Type</Label>
+                <Input 
+                  {...register("specifications.fit")}
+                  placeholder="e.g. Oversized"
+                  className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
+                />
+              </div>
+              <div className="space-y-4">
+                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Sleeve</Label>
+                <Input 
+                  {...register("specifications.sleeve")}
+                  placeholder="e.g. Drop Shoulder"
+                  className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
+                />
+              </div>
+              <div className="space-y-4">
+                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Pattern</Label>
+                <Input 
+                  {...register("specifications.pattern")}
+                  placeholder="e.g. Solid Color"
+                  className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
+                />
+              </div>
+              <div className="space-y-4">
+                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Collar</Label>
+                <Input 
+                  {...register("specifications.collar")}
+                  placeholder="e.g. Crewneck"
+                  className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-border/5 space-y-8">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-black uppercase tracking-[0.25em] text-muted-foreground">Product FAQ Page Schema (AEO)</h4>
+              <Button
+                type="button"
+                onClick={handleAddFaq}
+                className="h-12 px-6 bg-indigo-600 text-white rounded-xl font-bold uppercase tracking-widest text-[9px] hover:bg-indigo-700 shadow-xl transition-all"
+              >
+                <Plus size={14} className="mr-2" /> Add FAQ Item
+              </Button>
+            </div>
+
+            {faqsList.length === 0 ? (
+              <div className="bg-muted/10 p-10 rounded-3xl border border-dashed border-border/10 text-center flex flex-col items-center gap-3">
+                 <HelpCircle size={32} className="opacity-10" strokeWidth={1.5} />
+                 <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-30 italic">No FAQs added yet. AI search engines will fallback to general FAQs.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {faqsList.map((faq, idx) => (
+                  <div key={idx} className="bg-muted/10 border border-border/5 rounded-3xl p-6 md:p-8 space-y-6 relative group shadow-md hover:border-indigo-600/10 transition-all">
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFaq(idx)}
+                      className="absolute top-4 right-4 w-8 h-8 rounded-full bg-rose-600/10 text-rose-600 flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-3">
+                        <Label className="text-[9px] font-black uppercase tracking-[0.25em] text-muted-foreground ml-1">Question {idx + 1}</Label>
+                        <Input 
+                          value={faq.question || ""}
+                          onChange={(e) => handleFaqChange(idx, "question", e.target.value)}
+                          placeholder="e.g. Is this fabric pre-shrunk?"
+                          className="h-14 bg-background border-border/10 rounded-xl px-5 font-bold"
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <Label className="text-[9px] font-black uppercase tracking-[0.25em] text-muted-foreground ml-1">Answer {idx + 1}</Label>
+                        <Textarea 
+                          rows={2}
+                          value={faq.answer || ""}
+                          onChange={(e) => handleFaqChange(idx, "answer", e.target.value)}
+                          placeholder="e.g. Yes, all our shirts are pre-shrunk to ensure perfect fit even after multiple washes."
+                          className="bg-background border-border/10 rounded-xl px-5 py-3 font-medium resize-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* SEO / AEO Engine */}
+        <div className="admin-table-form p-8 md:p-14 space-y-12 bg-card border border-border/80 dark:border-border/10 rounded-[2.5rem] shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">
+              <Globe size={20} className="text-indigo-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-[0.2em] text-foreground">SEO / AEO Engine</h3>
+              <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-80">Optimize search engine snippet and AI-search engines visibility</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="space-y-4 md:col-span-2">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Meta Title</Label>
+              <Input 
+                {...register("seo.metaTitle")}
+                placeholder="e.g. Minimalist Vanguard Oversized Tee | Premium Streetwear"
+                className="h-16 bg-muted/30 dark:bg-muted/10 border border-border/60 dark:border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
+              />
+            </div>
+            
+            <div className="space-y-4 md:col-span-2">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Meta Description</Label>
+              <Textarea 
+                rows={3}
+                {...register("seo.metaDescription")}
+                placeholder="e.g. Discover the Minimalist Vanguard Oversized Tee, designed with heavyweight premium cotton and a relaxed drop shoulder fit."
+                className="bg-muted/30 dark:bg-muted/10 border border-border/60 dark:border-border/10 rounded-3xl px-6 py-5 font-medium focus:ring-2 focus:ring-indigo-600/20 resize-none"
+              />
+            </div>
+
+            <div className="space-y-4 md:col-span-2">
+              <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">SEO Keywords (comma separated)</Label>
+              <Input 
+                {...register("seo.keywords")}
+                placeholder="e.g. oversized tee, luxury streetwear, minimalist clothing, premium cotton shirt"
+                className="h-16 bg-muted/30 dark:bg-muted/10 border border-border/60 dark:border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Visibility */}
+        <div className="admin-table-form p-8 md:p-14 space-y-12 bg-card border border-border/80 dark:border-border/10 rounded-[2.5rem] shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-2xl bg-foreground/5 flex items-center justify-center border border-foreground/10">
               <Settings size={20} className="text-foreground" />
             </div>
             <h3 className="text-sm font-black uppercase tracking-[0.2em]">Visibility & Settings</h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="space-y-4">
                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Tags</Label>
                <Input 
                   {...register("tags")}
                   placeholder="limited, organic, industrial"
-                  className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
+                  className="h-16 bg-muted/30 dark:bg-muted/10 border border-border/60 dark:border-border/10 rounded-2xl px-6 font-bold focus:ring-2 focus:ring-indigo-600/20"
                />
             </div>
-            <div className="flex flex-col sm:flex-row gap-8 items-center justify-end">
-               <div className="flex items-center gap-4 bg-muted/20 p-6 rounded-3xl border border-border/5 flex-1 w-full sm:w-auto">
+            <div className="lg:col-span-2 flex flex-col sm:flex-row gap-6 items-center justify-end">
+               {/* Active Toggle */}
+               <div className="flex items-center gap-4 bg-muted/40 dark:bg-muted/20 p-6 rounded-3xl border border-border/60 dark:border-border/10 flex-1 w-full sm:w-auto shadow-sm hover:shadow-md transition-all duration-300">
                  <Checkbox 
                    id="isActive" 
                    checked={watch("isActive")} 
                    onCheckedChange={(val) => setValue("isActive", val)}
-                   className="w-8 h-8 rounded-xl border-border/20 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                   className="w-8 h-8 rounded-xl border border-slate-300 dark:border-border/40 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
                  />
                  <div>
                    <p className="text-[10px] font-black uppercase tracking-widest leading-none">Active</p>
-                   <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-60">Visible to customers</p>
+                   <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-80">Visible to customers</p>
                  </div>
                </div>
-               <div className="flex items-center gap-4 bg-muted/20 p-6 rounded-3xl border border-border/5 flex-1 w-full sm:w-auto">
+
+               {/* Featured Toggle */}
+               <div className="flex items-center gap-4 bg-muted/40 dark:bg-muted/20 p-6 rounded-3xl border border-border/60 dark:border-border/10 flex-1 w-full sm:w-auto shadow-sm hover:shadow-md transition-all duration-300">
                  <Checkbox 
                    id="isFeatured" 
                    checked={watch("isFeatured")} 
                    onCheckedChange={(val) => setValue("isFeatured", val)}
-                   className="w-8 h-8 rounded-xl border-border/20 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
+                   className="w-8 h-8 rounded-xl border border-slate-300 dark:border-border/40 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
                  />
                  <div>
                    <p className="text-[10px] font-black uppercase tracking-widest leading-none">Featured</p>
-                   <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-60">Show on homepage</p>
-                  </div>
+                   <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-80">Show on homepage</p>
                  </div>
-                 <div className="flex items-center gap-4 bg-muted/20 p-6 rounded-3xl border border-border/5 flex-1 w-full sm:w-auto">
+               </div>
+
+               {/* Show Ratings Toggle */}
+               <div className="flex items-center gap-4 bg-muted/40 dark:bg-muted/20 p-6 rounded-3xl border border-border/60 dark:border-border/10 flex-1 w-full sm:w-auto shadow-sm hover:shadow-md transition-all duration-300">
                  <Checkbox 
                    id="showReviews" 
                    checked={watch("showReviews")} 
                    onCheckedChange={(val) => setValue("showReviews", val)}
-                   className="w-8 h-8 rounded-xl border-border/20 data-[state=checked]:bg-indigo-500 data-[state=checked]:border-indigo-500"
+                   className="w-8 h-8 rounded-xl border border-slate-300 dark:border-border/40 data-[state=checked]:bg-indigo-500 data-[state=checked]:border-indigo-500"
                  />
                  <div>
                    <p className="text-[10px] font-black uppercase tracking-widest leading-none">Show Ratings</p>
-                   <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-60">Show customer reviews</p>
+                   <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-80">Show customer reviews</p>
                  </div>
                </div>
             </div>
           </div>
 
-          <div className="pt-10 border-t border-border/5">
+          <div className="pt-10 border-t border-border/60 dark:border-border/10">
             <Button
               type="submit"
               disabled={isSubmitting}

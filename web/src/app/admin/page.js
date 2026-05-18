@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { useAdminDashboard } from "@/app/admin/_hooks/useAdminDashboard";
+import { 
+  useDashboardStats,
+  useDashboardRecentOrders,
+  useDashboardInventoryAlerts,
+  useDashboardRevenueTrend,
+  useDashboardCategoryStats,
+  useDashboardCustomerGrowth,
+  useDashboardRetention
+} from "@/app/admin/_hooks/useAdminDashboard";
 import { AdminHeader } from "@/app/admin/_components/dashboard/AdminHeader";
 import { StatsCards } from "@/app/admin/_components/dashboard/StatsCards";
 import { hasPermission } from "@/utils/rbacUtils";
@@ -50,25 +58,42 @@ export default function Dashboard() {
   const [userYear, setUserYear] = useState(new Date().getFullYear());
   const [userMonth, setUserMonth] = useState("all");
 
-  const { data: revData, isLoading: revLoading, isFetching: revFetching } = useAdminDashboard({
-    year: revYear,
-    month: revMonth,
-  });
+  // 🚀 Segmented parallel fetch calls for instant progressive rendering
+  const { data: statsData, isLoading: statsLoading, isFetching: statsFetching } = useDashboardStats();
+  const { data: recentOrders, isLoading: recentOrdersLoading } = useDashboardRecentOrders();
+  const { data: inventoryAlertsData, isLoading: inventoryAlertsLoading } = useDashboardInventoryAlerts();
+  const { data: trendData, isLoading: trendLoading, isFetching: trendFetching } = useDashboardRevenueTrend({ year: revYear, month: revMonth });
+  const { data: categoryStatsData, isLoading: categoryStatsLoading, isFetching: categoryStatsFetching } = useDashboardCategoryStats();
+  const { data: customerGrowthData, isLoading: customerGrowthLoading, isFetching: customerGrowthFetching } = useDashboardCustomerGrowth({ year: userYear, month: userMonth });
+  const { data: retentionData, isLoading: retentionLoading } = useDashboardRetention();
 
-  const { data: userData, isLoading: userLoading, isFetching: userFetching } = useAdminDashboard({
-    year: userYear,
-    month: userMonth,
-  });
+  // Mapped formats for premium component compatibility
+  const revenue = {
+    today: statsData?.revenue?.today || 0,
+    total: statsData?.revenue?.total || 0,
+    avgOrder: statsData?.revenue?.avgOrder || 0,
+    forecast: statsData?.revenue?.forecast || 0,
+    trend: trendData || []
+  };
 
-  // Use revData for general stats and revenue
-  const revenue = revData?.revenue || { today: 0, total: 0, avgOrder: 0, trend: [], forecast: 0 };
-  const inventory = revData?.inventory || { totalProducts: 0, outOfStock: 0, criticalItems: [] };
-  const categories = revData?.categories || [];
-  const recentOrders = revData?.recentOrders || [];
-  const analytics = revData?.analytics || { mostSoldCategories: [], retentionRate: 0 };
-  
-  // Use userData for user growth specifically
-  const customers = userData?.customers || { total: 0, newThisMonth: 0, growth: [], recent: [] };
+  const inventory = {
+    totalProducts: statsData?.inventory?.totalProducts || 0,
+    outOfStock: statsData?.inventory?.outOfStock || 0,
+    criticalItems: inventoryAlertsData?.criticalItems || []
+  };
+
+  const categories = categoryStatsData?.categories || [];
+  const analytics = {
+    mostSoldCategories: categoryStatsData?.mostSoldCategories || [],
+    retentionRate: retentionData?.retentionRate || 0
+  };
+
+  const customers = {
+    total: statsData?.customers?.total || 0,
+    newThisMonth: statsData?.customers?.newThisMonth || 0,
+    growth: customerGrowthData?.growth || [],
+    recent: customerGrowthData?.recent || []
+  };
 
   const { user } = useAuthStore();
   const router = useRouter();
@@ -91,18 +116,13 @@ export default function Dashboard() {
     );
   }
 
-
-  const isLoading = revLoading || userLoading;
-
-  const isFetching = revFetching || userFetching;
-
   return (
     <div className="admin-page-container space-y-8 pb-12">
       {/* 1. HEADER */}
       <AdminHeader 
-        isFetching={revFetching} 
+        isFetching={statsFetching} 
         todayRevenue={revenue.today} 
-        isLoading={revLoading}
+        isLoading={statsLoading}
       />
 
       {/* 2. KPI GRID */}
@@ -110,8 +130,8 @@ export default function Dashboard() {
         revenue={revenue} 
         customers={{ ...customers, retentionRate: analytics.retentionRate }} 
         inventory={inventory} 
-        recentOrdersCount={recentOrders.length} 
-        isLoading={revLoading}
+        recentOrdersCount={recentOrders?.length || 0} 
+        isLoading={statsLoading}
       />
 
       {/* 3. MAIN ANALYTICS ROW */}
@@ -123,15 +143,15 @@ export default function Dashboard() {
             setSelectedYear={setRevYear}
             selectedMonth={revMonth}
             setSelectedMonth={setRevMonth}
-            isFetching={revFetching}
-            isLoading={revLoading}
+            isFetching={trendFetching}
+            isLoading={trendLoading}
           />
         </div>
         <div className="lg:col-span-1">
           <CategoryPie 
             categories={categories} 
-            isFetching={revFetching} 
-            isLoading={revLoading}
+            isFetching={categoryStatsFetching} 
+            isLoading={categoryStatsLoading}
           />
         </div>
       </div>
@@ -145,26 +165,26 @@ export default function Dashboard() {
             setSelectedYear={setUserYear}
             selectedMonth={userMonth}
             setSelectedMonth={setUserMonth}
-            isFetching={userFetching}
-            isLoading={userLoading}
+            isFetching={customerGrowthFetching}
+            isLoading={customerGrowthLoading}
           />
         </div>
         <div className="lg:col-span-1">
           <TopSellingCategories 
             categories={analytics.mostSoldCategories} 
-            isLoading={revLoading}
+            isLoading={categoryStatsLoading}
           />
         </div>
       </div>
 
       {/* 5. DATA TABLES */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <RecentOrders recentOrders={recentOrders} isLoading={revLoading} />
-        <UsersTable users={customers.recent} isLoading={userLoading} />
+        <RecentOrders recentOrders={recentOrders || []} isLoading={recentOrdersLoading} />
+        <UsersTable users={customers.recent} isLoading={customerGrowthLoading} />
       </div>
 
       {/* 6. INVENTORY ALERTS */}
-      <InventoryAlerts inventory={inventory} isLoading={revLoading} />
+      <InventoryAlerts inventory={inventory} isLoading={inventoryAlertsLoading} />
     </div>
   );
 }

@@ -85,6 +85,20 @@ export default function ProductAddPage() {
         setValue("isActive", product.isActive);
         setValue("isFeatured", product.isFeatured || false);
         setValue("showReviews", product.showReviews !== false);
+        setValue("sku", product.sku || "");
+        setValue("gtin", product.gtin || "");
+        setValue("brand", product.brand || "");
+        setValue("material", product.material || "");
+        setValue("color", product.color || "");
+        setValue("gender", product.gender || "Unisex");
+        setValue("specifications.fit", product.specifications?.fit || "");
+        setValue("specifications.sleeve", product.specifications?.sleeve || "");
+        setValue("specifications.pattern", product.specifications?.pattern || "");
+        setValue("specifications.collar", product.specifications?.collar || "");
+        setValue("faqs", product.faqs || []);
+        setValue("seo.metaTitle", product.seo?.metaTitle || "");
+        setValue("seo.metaDescription", product.seo?.metaDescription || "");
+        setValue("seo.keywords", product.seo?.keywords || "");
 
         setExistingImages(product.images || []);
         setImagePreviews(product.images?.map((img) => getImageUrl(img)) || []);
@@ -168,6 +182,22 @@ export default function ProductAddPage() {
       "showReviews",
       data.showReviews === true || data.showReviews === "on",
     );
+
+    if (data.sku) formData.append("sku", data.sku.trim());
+    if (data.gtin) formData.append("gtin", data.gtin.trim());
+    if (data.brand) formData.append("brand", data.brand.trim());
+    if (data.material) formData.append("material", data.material.trim());
+    if (data.color) formData.append("color", data.color.trim());
+    formData.append("gender", data.gender || "Unisex");
+    if (data.specifications) {
+      formData.append("specifications", JSON.stringify(data.specifications));
+    }
+    if (data.faqs) {
+      formData.append("faqs", JSON.stringify(data.faqs));
+    }
+    if (data.seo) {
+      formData.append("seo", JSON.stringify(data.seo));
+    }
 
     if (data.sizes && typeof data.sizes === "object") {
       const sizesArray = [];

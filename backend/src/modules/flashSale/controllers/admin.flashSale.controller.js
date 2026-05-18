@@ -46,6 +46,7 @@ export const createFlashSale = asyncHandler(async (req, res) => {
   clearCache('cache:/api/flash-sales*');
   clearCache('cache:/api/products*');
   clearCache('cache:/api/home-layout*');
+  clearCache('cache:/api/admin/dashboard*');
 
   res.status(201).json(flashSale);
 });
@@ -82,6 +83,7 @@ export const updateFlashSale = asyncHandler(async (req, res) => {
   clearCache('cache:/api/flash-sales*');
   clearCache('cache:/api/products*');
   clearCache('cache:/api/home-layout*');
+  clearCache('cache:/api/admin/dashboard*');
 
   res.json(updatedSale);
 });
@@ -115,6 +117,7 @@ export const deleteFlashSale = asyncHandler(async (req, res) => {
   clearCache('cache:/api/flash-sales*');
   clearCache('cache:/api/products*');
   clearCache('cache:/api/home-layout*');
+  clearCache('cache:/api/admin/dashboard*');
 
   res.json({ message: 'Campaign Terminated' });
 });

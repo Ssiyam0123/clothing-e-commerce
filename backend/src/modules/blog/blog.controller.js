@@ -3,6 +3,7 @@ import Blog from "./blog.model.js";
 import { asyncHandler } from "../../middleware/asyncHandler.js";
 import slugify from "slugify";
 import { uploadImage, deleteImage } from "../../services/imageUploadService.js";
+import { clearCache } from "../../middleware/cacheMiddleware.js";
 
 // 📝 Create Post
 export const createPost = asyncHandler(async (req, res) => {
@@ -40,6 +41,8 @@ export const createPost = asyncHandler(async (req, res) => {
     seo: parsedSeo,
     author: req.user._id
   });
+
+  clearCache('cache:/api/admin/dashboard*');
 
   res.status(201).json(blog);
 });
@@ -132,6 +135,7 @@ export const updatePost = asyncHandler(async (req, res) => {
   Object.assign(blog, rest);
   
   const updatedBlog = await blog.save();
+  clearCache('cache:/api/admin/dashboard*');
   res.json(updatedBlog);
 });
 
@@ -144,5 +148,6 @@ export const deletePost = asyncHandler(async (req, res) => {
   if (blog.featuredImage) await deleteImage(blog.featuredImage);
 
   await blog.deleteOne();
+  clearCache('cache:/api/admin/dashboard*');
   res.json({ message: "Article purged from archives successfully." });
 });

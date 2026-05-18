@@ -22,6 +22,7 @@ export default function ProfileAvatarUpload({
               src={avatarPreview} 
               alt="Profile Preview" 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+              referrerPolicy="no-referrer"
             />
           </div>
           <button

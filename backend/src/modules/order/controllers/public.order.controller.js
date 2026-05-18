@@ -1,6 +1,7 @@
 import Order from "../order.model.js";
 import mongoose from "mongoose";
 import { asyncHandler } from "../../../middleware/asyncHandler.js";
+import { clearCache } from "../../../middleware/cacheMiddleware.js";
 import {
   calculateValidatedOrder,
   normalizeShippingAddress,
@@ -101,15 +102,18 @@ export const initPayment = asyncHandler(async (req, res) => {
       order.orderStatus = "Processing";
       await order.save();
       await finalizeOrderProcessing(order);
+      clearCache('cache:/api/admin/dashboard*');
       res.json(await handleCODGateway(order));
     } else if (paymentMethod === "bkash") {
       await order.save();
+      clearCache('cache:/api/admin/dashboard*');
       const bkashData = await initiateBkash(order, bkashCreds);
       order.paymentResult.bkashPaymentID = bkashData.paymentID;
       await order.save();
       res.json({ url: bkashData.url });
     } else {
       await order.save();
+      clearCache('cache:/api/admin/dashboard*');
       const sslUrl = await initiateSSLCommerz(order, sslCreds);
       res.json({ url: sslUrl });
     }
@@ -132,6 +136,7 @@ export const paymentSuccess = asyncHandler(async (req, res) => {
     order.orderStatus = "Processing";
     await order.save();
     await finalizeOrderProcessing(order);
+    clearCache('cache:/api/admin/dashboard*');
   }
   res.redirect(`${frontendUrl}/payment/success?orderId=${order?._id}`);
 });
@@ -157,6 +162,7 @@ export const bkashSuccess = asyncHandler(async (req, res) => {
       order.orderStatus = "Processing";
       await order.save();
       await finalizeOrderProcessing(order);
+      clearCache('cache:/api/admin/dashboard*');
       return res.redirect(`${frontendUrl}/payment/success?orderId=${order._id}`);
     }
   }
@@ -169,6 +175,7 @@ export const paymentFail = asyncHandler(async (req, res) => {
     { "paymentResult.transactionId": tran_id },
     { $set: { "paymentResult.status": "Failed", orderStatus: "Cancelled" } }
   );
+  clearCache('cache:/api/admin/dashboard*');
   res.redirect(`${frontendUrl}/payment/failed?tran_id=${tran_id}&reason=Payment rejected by gateway`);
 });
 
@@ -184,6 +191,7 @@ export const ipn = asyncHandler(async (req, res) => {
     order.paymentResult.val_id = val_id;
     await order.save();
     await finalizeOrderProcessing(order);
+    clearCache('cache:/api/admin/dashboard*');
   }
   res.status(200).send("OK");
 });

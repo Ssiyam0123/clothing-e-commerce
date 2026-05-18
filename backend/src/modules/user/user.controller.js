@@ -1,6 +1,7 @@
 import User from "./user.model.js";
 import { asyncHandler } from "../../middleware/asyncHandler.js";
 import { uploadImage, deleteImage } from "../../services/imageUploadService.js";
+import { clearCache } from "../../middleware/cacheMiddleware.js";
 
 // @desc    Get current logged-in user
 // @route   GET /api/users/me
@@ -36,6 +37,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
   user.avatar = avatarUrl;
 
   await user.save();
+  clearCache('cache:/api/admin/dashboard*');
 
   const updatedUser = await User.findById(user._id).populate("role");
 
@@ -153,6 +155,7 @@ export const updateUser = asyncHandler(async (req, res) => {
   }
 
   await user.save();
+  clearCache('cache:/api/admin/dashboard*');
 
   const updatedUser = await User.findById(user._id).populate("role");
 
@@ -187,5 +190,6 @@ export const deleteUser = asyncHandler(async (req, res) => {
   }
 
   await user.deleteOne();
+  clearCache('cache:/api/admin/dashboard*');
   res.json({ message: "User removed successfully" });
 });

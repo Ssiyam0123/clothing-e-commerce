@@ -48,7 +48,7 @@ export default async function ProductDetailsPage({ params }) {
     ),
     "sku": product.sku || product._id,
     "gtin13": product.gtin || "",
-    "brand": { "@type": "Brand", name: siteName },
+    "brand": { "@type": "Brand", name: product.brand || siteName },
     "material": product.material || "Premium Fabric",
     "color": product.color || "",
     "offers": {
@@ -76,32 +76,41 @@ export default async function ProductDetailsPage({ params }) {
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": `What is the material of ${product.name}?`,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": t.compositionDesc
-        }
-      },
-      {
-        "@type": "Question",
-        "name": `How to care for ${product.name}?`,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": t.maintenanceDesc
-        }
-      },
-      {
-        "@type": "Question",
-        "name": `Is the ${product.name} authentic?`,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": t.authenticityDesc
-        }
-      }
-    ]
+    "mainEntity": product.faqs && product.faqs.length > 0
+      ? product.faqs.map((faq) => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.answer
+          }
+        }))
+      : [
+          {
+            "@type": "Question",
+            "name": `What is the material of ${product.name}?`,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": t.compositionDesc
+            }
+          },
+          {
+            "@type": "Question",
+            "name": `How to care for ${product.name}?`,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": t.maintenanceDesc
+            }
+          },
+          {
+            "@type": "Question",
+            "name": `Is the ${product.name} authentic?`,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": t.authenticityDesc
+            }
+          }
+        ]
   };
 
   const breadcrumbSchema = {
@@ -217,6 +226,63 @@ export default async function ProductDetailsPage({ params }) {
                   {product.description}
                 </p>
 
+                {/* Specifications Grid */}
+                {(product.brand || product.material || product.color || product.gender || (product.specifications && Object.values(product.specifications).some(Boolean))) && (
+                  <div className="space-y-4 pt-2">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-secondary">{t.specifications || "Specifications"}</h3>
+                    <div className="grid grid-cols-2 gap-4 bg-muted/10 border border-border/5 rounded-2xl p-5 text-xs">
+                      {product.brand && (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] font-black uppercase tracking-wider text-muted-foreground">Brand</span>
+                          <span className="font-bold text-foreground">{product.brand}</span>
+                        </div>
+                      )}
+                      {product.material && (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] font-black uppercase tracking-wider text-muted-foreground">Material</span>
+                          <span className="font-bold text-foreground">{product.material}</span>
+                        </div>
+                      )}
+                      {product.color && (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] font-black uppercase tracking-wider text-muted-foreground">Color</span>
+                          <span className="font-bold text-foreground">{product.color}</span>
+                        </div>
+                      )}
+                      {product.gender && (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] font-black uppercase tracking-wider text-muted-foreground">Gender</span>
+                          <span className="font-bold text-foreground">{product.gender}</span>
+                        </div>
+                      )}
+                      {product.specifications?.fit && (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] font-black uppercase tracking-wider text-muted-foreground">Fit</span>
+                          <span className="font-bold text-foreground">{product.specifications.fit}</span>
+                        </div>
+                      )}
+                      {product.specifications?.sleeve && (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] font-black uppercase tracking-wider text-muted-foreground">Sleeve</span>
+                          <span className="font-bold text-foreground">{product.specifications.sleeve}</span>
+                        </div>
+                      )}
+                      {product.specifications?.pattern && (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] font-black uppercase tracking-wider text-muted-foreground">Pattern</span>
+                          <span className="font-bold text-foreground">{product.specifications.pattern}</span>
+                        </div>
+                      )}
+                      {product.specifications?.collar && (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] font-black uppercase tracking-wider text-muted-foreground">Collar</span>
+                          <span className="font-bold text-foreground">{product.specifications.collar}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Core USP Items */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 lg:pt-8">
                    <div className="flex flex-col items-center gap-3 text-center group/usp p-3 rounded-2xl hover:bg-accent/10 transition-all duration-500 border border-border/5">
@@ -262,29 +328,47 @@ export default async function ProductDetailsPage({ params }) {
                 {/* AEO / FAQ Section */}
                 <div className="space-y-8">
                   <div className="grid sm:grid-cols-2 gap-8">
-                    <div itemScope itemType="https://schema.org/Question" className="space-y-3">
-                      <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-secondary flex items-center gap-2">
-                        <div className="w-1 h-1 bg-accent-secondary rounded-full" />
-                        {t.composition}
-                      </h3>
-                      <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                        <p itemProp="text" className="text-xs text-muted-foreground leading-relaxed font-medium">
-                          {t.compositionDesc}
-                        </p>
-                      </div>
-                    </div>
+                    {product.faqs && product.faqs.length > 0 ? (
+                      product.faqs.map((faq, idx) => (
+                        <div key={idx} itemScope itemType="https://schema.org/Question" className="space-y-3 bg-muted/5 border border-border/5 rounded-2xl p-5 hover:bg-muted/10 transition-all">
+                          <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-secondary flex items-center gap-2">
+                            <div className="w-1 h-1 bg-accent-secondary rounded-full" />
+                            {faq.question}
+                          </h3>
+                          <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                            <p itemProp="text" className="text-xs text-muted-foreground leading-relaxed font-medium">
+                              {faq.answer}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <>
+                        <div itemScope itemType="https://schema.org/Question" className="space-y-3">
+                          <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-secondary flex items-center gap-2">
+                            <div className="w-1 h-1 bg-accent-secondary rounded-full" />
+                            {t.composition}
+                          </h3>
+                          <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                            <p itemProp="text" className="text-xs text-muted-foreground leading-relaxed font-medium">
+                              {t.compositionDesc}
+                            </p>
+                          </div>
+                        </div>
 
-                    <div itemScope itemType="https://schema.org/Question" className="space-y-3">
-                      <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-secondary flex items-center gap-2">
-                        <div className="w-1 h-1 bg-accent-secondary rounded-full" />
-                        {t.maintenance}
-                      </h3>
-                      <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                        <p itemProp="text" className="text-xs text-muted-foreground leading-relaxed font-medium">
-                          {t.maintenanceDesc}
-                        </p>
-                      </div>
-                    </div>
+                        <div itemScope itemType="https://schema.org/Question" className="space-y-3">
+                          <h3 itemProp="name" className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-secondary flex items-center gap-2">
+                            <div className="w-1 h-1 bg-accent-secondary rounded-full" />
+                            {t.maintenance}
+                          </h3>
+                          <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                            <p itemProp="text" className="text-xs text-muted-foreground leading-relaxed font-medium">
+                              {t.maintenanceDesc}
+                            </p>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -321,13 +405,12 @@ export default async function ProductDetailsPage({ params }) {
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   try {
-    const [res, settings] = await Promise.all([
-      fetch(`${API_URL}/products/details/${slug}`, { next: { revalidate: 3600 } }),
+    const [product, settings] = await Promise.all([
+      getProductDetails(slug),
       getSettings()
     ]);
     
-    if (!res.ok) throw new Error("Product not found");
-    const product = await res.json();
+    if (!product || product.error) throw new Error("Product not found");
     const branding = settings?.branding || {};
     const siteName = branding.siteName || "Store";
 
@@ -340,20 +423,26 @@ export async function generateMetadata({ params }) {
         : `${SITE_URL}${product.images[0]}`
       : `${SITE_URL}/og-image.jpg`;
 
+    const metaTitle = product.seo?.metaTitle || `${product.name} | ${siteName} Collection`;
+    const metaDescription = product.seo?.metaDescription || product.description?.slice(0, 160) || `Shop ${product.name} – premium apparel from ${siteName}.`;
+    
+    let keywords = [
+      product.name,
+      product.category?.name,
+      "premium",
+      siteName,
+    ];
+    if (product.seo?.keywords) {
+      keywords = product.seo.keywords.split(",").map(k => k.trim()).filter(Boolean);
+    }
+
     return {
-      title: `${product.name} | ${siteName} Collection`,
-      description:
-        product.description?.slice(0, 160) ||
-        `Shop ${product.name} – premium apparel from ${siteName}.`,
-      keywords: [
-        product.name,
-        product.category?.name,
-        "premium",
-        siteName,
-      ],
+      title: metaTitle,
+      description: metaDescription,
+      keywords: keywords,
       openGraph: {
-        title: product.name,
-        description: product.description?.slice(0, 160),
+        title: metaTitle,
+        description: metaDescription,
         images: [
           { url: imageUrl, width: 1200, height: 630, alt: product.name },
         ],
@@ -366,8 +455,8 @@ export async function generateMetadata({ params }) {
       },
       twitter: {
         card: "summary_large_image",
-        title: product.name,
-        description: product.description?.slice(0, 160),
+        title: metaTitle,
+        description: metaDescription,
         images: [imageUrl],
       },
     };

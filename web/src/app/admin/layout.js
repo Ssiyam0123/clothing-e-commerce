@@ -10,8 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/store/appStore";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
-import { Menu, Globe, Sun, Moon, LogOut } from "lucide-react";
+import { Menu, Globe, Sun, Moon, LogOut, BarChart3, ShoppingBag, Package, Layers, Image, Zap, Ticket, FileText, Users } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
+import api from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
 import { hasPermission, hasAnyAdminPermission } from "@/utils/rbacUtils";
@@ -24,6 +25,32 @@ export default function AdminLayout({ children }) {
   const { theme, toggleTheme, isMounted, isAdminSidebarCollapsed } = useAppStore();
   const { initSocket, disconnectSocket, fetchUnreadCount } = useChatStore();
   useTheme();
+
+  const [counts, setCounts] = useState(null);
+  const [showStatsDropdown, setShowStatsDropdown] = useState(false);
+
+  useEffect(() => {
+    if (token) {
+      api.get("/admin/counts")
+        .then((res) => setCounts(res.data))
+        .catch((err) => console.error("Error fetching admin counts", err));
+    }
+  }, [token, pathname]);
+
+  useEffect(() => {
+    setShowStatsDropdown(false);
+  }, [pathname]);
+
+  const statItems = [
+    { label: "Orders", count: counts?.orders, icon: ShoppingBag, color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20 dark:bg-emerald-500/20" },
+    { label: "Products", count: counts?.products, icon: Package, color: "text-blue-500 bg-blue-500/10 border-blue-500/20 dark:bg-blue-500/20" },
+    { label: "Categories", count: counts?.categories, icon: Layers, color: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20 dark:bg-indigo-500/20" },
+    { label: "Banners", count: counts?.banners, icon: Image, color: "text-purple-500 bg-purple-500/10 border-purple-500/20 dark:bg-purple-500/20" },
+    { label: "Flash Sales", count: counts?.flashSales, icon: Zap, color: "text-amber-500 bg-amber-500/10 border-amber-500/20 dark:bg-amber-500/20" },
+    { label: "Coupons", count: counts?.coupons, icon: Ticket, color: "text-rose-500 bg-rose-500/10 border-rose-500/20 dark:bg-rose-500/20" },
+    { label: "Blogs", count: counts?.blogs, icon: FileText, color: "text-cyan-500 bg-cyan-500/10 border-cyan-500/20 dark:bg-cyan-500/20" },
+    { label: "Users", count: counts?.users, icon: Users, color: "text-teal-500 bg-teal-500/10 border-teal-500/20 dark:bg-teal-500/20" },
+  ];
 
   const isChatRoute = pathname?.startsWith("/admin/chat");
   const isFullPage = isChatRoute;
@@ -142,6 +169,55 @@ export default function AdminLayout({ children }) {
                     Active
                   </span>
                 </div>
+
+                {/* 📊 Stats Hub Widget */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowStatsDropdown(!showStatsDropdown)}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest transition-all shadow-sm active:scale-95",
+                      showStatsDropdown
+                        ? "bg-foreground text-background border-foreground"
+                        : "bg-muted/50 text-muted-foreground border-border/50 hover:bg-muted hover:text-foreground"
+                    )}
+                  >
+                    <BarChart3 size={11} className="animate-bounce" />
+                    <span>Stats Hub</span>
+                  </button>
+
+                  {showStatsDropdown && (
+                    <>
+                      {/* Overlay to close on outside click */}
+                      <div className="fixed inset-0 z-40" onClick={() => setShowStatsDropdown(false)} />
+                      
+                      <div className="absolute left-0 mt-3 w-[290px] sm:w-[360px] bg-card/95 backdrop-blur-3xl border border-border rounded-3xl p-4 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                        <div className="flex items-center justify-between pb-3 border-b border-border/50 mb-3 text-foreground">
+                          <span className="text-[10px] font-black uppercase tracking-wider">Live Database Metrics</span>
+                          <span className="flex h-2 w-2 relative">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {statItems.map((item, idx) => {
+                            const IconComponent = item.icon;
+                            return (
+                              <div key={idx} className="flex items-center gap-3 p-2.5 rounded-2xl bg-muted/30 border border-border/30 hover:bg-muted/50 transition-all text-foreground">
+                                <div className={cn("p-2 rounded-xl border flex items-center justify-center shrink-0", item.color)}>
+                                  <IconComponent size={14} />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest truncate">{item.label}</p>
+                                  <p className="text-sm font-black tabular-nums">{item.count ?? 0}</p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center gap-3 md:gap-8">
@@ -172,6 +248,7 @@ export default function AdminLayout({ children }) {
                             src={getImageUrl(user.avatar)}
                             alt={user.name}
                             className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
+                            referrerPolicy="no-referrer"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-muted">

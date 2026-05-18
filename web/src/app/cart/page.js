@@ -81,8 +81,14 @@ function UnifiedSettlementContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("ssl");
   const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [deliveryZone, setDeliveryZone] = useState("dhaka");
+
+  useEffect(() => {
+    const activeCouriers = settings?.shipping?.couriers?.filter(c => c.isActive) || [];
+    if (activeCouriers.length > 0 && deliveryZone === "dhaka") {
+      setDeliveryZone(activeCouriers[0].name);
+    }
+  }, [settings, deliveryZone]);
 
   const [shippingInfo, setShippingInfo] = useState({
     name: "",
@@ -149,6 +155,11 @@ function UnifiedSettlementContent() {
   }, [paymentOptions, settingsLoading]);
 
   const shippingCharge = useMemo(() => {
+    const activeCouriers = settings?.shipping?.couriers?.filter(c => c.isActive) || [];
+    if (activeCouriers.length > 0) {
+      const selected = activeCouriers.find(c => c.name === deliveryZone);
+      if (selected) return selected.charge;
+    }
     const inside = settings?.shipping?.insideDhaka ?? 60;
     const outside = settings?.shipping?.outsideDhaka ?? 120;
     return deliveryZone === "dhaka" ? inside : outside;
@@ -298,6 +309,7 @@ function UnifiedSettlementContent() {
             {/* 02. Logistics Section */}
             <CartLogisticsForm 
               t={t}
+              settings={settings}
               shippingInfo={shippingInfo}
               setShippingInfo={setShippingInfo}
               deliveryZone={deliveryZone}

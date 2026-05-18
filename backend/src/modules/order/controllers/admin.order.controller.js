@@ -3,6 +3,7 @@ import User from "../../user/user.model.js";
 import Product from "../../product/product.model.js";
 import mongoose from "mongoose";
 import { asyncHandler } from "../../../middleware/asyncHandler.js";
+import { clearCache } from "../../../middleware/cacheMiddleware.js";
 import {
   calculateValidatedOrder,
   normalizeShippingAddress,
@@ -127,6 +128,8 @@ export const createOrderAdmin = asyncHandler(async (req, res) => {
   // 🚀 Finalize: Deduct stock and initialize post-order logic
   await finalizeOrderProcessing(createdOrder);
   
+  clearCache('cache:/api/admin/dashboard*');
+  
   res.status(201).json(createdOrder);
 });
 
@@ -187,6 +190,8 @@ export const updateOrder = asyncHandler(async (req, res) => {
 
   const oldStatus = order.orderStatus;
   await order.save();
+
+  clearCache('cache:/api/admin/dashboard*');
 
   // 📧 TRIGGER STATUS UPDATE EMAIL
   if (req.body.orderStatus && req.body.orderStatus !== oldStatus) {

@@ -47,6 +47,27 @@ const parseProductData = (req) => {
             }));
         } catch (e) { console.error("Size parsing error"); }
     }
+    if (body.sku !== undefined) parsedData.sku = body.sku === 'null' || body.sku === 'undefined' || !body.sku ? null : body.sku;
+    if (body.gtin !== undefined) parsedData.gtin = body.gtin === 'null' || body.gtin === 'undefined' || !body.gtin ? null : body.gtin;
+    if (body.brand !== undefined) parsedData.brand = body.brand === 'null' || body.brand === 'undefined' || !body.brand ? null : body.brand;
+    if (body.material !== undefined) parsedData.material = body.material === 'null' || body.material === 'undefined' || !body.material ? null : body.material;
+    if (body.color !== undefined) parsedData.color = body.color === 'null' || body.color === 'undefined' || !body.color ? null : body.color;
+    if (body.gender !== undefined) parsedData.gender = body.gender === 'null' || body.gender === 'undefined' || !body.gender ? 'Unisex' : body.gender;
+    if (body.specifications !== undefined) {
+        try {
+            parsedData.specifications = typeof body.specifications === 'string' ? JSON.parse(body.specifications) : body.specifications;
+        } catch (e) { console.error("specifications parsing error"); }
+    }
+    if (body.faqs !== undefined) {
+        try {
+            parsedData.faqs = typeof body.faqs === 'string' ? JSON.parse(body.faqs) : body.faqs;
+        } catch (e) { console.error("faqs parsing error"); }
+    }
+    if (body.seo !== undefined) {
+        try {
+            parsedData.seo = typeof body.seo === 'string' ? JSON.parse(body.seo) : body.seo;
+        } catch (e) { console.error("seo parsing error"); }
+    }
     return parsedData;
 };
 
@@ -74,6 +95,7 @@ export const createProduct = asyncHandler(async (req, res) => {
         clearCache('cache:/api/products*');
         clearCache('cache:/api/home-layout*');
         clearCache('cache:/api/flash-sales*');
+        clearCache('cache:/api/admin/dashboard*');
 
         res.status(201).json(product);
     } catch (error) {
@@ -287,6 +309,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
         clearCache('cache:/api/products*');
         clearCache('cache:/api/home-layout*');
         clearCache('cache:/api/flash-sales*');
+        clearCache('cache:/api/admin/dashboard*');
 
         res.json(product);
     } catch (error) {
@@ -306,6 +329,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
     clearCache('cache:/api/products*');
     clearCache('cache:/api/home-layout*');
     clearCache('cache:/api/flash-sales*');
+    clearCache('cache:/api/admin/dashboard*');
 
     res.json({ message: 'Product purged.' });
 });
@@ -440,6 +464,7 @@ export const patchProduct = asyncHandler(async (req, res) => {
         clearCache('cache:/api/products*');
         clearCache('cache:/api/home-layout*');
         clearCache('cache:/api/flash-sales*');
+        clearCache('cache:/api/admin/dashboard*');
     }
 
     res.json(product);

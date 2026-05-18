@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function FormInput({
@@ -17,6 +18,14 @@ export default function FormInput({
   ...props
 }) {
   const error = errors[name];
+  const isSecretField = 
+    type === "password" || 
+    /key|token|secret|pass|password|id|pixel|credential/i.test(name) ||
+    /key|token|secret|pass|password|id|pixel|credential/i.test(label);
+
+  const [showSecret, setShowSecret] = useState(false);
+
+  const inputType = isSecretField ? (showSecret ? "text" : "password") : type;
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -29,19 +38,31 @@ export default function FormInput({
         </Label>
       )}
       
-      <Input
-        id={name}
-        type={type}
-        {...register(name, {
-          required: required ? `${label} is required` : false,
-        })}
-        placeholder={placeholder}
-        className={cn(
-          "bg-background/50 border-border/10 h-12 rounded-xl text-[11px] font-bold uppercase tracking-wider focus-visible:ring-rose-600/20 focus:border-rose-600 transition-all shadow-inner",
-          error && "border-rose-600/50 bg-rose-600/5 focus:border-rose-600"
+      <div className="relative">
+        <Input
+          id={name}
+          type={inputType}
+          {...register(name, {
+            required: required ? `${label} is required` : false,
+          })}
+          placeholder={placeholder}
+          className={cn(
+            "bg-background/50 border-border/10 h-12 rounded-xl text-[11px] font-bold uppercase tracking-wider focus-visible:ring-rose-600/20 focus:border-rose-600 transition-all shadow-inner w-full pr-12",
+            isSecretField && "font-mono normal-case tracking-normal",
+            error && "border-rose-600/50 bg-rose-600/5 focus:border-rose-600"
+          )}
+          {...props}
+        />
+        {isSecretField && (
+          <button
+            type="button"
+            onClick={() => setShowSecret(!showSecret)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors p-1"
+          >
+            {showSecret ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
         )}
-        {...props}
-      />
+      </div>
       
       {error && (
         <p className="text-[9px] font-black uppercase tracking-widest text-rose-500 ml-1 animate-in fade-in slide-in-from-top-1">

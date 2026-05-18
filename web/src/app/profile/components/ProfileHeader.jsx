@@ -22,7 +22,7 @@ export default function ProfileHeader({ user, ui }) {
         <div className="relative group">
           <div className="absolute inset-0 bg-gradient-to-tr from-accent-secondary to-primary blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 rounded-full" />
           <Avatar className="h-24 w-24 sm:h-40 sm:w-40 md:h-48 md:w-48 border-[3px] sm:border-[6px] border-background shadow-2xl relative z-10">
-            <AvatarImage src={getImageUrl(user.avatar)} alt={user.name} className="object-cover" />
+            <AvatarImage src={getImageUrl(user.avatar)} alt={user.name} className="object-cover" referrerPolicy="no-referrer" />
             <AvatarFallback className="bg-accent text-2xl sm:text-4xl font-black">
               {user.name?.slice(0, 2).toUpperCase()}
             </AvatarFallback>

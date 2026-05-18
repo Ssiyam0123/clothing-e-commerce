@@ -7,6 +7,7 @@ import { OAuth2Client } from "google-auth-library";
 import axios from "axios";
 import ApiKey from "../settings/apiKey.model.js";
 import { decrypt } from "../../utils/encryption.js";
+import { clearCache } from "../../middleware/cacheMiddleware.js";
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -46,6 +47,8 @@ export const register = async (req, res) => {
       emailVerificationToken: verificationToken,
       isEmailVerified: false, 
     });
+
+    clearCache('cache:/api/admin/dashboard*');
 
     // Try to send verification email, but don't block registration
     let emailSent = false;
@@ -331,6 +334,8 @@ export const googleLogin = async (req, res) => {
         googleId,
         role: customerRole ? customerRole._id : null,
       });
+      // Clear caches
+      clearCache('cache:/api/admin/dashboard*');
       // Populate role after creation
       user = await User.findById(user._id).populate("role");
     }
@@ -403,6 +408,8 @@ export const facebookLogin = async (req, res) => {
         facebookId,
         role: customerRole ? customerRole._id : null,
       });
+      // Clear caches
+      clearCache('cache:/api/admin/dashboard*');
       // Populate role
       user = await User.findById(user._id).populate("role");
     }

@@ -19,22 +19,27 @@ export async function generateMetadata({ params }) {
       ? blog.featuredImage
       : `${SITE_URL}${blog.featuredImage}`;
 
+    const seoTitle = blog.seo?.metaTitle || `${blog.title} | Vanguard Journal`;
+    const seoDescription = blog.seo?.metaDescription || blog.excerpt?.slice(0, 160) || blog.title;
+    const seoKeywords = blog.seo?.keywords || blog.tags || [];
+
     return {
-      title: `${blog.title} | Vanguard Journal`,
-      description: blog.excerpt?.slice(0, 160) || blog.title,
+      title: seoTitle,
+      description: seoDescription,
+      keywords: seoKeywords,
       openGraph: {
-        title: blog.title,
-        description: blog.excerpt?.slice(0, 160),
+        title: blog.seo?.metaTitle || blog.title,
+        description: seoDescription,
         images: [{ url: imageUrl, width: 1200, height: 630, alt: blog.title }],
         type: "article",
         publishedTime: blog.createdAt,
         authors: [blog.author?.name || "Vanguard Team"],
-        tags: [blog.category],
+        tags: [blog.category, ...seoKeywords],
       },
       twitter: {
         card: "summary_large_image",
-        title: blog.title,
-        description: blog.excerpt?.slice(0, 160),
+        title: blog.seo?.metaTitle || blog.title,
+        description: seoDescription,
         images: [imageUrl],
         "twitter:label2": "Reading Time",
         "twitter:data2": blog.readingTime,
@@ -102,7 +107,7 @@ export default async function BlogPage({ params }) {
         url: `${SITE_URL}/logo.png`,
       },
     },
-    description: blog.excerpt,
+    description: blog.seo?.metaDescription || blog.excerpt || blog.title,
   };
 
   const breadcrumbSchema = {
