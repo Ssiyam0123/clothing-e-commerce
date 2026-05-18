@@ -59,3 +59,20 @@ export const useAdminBannerCampaigns = (params = {}) => {
     deleteCampaign: deleteCampaign.mutateAsync,
   };
 };
+
+export const useAdminBannerCampaign = (id) => {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["admin-banner-campaign", id],
+    queryFn: async () => {
+      const response = await api.get(`/banner-campaigns/${id}`);
+      return response.data;
+    },
+    enabled: !!id && id !== "new",
+  });
+
+  return {
+    campaign: data,
+    isLoading,
+    error,
+  };
+};

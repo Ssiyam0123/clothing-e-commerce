@@ -69,6 +69,20 @@ export const useAdminOrders = (params = {}, orderId = null) => {
     },
   });
 
+  const searchAdminProducts = async (query) => {
+    const { data } = await api.get("/admin/products", { 
+      params: { search: query, limit: 5, isActive: "all" } 
+    });
+    return data.products;
+  };
+
+  const searchAdminUsers = async (query) => {
+    const { data } = await api.get("/users", { 
+      params: { search: query, limit: 5 } 
+    });
+    return data.users;
+  };
+
   return {
     orders: allOrdersData?.orders || [],
     total: allOrdersData?.total || 0,
@@ -83,5 +97,7 @@ export const useAdminOrders = (params = {}, orderId = null) => {
     isSyncing: syncToPathao.isPending,
     createAdminOrder: createAdminOrder.mutateAsync,
     isCreating: createAdminOrder.isPending,
+    searchAdminProducts,
+    searchAdminUsers,
   };
 };

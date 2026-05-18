@@ -4,7 +4,7 @@ import { getImageUrl } from "@/utils/imageUtils";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function CustomerIntelligenceCard({
+export default function OrderCustomerDetailsCard({
   order,
   customerName,
   customerEmail,

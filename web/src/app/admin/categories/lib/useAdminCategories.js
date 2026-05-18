@@ -84,3 +84,23 @@ export const useAdminCategories = (params = {}, initialData = undefined) => {
     toggleFeatured: toggleFeatured.mutateAsync,
   };
 };
+
+export const useAdminCategory = (id) => {
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["category", id],
+    queryFn: async () => {
+      const response = await api.get(`/admin/categories/${id}`);
+      return response.data;
+    },
+    enabled: !!id && id !== "new" && !!user && hasPermission(user, ["categories:view", "all"]),
+  });
+
+  return {
+    category: data,
+    isLoading,
+    error,
+  };
+};

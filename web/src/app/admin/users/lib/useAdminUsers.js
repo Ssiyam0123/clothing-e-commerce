@@ -1,1 +1,1 @@
-export { useUsers as useAdminUsers } from "@/app/_auth/lib/useUsers";
+export { useUsers as useAdminUsers } from "@/app/(auth)/lib/useUsers";

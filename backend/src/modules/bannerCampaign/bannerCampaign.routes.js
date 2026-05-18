@@ -24,6 +24,7 @@ router.route('/')
   .post(protect, authorize('banner-campaigns:create'), upload.array('slideImages', 20), createCampaign);
 
 router.route('/:id')
+  .get(protect, authorize('banner-campaigns:view'), getPublicCampaignById)
   .put(protect, authorize('banner-campaigns:update'), upload.array('slideImages', 20), updateCampaign)
   .delete(protect, authorize('banner-campaigns:delete'), deleteCampaign);
 

@@ -38,11 +38,6 @@ export const useAdminFlashSales = (params = {}) => {
     },
   });
 
-  const getFlashSaleById = async (id) => {
-      const response = await api.get(`/admin/flash-sales/${id}`);
-      return response.data;
-  };
-
   return {
     flashSales: flashSales?.flashSales || [],
     total: flashSales?.total || 0,
@@ -52,6 +47,23 @@ export const useAdminFlashSales = (params = {}) => {
     createFlashSale: createFlashSale.mutateAsync,
     updateFlashSale: updateFlashSale.mutateAsync,
     deleteFlashSale: deleteFlashSale.mutateAsync,
-    getFlashSaleById,
+  };
+};
+
+export const useAdminFlashSale = (id) => {
+  const { user } = useAuthStore();
+  const { data: sale, isLoading, error } = useQuery({
+    queryKey: ["adminFlashSale", id],
+    queryFn: async () => {
+      const response = await api.get(`/admin/flash-sales/${id}`);
+      return response.data;
+    },
+    enabled: !!id && id !== "new" && !!user && hasPermission(user, ["flash-sales:view", "all"]),
+  });
+
+  return {
+    sale,
+    isLoading,
+    error,
   };
 };

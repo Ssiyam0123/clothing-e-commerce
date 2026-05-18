@@ -169,3 +169,50 @@ export const useAdminProducts = (initialFilters = {}) => {
     createProduct: createProduct.mutateAsync,
   };
 };
+
+export const useAdminProduct = (id) => {
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["product", id],
+    queryFn: async () => {
+      const response = await api.get(`/admin/products/${id}`);
+      return response.data;
+    },
+    enabled: !!id && !!user && hasPermission(user, ["products:view", "all"]),
+  });
+
+  const updateProduct = useMutation({
+    mutationFn: async (updatedData) => {
+      const isFormData = updatedData instanceof FormData;
+      const response = await api.put(`/admin/products/${id}`, updatedData, {
+        headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
+      queryClient.invalidateQueries({ queryKey: ["product", id] });
+    },
+  });
+
+  const patchProduct = useMutation({
+    mutationFn: async (patchedData) => {
+      const response = await api.patch(`/admin/products/${id}`, patchedData);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
+      queryClient.invalidateQueries({ queryKey: ["product", id] });
+    },
+  });
+
+  return {
+    product: data,
+    isLoading,
+    error,
+    updateProduct: updateProduct.mutateAsync,
+    patchProduct: patchProduct.mutateAsync,
+  };
+};

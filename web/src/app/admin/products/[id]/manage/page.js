@@ -1,41 +1,39 @@
 "use client";
 
 import { use, useEffect, useState, useMemo } from "react";
-import { useAdminProducts } from "@/app/admin/products/lib/useAdminProducts";
+import { useAdminProduct } from "@/app/admin/products/lib/useAdminProducts";
 import { useSizes } from "@/app/_common/lib/useSizes";
 import Loader from "@/components/common/Loader";
 import { getImageUrl } from "@/utils/imageUtils";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Box, DollarSign, Image, MessageSquare } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 // Subcomponents for each Tab
 import ManageStockTab from "@/app/admin/products/components/ManageStockTab";
 import ManagePricingTab from "@/app/admin/products/components/ManagePricingTab";
 import ManageImagesTab from "@/app/admin/products/components/ManageImagesTab";
 import ManageReviewsTab from "@/app/admin/products/components/ManageReviewsTab";
+import ProductManageNavigation from "@/app/admin/products/components/ProductManageNavigation";
 
 export default function ProductManagementPage({ params: paramsPromise }) {
   const params = use(paramsPromise);
   const { id } = params;
-  const { products, updateProduct, patchProduct } = useAdminProducts();
+  const { product: fetchedProduct, isLoading, updateProduct, patchProduct } = useAdminProduct(id);
   const { sizes } = useSizes();
 
-  const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
   const [activeTab, setActiveTab] = useState("stock");
 
   // Find and bind current product
   useEffect(() => {
-    if (products && products.length > 0) {
-      const found = products.find(p => p._id === id);
-      if (found) {
-        setProduct(found);
-        setLoading(false);
-      }
+    if (fetchedProduct) {
+      setProduct(fetchedProduct);
     }
-  }, [products, id]);
+  }, [fetchedProduct]);
 
   const filteredSizes = useMemo(() => {
     if (!product || !sizes) return [];
@@ -45,7 +43,7 @@ export default function ProductManagementPage({ params: paramsPromise }) {
     );
   }, [product, sizes]);
 
-  if (loading) {
+  if (isLoading || !product) {
     return (
       <div className="admin-page-container flex items-center justify-center min-h-[60vh]">
         <Loader />
@@ -54,9 +52,9 @@ export default function ProductManagementPage({ params: paramsPromise }) {
   }
 
   return (
-    <div className="admin-page-container max-w-6xl pb-24">
+    <div className="admin-page-container max-w-[1400px] mx-auto pb-32">
       {/* 🔙 Navigation */}
-      <div className="mb-4">
+      <div className="mb-6">
         <Link href="/admin/products">
           <Button 
             variant="ghost" 
@@ -71,7 +69,7 @@ export default function ProductManagementPage({ params: paramsPromise }) {
       </div>
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 bg-card p-8 rounded-[2.5rem] border border-border shadow-sm">
         <div>
           <h1 className="admin-title">
             Manage <span className="text-muted-foreground/30">Console</span>
@@ -91,60 +89,48 @@ export default function ProductManagementPage({ params: paramsPromise }) {
       </div>
 
       {/* Control Center Tabs */}
-      <Tabs defaultValue="stock" onValueChange={setActiveTab} className="space-y-10">
-        <TabsList className="bg-muted/10 border border-border/5 p-1 rounded-2xl h-16 w-full flex overflow-x-auto justify-start md:justify-center items-center scrollbar-none gap-2">
-          <TabsTrigger value="stock" className="flex-1 rounded-xl h-12 font-black text-[9px] uppercase tracking-widest data-[state=active]:bg-foreground data-[state=active]:text-background">
-             Stock Levels
-          </TabsTrigger>
-          <TabsTrigger value="pricing" className="flex-1 rounded-xl h-12 font-black text-[9px] uppercase tracking-widest data-[state=active]:bg-foreground data-[state=active]:text-background">
-             Pricing Metrics
-          </TabsTrigger>
-          <TabsTrigger value="images" className="flex-1 rounded-xl h-12 font-black text-[9px] uppercase tracking-widest data-[state=active]:bg-foreground data-[state=active]:text-background">
-             Product Images
-          </TabsTrigger>
-          <TabsTrigger value="reviews" className="flex-1 rounded-xl h-12 font-black text-[9px] uppercase tracking-widest data-[state=active]:bg-foreground data-[state=active]:text-background">
-             Reviews ({product?.showReviews === false ? "Off" : "Active"})
-          </TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="stock" onValueChange={setActiveTab} className="w-full">
+        {/* Workspace Card */}
+        <div className="bg-card border border-border p-8 md:p-14 rounded-[3rem] shadow-sm flex flex-col justify-start min-h-[650px] lg:min-h-[700px] w-full">
+           {/* Tab 1: Stock levels */}
+           <TabsContent value="stock" className="focus-visible:outline-none mt-0 w-full">
+             <ManageStockTab 
+               product={product} 
+               filteredSizes={filteredSizes} 
+               updateProduct={updateProduct} 
+             />
+           </TabsContent>
 
-        {/* Tab 1: Stock levels */}
-        <TabsContent value="stock" className="focus-visible:outline-none">
-          <ManageStockTab 
-            product={product} 
-            filteredSizes={filteredSizes} 
-            updateProduct={updateProduct} 
-          />
-        </TabsContent>
+           {/* Tab 2: Pricing Metrics */}
+           <TabsContent value="pricing" className="focus-visible:outline-none mt-0 w-full">
+             <ManagePricingTab 
+               product={product} 
+               updateProduct={updateProduct} 
+             />
+           </TabsContent>
 
-        {/* Tab 2: Pricing Metrics */}
-        <TabsContent value="pricing" className="focus-visible:outline-none">
-          <ManagePricingTab 
-            product={product} 
-            updateProduct={updateProduct} 
-          />
-        </TabsContent>
+           {/* Tab 3: Product Images */}
+           <TabsContent value="images" className="focus-visible:outline-none mt-0 w-full">
+             <ManageImagesTab 
+               product={product} 
+               updateProduct={updateProduct}
+               setProduct={setProduct}
+             />
+           </TabsContent>
 
-        {/* Tab 3: Product Images */}
-        <TabsContent value="images" className="focus-visible:outline-none">
-          <ManageImagesTab 
-            product={product} 
-            updateProduct={updateProduct}
-            setProduct={setProduct}
-          />
-        </TabsContent>
+           {/* Tab 4: Reviews list */}
+           <TabsContent value="reviews" className="focus-visible:outline-none mt-0 w-full">
+             <ManageReviewsTab 
+               product={product} 
+               setProduct={setProduct} 
+               patchProduct={patchProduct} 
+             />
+           </TabsContent>
+        </div>
 
-        {/* Tab 4: Reviews list */}
-        <TabsContent value="reviews" className="focus-visible:outline-none">
-          <ManageReviewsTab 
-            product={product} 
-            setProduct={setProduct} 
-            patchProduct={patchProduct} 
-          />
-        </TabsContent>
+        {/* 📱 Unified Floating Tabs Navigation */}
+        <ProductManageNavigation activeTab={activeTab} product={product} />
       </Tabs>
     </div>
   );
 }
-
-
-

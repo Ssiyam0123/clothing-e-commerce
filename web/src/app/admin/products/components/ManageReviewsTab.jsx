@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Star, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { MessageSquare, Star, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Loader from "@/components/common/Loader";
 import { getImageUrl } from "@/utils/imageUtils";
 import { swalToast, swalError, swalConfirm } from "@/utils/swal";
 import { useProductReviews } from "@/app/admin/products/lib/useProductReviews";
+import Pagination from "@/components/common/Pagination";
 
 export default function ManageReviewsTab({ product, setProduct, patchProduct }) {
   const [page, setPage] = useState(1);
@@ -127,47 +128,12 @@ export default function ManageReviewsTab({ product, setProduct, patchProduct }) 
                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
                   Showing {Math.min(totalReviews, (page - 1) * limit + 1)}-{Math.min(totalReviews, page * limit)} of {totalReviews} Reviews
                 </p>
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    disabled={page === 1}
-                    onClick={() => setPage(p => p - 1)}
-                    className="h-10 px-4 rounded-xl text-[9px] font-black uppercase tracking-widest border border-border/5 hover:bg-muted/10"
-                    variant="outline"
-                  >
-                    <ChevronLeft size={14} className="mr-1" /> Previous
-                  </Button>
-                  
-                  {Array.from({ length: totalPages }).map((_, idx) => {
-                    const pNum = idx + 1;
-                    return (
-                      <Button
-                        key={pNum}
-                        type="button"
-                        onClick={() => setPage(pNum)}
-                        className={cn(
-                          "h-10 w-10 rounded-xl text-[9px] font-black p-0 transition-all duration-300",
-                          page === pNum 
-                            ? "bg-foreground text-background scale-105" 
-                            : "border border-border/5 text-muted-foreground hover:text-foreground hover:bg-muted/10"
-                        )}
-                        variant={page === pNum ? "default" : "outline"}
-                      >
-                        {pNum}
-                      </Button>
-                    );
-                  })}
-
-                  <Button
-                    type="button"
-                    disabled={page === totalPages}
-                    onClick={() => setPage(p => p + 1)}
-                    className="h-10 px-4 rounded-xl text-[9px] font-black uppercase tracking-widest border border-border/5 hover:bg-muted/10"
-                    variant="outline"
-                  >
-                    Next <ChevronRight size={14} className="ml-1" />
-                  </Button>
-                </div>
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  onPageChange={setPage}
+                  className="py-0 mx-0 justify-end w-auto"
+                />
               </div>
             )}
          </div>

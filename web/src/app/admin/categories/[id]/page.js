@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { useAdminCategories } from "@/app/admin/categories/lib/useAdminCategories";
+import { useAdminCategories, useAdminCategory } from "@/app/admin/categories/lib/useAdminCategories";
 import { getImageUrl } from "@/utils/imageUtils";
 import { swalToast, swalError } from "@/utils/swal";
 import { Input } from "@/components/ui/input";
@@ -19,8 +19,9 @@ export default function CategoryFormPage() {
   const router = useRouter();
   const isEdit = id !== "new";
 
-  const { categories, isLoading, createCategory, updateCategory } = useAdminCategories();
-  const [loading, setLoading] = useState(isEdit);
+  const { createCategory, updateCategory } = useAdminCategories();
+  const { category, isLoading: isCategoryLoading } = useAdminCategory(id);
+  
   const [imagePreview, setImagePreview] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,21 +34,13 @@ export default function CategoryFormPage() {
   } = useForm();
 
   useEffect(() => {
-    if (isEdit && categories) {
-      const category = categories.find((c) => c._id === id);
-      if (category) {
-        setValue("name", category.name);
-        setValue("slug", category.slug);
-        setValue("description", category.description || "");
-        if (category.image) setImagePreview(getImageUrl(category.image));
-        setLoading(false);
-      } else if (categories) {
-        setLoading(false);
-      }
-    } else {
-      setLoading(false);
+    if (isEdit && category) {
+      setValue("name", category.name);
+      setValue("slug", category.slug);
+      setValue("description", category.description || "");
+      if (category.image) setImagePreview(getImageUrl(category.image));
     }
-  }, [isEdit, id, categories, setValue]);
+  }, [isEdit, category, setValue]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -87,7 +80,7 @@ export default function CategoryFormPage() {
     }
   };
 
-  if (loading)
+  if (isEdit && isCategoryLoading)
     return (
       <div className="admin-page-container flex items-center justify-center min-h-[40vh]">
         <Loader />

@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useAdminUsers } from "@/app/admin/users/lib/useAdminUsers";
-import { useRoles } from "@/app/_auth/lib/useRoles";
+import { useRoles } from "@/app/(auth)/lib/useRoles";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Loader from "@/components/common/Loader";
