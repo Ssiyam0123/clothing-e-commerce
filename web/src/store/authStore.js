@@ -33,6 +33,50 @@ export const useAuthStore = create(
         }
       },
 
+      loginWithGoogle: async (idToken) => {
+        set({ isLoading: true });
+        try {
+          const { data } = await api.post("/auth/google-login", { idToken });
+
+          localStorage.setItem("token", data.token);
+          set({
+            user: data.user,
+            token: data.token,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+
+          await useProductStore.getState().syncGuestDataWithUser();
+
+          return data;
+        } catch (error) {
+          set({ isLoading: false });
+          throw error;
+        }
+      },
+
+      loginWithFacebook: async (accessToken) => {
+        set({ isLoading: true });
+        try {
+          const { data } = await api.post("/auth/facebook-login", { accessToken });
+
+          localStorage.setItem("token", data.token);
+          set({
+            user: data.user,
+            token: data.token,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+
+          await useProductStore.getState().syncGuestDataWithUser();
+
+          return data;
+        } catch (error) {
+          set({ isLoading: false });
+          throw error;
+        }
+      },
+
       logout: () => {
         localStorage.removeItem("token");
 

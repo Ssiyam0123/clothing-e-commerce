@@ -34,6 +34,10 @@ const apiKeySchema = new mongoose.Schema({
     // SMS
     smsApiKey: { type: String, default: "" },
     smsSenderId: { type: String, default: "" },
+
+    // Social Auth
+    googleClientId: { type: String, default: "" },
+    facebookAppId: { type: String, default: "" },
 }, { timestamps: true });
 
 const ApiKey = mongoose.model('ApiKey', apiKeySchema);

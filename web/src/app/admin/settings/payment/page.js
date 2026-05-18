@@ -3,16 +3,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Save, Settings2 } from "lucide-react";
-import { toast } from "sonner";
-import api from "@/lib/api";
+import { useSettings } from "@/hooks/useSettings";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FormInput from "@/app/admin/_components/FormInput";
 import { cn } from "@/lib/utils";
 
 export default function PaymentPage() {
-  const [loading, setLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(true);
+  const { settings, isLoading, updateSettings, isUpdating } = useSettings();
   const [formData, setFormData] = useState({
     paymentOptions: {
       cod: true,
@@ -31,42 +29,25 @@ export default function PaymentPage() {
     }
   });
 
+  // Sync state with React Query cache instantly on load/update
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const { data } = await api.get("/settings");
-        if (data) {
-          setFormData({
-            paymentOptions: data.paymentOptions || formData.paymentOptions,
-            payment: data.payment || formData.payment,
-          });
-        }
-      } catch (error) {
-        toast.error("Failed to load payment settings.");
-      } finally {
-        setIsFetching(false);
-      }
-    };
-    fetchSettings();
-  }, []);
+    if (settings) {
+      setFormData({
+        paymentOptions: settings.paymentOptions || formData.paymentOptions,
+        payment: settings.payment || formData.payment,
+      });
+    }
+  }, [settings]);
 
   const handleSave = async () => {
-    setLoading(true);
-    try {
-      const payload = new FormData();
-      payload.append("paymentOptions", JSON.stringify(formData.paymentOptions));
-      payload.append("payment", JSON.stringify(formData.payment));
+    const payload = new FormData();
+    payload.append("paymentOptions", JSON.stringify(formData.paymentOptions));
+    payload.append("payment", JSON.stringify(formData.payment));
 
-      await api.put("/settings", payload);
-      toast.success("Payment settings updated!");
-    } catch (error) {
-      toast.error("Failed to update payment settings.");
-    } finally {
-      setLoading(false);
-    }
+    await updateSettings(payload);
   };
 
-  if (isFetching) return <div className="animate-pulse h-96 bg-muted rounded-3xl" />;
+  if (isLoading && !settings) return <div className="animate-pulse h-96 bg-muted rounded-3xl" />;
 
   return (
     <Card className="rounded-[2rem] md:rounded-[3rem] border-border/10 bg-card/30 backdrop-blur-2xl shadow-2xl overflow-hidden">
@@ -131,6 +112,7 @@ export default function PaymentPage() {
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-black uppercase tracking-widest italic text-primary">SSLCommerz Settings</h3>
                   <button 
+                    type="button"
                     onClick={() => setFormData({...formData, payment: {...formData.payment, sslIsTest: !formData.payment?.sslIsTest}})}
                     className={cn("px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest transition-all", formData.payment?.sslIsTest ? "bg-orange-500/20 text-orange-500" : "bg-emerald-500/20 text-emerald-500")}
                   >
@@ -161,6 +143,7 @@ export default function PaymentPage() {
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-black uppercase tracking-widest italic text-primary">bKash Settings</h3>
                   <button 
+                    type="button"
                     onClick={() => setFormData({...formData, payment: {...formData.payment, bkashIsTest: !formData.payment?.bkashIsTest}})}
                     className={cn("px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest transition-all", formData.payment?.bkashIsTest ? "bg-orange-500/20 text-orange-500" : "bg-emerald-500/20 text-emerald-500")}
                   >
@@ -208,11 +191,11 @@ export default function PaymentPage() {
           <div className="pt-16 border-t border-border/5 flex justify-end">
             <Button
               onClick={handleSave}
-              disabled={loading}
+              disabled={isUpdating}
               className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
             >
-              <Save size={16} className={cn("mr-2", loading && "animate-pulse")} />
-              {loading ? "Updating Payments..." : "Save Payment Options"}
+              <Save size={16} className={cn("mr-2", isUpdating && "animate-pulse")} />
+              {isUpdating ? "Updating Payments..." : "Save Payment Options"}
             </Button>
           </div>
         </motion.div>

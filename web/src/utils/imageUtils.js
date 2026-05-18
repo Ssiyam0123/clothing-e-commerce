@@ -1,6 +1,9 @@
 export const getImageUrl = (path, width = 800, quality = 75) => {
   if (!path) return 'https://placehold.co/800x800/222/white?text=Product';
   if (path.startsWith('blob:') || path.startsWith('data:')) return path;
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    if (!path.includes('cloudinary.com')) return path;
+  }
   
   // Cloudinary optimizations: f_auto (WebP/AVIF), q_auto (smart quality), c_limit (fit within width)
   const params = ['f_auto', 'q_auto', 'c_limit', `w_${width}`];
@@ -12,7 +15,6 @@ export const getImageUrl = (path, width = 800, quality = 75) => {
     if (path.includes('/upload/')) {
       // Check if it already has parameters (e.g., /upload/v123/ or /upload/w_100/)
       const parts = path.split('/upload/');
-      const afterUpload = parts[1].split('/');
       
       // If the first part after /upload/ doesn't look like a version (v123) or a folder, 
       // it might be parameters. To be safe, we always inject ours.

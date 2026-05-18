@@ -27,7 +27,8 @@ export const getSettings = asyncHandler(async (req, res) => {
         marketing: ['fbPixelId', 'fbAccessToken', 'fbTestEventCode', 'gtmId', 'tiktokPixelId', 'tiktokAccessToken', 'snapPixelId', 'pinterestTagId', 'googleAdsId', 'clarityId'],
         payment: ['sslStoreId', 'sslStorePassword', 'sslIsTest', 'bkashAppKey', 'bkashAppSecret', 'bkashUsername', 'bkashPassword', 'bkashIsTest'],
         smtp: ['mailHost', 'mailPort', 'mailUser', 'mailPass', 'mailFrom'],
-        sms: ['smsApiKey', 'smsSenderId']
+        sms: ['smsApiKey', 'smsSenderId'],
+        auth: ['googleClientId', 'facebookAppId']
     };
 
     const response = { ...settings.toObject() };
@@ -69,7 +70,7 @@ export const updateSettings = asyncHandler(async (req, res) => {
     if (req.body.shipping) updateData.shipping = parseField('shipping');
     
     // Handle API Keys / Credentials (Encrypted)
-    const credentialFields = ['marketing', 'smtp', 'payment', 'sms'];
+    const credentialFields = ['marketing', 'smtp', 'payment', 'sms', 'auth'];
     let combinedCredentials = {};
     let hasCredentials = false;
 

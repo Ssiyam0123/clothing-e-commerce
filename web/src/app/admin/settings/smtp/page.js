@@ -3,16 +3,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Save } from "lucide-react";
-import { toast } from "sonner";
-import api from "@/lib/api";
+import { useSettings } from "@/hooks/useSettings";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FormInput from "@/app/admin/_components/FormInput";
 import { cn } from "@/lib/utils";
 
 export default function SMTPPage() {
-  const [loading, setLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(true);
+  const { settings, isLoading, updateSettings, isUpdating } = useSettings();
   const [formData, setFormData] = useState({
     mailHost: "",
     mailPort: "",
@@ -21,37 +19,26 @@ export default function SMTPPage() {
     mailFrom: "",
   });
 
+  // Sync state with React Query cache instantly on load/update
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const { data } = await api.get("/settings");
-        if (data?.smtp) {
-          setFormData(data.smtp);
-        }
-      } catch (error) {
-        toast.error("Failed to load SMTP settings.");
-      } finally {
-        setIsFetching(false);
-      }
-    };
-    fetchSettings();
-  }, []);
+    if (settings?.smtp) {
+      setFormData({
+        mailHost: settings.smtp.mailHost || "",
+        mailPort: settings.smtp.mailPort || "",
+        mailUser: settings.smtp.mailUser || "",
+        mailPass: settings.smtp.mailPass || "",
+        mailFrom: settings.smtp.mailFrom || "",
+      });
+    }
+  }, [settings]);
 
   const handleSave = async () => {
-    setLoading(true);
-    try {
-      const payload = new FormData();
-      payload.append("smtp", JSON.stringify(formData));
-      await api.put("/settings", payload);
-      toast.success("Email configuration updated!");
-    } catch (error) {
-      toast.error("Failed to update email settings.");
-    } finally {
-      setLoading(false);
-    }
+    const payload = new FormData();
+    payload.append("smtp", JSON.stringify(formData));
+    await updateSettings(payload);
   };
 
-  if (isFetching) return <div className="animate-pulse h-96 bg-muted rounded-3xl" />;
+  if (isLoading && !settings) return <div className="animate-pulse h-96 bg-muted rounded-3xl" />;
 
   return (
     <Card className="rounded-[2rem] md:rounded-[3rem] border-border/10 bg-card/30 backdrop-blur-2xl shadow-2xl overflow-hidden">
@@ -112,11 +99,11 @@ export default function SMTPPage() {
           <div className="pt-12 border-t border-border/5 flex justify-end">
             <Button
               onClick={handleSave}
-              disabled={loading}
+              disabled={isUpdating}
               className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
             >
-              <Save size={16} className={cn("mr-2", loading && "animate-pulse")} />
-              {loading ? "Updating Email..." : "Save Email Config"}
+              <Save size={16} className={cn("mr-2", isUpdating && "animate-pulse")} />
+              {isUpdating ? "Updating Email..." : "Save Email Config"}
             </Button>
           </div>
         </motion.div>

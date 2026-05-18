@@ -3,67 +3,43 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Save } from "lucide-react";
-import { toast } from "sonner";
-import api from "@/lib/api";
-import { useAppStore } from "@/store/appStore";
-import { revalidateSettings } from "@/app/actions/revalidate";
+import { useSettings } from "@/hooks/useSettings";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function ThemePage() {
-  const { initApp } = useAppStore();
-  const [loading, setLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(true);
+  const { settings, isLoading, updateSettings, isUpdating } = useSettings();
   const [formData, setFormData] = useState({
     defaultThemeColor: "Zinc",
     defaultThemeFont: "Inter",
     activeTheme: "executive",
   });
 
+  // Sync state with React Query cache instantly on load/update
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const { data } = await api.get("/settings");
-        if (data?.branding) {
-          setFormData({
-            defaultThemeColor: data.branding.defaultThemeColor || "Zinc",
-            defaultThemeFont: data.branding.defaultThemeFont || "Inter",
-            activeTheme: data.branding.activeTheme || "executive",
-          });
-        }
-      } catch (error) {
-        toast.error("Failed to load theme settings.");
-      } finally {
-        setIsFetching(false);
-      }
-    };
-    fetchSettings();
-  }, []);
+    if (settings?.branding) {
+      setFormData({
+        defaultThemeColor: settings.branding.defaultThemeColor || "Zinc",
+        defaultThemeFont: settings.branding.defaultThemeFont || "Inter",
+        activeTheme: settings.branding.activeTheme || "executive",
+      });
+    }
+  }, [settings]);
 
   const handleSave = async () => {
-    setLoading(true);
-    try {
-      // Branding update includes theme settings
-      const { data: currentSettings } = await api.get("/settings");
-      const updatedBranding = { ...currentSettings.branding, ...formData };
-      
-      const payload = new FormData();
-      payload.append("branding", JSON.stringify(updatedBranding));
+    // Branding update includes theme settings
+    const updatedBranding = { ...settings?.branding, ...formData };
+    
+    const payload = new FormData();
+    payload.append("branding", JSON.stringify(updatedBranding));
 
-      await api.put("/settings", payload);
-
-      toast.success("Theme settings updated!");
-      await initApp();
-      await revalidateSettings();
-    } catch (error) {
-      toast.error("Failed to update theme settings.");
-    } finally {
-      setLoading(false);
-    }
+    await updateSettings(payload);
   };
 
-  if (isFetching) return <div className="animate-pulse h-96 bg-muted rounded-3xl" />;
+  if (isLoading && !settings) {
+    return <div className="animate-pulse h-96 bg-muted rounded-3xl" />;
+  }
 
   return (
     <Card className="rounded-[2rem] md:rounded-[3rem] border-border/10 bg-card/30 backdrop-blur-2xl shadow-2xl overflow-hidden">
@@ -93,6 +69,7 @@ export default function ThemePage() {
                   key={item.name}
                   onClick={() => setFormData({ ...formData, defaultThemeColor: item.name })}
                   className="group flex flex-col items-center gap-4 transition-all"
+                  type="button"
                 >
                   <div className={cn(
                     "w-16 h-16 rounded-full shadow-2xl transition-all flex items-center justify-center relative",
@@ -134,6 +111,7 @@ export default function ThemePage() {
                       ? "border-accent-secondary bg-accent-secondary/5 shadow-2xl"
                       : "border-border/5 hover:border-border/20 bg-muted/20"
                   )}
+                  type="button"
                 >
                   <div className="flex flex-col gap-4">
                     <span className="text-2xl font-black italic tracking-tighter" style={{ fontFamily: font }}>Aa</span>
@@ -164,6 +142,7 @@ export default function ThemePage() {
                       ? "border-accent-secondary bg-accent-secondary/5 shadow-2xl"
                       : "border-border/5 hover:border-border/20 bg-muted/20"
                   )}
+                  type="button"
                 >
                   <span className="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">
                     {theme}
@@ -179,11 +158,11 @@ export default function ThemePage() {
           <div className="pt-16 border-t border-border/5 flex justify-end">
             <Button
               onClick={handleSave}
-              disabled={loading}
+              disabled={isUpdating}
               className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
             >
-              <Save size={16} className={cn("mr-2", loading && "animate-pulse")} />
-              {loading ? "Updating Styles..." : "Save Styles"}
+              <Save size={16} className={cn("mr-2", isUpdating && "animate-pulse")} />
+              {isUpdating ? "Updating Styles..." : "Save Styles"}
             </Button>
           </div>
         </motion.div>

@@ -7,6 +7,8 @@ import { swalToast, swalError } from "@/utils/swal";
 import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import { getTranslation } from "@/utils/typography/handler";
+import { Eye, EyeOff } from "lucide-react";
+import SocialAuthButtons from "@/components/common/SocialAuthButtons";
 
 export default function RegisterPage() {
   const { register } = useAuthStore();
@@ -14,7 +16,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const t = useMemo(() => getTranslation('auth', lang), [lang]);
@@ -24,10 +26,6 @@ export default function RegisterPage() {
 
     if (!name || !email || !password) {
       return swalError(t.missingFields, lang === 'bn' ? "দয়া করে সব তথ্য পূরণ করুন।" : "Please fill in all fields");
-    }
-
-    if (password !== confirmPassword) {
-      return swalError(lang === 'bn' ? "পাসওয়ার্ড মিলেনি" : "Password Mismatch", lang === 'bn' ? "পাসওয়ার্ড দুটি একই হতে হবে।" : "Passwords do not match");
     }
 
     if (password.length < 6) {
@@ -118,28 +116,27 @@ export default function RegisterPage() {
           <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">
             {t.passwordLabel}
           </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full bg-accent/10 border border-border/5 rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-accent-secondary/30 transition-all font-bold text-sm"
-            placeholder="••••••••"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">
-            {t.confirmPasswordLabel}
-          </label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            className="w-full bg-accent/10 border border-border/5 rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-accent-secondary/30 transition-all font-bold text-sm"
-            placeholder="••••••••"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full bg-accent/10 border border-border/5 rounded-2xl pl-6 pr-14 py-4 outline-none focus:ring-2 focus:ring-accent-secondary/30 transition-all font-bold text-sm"
+              placeholder="••••••••"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground/45 hover:text-foreground transition-colors cursor-pointer p-1"
+            >
+              {showPassword ? (
+                <EyeOff className="w-5 h-5" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
 
         <motion.button
@@ -152,6 +149,8 @@ export default function RegisterPage() {
           {isSubmitting ? t.signingUp : t.signUp}
         </motion.button>
       </form>
+
+      <SocialAuthButtons onSuccessRedirect={() => window.location.href = "/"} />
 
       <div className="mt-10 pt-8 border-t border-border/10 text-center">
         <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest opacity-60">

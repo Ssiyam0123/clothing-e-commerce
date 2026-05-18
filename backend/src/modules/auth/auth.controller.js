@@ -3,6 +3,10 @@ import Role from "../role/role.model.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { sendVerificationEmail, sendPasswordResetEmail } from "../../services/email.service.js";
+import { OAuth2Client } from "google-auth-library";
+import axios from "axios";
+import ApiKey from "../settings/apiKey.model.js";
+import { decrypt } from "../../utils/encryption.js";
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -240,5 +244,184 @@ export const getMe = async (req, res) => {
   } catch (error) {
     console.error("Get me error:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Google Login Verification
+export const googleLogin = async (req, res) => {
+  const { idToken, accessToken } = req.body;
+
+  if (!idToken && !accessToken) {
+    return res.status(400).json({ message: "Google ID Token or Access Token is required" });
+  }
+
+  try {
+    let googleId, email, name, picture;
+    let googleClientId = process.env.GOOGLE_CLIENT_ID;
+
+    // Retrieve and decrypt googleClientId from ApiKey settings collection
+    try {
+      const apiKeys = await ApiKey.findOne();
+      if (apiKeys && apiKeys.googleClientId) {
+        googleClientId = decrypt(apiKeys.googleClientId);
+      }
+    } catch (dbErr) {
+      console.error("Failed to fetch googleClientId from database:", dbErr.message);
+    }
+
+    // Determine if the token is a JWT ID Token or an Access Token
+    // A JWT consists of three base64url-encoded parts separated by dots
+    const isJWT = typeof idToken === "string" && idToken.split(".").length === 3;
+
+    if (idToken && isJWT) {
+      if (!googleClientId) {
+        return res.status(400).json({ message: "Google client ID is not configured on the server." });
+      }
+      const client = new OAuth2Client(googleClientId);
+      const ticket = await client.verifyIdToken({
+        idToken,
+        audience: googleClientId,
+      });
+
+      const payload = ticket.getPayload();
+      googleId = payload.sub;
+      email = payload.email;
+      name = payload.name;
+      picture = payload.picture;
+    } else {
+      // Treat as access token (either from accessToken field or misnamed idToken field)
+      const tokenToUse = accessToken || idToken;
+      if (!tokenToUse) {
+        return res.status(400).json({ message: "Google ID Token or Access Token is required" });
+      }
+      // Validate using Google UserInfo API using the access token
+      const response = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+        headers: { Authorization: `Bearer ${tokenToUse}` },
+      });
+      googleId = response.data.sub;
+      email = response.data.email;
+      name = response.data.name;
+      picture = response.data.picture;
+    }
+
+    if (!email) {
+      return res.status(400).json({ message: "Google account does not provide an email" });
+    }
+
+    // Assign default "customer" role
+    const customerRole = await Role.findOne({ name: "customer" });
+
+    // Find or create user
+    let user = await User.findOne({ email: email.toLowerCase() }).populate("role");
+
+    if (user) {
+      // Merge/update google information if missing
+      user.googleId = googleId;
+      user.provider = "google";
+      user.isEmailVerified = true;
+      if (!user.avatar) user.avatar = picture || "";
+      await user.save();
+    } else {
+      user = await User.create({
+        name,
+        email: email.toLowerCase(),
+        avatar: picture || "",
+        isEmailVerified: true,
+        provider: "google",
+        googleId,
+        role: customerRole ? customerRole._id : null,
+      });
+      // Populate role after creation
+      user = await User.findById(user._id).populate("role");
+    }
+
+    const token = generateToken(user._id);
+
+    res.json({
+      message: "Google login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Google login verification error:", error);
+    res.status(400).json({ message: "Invalid Google ID Token or Access Token" });
+  }
+};
+
+// Facebook Login Verification
+export const facebookLogin = async (req, res) => {
+  const { accessToken } = req.body;
+
+  if (!accessToken) {
+    return res.status(400).json({ message: "Facebook Access Token is required" });
+  }
+
+  try {
+    // Call Facebook Graph API to verify the token and get user details
+    const fbResponse = await axios.get(
+      `https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=${accessToken}`
+    );
+
+    const { id: facebookId, name, email, picture } = fbResponse.data;
+
+    // Facebook accounts might not return email in rare cases (e.g. registered with phone only)
+    const userEmail = email ? email.toLowerCase() : `${facebookId}@facebook.com`;
+
+    // Assign default "customer" role
+    const customerRole = await Role.findOne({ name: "customer" });
+
+    // Find or create user
+    let user = await User.findOne({ 
+      $or: [
+        { email: userEmail },
+        { facebookId: facebookId }
+      ]
+    }).populate("role");
+
+    const avatarUrl = picture?.data?.url || "";
+
+    if (user) {
+      // Merge/update facebook information
+      user.facebookId = facebookId;
+      user.provider = "facebook";
+      user.isEmailVerified = true;
+      if (!user.avatar) user.avatar = avatarUrl;
+      await user.save();
+    } else {
+      user = await User.create({
+        name,
+        email: userEmail,
+        avatar: avatarUrl,
+        isEmailVerified: true,
+        provider: "facebook",
+        facebookId,
+        role: customerRole ? customerRole._id : null,
+      });
+      // Populate role
+      user = await User.findById(user._id).populate("role");
+    }
+
+    const token = generateToken(user._id);
+
+    res.json({
+      message: "Facebook login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Facebook login verification error:", error);
+    res.status(400).json({ message: "Invalid Facebook Access Token" });
   }
 };

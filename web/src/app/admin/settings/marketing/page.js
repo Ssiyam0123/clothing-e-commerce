@@ -3,16 +3,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Save } from "lucide-react";
-import { toast } from "sonner";
-import api from "@/lib/api";
+import { useSettings } from "@/hooks/useSettings";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FormInput from "@/app/admin/_components/FormInput";
 import { cn } from "@/lib/utils";
 
 export default function MarketingPage() {
-  const [loading, setLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(true);
+  const { settings, isLoading, updateSettings, isUpdating } = useSettings();
   const [formData, setFormData] = useState({
     fbPixelId: "",
     fbAccessToken: "",
@@ -26,37 +24,31 @@ export default function MarketingPage() {
     clarityId: ""
   });
 
+  // Sync state with React Query cache instantly on load/update
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const { data } = await api.get("/settings");
-        if (data?.marketing) {
-          setFormData(data.marketing);
-        }
-      } catch (error) {
-        toast.error("Failed to load marketing settings.");
-      } finally {
-        setIsFetching(false);
-      }
-    };
-    fetchSettings();
-  }, []);
+    if (settings?.marketing) {
+      setFormData({
+        fbPixelId: settings.marketing.fbPixelId || "",
+        fbAccessToken: settings.marketing.fbAccessToken || "",
+        fbTestEventCode: settings.marketing.fbTestEventCode || "",
+        gtmId: settings.marketing.gtmId || "",
+        tiktokPixelId: settings.marketing.tiktokPixelId || "",
+        tiktokAccessToken: settings.marketing.tiktokAccessToken || "",
+        snapPixelId: settings.marketing.snapPixelId || "",
+        pinterestTagId: settings.marketing.pinterestTagId || "",
+        googleAdsId: settings.marketing.googleAdsId || "",
+        clarityId: settings.marketing.clarityId || ""
+      });
+    }
+  }, [settings]);
 
   const handleSave = async () => {
-    setLoading(true);
-    try {
-      const payload = new FormData();
-      payload.append("marketing", JSON.stringify(formData));
-      await api.put("/settings", payload);
-      toast.success("Marketing tracking updated!");
-    } catch (error) {
-      toast.error("Failed to update marketing settings.");
-    } finally {
-      setLoading(false);
-    }
+    const payload = new FormData();
+    payload.append("marketing", JSON.stringify(formData));
+    await updateSettings(payload);
   };
 
-  if (isFetching) return <div className="animate-pulse h-96 bg-muted rounded-3xl" />;
+  if (isLoading && !settings) return <div className="animate-pulse h-96 bg-muted rounded-3xl" />;
 
   return (
     <Card className="rounded-[2rem] md:rounded-[3rem] border-border/10 bg-card/30 backdrop-blur-2xl shadow-2xl overflow-hidden">
@@ -155,11 +147,11 @@ export default function MarketingPage() {
           <div className="pt-12 border-t border-border/5 flex justify-end">
             <Button
               onClick={handleSave}
-              disabled={loading}
+              disabled={isUpdating}
               className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
             >
-              <Save size={16} className={cn("mr-2", loading && "animate-pulse")} />
-              {loading ? "Updating Marketing..." : "Save Marketing Keys"}
+              <Save size={16} className={cn("mr-2", isUpdating && "animate-pulse")} />
+              {isUpdating ? "Updating Marketing..." : "Save Marketing Keys"}
             </Button>
           </div>
         </motion.div>
