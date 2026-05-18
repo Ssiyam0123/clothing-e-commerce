@@ -55,20 +55,28 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://clothing-e-commerce-web.vercel.app",
   process.env.FRONTEND_URL,
-].filter(Boolean);
+]
+  .filter(Boolean)
+  .map(origin => origin.trim().replace(/\/$/, "")); // Trim whitespace and remove trailing slashes
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || origin === 'null' || allowedOrigins.includes(origin)) {
+      if (!origin || origin === 'null') {
+        return callback(null, true);
+      }
+      
+      const sanitizedOrigin = origin.trim().replace(/\/$/, "");
+      
+      if (allowedOrigins.includes(sanitizedOrigin)) {
         callback(null, true);
       } else {
         console.warn(`⚠️ CORS blocked for origin: ${origin}`);
-        // In development, we can be a bit more permissive if needed
+        // Fallback for subdomains or development environments
         if (process.env.NODE_ENV === 'development') {
-           return callback(null, true);
+          return callback(null, true);
         }
-        callback(new Error("Not allowed by CORS"));
+        callback(null, false); // Return false instead of throwing 500 error, letting browser handle CORS rejection cleanly
       }
     },
     credentials: true,
