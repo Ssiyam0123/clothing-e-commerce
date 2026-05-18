@@ -82,6 +82,7 @@ function UnifiedSettlementContent() {
   const [paymentMethod, setPaymentMethod] = useState("ssl");
   const [couponCode, setCouponCode] = useState("");
   const [deliveryZone, setDeliveryZone] = useState("dhaka");
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
 
   useEffect(() => {
     const activeCouriers = settings?.shipping?.couriers?.filter(c => c.isActive) || [];
