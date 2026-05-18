@@ -440,6 +440,9 @@ export async function generateMetadata({ params }) {
       title: metaTitle,
       description: metaDescription,
       keywords: keywords,
+      alternates: {
+        canonical: `${SITE_URL}/products/${slug}`,
+      },
       openGraph: {
         title: metaTitle,
         description: metaDescription,

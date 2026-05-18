@@ -45,6 +45,9 @@ export async function generateMetadata({ searchParams }) {
   return {
     title,
     description,
+    alternates: {
+      canonical: `${SITE_URL}/products${category ? `?category=${category}${subcategory ? `&subcategory=${subcategory}` : ""}` : ""}`,
+    },
     openGraph: {
       title,
       description,
