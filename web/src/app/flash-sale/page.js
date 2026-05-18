@@ -40,7 +40,45 @@ async function FlashSaleDataWrapper({ dataPromise }) {
 }
 
 
-export const metadata = {
-  title: "Exclusive Flash Drops | Vanguard",
-  description: "Limited time premium offers and exclusive drops. High-performance streetwear artifacts.",
-};
+import { getSettings } from "@/lib/settings";
+
+export async function generateMetadata() {
+  const settings = await getSettings();
+  const siteName = settings?.branding?.siteName || "Vanguard";
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://clothing-e-commerce-web.vercel.app";
+
+  let salesCount = 0;
+  let activeSalesNames = [];
+  try {
+    const sales = await getFlashSales();
+    const activeSales = (sales || []).filter(s => s.isActive);
+    salesCount = activeSales.length;
+    activeSalesNames = activeSales.map(s => s.name);
+  } catch (e) {
+    console.error("Flash sale metadata fetch failed", e);
+  }
+
+  const title = `Limited Flash Drops & Campaigns | ${siteName}`;
+  const description = salesCount > 0
+    ? `Shop our active exclusive flash campaigns: ${activeSalesNames.join(", ")}. Limited time streetwear drops up to 70% off at ${siteName}!`
+    : `Explore limited-time exclusive drops and high-performance streetwear artifacts on flash sale at ${siteName}.`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${SITE_URL}/flash-sale`,
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `${SITE_URL}/flash-sale`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    }
+  };
+}

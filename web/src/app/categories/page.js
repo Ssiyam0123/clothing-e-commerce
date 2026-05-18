@@ -25,13 +25,37 @@ export async function generateMetadata() {
   const settings = await getSettings();
   const branding = settings?.branding || {};
   const siteName = branding.siteName || "Store";
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://clothing-e-commerce-web.vercel.app";
+
+  let catList = [];
+  try {
+    const categories = await getCategories();
+    catList = (categories || []).map(c => c.name);
+  } catch (e) {
+    console.error("Categories metadata fetch failed", e);
+  }
+
+  const title = `Curated Collections & Categories | ${siteName}`;
+  const description = catList.length > 0
+    ? `Explore our premium curated collections: ${catList.join(", ")}. Discover tactical streetwear and active apparel at ${siteName}.`
+    : `Explore our curated collections of premium streetwear and apparel at ${siteName}.`;
 
   return {
-    title: `Categories | ${siteName}`,
-    description: "Explore our curated collections of premium artifacts and apparel.",
+    title,
+    description,
+    alternates: {
+      canonical: `${SITE_URL}/categories`,
+    },
     openGraph: {
-      title: `Categories - ${siteName}`,
-      description: "Explore our curated collections of premium artifacts and apparel.",
+      title,
+      description,
+      type: "website",
+      url: `${SITE_URL}/categories`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     }
   };
 }

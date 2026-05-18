@@ -9,14 +9,52 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
   "https://clothing-e-commerce-web.vercel.app";
 
-export const metadata = {
-  title: "Vanguard Journal | Streetwear Narrative",
-  description:
-    "Explore the tactical aesthetic and fabric narratives at the Vanguard Journal. Latest trends in sustainable streetwear.",
-  alternates: {
-    canonical: `${SITE_URL}/blog`,
-  },
-};
+import { getSettings } from "@/lib/settings";
+
+export async function generateMetadata() {
+  const settings = await getSettings();
+  const siteName = settings?.branding?.siteName || "Vanguard";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://clothing-e-commerce-web.vercel.app";
+
+  let blogCount = 0;
+  let categories = [];
+  try {
+    const res = await fetch(`${API_URL}/blogs?fields=category`, { next: { revalidate: 3600 } });
+    if (res.ok) {
+      const data = await res.json();
+      const blogs = data.blogs || [];
+      blogCount = blogs.length;
+      categories = [...new Set(blogs.map(b => b.category))].filter(Boolean);
+    }
+  } catch (e) {
+    console.error("Blog metadata fetch failed", e);
+  }
+
+  const title = `Tactical Aesthetic & Streetwear Journal | ${siteName}`;
+  const description = blogCount > 0
+    ? `Read our ${blogCount} exclusive streetwear journals and fabric narratives. Discover latest trends in ${categories.slice(0, 3).join(", ").toLowerCase()} and sustainable tactical fashion at ${siteName}.`
+    : `Explore the tactical aesthetic and fabric narratives at the Vanguard Journal. Latest trends in sustainable streetwear at ${siteName}.`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${SITE_URL}/blog`,
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `${SITE_URL}/blog`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    }
+  };
+}
 
 export default async function BlogPage() {
   const cookieStore = await cookies();
