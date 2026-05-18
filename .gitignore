@@ -9,6 +9,7 @@
 # Explicitly allow essential root configuration
 !/.gitignore
 !/README.md
+!/render.yaml
 
 # Handle nested ignores (optional but good practice)
 # If you want to ignore specific things inside backend or web, 
