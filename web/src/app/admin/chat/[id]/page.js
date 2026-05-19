@@ -141,6 +141,53 @@ export default function AdminChatPage() {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Lock body/html scroll and dynamically size container based on mobile visual viewport (keyboard)
+  useEffect(() => {
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const originalBodyHeight = document.body.style.height;
+    const originalHtmlHeight = document.documentElement.style.height;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.height = "100%";
+    document.documentElement.style.height = "100%";
+
+    const preventScroll = () => {
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener("scroll", preventScroll);
+
+    const handleVisualResize = () => {
+      if (!window.visualViewport) return;
+      const viewport = window.visualViewport;
+      const container = document.getElementById("admin-chat-detail-container");
+      if (container) {
+        container.style.height = `${viewport.height}px`;
+        container.style.top = `${viewport.offsetTop}px`;
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleVisualResize);
+      window.visualViewport.addEventListener("scroll", handleVisualResize);
+      handleVisualResize();
+    }
+
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.height = originalBodyHeight;
+      document.documentElement.style.height = originalHtmlHeight;
+      
+      window.removeEventListener("scroll", preventScroll);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleVisualResize);
+        window.visualViewport.removeEventListener("scroll", handleVisualResize);
+      }
+    };
+  }, []);
+
   const handleSend = () => {
     if (input.trim() && socket) {
       socket.emit("send_message", {
@@ -190,7 +237,7 @@ export default function AdminChatPage() {
   if (!conversation) return null;
 
   return (
-    <div className="absolute inset-0 flex flex-col bg-[#f0f2f5] dark:bg-[#0b141a] overflow-hidden">
+    <div id="admin-chat-detail-container" className="absolute inset-0 flex flex-col bg-[#f0f2f5] dark:bg-[#0b141a] overflow-hidden">
       {/* Chat Header */}
       <header className="h-[60px] bg-[#f0f2f5] dark:bg-[#202c33] px-4 flex items-center justify-between border-l border-border/5 shrink-0 z-10 shadow-sm">
         <div className="flex items-center gap-3">

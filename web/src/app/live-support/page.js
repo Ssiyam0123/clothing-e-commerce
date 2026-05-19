@@ -84,6 +84,56 @@ export default function LiveSupportPage() {
     }
   }, [messages]);
 
+  // Lock body/html scroll on mobile devices and adjust container size via Visual Viewport API
+  useEffect(() => {
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const originalBodyHeight = document.body.style.height;
+    const originalHtmlHeight = document.documentElement.style.height;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.height = "100%";
+    document.documentElement.style.height = "100%";
+
+    // Prevent body/document scrolling
+    const preventScroll = () => {
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener("scroll", preventScroll);
+
+    // Visual Viewport resize handler for mobile keyboards
+    const handleVisualResize = () => {
+      if (!window.visualViewport) return;
+      const viewport = window.visualViewport;
+      const container = document.getElementById("live-support-container");
+      if (container) {
+        container.style.height = `${viewport.height}px`;
+        container.style.top = `${viewport.offsetTop}px`;
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleVisualResize);
+      window.visualViewport.addEventListener("scroll", handleVisualResize);
+      // Run once
+      handleVisualResize();
+    }
+
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.height = originalBodyHeight;
+      document.documentElement.style.height = originalHtmlHeight;
+      
+      window.removeEventListener("scroll", preventScroll);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleVisualResize);
+        window.visualViewport.removeEventListener("scroll", handleVisualResize);
+      }
+    };
+  }, []);
+
   const handleSend = () => {
     if (input.trim() && isConnected) {
       sendMessage({ text: input });
@@ -149,7 +199,7 @@ export default function LiveSupportPage() {
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-[#f0f2f5] dark:bg-[#0b141a] overflow-hidden z-50">
+    <div id="live-support-container" className="fixed inset-0 flex flex-col bg-[#f0f2f5] dark:bg-[#0b141a] overflow-hidden z-50">
       {/* Header */}
       <header className="h-[64px] bg-white dark:bg-[#202c33] px-4 md:px-8 flex items-center justify-between border-b border-border/10 shrink-0 z-20 shadow-sm">
         <div className="flex items-center gap-3">
