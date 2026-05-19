@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import RichTextEditor from "./RichTextEditor";
 import { ArrowLeft, Globe, ImageIcon, Loader2, Plus, Save, Zap } from "lucide-react";
@@ -26,7 +26,7 @@ export default function BlogForm({ blog = null, onSubmit, isSubmitting, mode = "
     isEdit && blog ? getImageUrl(blog.featuredImage) : null
   );
   const [imageFile, setImageFile] = useState(null);
-  const fileInputRef = useState(null);
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     title: blog?.title || "",
@@ -164,7 +164,7 @@ export default function BlogForm({ blog = null, onSubmit, isSubmitting, mode = "
             </div>
 
             <div className="flex gap-3">
-              <Button variant="outline" onClick={() => document.querySelector('input[type=file]').click()} className="flex-1">Change</Button>
+              <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="flex-1">Change</Button>
               <Button variant="ghost" onClick={() => { setImageFile(null); setImagePreview(null); }} className="flex-1">Remove</Button>
             </div>
           </Card>

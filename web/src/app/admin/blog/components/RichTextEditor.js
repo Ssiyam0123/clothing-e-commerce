@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 // 🚀 Dynamically import Jodit to avoid SSR issues
 const JoditEditor = dynamic(() => import("jodit-react"), { 
   ssr: false,
-  loading: () => <div className="h-[600px] w-full bg-accent/10 animate-pulse rounded-[2.5rem] flex items-center justify-center font-black uppercase tracking-widest text-[10px] text-muted-foreground/30">Deploying Tactical Environment...</div>
+  loading: () => <div className="h-[600px] w-full bg-accent/10 animate-pulse rounded-xl flex items-center justify-center font-black uppercase tracking-widest text-[10px] text-muted-foreground/30">Deploying Tactical Environment...</div>
 });
 
 export default function RichTextEditor({ value, onChange, placeholder = "Initialize narrative data stream..." }) {
@@ -199,15 +199,15 @@ export default function RichTextEditor({ value, onChange, placeholder = "Initial
         }
 
         .jodit-container {
-          border: 1px solid rgba(255, 255, 255, 0.05) !important;
+          border: 1px solid rgba(255, 255, 255, 0.08) !important;
           background: #09090b !important;
-          border-radius: 2.5rem !important;
+          border-radius: 12px !important;
           overflow: hidden;
         }
 
         .jodit-toolbar__box {
           background: #09090b !important;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
           padding: 12px 24px !important;
         }
 
@@ -218,7 +218,7 @@ export default function RichTextEditor({ value, onChange, placeholder = "Initial
 
         .jodit-status-bar {
           background: #09090b !important;
-          border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+          border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
           color: #71717a !important;
           padding: 10px 24px !important;
         }
@@ -236,7 +236,7 @@ export default function RichTextEditor({ value, onChange, placeholder = "Initial
         .jodit-ui-panel, .jodit-ui-popup {
           background: #18181b !important;
           border: 1px solid rgba(255, 255, 255, 0.1) !important;
-          border-radius: 1rem !important;
+          border-radius: 8px !important;
           color: white !important;
           z-index: 1000001 !important;
         }

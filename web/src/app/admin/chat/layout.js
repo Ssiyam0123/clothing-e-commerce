@@ -14,6 +14,7 @@ import { getImageUrl } from "@/utils/imageUtils";
 import { ChatProvider, useChat } from "./ChatContext";
 import api from "@/lib/api";
 import { useChatStore } from "@/store/chatStore";
+import { ChatListSkeleton } from "@/components/common/Skeletons";
 
 export default function ChatLayout({ children }) {
   return (
@@ -25,7 +26,7 @@ export default function ChatLayout({ children }) {
 
 function ChatContent({ children }) {
   const router = useRouter();
-  const { conversations, startConversation } = useChat();
+  const { conversations, loading, startConversation } = useChat();
   const { resetUnread } = useChatStore();
   const { id } = useParams();
   
@@ -129,93 +130,99 @@ function ChatContent({ children }) {
         {/* Conversation List */}
         <ScrollArea className="flex-1 bg-white dark:bg-[#111b21]">
           <div className="flex flex-col">
-            {/* Global Results Section */}
-            {globalUsers.length > 0 && (
-              <div className="px-4 py-2 bg-accent/5">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-secondary mb-2">New Contacts</p>
-                {globalUsers.map((user) => (
-                  <div
-                    key={user._id}
-                    onClick={() => handleStartChat(user._id)}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition-colors group"
-                  >
-                    <Avatar className="h-10 w-10 border border-border/10 shadow-sm">
-                      <AvatarImage src={getImageUrl(user.avatar)} className="object-cover" />
-                      <AvatarFallback className="bg-accent-secondary/10 text-accent-secondary font-bold text-xs">
-                        {user.name?.charAt(0) || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold truncate group-hover:text-accent-secondary transition-colors">{user.name}</p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-[10px] text-muted-foreground truncate uppercase tracking-tighter">{user.role?.name || "Customer"}</p>
-                        {user.phone && <p className="text-[10px] text-accent-secondary/70 font-mono tracking-tighter">{user.phone}</p>}
+            {loading ? (
+              <ChatListSkeleton count={6} />
+            ) : (
+              <>
+                {/* Global Results Section */}
+                {globalUsers.length > 0 && (
+                  <div className="px-4 py-2 bg-accent/5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-secondary mb-2">New Contacts</p>
+                    {globalUsers.map((user) => (
+                      <div
+                        key={user._id}
+                        onClick={() => handleStartChat(user._id)}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition-colors group"
+                      >
+                        <Avatar className="h-10 w-10 border border-border/10 shadow-sm">
+                          <AvatarImage src={getImageUrl(user.avatar)} className="object-cover" />
+                          <AvatarFallback className="bg-accent-secondary/10 text-accent-secondary font-bold text-xs">
+                            {user.name?.charAt(0) || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold truncate group-hover:text-accent-secondary transition-colors">{user.name}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-[10px] text-muted-foreground truncate uppercase tracking-tighter">{user.role?.name || "Customer"}</p>
+                            {user.phone && <p className="text-[10px] text-accent-secondary/70 font-mono tracking-tighter">{user.phone}</p>}
+                          </div>
+                        </div>
+                        <UserPlus size={16} className="text-accent-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
-                    </div>
-                    <UserPlus size={16} className="text-accent-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
+                    ))}
+                    <div className="h-[1px] bg-border/20 my-3" />
                   </div>
-                ))}
-                <div className="h-[1px] bg-border/20 my-3" />
-              </div>
+                )}
+
+                {filteredConversations.length === 0 && globalUsers.length === 0 && (
+                  <div className="py-20 text-center space-y-3 px-6">
+                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto opacity-20">
+                       <MessageSquarePlus size={24} />
+                    </div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {searchQuery ? "No matching frequency found" : "No active transmissions"}
+                    </p>
+                  </div>
+                )}
+                
+                {filteredConversations.map((conv) => {
+                  const customer = conv.participants?.find((p) => p.role?.name === "customer");
+                  const isActive = id === conv._id;
+                  const lastMsgTime = new Date(conv.updatedAt);
+                  const isToday = lastMsgTime.toDateString() === new Date().toDateString();
+
+                  return (
+                    <Link
+                      key={conv._id}
+                      href={`/admin/chat/${conv._id}`}
+                      className={cn(
+                        "relative w-full h-[72px] flex items-center px-4 transition-all duration-200 group",
+                        isActive ? "bg-[#f0f2f5] dark:bg-[#2a3942]" : "hover:bg-[#f5f6f6] dark:hover:bg-[#202c33]"
+                      )}
+                    >
+                      {isActive && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#00a884] z-10" />}
+
+                      <div className="relative shrink-0 mr-4">
+                        <Avatar className="h-12 w-12 border border-border/10 shadow-sm">
+                          <AvatarImage src={getImageUrl(customer?.avatar)} className="object-cover" />
+                          <AvatarFallback className="bg-accent-secondary/10 text-accent-secondary font-bold">
+                            {customer?.name?.charAt(0) || "?"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-[#111b21] rounded-full" />
+                      </div>
+
+                      <div className="flex-1 min-w-0 h-full flex flex-col justify-center border-b border-border/50 dark:border-white/5">
+                        <div className="flex justify-between items-baseline mb-0.5">
+                          <h3 className={cn("text-[15px] truncate", conv.unreadCount > 0 ? "font-bold text-foreground" : "font-medium text-foreground/90")}>
+                            {customer?.name || "Anonymous_User"}
+                          </h3>
+                          <span className={cn("text-[11px] whitespace-nowrap ml-2", conv.unreadCount > 0 ? "text-[#00a884] font-bold" : "text-muted-foreground/60")}>
+                            {isToday ? lastMsgTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }) : lastMsgTime.toLocaleDateString([], { month: "short", day: "numeric" })}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <p className={cn("text-[13px] truncate pr-4", conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground/70")}>
+                            {conv.lastMessage?.text || "Establish connection..."}
+                          </p>
+                          {conv.unreadCount > 0 && <div className="bg-[#00a884] text-white text-[10px] font-black min-w-[20px] h-[20px] flex items-center justify-center rounded-full px-1.5 shadow-sm animate-in zoom-in">{conv.unreadCount}</div>}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </>
             )}
-
-            {filteredConversations.length === 0 && globalUsers.length === 0 && (
-              <div className="py-20 text-center space-y-3 px-6">
-                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto opacity-20">
-                   <MessageSquarePlus size={24} />
-                </div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  {searchQuery ? "No matching frequency found" : "No active transmissions"}
-                </p>
-              </div>
-            )}
-            
-            {filteredConversations.map((conv) => {
-              const customer = conv.participants?.find((p) => p.role?.name === "customer");
-              const isActive = id === conv._id;
-              const lastMsgTime = new Date(conv.updatedAt);
-              const isToday = lastMsgTime.toDateString() === new Date().toDateString();
-
-              return (
-                <Link
-                  key={conv._id}
-                  href={`/admin/chat/${conv._id}`}
-                  className={cn(
-                    "relative w-full h-[72px] flex items-center px-4 transition-all duration-200 group",
-                    isActive ? "bg-[#f0f2f5] dark:bg-[#2a3942]" : "hover:bg-[#f5f6f6] dark:hover:bg-[#202c33]"
-                  )}
-                >
-                  {isActive && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#00a884] z-10" />}
-
-                  <div className="relative shrink-0 mr-4">
-                    <Avatar className="h-12 w-12 border border-border/10 shadow-sm">
-                      <AvatarImage src={getImageUrl(customer?.avatar)} className="object-cover" />
-                      <AvatarFallback className="bg-accent-secondary/10 text-accent-secondary font-bold">
-                        {customer?.name?.charAt(0) || "?"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-[#111b21] rounded-full" />
-                  </div>
-
-                  <div className="flex-1 min-w-0 h-full flex flex-col justify-center border-b border-border/50 dark:border-white/5">
-                    <div className="flex justify-between items-baseline mb-0.5">
-                      <h3 className={cn("text-[15px] truncate", conv.unreadCount > 0 ? "font-bold text-foreground" : "font-medium text-foreground/90")}>
-                        {customer?.name || "Anonymous_User"}
-                      </h3>
-                      <span className={cn("text-[11px] whitespace-nowrap ml-2", conv.unreadCount > 0 ? "text-[#00a884] font-bold" : "text-muted-foreground/60")}>
-                        {isToday ? lastMsgTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }) : lastMsgTime.toLocaleDateString([], { month: "short", day: "numeric" })}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <p className={cn("text-[13px] truncate pr-4", conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground/70")}>
-                        {conv.lastMessage?.text || "Establish connection..."}
-                      </p>
-                      {conv.unreadCount > 0 && <div className="bg-[#00a884] text-white text-[10px] font-black min-w-[20px] h-[20px] flex items-center justify-center rounded-full px-1.5 shadow-sm animate-in zoom-in">{conv.unreadCount}</div>}
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
           </div>
         </ScrollArea>
       </div>

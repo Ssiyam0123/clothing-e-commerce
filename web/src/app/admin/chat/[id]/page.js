@@ -5,7 +5,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import { useChat } from "../ChatContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, MoreVertical, Phone, Video, Search, User, Check, CheckCheck, Image as ImageIcon, Loader2 } from "lucide-react";
+import { ArrowLeft, Send, MoreVertical, Phone, Video, Search, User, Check, CheckCheck, Image as ImageIcon, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -190,10 +190,20 @@ export default function AdminChatPage() {
   if (!conversation) return null;
 
   return (
-    <div className="flex flex-col h-full bg-[#f0f2f5] dark:bg-[#0b141a]">
+    <div className="absolute inset-0 flex flex-col bg-[#f0f2f5] dark:bg-[#0b141a] overflow-hidden">
       {/* Chat Header */}
       <header className="h-[60px] bg-[#f0f2f5] dark:bg-[#202c33] px-4 flex items-center justify-between border-l border-border/5 shrink-0 z-10 shadow-sm">
         <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            asChild
+            className="lg:hidden rounded-full hover:bg-black/5 dark:hover:bg-white/5 -ml-2 text-foreground/70 shrink-0"
+          >
+            <Link href="/admin/chat">
+              <ArrowLeft size={20} />
+            </Link>
+          </Button>
           <Avatar className="h-10 w-10 border border-border/10">
             <AvatarImage src={getImageUrl(customer?.avatar)} className="object-cover" />
             <AvatarFallback className="bg-accent-secondary/10 text-accent-secondary font-bold">
@@ -239,7 +249,7 @@ export default function AdminChatPage() {
 
       {/* Messages Area */}
       <main className="flex-1 overflow-y-auto p-4 md:p-6 no-scrollbar bg-[#efeae2] dark:bg-[#0b141a] relative">
-         <div className="fixed inset-0 opacity-[0.06] dark:opacity-[0.03] pointer-events-none bg-[url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-whatsapp-texture.jpg')] bg-repeat" />
+         <div className="absolute inset-0 opacity-[0.06] dark:opacity-[0.03] pointer-events-none bg-[url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-whatsapp-texture.jpg')] bg-repeat" />
          
          <div className="max-w-4xl mx-auto space-y-1 relative z-10">
             {messages.map((msg, idx) => {

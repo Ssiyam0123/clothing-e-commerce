@@ -228,3 +228,27 @@ export function ProfileSkeleton() {
     </div>
   );
 }
+
+export function ChatListSkeleton({ count = 6 }) {
+  return (
+    <div className="flex flex-col">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="w-full h-[72px] flex items-center px-4 border-b border-border/50 dark:border-white/5"
+        >
+          <div className="relative shrink-0 mr-4">
+            <Skeleton className="h-12 w-12 rounded-full" />
+          </div>
+          <div className="flex-1 min-w-0 h-full flex flex-col justify-center gap-2">
+            <div className="flex justify-between items-baseline">
+              <Skeleton className="h-4 w-1/3 rounded-lg" />
+              <Skeleton className="h-3 w-10 rounded-lg" />
+            </div>
+            <Skeleton className="h-3 w-1/2 rounded-lg" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

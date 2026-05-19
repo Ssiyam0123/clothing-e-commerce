@@ -10,10 +10,16 @@ const ChatContext = createContext();
 export function ChatProvider({ children }) {
   const { token } = useAuthStore();
   const [conversations, setConversations] = useState([]);
+  const [loading, setLoading] = useState(true);
   const socketRef = useRef();
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
 
     socketRef.current = io(
       process.env.NEXT_PUBLIC_API_URL.replace("/api", ""),
@@ -42,6 +48,8 @@ export function ChatProvider({ children }) {
       }
     } catch (err) {
       console.error("📡 Intelligence Failure", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,6 +77,7 @@ export function ChatProvider({ children }) {
   return (
     <ChatContext.Provider value={{ 
       conversations, 
+      loading,
       socket: socketRef.current, 
       fetchConversations,
       startConversation 

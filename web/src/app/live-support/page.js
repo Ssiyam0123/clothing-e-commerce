@@ -149,7 +149,7 @@ export default function LiveSupportPage() {
   }
 
   return (
-    <div className="h-[100dvh] w-full bg-[#f0f2f5] dark:bg-[#0b141a] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 flex flex-col bg-[#f0f2f5] dark:bg-[#0b141a] overflow-hidden z-50">
       {/* Header */}
       <header className="h-[64px] bg-white dark:bg-[#202c33] px-4 md:px-8 flex items-center justify-between border-b border-border/10 shrink-0 z-20 shadow-sm">
         <div className="flex items-center gap-3">
@@ -193,7 +193,7 @@ export default function LiveSupportPage() {
 
       {/* Messages Area */}
       <main className="flex-1 overflow-y-auto p-4 md:p-8 no-scrollbar relative z-10">
-        <div className="fixed inset-0 opacity-[0.04] dark:opacity-[0.02] pointer-events-none bg-[url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-whatsapp-texture.jpg')] bg-repeat" />
+        <div className="absolute inset-0 opacity-[0.04] dark:opacity-[0.02] pointer-events-none bg-[url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-whatsapp-texture.jpg')] bg-repeat" />
         
         <div className="max-w-3xl mx-auto space-y-2 relative z-10">
           {messages.length === 0 ? (
