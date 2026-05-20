@@ -1,6 +1,7 @@
 import { removeBackground } from "@imgly/background-removal-node";
 import fs from "fs/promises";
 import path from "path";
+import { fileURLToPath } from "url";
 
 async function run() {
     const [,, inputPath, outputPath] = process.argv;
@@ -13,7 +14,9 @@ async function run() {
         const inputBuffer = await fs.readFile(inputPath);
         const blobInput = new Blob([inputBuffer], { type: "image/png" });
         
-        const distPath = path.resolve('node_modules/@imgly/background-removal-node/dist').replace(/\\/g, '/');
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        const distPath = path.resolve(__dirname, "../../node_modules/@imgly/background-removal-node/dist").replace(/\\/g, '/');
         const publicPath = `file://${distPath}/`;
         
         const blob = await removeBackground(blobInput, { publicPath });

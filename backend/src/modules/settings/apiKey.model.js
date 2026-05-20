@@ -38,6 +38,11 @@ const apiKeySchema = new mongoose.Schema({
     // Social Auth
     googleClientId: { type: String, default: "" },
     facebookAppId: { type: String, default: "" },
+
+    // Cloudinary
+    cloudinaryCloudName: { type: String, default: "" },
+    cloudinaryApiKey: { type: String, default: "" },
+    cloudinaryApiSecret: { type: String, default: "" },
 }, { timestamps: true });
 
 const ApiKey = mongoose.model('ApiKey', apiKeySchema);

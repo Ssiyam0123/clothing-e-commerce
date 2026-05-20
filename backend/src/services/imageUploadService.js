@@ -1,8 +1,10 @@
-// src/services/imageUploadService.js
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { v2 as cloudinary } from 'cloudinary';
+import PageSetting from '../modules/settings/settings.model.js';
+import ApiKey from '../modules/settings/apiKey.model.js';
+import { decrypt } from '../utils/encryption.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,13 +25,67 @@ if (storageType === 'cloudinary') {
     });
 }
 
+const getStorageConfig = async () => {
+    try {
+        const settings = await PageSetting.findOne();
+        const apiKeys = await ApiKey.findOne();
+
+        let storageType = 'cloudinary';
+        if (settings && settings.config && settings.config.storageMethod) {
+            storageType = settings.config.storageMethod === 'server' ? 'local' : 'cloudinary';
+        } else if (process.env.STORAGE_TYPE) {
+            storageType = process.env.STORAGE_TYPE.toLowerCase().trim() === 'server' ? 'local' : 'cloudinary';
+        }
+
+        let cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+        let apiKey = process.env.CLOUDINARY_API_KEY;
+        let apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+        if (apiKeys) {
+            if (apiKeys.cloudinaryCloudName) {
+                const decCloudName = decrypt(apiKeys.cloudinaryCloudName);
+                if (decCloudName) cloudName = decCloudName;
+            }
+            if (apiKeys.cloudinaryApiKey) {
+                const decApiKey = decrypt(apiKeys.cloudinaryApiKey);
+                if (decApiKey) apiKey = decApiKey;
+            }
+            if (apiKeys.cloudinaryApiSecret) {
+                const decApiSecret = decrypt(apiKeys.cloudinaryApiSecret);
+                if (decApiSecret) apiSecret = decApiSecret;
+            }
+        }
+
+        return {
+            storageType,
+            cloudName,
+            apiKey,
+            apiSecret
+        };
+    } catch (err) {
+        console.error("❌ Error loading storage configuration from DB, falling back to ENV:", err.message);
+        return {
+            storageType: (process.env.STORAGE_TYPE || 'cloudinary').toLowerCase().trim() === 'server' ? 'local' : 'cloudinary',
+            cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+            apiKey: process.env.CLOUDINARY_API_KEY,
+            apiSecret: process.env.CLOUDINARY_API_SECRET
+        };
+    }
+};
+
 console.log(`\x1b[36m%s\x1b[0m`, `📦 Image Storage Strategy: ${storageType.toUpperCase()}`);
 
 /**
  * Cloudinary Buffer Upload
  */
-const uploadToCloudinary = (fileBuffer, folder) => {
+const uploadToCloudinary = (fileBuffer, folder, config) => {
     return new Promise((resolve, reject) => {
+        cloudinary.config({
+            cloud_name: config.cloudName,
+            api_key: config.apiKey,
+            api_secret: config.apiSecret,
+        });
+
         const uploadStream = cloudinary.uploader.upload_stream(
             { 
                 folder: `ecowear/${folder}`,
@@ -69,13 +125,21 @@ const saveToLocal = async (fileBuffer, folder, originalname) => {
 export const deleteImage = async (imageUrl) => {
     if (!imageUrl) return;
 
-    if (storageType === 'cloudinary' && imageUrl.includes('cloudinary.com')) {
+    const config = await getStorageConfig();
+
+    if (config.storageType === 'cloudinary' && imageUrl.includes('cloudinary.com')) {
         try {
             const parts = imageUrl.split('/');
             const fileNameWithExt = parts.pop();
             const folderPart = parts.slice(parts.indexOf('ecowear')).join('/');
             const publicId = `${folderPart}/${fileNameWithExt.split('.')[0]}`;
             
+            cloudinary.config({
+                cloud_name: config.cloudName,
+                api_key: config.apiKey,
+                api_secret: config.apiSecret,
+            });
+
             await cloudinary.uploader.destroy(publicId);
             console.log(`✅ Cloudinary asset purged: ${publicId}`);
         } catch (err) {
@@ -110,8 +174,9 @@ export const uploadImage = async (file, folder, oldUrl = null) => {
         const sharp = (await import('sharp')).default;
         
         const isLogoOrFavicon = folder === 'settings';
+        const enableBgRemoval = process.env.ENABLE_BG_REMOVAL === 'true';
         
-        if (isLogoOrFavicon) {
+        if (isLogoOrFavicon && enableBgRemoval) {
             console.log(`[Image Processing] Site setting logo/favicon detected. Automatically removing background using AI (Isolated Process)...`);
             try {
                 const tempDir = path.join(__dirname, '../../temp');
@@ -166,8 +231,10 @@ export const uploadImage = async (file, folder, oldUrl = null) => {
         console.error("❌ [Image Processing] Failed to compress image using sharp, falling back to original:", e.message);
     }
 
-    if (storageType === 'cloudinary') {
-        return await uploadToCloudinary(processedBuffer, folder);
+    const config = await getStorageConfig();
+
+    if (config.storageType === 'cloudinary') {
+        return await uploadToCloudinary(processedBuffer, folder, config);
     } else {
         return await saveToLocal(processedBuffer, folder, processedName);
     }

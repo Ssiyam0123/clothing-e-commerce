@@ -2,6 +2,7 @@ services:
   - type: web
     name: vanguard-backend
     env: node
+    autoDeploy: true
     plan: free
     rootDir: backend
     buildCommand: npm install
