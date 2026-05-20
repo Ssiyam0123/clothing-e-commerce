@@ -47,6 +47,20 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
 
+  outputFileTracingExcludes: {
+    '*': [
+      'node_modules/@swc/core-linux-x64-gnu',
+      'node_modules/@swc/core-linux-x64-musl',
+      'node_modules/@swc/core-linux-x64-musl-abi-none',
+      'node_modules/@esbuild/linux-x64',
+      'node_modules/typescript/**/*',
+      'node_modules/eslint/**/*',
+      'node_modules/prettier/**/*',
+      'node_modules/rollup/**/*',
+      '**/*.map',
+    ],
+  },
+
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', 'swiper', '@tanstack/react-query'],
     optimisticClientCache: true,

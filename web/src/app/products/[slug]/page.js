@@ -25,7 +25,8 @@ export async function generateStaticParams() {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
     const res = await fetch(`${API_URL}/products?limit=100&isActive=true`, {
-      next: { revalidate: 3600 }
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(3000)
     });
     if (!res.ok) return [];
     const data = await res.json();

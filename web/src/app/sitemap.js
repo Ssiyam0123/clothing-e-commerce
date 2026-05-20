@@ -12,11 +12,12 @@ async function fetchAPI(endpoint) {
   try {
     const res = await fetch(`${API_URL}${endpoint}`, {
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(3000)
     });
     if (!res.ok) return null;
     return await res.json();
   } catch (error) {
-    console.error(`Sitemap fetch error for ${endpoint}:`, error);
+    console.error(`Sitemap fetch error for ${endpoint}:`, error.message);
     return null;
   }
 }
