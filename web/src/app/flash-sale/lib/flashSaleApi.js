@@ -3,6 +3,7 @@ export const getFlashSales = async () => {
   try {
     const res = await fetch(`${API_URL}/flash-sales/active`, {
       next: { revalidate: 30 },
+      signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) return [];
     return await res.json();

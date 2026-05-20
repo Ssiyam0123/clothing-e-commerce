@@ -6,7 +6,8 @@ export const getProductDetails = cache(async (slug) => {
   try {
     const res = await fetch(`${API_URL}/products/details/${slug}`, {
       // FIX: revalidate every 15 min instead of 1 hour for fresher data
-      next: { revalidate: 900, tags: [`product-${slug}`] }
+      next: { revalidate: 900, tags: [`product-${slug}`] },
+      signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) {
       if (res.status === 404) return { error: 404 };

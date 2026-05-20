@@ -12,6 +12,7 @@ export const getCategories = cache(async () => {
         revalidate: 3600, // Cache for 1 hour
         tags: ['categories']
       }, 
+      signal: AbortSignal.timeout(3000),
     });
     
     if (!res.ok) {

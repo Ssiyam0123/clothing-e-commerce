@@ -20,7 +20,10 @@ export async function generateMetadata() {
   let blogCount = 0;
   let categories = [];
   try {
-    const res = await fetch(`${API_URL}/blogs?fields=category`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${API_URL}/blogs?fields=category`, {
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(3000)
+    });
     if (res.ok) {
       const data = await res.json();
       const blogs = data.blogs || [];
@@ -63,7 +66,10 @@ export default async function BlogPage() {
 
   const postsPromise = fetch(
     `${API_URL}/blogs?fields=title,slug,featuredImage,category,readingTime,author,createdAt`,
-    { next: { revalidate: 3600 } }
+    { 
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(3000)
+    }
   ).then(res => res.ok ? res.json().then(data => data.blogs || []) : []);
 
   const faqSchema = {

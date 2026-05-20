@@ -35,6 +35,7 @@ export const getInitialProducts = async (searchParams) => {
   try {
     const res = await fetch(`${API_URL}/products?${apiParams.toString()}`, {
       next: { revalidate: 60 }, // Revalidate every minute
+      signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) return null;
     return await res.json();
