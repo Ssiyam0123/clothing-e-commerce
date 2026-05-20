@@ -11,6 +11,7 @@ import {
 } from "../order.utils.js";
 import pathaoService from '../../../services/pathao.service.js';
 import { sendOrderStatusUpdateEmail } from '../../../services/email.service.js';
+import { cancelOrderWithTransaction } from '../order.service.js';
 
 export const getOrders = asyncHandler(async (req, res) => {
   const { search, status, user, sort, page = 1, limit = 30 } = req.query;
@@ -172,11 +173,38 @@ export const updateOrder = asyncHandler(async (req, res) => {
 
     const deductOps = order.orderItems.map((item) => ({
       updateOne: {
-        filter: { _id: item.product, "sizes.size": item.size },
+        // FIX Bug 6: Atomic deduct with $gte safety — prevents negative stock under concurrency
+        filter: { _id: item.product, "sizes.size": item.size, "sizes.stock": { $gte: item.quantity } },
         update: { $inc: { "sizes.$.stock": -item.quantity } },
       },
     }));
-    if (deductOps.length > 0) await Product.bulkWrite(deductOps);
+    if (deductOps.length > 0) {
+      const deductResult = await Product.bulkWrite(deductOps);
+      if (deductResult.matchedCount < deductOps.length) {
+        console.error("❌ updateOrder: Some items had insufficient stock during deduct.");
+        // Don't throw — admin-level operation, log and continue
+      }
+    }
+  }
+
+  const oldStatus = order.orderStatus;
+
+  if (req.body.orderStatus === "Cancelled" && oldStatus !== "Cancelled") {
+    await cancelOrderWithTransaction(order._id);
+    clearCache('cache:/api/admin/dashboard*');
+
+    const updatedOrder = await Order.findById(order._id)
+      .populate({ path: "user", select: "name email avatar role", populate: { path: "role" } })
+      .populate("orderItems.product", "name images slug");
+
+    try {
+      await sendOrderStatusUpdateEmail(updatedOrder);
+      console.log(`📧 Status update email sent to ${updatedOrder.shippingAddress.email} (Cancelled)`);
+    } catch (error) {
+      console.error("❌ Failed to send status update email:", error);
+    }
+
+    return res.json(updatedOrder);
   }
 
   if (req.body.shippingAddress) {
@@ -188,7 +216,6 @@ export const updateOrder = asyncHandler(async (req, res) => {
     order.paymentResult = { ...order.paymentResult, ...req.body.paymentResult };
   }
 
-  const oldStatus = order.orderStatus;
   await order.save();
 
   clearCache('cache:/api/admin/dashboard*');

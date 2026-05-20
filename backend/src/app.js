@@ -33,12 +33,22 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { handleFileError } from "./middleware/cleanup.js";
 import compression from "compression";
 import contextMiddleware from "./middleware/context.js";
+import { apiLimiter } from "./middleware/rateLimiter.js";
+import { swaggerUi, specs } from "./swagger.js";
 
 const app = express();
 
-app.use(compression());
-
+// 🛡️ Trust proxy MUST be set before rate limiter so req.ip resolves correctly
+// Without this, all requests appear to come from the same proxy IP
 app.set("trust proxy", 1);
+
+// 📝 Swagger API Documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+
+// 🛡️ Global Rate Limiting for all API endpoints
+app.use("/api", apiLimiter);
+
+app.use(compression());
 
 // 📝 Request Logger Middleware
 app.use((req, res, next) => {

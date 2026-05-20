@@ -35,16 +35,21 @@ export const getCart = asyncHandler(async (req, res) => {
     return res.json({ ...cart.toObject(), totalItems: 0, totalPrice: 0 });
   }
   
+  // FIX Issue 12: Filter inactive items and save, then rely on the already-populated data
   const activeItems = cart.items.filter(item => item.product && item.product.isActive !== false);
   
   if (activeItems.length !== cart.items.length) {
-    cart.items = activeItems.map(item => ({
-        product: item.product._id,
-        size: item.size._id,
+    // Save cleaned items (use ObjectId refs)
+    cart.items = activeItems
+      .filter(item => item.product && item.size)
+      .map(item => ({
+        product: item.product._id || item.product,
+        size: item.size._id || item.size,
         quantity: item.quantity
-    }));
+      }));
     await cart.save();
     
+    // Re-populate once after saving
     await cart.populate('items.product', 'name price discount images slug isActive');
     await cart.populate('items.size', 'name');
   }
@@ -83,7 +88,14 @@ export const addToCart = asyncHandler(async (req, res) => {
   );
   
   if (existingItem) {
-    existingItem.quantity += quantity;
+    // FIX Bug 2: Check cumulative quantity against stock
+    const newQuantity = existingItem.quantity + quantity;
+    if (sizeStock.stock < newQuantity) {
+      return res.status(400).json({ 
+        message: `Only ${sizeStock.stock} units available. You already have ${existingItem.quantity} in cart.` 
+      });
+    }
+    existingItem.quantity = newQuantity;
   } else {
     cart.items.push({ product: productId, size: sizeId, quantity });
   }
@@ -106,12 +118,20 @@ export const updateCartItem = asyncHandler(async (req, res) => {
   const { productId, sizeId, quantity } = req.body;
   const userId = req.user.id || req.user._id;
   
-  if (quantity < 1) {
-    return removeFromCart(req, res);
-  }
-  
   const cart = await Cart.findOne({ user: userId });
   if (!cart) return res.status(404).json({ message: 'Cart not found' });
+  
+  // FIX Bug 1: Inline remove instead of calling removeFromCart (which reads req.params)
+  if (quantity < 1) {
+    cart.items = cart.items.filter(
+      item => !(item.product.toString() === productId && item.size.toString() === sizeId)
+    );
+    await cart.save();
+    await cart.populate('items.product', 'name price discount images slug isActive');
+    await cart.populate('items.size', 'name');
+    const { totalItems, totalPrice } = calculateCartTotals(cart);
+    return res.json({ ...cart.toObject(), totalItems, totalPrice });
+  }
   
   const item = cart.items.find(
     item => item.product.toString() === productId && item.size.toString() === sizeId
@@ -120,9 +140,9 @@ export const updateCartItem = asyncHandler(async (req, res) => {
   if (!item) return res.status(404).json({ message: 'Item not found in cart' });
   
   const product = await Product.findById(productId);
-  const sizeStock = product.sizes.find(s => s.size.toString() === sizeId);
+  const sizeStock = product?.sizes.find(s => s.size.toString() === sizeId);
   if (sizeStock && sizeStock.stock < quantity) {
-    return res.status(400).json({ message: 'Insufficient stock' });
+    return res.status(400).json({ message: `Insufficient stock. Only ${sizeStock.stock} available.` });
   }
   
   item.quantity = quantity;
@@ -181,7 +201,7 @@ export const changeSize = asyncHandler(async (req, res) => {
 
   // Check stock for new size
   const product = await Product.findById(productId);
-  const sizeStock = product.sizes.find(s => s.size.toString() === newSizeId);
+  const sizeStock = product?.sizes.find(s => s.size.toString() === newSizeId);
   if (!sizeStock || sizeStock.stock < quantity) {
     return res.status(400).json({ message: 'Insufficient stock for new size' });
   }
@@ -192,11 +212,16 @@ export const changeSize = asyncHandler(async (req, res) => {
   );
 
   if (targetItemIndex !== -1) {
-    // Merge into existing item
-    cart.items[targetItemIndex].quantity += quantity;
+    // Merge: check combined quantity against stock
+    const combinedQty = cart.items[targetItemIndex].quantity + quantity;
+    if (sizeStock.stock < combinedQty) {
+      return res.status(400).json({ 
+        message: `Insufficient stock. Only ${sizeStock.stock} available for this size.` 
+      });
+    }
+    cart.items[targetItemIndex].quantity = combinedQty;
     cart.items.splice(itemIndex, 1);
   } else {
-    // Update size of current item
     cart.items[itemIndex].size = newSizeId;
   }
 
@@ -224,46 +249,42 @@ export const clearCart = asyncHandler(async (req, res) => {
   res.json({ message: 'Cart cleared', items: [], totalItems: 0, totalPrice: 0 });
 });
 
+export const bulkAddCart = asyncHandler(async (req, res) => {
+  const { items } = req.body; 
+  const userId = req.user.id || req.user._id;
 
-
-
-// controllers/cart.controller.js
-
-export const bulkAddCart = async (req, res) => {
-  try {
-    const { items } = req.body; 
-    const userId = req.user.id || req.user._id;
-
-    if (!Array.isArray(items)) {
-      return res.status(400).json({ message: "Items must be an array" });
-    }
-
-    let cart = await Cart.findOne({ user: userId });
-    if (!cart) {
-      cart = new Cart({ user: userId, items: [] });
-    }
-
-    for (const newItem of items) {
-      const existingItemIndex = cart.items.findIndex(
-        (item) => 
-          item.product.toString() === newItem.productId && 
-          item.size.toString() === newItem.sizeId
-      );
-
-      if (existingItemIndex > -1) {
-        cart.items[existingItemIndex].quantity += newItem.quantity;
-      } else {
-        cart.items.push({
-          product: newItem.productId,
-          size: newItem.sizeId,
-          quantity: newItem.quantity
-        });
-      }
-    }
-
-    await cart.save();
-    res.status(200).json(cart);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (!Array.isArray(items)) {
+    return res.status(400).json({ message: "Items must be an array" });
   }
-};
+
+  let cart = await Cart.findOne({ user: userId });
+  if (!cart) {
+    cart = new Cart({ user: userId, items: [] });
+  }
+
+  for (const newItem of items) {
+    const existingItemIndex = cart.items.findIndex(
+      (item) => 
+        item.product.toString() === newItem.productId && 
+        item.size.toString() === newItem.sizeId
+    );
+
+    if (existingItemIndex > -1) {
+      cart.items[existingItemIndex].quantity += newItem.quantity;
+    } else {
+      cart.items.push({
+        product: newItem.productId,
+        size: newItem.sizeId,
+        quantity: newItem.quantity
+      });
+    }
+  }
+
+  await cart.save();
+  
+  await cart.populate('items.product', 'name price discount images slug isActive');
+  await cart.populate('items.size', 'name');
+  
+  const { totalItems, totalPrice } = calculateCartTotals(cart);
+  res.status(200).json({ ...cart.toObject(), totalItems, totalPrice });
+});

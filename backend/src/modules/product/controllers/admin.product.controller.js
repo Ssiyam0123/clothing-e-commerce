@@ -342,27 +342,36 @@ export const getProductHistory = asyncHandler(async (req, res) => {
     if (!product) return res.status(404).json({ message: 'Product not found' });
 
     const filter = {
-        'orderItems.product': id,
+        'orderItems.product': new mongoose.Types.ObjectId(id),
         'paymentResult.status': { $in: ['Completed', 'COD'] }
     };
 
-    // Calculate totals based on ALL history
-    const allOrders = await Order.find(filter).lean();
-    const allItems = allOrders.map(order => order.orderItems.find(oi => String(oi.product) === id));
-    
-    const totalSold = allItems.reduce((sum, item) => sum + (item?.quantity || 0), 0);
-    const totalRevenue = allItems.reduce((sum, item) => sum + ((item?.quantity || 0) * (item?.price || 0)), 0);
+    // FIX Bug 7: Use MongoDB aggregation for stats instead of fetching all orders into RAM
+    const statsAgg = await Order.aggregate([
+        { $match: filter },
+        { $unwind: '$orderItems' },
+        { $match: { 'orderItems.product': new mongoose.Types.ObjectId(id) } },
+        {
+            $group: {
+                _id: null,
+                totalSold: { $sum: '$orderItems.quantity' },
+                totalRevenue: { $sum: { $multiply: ['$orderItems.quantity', '$orderItems.price'] } },
+                orderCount: { $sum: 1 }
+            }
+        }
+    ]);
 
-    const total = allOrders.length;
+    const stats = statsAgg[0] || { totalSold: 0, totalRevenue: 0, orderCount: 0 };
+    const total = await Order.countDocuments(filter);
     const skip = (Math.max(1, Number(page)) - 1) * Math.max(1, Number(limit));
 
-    // Find paginated orders
+    // Paginated orders for history table
     const orders = await Order.find(filter)
-    .populate('user', 'name email avatar')
-    .sort('-createdAt')
-    .skip(skip)
-    .limit(Number(limit))
-    .lean();
+        .populate('user', 'name email avatar')
+        .sort('-createdAt')
+        .skip(skip)
+        .limit(Number(limit))
+        .lean();
 
     const history = orders.map(order => {
         const item = order.orderItems.find(oi => String(oi.product) === id);
@@ -370,9 +379,9 @@ export const getProductHistory = asyncHandler(async (req, res) => {
             orderId: order._id,
             date: order.createdAt,
             customer: order.user || { name: order.shippingAddress.name, email: order.shippingAddress.email },
-            quantity: item.quantity,
-            price: item.price,
-            total: item.quantity * item.price,
+            quantity: item?.quantity || 0,
+            price: item?.price || 0,
+            total: (item?.quantity || 0) * (item?.price || 0),
             orderStatus: order.orderStatus,
             isGuest: order.isGuest
         };
@@ -382,8 +391,8 @@ export const getProductHistory = asyncHandler(async (req, res) => {
         success: true,
         product,
         stats: {
-            totalSold,
-            totalRevenue,
+            totalSold: stats.totalSold,
+            totalRevenue: stats.totalRevenue,
             orderCount: total
         },
         pagination: {

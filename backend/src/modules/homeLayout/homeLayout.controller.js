@@ -64,11 +64,20 @@ export const createLayout = asyncHandler(async (req, res) => {
 export const updateLayout = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { sections, name } = req.body;
-  
+
+  // FIX Bug 9: Only include defined fields in $set to avoid overriding with undefined
+  const updateFields = {};
+  if (sections !== undefined) updateFields.sections = sections;
+  if (name !== undefined) updateFields.name = name;
+
+  if (Object.keys(updateFields).length === 0) {
+    return res.status(400).json({ message: "No valid fields provided to update." });
+  }
+
   const layout = await HomeLayout.findByIdAndUpdate(
     id,
-    { $set: { sections, name } },
-    { new: true }
+    { $set: updateFields },
+    { new: true, runValidators: true }
   );
 
   if (!layout) return res.status(404).json({ message: "Layout not found" });

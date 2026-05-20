@@ -20,10 +20,30 @@ import { getSettings } from "@/lib/settings";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://clothing-e-commerce-web.vercel.app";
 
+// Static generation for popular products at build time
+export async function generateStaticParams() {
+  try {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+    const res = await fetch(`${API_URL}/products?limit=100&isActive=true`, {
+      next: { revalidate: 3600 }
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.products || []).map((p) => ({ slug: p.slug }));
+  } catch {
+    return [];
+  }
+}
+
 export default async function ProductDetailsPage({ params }) {
   const { slug } = await params;
-  
-  const product = await getProductDetails(slug);
+
+  // Parallel fetch: product + settings simultaneously (saves ~100-300ms per load)
+  const [product, settings] = await Promise.all([
+    getProductDetails(slug),
+    getSettings()
+  ]);
+
   if (product.error) {
     notFound();
   }
@@ -31,12 +51,11 @@ export default async function ProductDetailsPage({ params }) {
   const discountedPrice =
     product.price - (product.price * (product.discount || 0)) / 100;
   const isAvailable = product.sizes?.some((s) => s.stock > 0);
-  
+
   const cookieStore = await cookies();
   const lang = cookieStore.get("vanguard-lang")?.value || "en";
   const t = getTranslation('product_details', lang);
 
-  const settings = await getSettings();
   const siteName = settings?.branding?.siteName || "Store";
 
   const productSchema = {

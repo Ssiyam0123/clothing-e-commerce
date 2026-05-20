@@ -25,7 +25,17 @@ if (storageType === 'cloudinary') {
     });
 }
 
+// FIX Issue 13: In-memory cache for storage config (60s TTL) — avoids 2 DB queries per upload
+let _configCache = null;
+let _configCacheTime = 0;
+const CONFIG_CACHE_TTL_MS = 60 * 1000; // 60 seconds
+
 const getStorageConfig = async () => {
+    const now = Date.now();
+    if (_configCache && (now - _configCacheTime) < CONFIG_CACHE_TTL_MS) {
+        return _configCache;
+    }
+
     try {
         const settings = await PageSetting.findOne();
         const apiKeys = await ApiKey.findOne();
@@ -56,12 +66,9 @@ const getStorageConfig = async () => {
             }
         }
 
-        return {
-            storageType,
-            cloudName,
-            apiKey,
-            apiSecret
-        };
+        _configCache = { storageType, cloudName, apiKey, apiSecret };
+        _configCacheTime = now;
+        return _configCache;
     } catch (err) {
         console.error("❌ Error loading storage configuration from DB, falling back to ENV:", err.message);
         return {
@@ -71,6 +78,12 @@ const getStorageConfig = async () => {
             apiSecret: process.env.CLOUDINARY_API_SECRET
         };
     }
+};
+
+// Exported so admin settings update can bust the cache immediately
+export const bustStorageConfigCache = () => {
+    _configCache = null;
+    _configCacheTime = 0;
 };
 
 console.log(`\x1b[36m%s\x1b[0m`, `📦 Image Storage Strategy: ${storageType.toUpperCase()}`);

@@ -4,8 +4,10 @@ import Cart from "../cart/cart.model.js";
 import PageSetting from "../settings/settings.model.js";
 import { sendOrderConfirmationEmail } from "../../services/email.service.js";
 
-export const calculateValidatedOrder = async (orderItems, couponCode, shippingPrice, deliveryZone) => {
-    const settings = await PageSetting.findOne();
+// FIX Issue 14: Accept pre-fetched settings to avoid double DB query per order
+export const calculateValidatedOrder = async (orderItems, couponCode, shippingPrice, deliveryZone, preloadedSettings = null) => {
+    // Use passed-in settings or fetch as fallback
+    const settings = preloadedSettings || await PageSetting.findOne();
     const defaultInside = settings?.shipping?.insideDhaka || 60;
     const defaultOutside = settings?.shipping?.outsideDhaka || 120;
     let itemsPrice = 0;
@@ -108,7 +110,7 @@ export const finalizeOrderProcessing = async (order, session = null) => {
         const result = await Product.bulkWrite(bulkOps, { session });
         if (result.matchedCount < bulkOps.length) {
             console.error("❌ CONCURRENCY ERROR: Stock depletion between validation and finalization");
-            // In a real scenario, this might need more complex handling if payment was already made
+            throw new Error("One or more items in your order are out of stock or have insufficient quantity. Order cancelled.");
         }
     }
     

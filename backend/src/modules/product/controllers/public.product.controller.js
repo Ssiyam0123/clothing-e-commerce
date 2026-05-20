@@ -187,17 +187,93 @@ export const getPublicProducts = asyncHandler(async (req, res) => {
 export const getPublicProductBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.params;
 
-    const product = await Product.findOne({ slug, isActive: true })
-        .populate('category', 'name slug')
-        .populate('subcategory', 'name slug')
-        .populate('sizes.size', 'name')
-        .lean();
+    // Single aggregation: avoids multiple populate() roundtrips
+    const results = await Product.aggregate([
+        { $match: { slug, isActive: true } },
+        { $limit: 1 },
+        {
+            $lookup: {
+                from: 'categories',
+                localField: 'category',
+                foreignField: '_id',
+                as: 'category',
+                pipeline: [{ $project: { name: 1, slug: 1 } }]
+            }
+        },
+        { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: 'subcategories',
+                localField: 'subcategory',
+                foreignField: '_id',
+                as: 'subcategory',
+                pipeline: [{ $project: { name: 1, slug: 1 } }]
+            }
+        },
+        { $unwind: { path: '$subcategory', preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: '$sizes', preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: 'sizes',
+                localField: 'sizes.size',
+                foreignField: '_id',
+                as: 'sizes.sizeObj',
+                pipeline: [{ $project: { name: 1 } }]
+            }
+        },
+        {
+            $addFields: {
+                'sizes.size': { $arrayElemAt: ['$sizes.sizeObj', 0] }
+            }
+        },
+        {
+            $project: { 'sizes.sizeObj': 0 }
+        },
+        {
+            $group: {
+                _id: '$_id',
+                root: { $first: '$$ROOT' },
+                sizes: { $push: '$sizes' }
+            }
+        },
+        {
+            $replaceRoot: {
+                newRoot: {
+                    $mergeObjects: [
+                        '$root',
+                        {
+                            sizes: {
+                                $filter: {
+                                    input: '$sizes',
+                                    as: 's',
+                                    cond: { $ne: ['$$s', {}] }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        // Strip admin-only fields from response
+        {
+            $project: {
+                isActive: 0,
+                featuredOrder: 0
+            }
+        }
+    ]);
 
-    if (!product) return res.status(404).json({ message: 'Artifact not found' });
+    if (!results || results.length === 0) {
+        return res.status(404).json({ message: 'Artifact not found' });
+    }
 
-    // Minimized projection for details (hide admin internal flags)
-    const { isActive, featuredOrder, ...publicData } = product;
-    res.json(publicData);
+    const product = results[0];
+
+    // HTTP Cache headers — browser & CDN can serve this without hitting the server at all
+    res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
+    res.set('Vary', 'Accept-Encoding');
+
+    res.json(product);
 });
 
 export const getPublicProductById = asyncHandler(async (req, res) => {
@@ -216,5 +292,10 @@ export const getPublicProductById = asyncHandler(async (req, res) => {
     if (!product) return res.status(404).json({ message: 'Artifact not found' });
 
     const { isActive, featuredOrder, ...publicData } = product;
+
+    // HTTP Cache headers
+    res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
+    res.set('Vary', 'Accept-Encoding');
+
     res.json(publicData);
 });

@@ -1,7 +1,8 @@
 import SSLCommerzPayment from "sslcommerz-lts";
 import bkashService from "../../services/bkash.service.js";
 
-const backendUrl = process.env.BACKEND_URL;
+// FIX Bug 8: Always use fallback so backendUrl is never "undefined"
+const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
 

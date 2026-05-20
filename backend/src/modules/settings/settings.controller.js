@@ -2,6 +2,7 @@ import PageSetting from './settings.model.js';
 import ApiKey from './apiKey.model.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { uploadImage } from '../../services/imageUploadService.js';
+import { bustStorageConfigCache } from '../../services/imageUploadService.js';
 import { encrypt, decrypt } from '../../utils/encryption.js';
 import { clearCache } from '../../middleware/cacheMiddleware.js';
 
@@ -80,14 +81,21 @@ export const updateSettings = asyncHandler(async (req, res) => {
             hasCredentials = true;
             Object.keys(fieldData).forEach(key => {
                 // Skip system fields
-                if (!['_id', 'createdAt', 'updatedAt', '__v'].includes(key)) {
-                    // Encrypt string values, keep others (like booleans) as is
-                    if (typeof fieldData[key] === 'string' && fieldData[key].trim() !== "") {
-                        combinedCredentials[key] = encrypt(fieldData[key]);
-                    } else {
-                        combinedCredentials[key] = fieldData[key];
+                if (['_id', 'createdAt', 'updatedAt', '__v'].includes(key)) return;
+
+                const val = fieldData[key];
+
+                if (typeof val === 'string') {
+                    // FIX Bug 10: Skip empty strings — don't overwrite existing value with empty
+                    // Empty string in form means "no change", not "clear this field"
+                    if (val.trim() !== '') {
+                        combinedCredentials[key] = encrypt(val.trim());
                     }
+                } else if (typeof val === 'boolean') {
+                    // Booleans (e.g. sslIsTest, bkashIsTest) stored as-is
+                    combinedCredentials[key] = val;
                 }
+                // null / undefined / other types — ignored
             });
         }
     }
@@ -134,6 +142,8 @@ export const updateSettings = asyncHandler(async (req, res) => {
 
     // Clear settings cache after update (Non-blocking)
     clearCache('cache:/api/settings*');
+    // Bust image storage config cache so new Cloudinary keys take effect immediately
+    bustStorageConfigCache();
 
     res.status(200).json({
         message: "Site protocol updated successfully.",

@@ -7,6 +7,7 @@ import {
   normalizeShippingAddress,
   finalizeOrderProcessing
 } from "../order.utils.js";
+import { createOrderWithTransaction } from "../order.service.js";
 import {
   initiateSSLCommerz,
   initiateBkash,
@@ -71,14 +72,16 @@ export const initPayment = asyncHandler(async (req, res) => {
   };
 
   try {
+    // FIX Issue 14: Pass already-fetched settings to avoid a second DB query inside calculateValidatedOrder
     const orderData = await calculateValidatedOrder(
       orderItems,
       couponCode,
       shippingPrice,
-      deliveryZone
+      deliveryZone,
+      settings  // preloaded
     );
 
-    const order = new Order({
+    const orderPayload = {
       user: isRegisteredUser ? userId : undefined, 
       isGuest: !isRegisteredUser,
       guestId: !isRegisteredUser ? userId : undefined,
@@ -95,24 +98,21 @@ export const initPayment = asyncHandler(async (req, res) => {
         transactionId: new mongoose.Types.ObjectId().toString(),
         status: "Pending",
       },
-    });
+    };
 
     if (paymentMethod === "cod") {
-      order.paymentResult.status = "COD";
-      order.orderStatus = "Processing";
-      await order.save();
-      await finalizeOrderProcessing(order);
+      const order = await createOrderWithTransaction(orderPayload, true);
       clearCache('cache:/api/admin/dashboard*');
       res.json(await handleCODGateway(order));
     } else if (paymentMethod === "bkash") {
-      await order.save();
+      const order = await createOrderWithTransaction(orderPayload, false);
       clearCache('cache:/api/admin/dashboard*');
       const bkashData = await initiateBkash(order, bkashCreds);
       order.paymentResult.bkashPaymentID = bkashData.paymentID;
       await order.save();
       res.json({ url: bkashData.url });
     } else {
-      await order.save();
+      const order = await createOrderWithTransaction(orderPayload, false);
       clearCache('cache:/api/admin/dashboard*');
       const sslUrl = await initiateSSLCommerz(order, sslCreds);
       res.json({ url: sslUrl });
@@ -129,8 +129,15 @@ export const initPayment = asyncHandler(async (req, res) => {
 export const paymentSuccess = asyncHandler(async (req, res) => {
   const { tran_id } = req.params;
   const { val_id } = req.body;
+
+  // FIX Bug 4: Guard against null order before processing or redirecting
   const order = await Order.findOne({ "paymentResult.transactionId": tran_id });
-  if (order && order.paymentResult.status === "Pending") {
+  if (!order) {
+    console.error(`❌ paymentSuccess: Order not found for tran_id=${tran_id}`);
+    return res.redirect(`${frontendUrl}/payment/failed?reason=Order not found`);
+  }
+
+  if (order.paymentResult.status === "Pending") {
     order.paymentResult.status = "Completed";
     order.paymentResult.val_id = val_id;
     order.orderStatus = "Processing";
@@ -138,32 +145,41 @@ export const paymentSuccess = asyncHandler(async (req, res) => {
     await finalizeOrderProcessing(order);
     clearCache('cache:/api/admin/dashboard*');
   }
-  res.redirect(`${frontendUrl}/payment/success?orderId=${order?._id}`);
+  res.redirect(`${frontendUrl}/payment/success?orderId=${order._id}`);
 });
 
 export const bkashSuccess = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { paymentID, status } = req.query;
+
   const apiKeys = await ApiKey.findOne();
   const bkashCreds = {
     appKey: apiKeys?.bkashAppKey || process.env.BKASH_APP_KEY,
     appSecret: apiKeys?.bkashAppSecret ? decrypt(apiKeys.bkashAppSecret) : process.env.BKASH_APP_SECRET
   };
+
+  // FIX Bug 5: Guard against null order
   const order = await Order.findById(orderId);
+  if (!order) {
+    console.error(`❌ bkashSuccess: Order not found for orderId=${orderId}`);
+    return res.redirect(`${frontendUrl}/payment/failed?reason=Order not found`);
+  }
 
   if (status === "success" && paymentID) {
-    const executeResult = await bkashService.executePayment(
-      paymentID,
-      bkashCreds
-    );
-    if (executeResult.transactionStatus === "Completed") {
-      order.paymentResult.status = "Completed";
-      order.paymentResult.transactionId = executeResult.trxID;
-      order.orderStatus = "Processing";
-      await order.save();
-      await finalizeOrderProcessing(order);
-      clearCache('cache:/api/admin/dashboard*');
-      return res.redirect(`${frontendUrl}/payment/success?orderId=${order._id}`);
+    try {
+      const executeResult = await bkashService.executePayment(paymentID, bkashCreds);
+      if (executeResult.transactionStatus === "Completed") {
+        order.paymentResult.status = "Completed";
+        order.paymentResult.transactionId = executeResult.trxID;
+        order.orderStatus = "Processing";
+        await order.save();
+        await finalizeOrderProcessing(order);
+        clearCache('cache:/api/admin/dashboard*');
+        return res.redirect(`${frontendUrl}/payment/success?orderId=${order._id}`);
+      }
+    } catch (err) {
+      console.error(`❌ bkashSuccess: bKash execute failed:`, err.message);
+      return res.redirect(`${frontendUrl}/payment/failed?reason=bKash execution error`);
     }
   }
   res.redirect(`${frontendUrl}/payment/failed?reason=bKash verification failed`);
