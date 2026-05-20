@@ -9,6 +9,7 @@ import ProductActionsClient from "@/app/products/[slug]/components/ProductAction
 import ProductViewTracker from "@/app/products/[slug]/components/ProductViewTracker";
 import RelatedProducts from "@/app/products/[slug]/components/RelatedProducts";
 import ReviewSectionWrapper from "./components/ReviewSectionWrapper";
+import ProductShareButton from "@/app/products/[slug]/components/ProductShareButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -199,9 +200,10 @@ export default async function ProductDetailsPage({ params }) {
                     lang={lang}
                     className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
                   />
-                  <Button variant="ghost" size="icon" className="w-10 h-10 sm:w-12 sm:h-12 rounded-full glass hover:bg-accent-secondary hover:text-white transition-all">
-                    <Share2 size={18} />
-                  </Button>
+                  <ProductShareButton 
+                    productName={product.name} 
+                    productDescription={product.description} 
+                  />
                 </div>
               </div>
 

@@ -564,9 +564,9 @@ export default function LayoutBuilderPage() {
     onSuccess: () => {
       queryClient.invalidateQueries(['homeLayout', selectedLayoutId]);
       queryClient.invalidateQueries(['architectures']);
-      notify.success("Blueprint Committed");
+      notify.success("Layout saved successfully");
     },
-    onError: () => notify.error("Sync Failure", "Could not persist blueprint.")
+    onError: () => notify.error("Error", "Could not save layout.")
   });
 
   const createMutation = useMutation({
@@ -575,7 +575,7 @@ export default function LayoutBuilderPage() {
       queryClient.invalidateQueries(['architectures']);
       const layoutId = data?._id || data?.data?._id;
       if (layoutId) setSelectedLayoutId(layoutId);
-      notify.success("New Architecture Forged");
+      notify.success("New layout version created");
     }
   });
 
@@ -584,7 +584,7 @@ export default function LayoutBuilderPage() {
     onSuccess: () => {
       queryClient.invalidateQueries(['architectures']);
       queryClient.invalidateQueries(['homeLayout']);
-      notify.success("Architecture Deployed Globally");
+      notify.success("Layout activated successfully");
     }
   });
 
@@ -592,7 +592,7 @@ export default function LayoutBuilderPage() {
     mutationFn: deleteHomeLayout,
     onSuccess: () => {
       queryClient.invalidateQueries(['architectures']);
-      notify.info("Architecture Scrapped");
+      notify.info("Layout deleted");
     }
   });
 
@@ -680,9 +680,8 @@ export default function LayoutBuilderPage() {
           <div className="w-16 h-16 border-4 border-primary/20 rounded-full" />
           <div className="absolute top-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
-        <div className="flex flex-col items-center animate-pulse">
-           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Architectural Protocol</p>
-           <p className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Synchronizing Home Blueprint...</p>
+        <div className="flex flex-col items-center">
+           <p className="text-sm font-semibold text-muted-foreground">Loading layout settings...</p>
         </div>
       </div>
     );
@@ -693,18 +692,13 @@ export default function LayoutBuilderPage() {
       {/* 🏛️ Architecture Selector */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 bg-card/30 p-8 rounded-[2.5rem] border border-border/10 backdrop-blur-xl">
         <div className="space-y-4">
-            <div>
-              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-2">Design Hub</h2>
-              <p className="text-2xl font-black italic uppercase tracking-tighter">Choose a Layout</p>
-            </div>
-            
             <div className="flex flex-wrap gap-3">
                 {architectures.map(arch => (
                     <button
                         key={arch._id}
                         onClick={() => setSelectedLayoutId(arch._id)}
                         className={cn(
-                            "group relative px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-3",
+                            "group relative px-6 py-3 rounded-2xl text-xs font-semibold tracking-wide border transition-all flex items-center gap-3",
                             selectedLayoutId === arch._id 
                                 ? "bg-foreground text-background border-foreground shadow-2xl scale-105" 
                                 : "bg-background/50 border-border/10 text-muted-foreground hover:border-primary/40 hover:bg-background"
@@ -715,7 +709,7 @@ export default function LayoutBuilderPage() {
                         {arch.isActive && (
                           <div className="flex items-center gap-1.5 ml-1">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[7px] text-emerald-500">LIVE</span>
+                            <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-wider">LIVE</span>
                           </div>
                         )}
                         {selectedLayoutId === arch._id && (
@@ -729,9 +723,9 @@ export default function LayoutBuilderPage() {
                         const name = prompt("Enter a name for this new layout version:");
                         if (name) createMutation.mutate(name);
                     }}
-                    className="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-dashed border-primary/40 text-primary hover:bg-primary/10 transition-all flex items-center gap-3"
+                    className="px-6 py-3 rounded-2xl text-xs font-semibold tracking-wide border border-dashed border-primary/40 text-primary hover:bg-primary/10 transition-all flex items-center gap-3"
                 >
-                    <Plus size={14} /> New Layout Version
+                    <Plus size={14} /> Create Layout
                 </button>
             </div>
         </div>
@@ -740,18 +734,18 @@ export default function LayoutBuilderPage() {
           {selectedLayoutId && architectures.find(a => a._id === selectedLayoutId && !a.isActive) && (
              <Button 
                 onClick={() => activateMutation.mutate(selectedLayoutId)}
-                className="rounded-xl h-14 px-8 font-black text-[10px] uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-xl shadow-emerald-500/20 group"
+                className="rounded-xl h-14 px-8 font-bold text-xs uppercase tracking-wider bg-emerald-600 text-white hover:bg-emerald-500 shadow-xl shadow-emerald-500/20 group"
              >
                 <Zap size={16} className="mr-3 group-hover:scale-125 transition-transform" />
-                Make This Live
+                Make Live
              </Button>
           )}
           
-          <Button variant="outline" onClick={resetLayout} className="rounded-xl h-14 px-6 font-black text-[10px] uppercase tracking-widest border-border/20 hover:bg-muted transition-all">
+          <Button variant="outline" onClick={resetLayout} className="rounded-xl h-14 px-6 font-bold text-xs uppercase tracking-wider border-border/20 hover:bg-muted transition-all">
             <RefreshCcw size={16} className="mr-3" /> Reset
           </Button>
 
-          <Button onClick={() => updateMutation.mutate(layout)} disabled={updateMutation.isPending} className="rounded-xl h-14 px-10 font-black text-[10px] uppercase tracking-widest bg-foreground text-background hover:bg-primary transition-all shadow-xl">
+          <Button onClick={() => updateMutation.mutate(layout)} disabled={updateMutation.isPending} className="rounded-xl h-14 px-10 font-bold text-xs uppercase tracking-wider bg-foreground text-background hover:bg-primary transition-all shadow-xl">
             {updateMutation.isPending ? <div className="w-5 h-5 border-2 border-background border-t-transparent rounded-full animate-spin mr-3" /> : <Save size={16} className="mr-3" />}
             {updateMutation.isPending ? "Saving..." : "Save Layout"}
           </Button>
@@ -759,7 +753,7 @@ export default function LayoutBuilderPage() {
           {selectedLayoutId && architectures.find(a => a._id === selectedLayoutId && !a.isActive) && (
              <Button 
                 onClick={async () => {
-                    const confirmed = await notify.confirm("Delete this layout version?", "This architecture blueprint will be permanently scrapped.");
+                    const confirmed = await notify.confirm("Delete this layout version?", "This layout version will be permanently deleted.");
                     if(confirmed) deleteMutation.mutate(selectedLayoutId);
                 }}
                 variant="ghost"
@@ -775,15 +769,14 @@ export default function LayoutBuilderPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-elevated border border-border/50 rounded-[2rem] md:rounded-[2.5rem] p-5 md:p-12 shadow-2xl">
-            <header className="mb-8 md:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/50 pb-6">
-              <div className="flex flex-col gap-2">
-                <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter italic">Home Designer</h1>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Drag and drop to reorder sections</p>
-              </div>
-              <Badge variant="outline" className="w-fit rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest bg-primary/5 text-primary border-primary/20">
-                {layout.length} Sections
-              </Badge>
-            </header>
+            <header className="mb-8 md:mb-10 flex items-center justify-between gap-4 border-b border-border/50 pb-6">
+               <div className="flex flex-col gap-1">
+                 <span className="text-xs font-semibold text-muted-foreground">Drag and drop to reorder sections</span>
+               </div>
+               <Badge variant="outline" className="w-fit rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest bg-primary/5 text-primary border-primary/20">
+                 {layout.length} Sections
+               </Badge>
+             </header>
 
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={layout.map(i => i.id)} strategy={verticalListSortingStrategy}>

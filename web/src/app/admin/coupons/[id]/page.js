@@ -25,6 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Pagination from "@/components/common/Pagination";
+import AdminPageHeader, { AdminBackLink } from "@/app/admin/_components/AdminPageHeader";
 
 export default function CouponDetailPage() {
   const { id } = useParams();
@@ -46,73 +47,62 @@ export default function CouponDetailPage() {
   const pagination = coupon?.usagePagination;
 
   return (
-    <div className="max-w-7xl mx-auto pb-24 px-4 sm:px-6 space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
-      {/* 🏔️ Strategic Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card/50 backdrop-blur-3xl p-8 sm:p-10 rounded-[3rem] border border-border/10 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-rose-600/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-rose-600/10 transition-colors duration-1000" />
-        
-        <div className="space-y-1 relative z-10">
-          <div className="flex items-center gap-3">
-             <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500">
-                <Tag size={20} />
-             </div>
-             <div className="flex flex-col">
-                <h1 className="text-3xl font-black uppercase tracking-tighter italic">
-                   Voucher: {coupon?.code}
-                </h1>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge 
-                    variant="outline" 
-                    className={cn(
-                      "px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border-none",
-                      coupon?.isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-500"
-                    )}
-                  >
-                    {coupon?.isActive ? "System Active" : "Logic Suspended"}
-                  </Badge>
-                  <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground">
-                     // Deployment_ID: {id?.slice(-8).toUpperCase()}
-                  </span>
-                </div>
-             </div>
+    <div className="admin-page-container max-w-7xl mx-auto pb-24 space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+      <AdminBackLink href="/admin/coupons" label="Back to coupons" />
+
+      <AdminPageHeader
+        title={`Voucher: ${coupon?.code || ""}`}
+        description={
+          <div className="flex items-center gap-2 mt-1">
+            <Badge 
+              variant="outline" 
+              className={cn(
+                "px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border-none",
+                coupon?.isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-500"
+              )}
+            >
+              {coupon?.isActive ? "System Active" : "Logic Suspended"}
+            </Badge>
+            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+               // Deployment_ID: {id?.slice(-8).toUpperCase()}
+            </span>
           </div>
-        </div>
-        
-        <div className="flex items-center gap-3 relative z-10">
-          <button
-            onClick={async () => {
-              try {
-                await updateCoupon({ id, data: { isActive: !coupon.isActive } });
-              } catch (err) {
-                console.error(err);
-              }
-            }}
-            className={cn(
-              "group flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg",
-              coupon?.isActive 
-                ? "bg-rose-600 text-white hover:bg-rose-700 shadow-rose-500/20" 
-                : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-500/20"
-            )}
-          >
-            <Power size={14} className="text-white" />
-            {coupon?.isActive ? "Deactivate Now" : "Activate Now"}
-          </button>
-          <Link
-            href={`/admin/coupons/${id}/edit`}
-            className="group flex items-center gap-3 px-6 py-3 rounded-2xl bg-foreground text-background text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all"
-          >
-            <Edit3 size={14} />
-            Modify Logic
-          </Link>
-          <Link
-            href="/admin/coupons"
-            className="group flex items-center gap-3 px-6 py-3 rounded-2xl bg-accent/10 border border-border/5 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-all"
-          >
-            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-            Abort to Hub
-          </Link>
-        </div>
-      </div>
+        }
+        actions={
+          <div className="flex items-center gap-3">
+            <button
+              onClick={async () => {
+                try {
+                  await updateCoupon({ id, data: { isActive: !coupon.isActive } });
+                } catch (err) {
+                  console.error(err);
+                }
+              }}
+              className={cn(
+                "group flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg cursor-pointer",
+                coupon?.isActive 
+                  ? "bg-rose-600 text-white hover:bg-rose-700 shadow-rose-500/20" 
+                  : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-500/20"
+              )}
+            >
+              <Power size={14} className="text-white" />
+              {coupon?.isActive ? "Deactivate Now" : "Activate Now"}
+            </button>
+            <Link
+              href={`/admin/coupons/${id}/edit`}
+              className="group flex items-center gap-3 px-6 py-3 rounded-2xl bg-foreground text-background text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all"
+            >
+              <Edit3 size={14} />
+              Modify Logic
+            </Link>
+          </div>
+        }
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Coupons", href: "/admin/coupons" },
+          { label: coupon?.code || "Details" },
+        ]}
+      />
 
       {/* 📊 Strategic Metrics Matrix */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

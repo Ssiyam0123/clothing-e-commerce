@@ -99,7 +99,7 @@ export default function Footer() {
                  <img 
                    src={getImageUrl(theme === 'dark' ? (branding.logoDark || branding.logo) : (branding.logo || branding.logoDark))} 
                    alt={branding.siteName} 
-                   className="h-8 md:h-10 w-auto object-contain transition-transform group-hover:scale-105 duration-500 relative z-10" 
+                   className={`h-18 md:h-24 lg:h-32 w-auto object-contain transition-transform group-hover:scale-105 duration-500 relative z-10 ${theme === 'dark' ? 'invert' : ''}`}
                  />
                ) : (
                  <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background shadow-2xl relative z-10">

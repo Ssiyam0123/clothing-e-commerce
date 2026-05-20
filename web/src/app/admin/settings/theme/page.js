@@ -49,10 +49,10 @@ export default function ThemePage() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-16"
         >
-          <section className="space-y-10">
+          <section className="space-y-6">
             <div>
-              <h2 className="text-xl font-black uppercase tracking-tighter italic">Theme Colors</h2>
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Pick your brand's main color</p>
+              <h2 className="text-lg font-bold text-foreground">Theme Colors</h2>
+              <p className="text-xs text-muted-foreground mt-1">Pick your brand's main color</p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-8">
@@ -81,7 +81,7 @@ export default function ThemePage() {
                     )}
                   </div>
                   <span className={cn(
-                    "text-[9px] font-black uppercase tracking-widest transition-colors",
+                    "text-xs font-semibold transition-colors",
                     formData.defaultThemeColor === item.name ? "text-foreground" : "text-muted-foreground"
                   )}>
                     {item.name}
@@ -91,10 +91,10 @@ export default function ThemePage() {
             </div>
           </section>
 
-          <section className="space-y-10 pt-16 border-t border-border/5">
+          <section className="space-y-6 pt-16 border-t border-border/5">
             <div>
-              <h2 className="text-xl font-black uppercase tracking-tighter italic">Text Fonts</h2>
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Choose the main font for your site</p>
+              <h2 className="text-lg font-bold text-foreground">Text Fonts</h2>
+              <p className="text-xs text-muted-foreground mt-1">Choose the main font for your site</p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
@@ -115,7 +115,7 @@ export default function ThemePage() {
                 >
                   <div className="flex flex-col gap-4">
                     <span className="text-2xl font-black italic tracking-tighter" style={{ fontFamily: font }}>Aa</span>
-                    <span className="text-[10px] font-black uppercase tracking-widest opacity-60">{font}</span>
+                    <span className="text-xs font-semibold opacity-60">{font}</span>
                   </div>
                   {formData.defaultThemeFont === font && (
                     <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-accent-secondary animate-pulse" />
@@ -125,10 +125,10 @@ export default function ThemePage() {
             </div>
           </section>
 
-          <section className="space-y-10 pt-16 border-t border-border/5">
+          <section className="space-y-6 pt-16 border-t border-border/5">
             <div>
-              <h2 className="text-xl font-black uppercase tracking-tighter italic">Design Preset</h2>
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Pick a visual style for your store</p>
+              <h2 className="text-lg font-bold text-foreground">Design Preset</h2>
+              <p className="text-xs text-muted-foreground mt-1">Pick a visual style for your store</p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
@@ -144,7 +144,7 @@ export default function ThemePage() {
                   )}
                   type="button"
                 >
-                  <span className="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">
+                  <span className="text-xs font-semibold opacity-60 group-hover:opacity-100 transition-opacity">
                     {theme}
                   </span>
                   {formData.activeTheme === theme && (
@@ -159,10 +159,10 @@ export default function ThemePage() {
             <Button
               onClick={handleSave}
               disabled={isUpdating}
-              className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
+              className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-bold text-xs shadow-xl transition-all active:scale-95 group"
             >
               <Save size={16} className={cn("mr-2", isUpdating && "animate-pulse")} />
-              {isUpdating ? "Updating Styles..." : "Save Styles"}
+              {isUpdating ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </motion.div>

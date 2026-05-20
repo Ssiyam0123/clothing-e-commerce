@@ -58,11 +58,6 @@ export default function PaymentPage() {
           className="space-y-16"
         >
           <section className="space-y-10">
-            <div>
-              <h2 className="text-xl font-black uppercase tracking-tighter italic">Payment Methods</h2>
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">Turn on or off your payment options</p>
-            </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {[
                 { id: "cod", label: "Cash On Delivery", desc: "Pay when you get product" },
@@ -80,7 +75,7 @@ export default function PaymentPage() {
                     }
                   })}
                   className={cn(
-                    "group relative p-8 rounded-[2.5rem] border-2 transition-all duration-500 text-left overflow-hidden",
+                    "group relative p-8 rounded-[2.5rem] border-2 transition-all duration-500 text-left",
                     formData.paymentOptions?.[option.id]
                       ? "border-emerald-500/50 bg-emerald-500/5 shadow-2xl"
                       : "border-border/5 hover:border-border/20 bg-muted/20 opacity-40 hover:opacity-100"
@@ -94,8 +89,8 @@ export default function PaymentPage() {
                          <Settings2 size={20} />
                       </div>
                       <div>
-                        <h3 className="text-sm font-black uppercase tracking-tight">{option.label}</h3>
-                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1">{option.desc}</p>
+                        <h3 className="text-sm font-bold text-foreground">{option.label}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">{option.desc}</p>
                       </div>
                    </div>
                    {formData.paymentOptions?.[option.id] && (
@@ -110,11 +105,11 @@ export default function PaymentPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div className="space-y-8">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-black uppercase tracking-widest italic text-primary">SSLCommerz Settings</h3>
+                  <h3 className="text-sm font-bold text-foreground">SSLCommerz Settings</h3>
                   <button 
                     type="button"
                     onClick={() => setFormData({...formData, payment: {...formData.payment, sslIsTest: !formData.payment?.sslIsTest}})}
-                    className={cn("px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest transition-all", formData.payment?.sslIsTest ? "bg-orange-500/20 text-orange-500" : "bg-emerald-500/20 text-emerald-500")}
+                    className={cn("px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all", formData.payment?.sslIsTest ? "bg-orange-500/20 text-orange-500" : "bg-emerald-500/20 text-emerald-500")}
                   >
                     {formData.payment?.sslIsTest ? "Sandbox" : "Live"}
                   </button>
@@ -141,11 +136,11 @@ export default function PaymentPage() {
 
               <div className="space-y-8">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-black uppercase tracking-widest italic text-primary">bKash Settings</h3>
+                  <h3 className="text-sm font-bold text-foreground">bKash Settings</h3>
                   <button 
                     type="button"
                     onClick={() => setFormData({...formData, payment: {...formData.payment, bkashIsTest: !formData.payment?.bkashIsTest}})}
-                    className={cn("px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest transition-all", formData.payment?.bkashIsTest ? "bg-orange-500/20 text-orange-500" : "bg-emerald-500/20 text-emerald-500")}
+                    className={cn("px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all", formData.payment?.bkashIsTest ? "bg-orange-500/20 text-orange-500" : "bg-emerald-500/20 text-emerald-500")}
                   >
                     {formData.payment?.bkashIsTest ? "Sandbox" : "Live"}
                   </button>
@@ -192,10 +187,10 @@ export default function PaymentPage() {
             <Button
               onClick={handleSave}
               disabled={isUpdating}
-              className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group"
+              className="bg-foreground text-background hover:bg-accent-secondary hover:text-white px-10 h-14 rounded-2xl font-bold text-xs uppercase tracking-wider shadow-xl transition-all active:scale-95 group"
             >
               <Save size={16} className={cn("mr-2", isUpdating && "animate-pulse")} />
-              {isUpdating ? "Updating Payments..." : "Save Payment Options"}
+              {isUpdating ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </motion.div>

@@ -97,7 +97,7 @@ export default function ManageImagesTab({ product, updateProduct, setProduct }) 
   };
 
   return (
-    <form onSubmit={onImagesSubmit} className="admin-table-form p-8 md:p-14 space-y-12">
+    <form onSubmit={onImagesSubmit} className="p-0 space-y-12">
       {/* Tab Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">

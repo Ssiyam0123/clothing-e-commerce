@@ -69,6 +69,17 @@ export const useAdminOrders = (params = {}, orderId = null) => {
     },
   });
 
+  const deleteOrder = useMutation({
+    mutationFn: (id) => api.delete(`/admin/orders/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
+      swalSuccess("Order Deleted", "The order was successfully deleted.");
+    },
+    onError: (err) => {
+      swalError("Delete Failed", err.response?.data?.message || "Could not delete order.");
+    }
+  });
+
   const searchAdminProducts = async (query) => {
     const { data } = await api.get("/admin/products", { 
       params: { search: query, limit: 5, isActive: "all" } 
@@ -97,6 +108,8 @@ export const useAdminOrders = (params = {}, orderId = null) => {
     isSyncing: syncToPathao.isPending,
     createAdminOrder: createAdminOrder.mutateAsync,
     isCreating: createAdminOrder.isPending,
+    deleteOrder: deleteOrder.mutateAsync,
+    isDeleting: deleteOrder.isPending,
     searchAdminProducts,
     searchAdminUsers,
   };

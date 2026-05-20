@@ -54,8 +54,10 @@ export default function ImageUpload({
     if (multiple) {
       const newPreviews = previews.filter((_, i) => i !== index);
       setPreviews(newPreviews);
+      if (onImageChange) onImageChange(null);
     } else {
       setPreview(null);
+      if (onImageChange) onImageChange(null);
     }
   };
 

@@ -283,3 +283,30 @@ export const syncOrderToPathao = asyncHandler(async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+export const deleteOrder = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    return res.status(404).json({ message: "Order not found." });
+  }
+
+  // Restore stock if the order status is NOT Cancelled
+  if (order.orderStatus !== "Cancelled" && order.orderItems && order.orderItems.length > 0) {
+    try {
+      const restoreOps = order.orderItems.map((item) => ({
+        updateOne: {
+          filter: { _id: item.product, "sizes.size": item.size },
+          update: { $inc: { "sizes.$.stock": item.quantity } },
+        },
+      }));
+      await Product.bulkWrite(restoreOps);
+    } catch (err) {
+      console.error("Failed to restore stock on order deletion:", err);
+    }
+  }
+
+  await Order.findByIdAndDelete(req.params.id);
+  clearCache('cache:/api/admin/dashboard*');
+
+  res.json({ success: true, message: "Order deleted successfully" });
+});

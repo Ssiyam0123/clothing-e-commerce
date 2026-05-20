@@ -31,7 +31,7 @@ export default function ManagePricingTab({ product, updateProduct }) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onPricingSubmit)} className="admin-table-form p-8 md:p-14 space-y-12">
+    <form onSubmit={handleSubmit(onPricingSubmit)} className="p-0 space-y-12">
       <div className="flex items-center gap-4">
         <div className="w-10 h-10 rounded-2xl bg-emerald-600/10 flex items-center justify-center border border-emerald-600/20">
           <DollarSign size={20} className="text-emerald-600" />

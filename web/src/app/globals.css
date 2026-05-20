@@ -333,5 +333,67 @@
       transform: translateX(100%);
     }
   }
+
+  /* 🛍️ Quick Select Modal Component Styles */
+  .quick-select-modal-container {
+    @apply relative w-full sm:max-w-md md:max-w-lg bg-background rounded-2xl sm:rounded-xl shadow-2xl border border-border flex flex-col p-6 sm:p-8 gap-5 max-h-[90vh] overflow-y-auto;
+  }
+
+  .quick-select-close-btn {
+    @apply absolute top-6 right-6 text-destructive hover:opacity-80 transition-opacity z-30 p-1;
+  }
+
+  .quick-select-title {
+    @apply font-bold text-lg sm:text-xl text-foreground leading-tight;
+  }
+
+  .quick-select-price-label {
+    @apply text-xs text-muted-foreground font-medium;
+  }
+
+  .quick-select-price-val {
+    @apply text-xl font-bold text-foreground mt-1;
+  }
+
+  .quick-select-size-label {
+    @apply text-xs text-muted-foreground font-medium;
+  }
+
+  .quick-select-size-btn {
+    @apply relative px-5 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-200 rounded-full border bg-background text-foreground border-border hover:bg-muted;
+  }
+
+  .quick-select-size-btn-active {
+    @apply bg-accent text-accent-foreground border-muted-foreground/35 font-bold;
+  }
+
+  .quick-select-size-btn-disabled {
+    @apply bg-muted/40 text-muted-foreground/50 border-border opacity-40 cursor-not-allowed line-through;
+  }
+
+  .quick-select-qty-container {
+    @apply flex items-center justify-between border border-border sm:border-primary rounded-xl sm:rounded-none px-2 h-12 w-32 shrink-0;
+  }
+
+  .quick-select-qty-btn {
+    @apply text-muted-foreground hover:text-foreground px-2 transition-colors active:scale-90;
+  }
+
+  .quick-select-qty-val {
+    @apply border border-border bg-background text-foreground font-semibold rounded px-3 py-1 text-sm select-none;
+  }
+
+  .quick-select-cart-btn {
+    @apply flex-1 h-12 border border-accent-secondary/35 rounded-xl sm:rounded-none bg-background text-accent-secondary font-bold text-sm hover:bg-accent-secondary hover:text-white transition-all flex items-center justify-center;
+  }
+
+  .quick-select-buy-btn {
+    @apply w-full h-12 bg-accent-secondary text-white font-bold text-sm rounded-xl sm:rounded-none hover:brightness-110 active:scale-95 transition-all flex items-center justify-center;
+  }
+
+  .quick-select-buy-inline-btn {
+    @apply flex-1 h-12 bg-accent-secondary text-white font-bold text-sm rounded-xl sm:rounded-none hover:brightness-110 active:scale-95 transition-all flex items-center justify-center;
+  }
 }
+
 

@@ -22,6 +22,7 @@ export default function ProfileIdentity({ user, ui, onUpdate, loading }) {
       name: user.name,
       phone: user.phone || "",
       bio: user.bio || "",
+      address: user.addresses?.[0]?.address || user.addresses?.[0]?.street || "",
     }
   });
 
@@ -83,6 +84,18 @@ export default function ProfileIdentity({ user, ui, onUpdate, loading }) {
               className="h-14 rounded-2xl bg-accent/5 border-border/50 focus:border-accent-secondary/50 transition-all font-bold"
             />
           </div>
+        </div>
+
+        <div className="space-y-4">
+          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+            {ui.addressLabel || "Full Address"}
+          </Label>
+          <Textarea 
+            {...register("address")}
+            rows={3}
+            placeholder="Street address, house, apartment, area, city..."
+            className="rounded-[2rem] bg-accent/5 border-border/50 focus:border-accent-secondary/50 transition-all font-medium p-6 min-h-[100px]"
+          />
         </div>
 
         <div className="space-y-4">

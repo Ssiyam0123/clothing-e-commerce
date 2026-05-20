@@ -46,7 +46,7 @@ export const cacheMiddleware = (ttl = 300) => {
  * @param {string} pattern - Pattern to match keys
  */
 export const clearCache = (pattern) => {
-  if (!redis || redis.status !== "ready") return;
+  if (!redis || (redis.status !== "ready" && redis.status !== "connect")) return;
 
   // Use scanStream instead of keys for better performance
   const stream = redis.scanStream({

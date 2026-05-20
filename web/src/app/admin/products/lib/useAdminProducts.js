@@ -185,8 +185,12 @@ export const useAdminProduct = (id) => {
 
   const updateProduct = useMutation({
     mutationFn: async (updatedData) => {
-      const isFormData = updatedData instanceof FormData;
-      const response = await api.put(`/admin/products/${id}`, updatedData, {
+      let payload = updatedData;
+      if (updatedData && updatedData.data !== undefined && updatedData.id !== undefined) {
+        payload = updatedData.data;
+      }
+      const isFormData = payload instanceof FormData;
+      const response = await api.put(`/admin/products/${id}`, payload, {
         headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
       });
       return response.data;
@@ -199,7 +203,11 @@ export const useAdminProduct = (id) => {
 
   const patchProduct = useMutation({
     mutationFn: async (patchedData) => {
-      const response = await api.patch(`/admin/products/${id}`, patchedData);
+      let payload = patchedData;
+      if (patchedData && patchedData.data !== undefined && patchedData.id !== undefined) {
+        payload = patchedData.data;
+      }
+      const response = await api.patch(`/admin/products/${id}`, payload);
       return response.data;
     },
     onSuccess: () => {

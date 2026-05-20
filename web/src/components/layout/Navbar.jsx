@@ -94,21 +94,24 @@ export default function Navbar() {
   return (
     <header
       className={cn(
-        "sticky top-0 left-0 right-0 z-[120] px-4 sm:px-6 lg:px-12 py-4 transition-all duration-300",
+        "sticky top-0 left-0 right-0 z-[120] px-4 sm:px-6 lg:px-12 py-4 transition-[background-color,border-color,padding,box-shadow] duration-300",
         (scrolled || !isTransparentPage) ? "bg-background/95 backdrop-blur-3xl border-b border-border/10 py-3 shadow-xl shadow-black/5" : "bg-transparent"
       )}
     >
       <div className="w-full mx-auto flex items-center justify-between gap-2">
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-3 group flex-shrink-0" aria-label={branding.siteName || "Home"}>
+        <Link href="/" className="relative flex items-center h-10 sm:h-12 w-24 sm:w-28 md:w-32 group flex-shrink-0" aria-label={branding.siteName || "Home"}>
           {branding.logo || branding.logoDark ? (
             <img 
               src={getImageUrl(theme === 'dark' ? (branding.logoDark || branding.logo) : (branding.logo || branding.logoDark))} 
               alt={branding.siteName || "Logo"} 
-              className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105 duration-500" 
+              className={cn(
+                "absolute left-0 top-1/2 -translate-y-1/2 h-14 sm:h-18 md:h-20 w-auto object-contain transition-transform group-hover:scale-105 duration-500",
+                theme === 'dark' && "invert"
+              )}
             />
           ) : (
-            <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background group-hover:rotate-[15deg] transition-transform duration-500 shadow-xl shadow-foreground/5">
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-foreground rounded-xl flex items-center justify-center text-background group-hover:rotate-[15deg] transition-transform duration-500 shadow-xl shadow-foreground/5">
                <Sparkles size={20} className="group-hover:scale-125 transition-transform" />
             </div>
           )}

@@ -67,17 +67,9 @@ export default function CartLogisticsForm({
                   </div>
                 ))
               ) : (
-                ["dhaka", "outside"].map((z) => (
-                  <div key={z} className="relative">
-                    <RadioGroupItem value={z} id={z} className="peer sr-only" />
-                    <Label
-                      htmlFor={z}
-                      className="flex flex-col items-center justify-center h-12 sm:h-14 rounded-xl sm:rounded-2xl border-2 border-transparent bg-accent/20 peer-data-[state=checked]:border-accent-secondary peer-data-[state=checked]:bg-accent-secondary/10 peer-data-[state=checked]:text-accent-secondary cursor-pointer transition-all hover:bg-accent/40 text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-center px-2"
-                    >
-                      {t[z] || (z === 'dhaka' ? "Inside Dhaka" : "Outside Dhaka")}
-                    </Label>
-                  </div>
-                ))
+                <div className="col-span-1 sm:col-span-2 text-center py-6 text-[10px] sm:text-xs text-muted-foreground font-black uppercase tracking-wider bg-accent/10 rounded-2xl border border-border/10">
+                  No active shipping methods available.
+                </div>
               )}
             </RadioGroup>
         </div>

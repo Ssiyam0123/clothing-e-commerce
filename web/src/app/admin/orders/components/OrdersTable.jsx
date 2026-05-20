@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Eye, Edit2 } from "lucide-react";
+import { Eye, Edit2, Trash2 } from "lucide-react";
 import DataTable from "@/app/admin/_components/DataTable";
 import Pagination from "@/components/common/Pagination";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ export default function OrdersTable({
   onPageChange,
   isAllFetching,
   onQuickStatusUpdate,
+  onDeleteOrder,
 }) {
   const columns = [
     {
@@ -117,6 +118,13 @@ export default function OrdersTable({
           >
             <Edit2 size={16} className="group-hover:scale-110 transition-transform" />
           </Link>
+          <button
+            onClick={() => onDeleteOrder(item._id)}
+            className="p-2.5 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all shadow-sm border border-border/10 group"
+            title="Delete Order"
+          >
+            <Trash2 size={16} className="group-hover:scale-110 transition-transform" />
+          </button>
         </div>
       ),
     },

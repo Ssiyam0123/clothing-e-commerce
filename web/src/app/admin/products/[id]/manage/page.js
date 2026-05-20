@@ -17,6 +17,7 @@ import ManageStockTab from "@/app/admin/products/components/ManageStockTab";
 import ManagePricingTab from "@/app/admin/products/components/ManagePricingTab";
 import ManageImagesTab from "@/app/admin/products/components/ManageImagesTab";
 import ManageReviewsTab from "@/app/admin/products/components/ManageReviewsTab";
+import ManageSeoTab from "@/app/admin/products/components/ManageSeoTab";
 import ProductManageNavigation from "@/app/admin/products/components/ProductManageNavigation";
 import AdminPageHeader, { AdminBackLink } from "@/app/admin/_components/AdminPageHeader";
 
@@ -60,8 +61,8 @@ export default function ProductManagementPage({ params: paramsPromise }) {
         title="Manage product"
         description={
           product?.name
-            ? `Stock, pricing, images, and reviews for ${product.name}.`
-            : "Stock, pricing, images, and reviews."
+            ? `Stock, pricing, images, reviews, and SEO for ${product.name}.`
+            : "Stock, pricing, images, reviews, and SEO."
         }
         actions={
           <div className="flex items-center gap-4 rounded-xl border border-border bg-muted/30 p-4">
@@ -116,6 +117,14 @@ export default function ProductManagementPage({ params: paramsPromise }) {
                product={product} 
                setProduct={setProduct} 
                patchProduct={patchProduct} 
+             />
+           </TabsContent>
+
+           {/* Tab 5: SEO Configuration */}
+           <TabsContent value="seo" className="focus-visible:outline-none mt-0 w-full">
+             <ManageSeoTab 
+               product={product} 
+               updateProduct={updateProduct} 
              />
            </TabsContent>
         </div>

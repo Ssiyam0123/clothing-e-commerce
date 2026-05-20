@@ -58,7 +58,7 @@ const WishlistButton = memo(({ product, lang, className }) => {
       className={cn(
         "p-2.5 rounded-full backdrop-blur-md transition-all duration-200 border border-border/20 shadow-xl",
         inWishlist
-          ? "bg-accent-secondary text-primary shadow-accent-secondary/40"
+          ? "bg-accent-secondary text-white shadow-accent-secondary/40"
           : "bg-surface text-primary hover:bg-accent hover:text-white",
         className
       )}
@@ -66,7 +66,7 @@ const WishlistButton = memo(({ product, lang, className }) => {
       <Heart
         size={16}
         fill={inWishlist ? "currentColor" : "none"}
-        strokeWidth={inWishlist ? 0 : 2}
+        strokeWidth={1.5}
       />
     </motion.button>
   );

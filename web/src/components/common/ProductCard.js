@@ -154,15 +154,13 @@ export default function ProductCard({ product, className }) {
         </div>
       </div>
 
-      {isModalOpen && (
-        <QuickSelectModal 
-          product={product}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          mode={modalMode}
-          lang={lang}
-        />
-      )}
+      <QuickSelectModal 
+        product={product}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        mode={modalMode}
+        lang={lang}
+      />
     </>
   );
 }

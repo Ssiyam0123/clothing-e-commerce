@@ -36,6 +36,14 @@ export const updateProfile = asyncHandler(async (req, res) => {
   user.bio = req.body.bio || user.bio;
   user.avatar = avatarUrl;
 
+  if (req.body.addresses) {
+    try {
+      user.addresses = typeof req.body.addresses === 'string' ? JSON.parse(req.body.addresses) : req.body.addresses;
+    } catch (e) {
+      user.addresses = req.body.addresses;
+    }
+  }
+
   await user.save();
   clearCache('cache:/api/admin/dashboard*');
 
@@ -49,6 +57,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
     bio: updatedUser.bio,
     avatar: updatedUser.avatar,
     role: updatedUser.role,
+    addresses: updatedUser.addresses,
   });
 });
 
@@ -149,6 +158,14 @@ export const updateUser = asyncHandler(async (req, res) => {
   user.phone = req.body.phone || user.phone;
   user.bio = req.body.bio || user.bio;
 
+  if (req.body.addresses) {
+    try {
+      user.addresses = typeof req.body.addresses === 'string' ? JSON.parse(req.body.addresses) : req.body.addresses;
+    } catch (e) {
+      user.addresses = req.body.addresses;
+    }
+  }
+
   // Handle avatar upload if provided
   if (req.file) {
     user.avatar = await uploadImage(req.file, "avatars", user.avatar);
@@ -167,6 +184,7 @@ export const updateUser = asyncHandler(async (req, res) => {
     phone: updatedUser.phone,
     bio: updatedUser.bio,
     avatar: updatedUser.avatar,
+    addresses: updatedUser.addresses,
   });
 });
 

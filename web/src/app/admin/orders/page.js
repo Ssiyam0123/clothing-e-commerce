@@ -8,6 +8,7 @@ import OrdersSearchAndFilter from "./components/OrdersSearchAndFilter";
 import OrdersTable from "./components/OrdersTable";
 import { Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { notify } from "@/utils/swal";
 import AdminPageHeader, {
   AdminHeaderButton,
   AdminHeaderStat,
@@ -30,7 +31,7 @@ function AdminOrdersContent() {
     [queryParams, status],
   );
 
-  const { orders, total, pages, isLoading, isAllFetching, updateOrder } =
+  const { orders, total, pages, isLoading, isAllFetching, updateOrder, deleteOrder } =
     useAdminOrders(finalQueryParams);
 
   const handleQuickStatusUpdate = async (id, newStatus) => {
@@ -38,6 +39,20 @@ function AdminOrdersContent() {
       await updateOrder({ id, data: { orderStatus: newStatus } });
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleDeleteOrder = async (id) => {
+    const confirmed = await notify.confirm(
+      "Delete Order?",
+      "Are you sure you want to permanently delete this order? This action cannot be undone."
+    );
+    if (confirmed) {
+      try {
+        await deleteOrder(id);
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
@@ -92,6 +107,7 @@ function AdminOrdersContent() {
               onPageChange={setPage}
               isAllFetching={isAllFetching}
               onQuickStatusUpdate={handleQuickStatusUpdate}
+              onDeleteOrder={handleDeleteOrder}
             />
           )}
         </div>

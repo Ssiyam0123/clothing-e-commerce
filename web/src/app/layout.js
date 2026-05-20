@@ -90,6 +90,7 @@ import LayoutResolver from "@/components/layout/LayoutResolver";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import PixelManager, { GTMNoScript } from "@/lib/tracking/PixelManager";
+import UploadProgressBar from "@/components/layout/UploadProgressBar";
 
 export default async function RootLayout({ children }) {
   const settings = await getSettings();
@@ -191,6 +192,7 @@ export default async function RootLayout({ children }) {
               )}
             </ThemeProvider>
             <Toaster position="top-right" richColors />
+            <UploadProgressBar />
             {!pathname.startsWith("/admin") && (
               <PixelManager marketing={settings?.marketing} />
             )}

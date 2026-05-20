@@ -62,7 +62,6 @@ export const updateSettings = asyncHandler(async (req, res) => {
         }
     };
 
-    if (req.body.branding) updateData.branding = parseField('branding');
     if (req.body.config) updateData.config = parseField('config');
     if (req.body.socialLinks) updateData.socialLinks = parseField('socialLinks');
     if (req.body.contact) updateData.contact = parseField('contact');
@@ -96,9 +95,16 @@ export const updateSettings = asyncHandler(async (req, res) => {
         await ApiKey.findOneAndUpdate({}, combinedCredentials, { upsert: true, new: true });
     }
 
-    // Handle Image Uploads
+    // Handle Image Uploads and merge branding properties safely
     const currentSettings = await PageSetting.findOne();
-    let branding = parseField('branding') || (currentSettings ? JSON.parse(JSON.stringify(currentSettings.branding)) : {});
+    let branding = currentSettings ? JSON.parse(JSON.stringify(currentSettings.branding)) : {};
+
+    if (req.body.branding) {
+        const parsedBranding = parseField('branding');
+        if (parsedBranding && typeof parsedBranding === 'object') {
+            branding = { ...branding, ...parsedBranding };
+        }
+    }
 
     let brandingUpdated = !!req.body.branding;
 

@@ -21,6 +21,7 @@ export default function ProfileDetailsPage() {
       formData.append("name", data.name);
       formData.append("phone", data.phone);
       formData.append("bio", data.bio);
+      formData.append("addresses", JSON.stringify([{ address: data.address, isDefault: true }]));
       
       if (data.avatar && data.avatar[0]) {
         formData.append("avatar", data.avatar[0]);

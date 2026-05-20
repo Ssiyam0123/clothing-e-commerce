@@ -51,7 +51,7 @@ export default function ManageReviewsTab({ product, setProduct, patchProduct }) 
   };
 
   return (
-    <div className="admin-table-form p-8 md:p-14 space-y-12">
+    <div className="p-0 space-y-12">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">

@@ -4,7 +4,8 @@ import {
     createOrderAdmin,
     getAdminOrderById,
     updateOrder,
-    syncOrderToPathao
+    syncOrderToPathao,
+    deleteOrder
 } from '../controllers/admin.order.controller.js';
 import { protect } from '../../../middleware/auth.js';
 import { authorize } from '../../../middleware/rbac.js';
@@ -22,7 +23,8 @@ router.route('/')
 
 router.route('/:id')
     .get(authorize('orders:view'), validateObjectId, getAdminOrderById)
-    .put(authorize('orders:update'), validateObjectId, validate(adminUpdateOrderSchema), updateOrder);
+    .put(authorize('orders:update'), validateObjectId, validate(adminUpdateOrderSchema), updateOrder)
+    .delete(authorize('orders:delete'), validateObjectId, deleteOrder);
 
 router.post('/:id/sync-pathao', authorize('orders:update'), validateObjectId, syncOrderToPathao);
 

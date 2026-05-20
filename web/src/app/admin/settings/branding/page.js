@@ -42,8 +42,13 @@ export default function BrandingPage() {
   }, [settings]);
 
   const handleSave = async () => {
+    const mergedBranding = {
+      ...settings?.branding,
+      ...formData
+    };
+
     const payload = new FormData();
-    payload.append("branding", JSON.stringify(formData));
+    payload.append("branding", JSON.stringify(mergedBranding));
     if (files.logo) payload.append("logo", files.logo);
     if (files.logoDark) payload.append("logoDark", files.logoDark);
     if (files.favicon) payload.append("favicon", files.favicon);
@@ -95,26 +100,35 @@ export default function BrandingPage() {
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 pt-12 border-t border-border/5">
-            <ImageUpload
+             <ImageUpload
               label="Primary Logo"
               name="logo"
               register={() => ({})}
               currentImage={formData.logo}
-              onImageChange={(f) => setFiles({ ...files, logo: f })}
+              onImageChange={(f) => {
+                setFiles(prev => ({ ...prev, logo: f }));
+                if (!f) setFormData(prev => ({ ...prev, logo: "" }));
+              }}
             />
             <ImageUpload
               label="Logo (Dark Mode)"
               name="logoDark"
               register={() => ({})}
               currentImage={formData.logoDark}
-              onImageChange={(f) => setFiles({ ...files, logoDark: f })}
+              onImageChange={(f) => {
+                setFiles(prev => ({ ...prev, logoDark: f }));
+                if (!f) setFormData(prev => ({ ...prev, logoDark: "" }));
+              }}
             />
             <ImageUpload
               label="Favicon"
               name="favicon"
               register={() => ({})}
               currentImage={formData.favicon}
-              onImageChange={(f) => setFiles({ ...files, favicon: f })}
+              onImageChange={(f) => {
+                setFiles(prev => ({ ...prev, favicon: f }));
+                if (!f) setFormData(prev => ({ ...prev, favicon: "" }));
+              }}
             />
           </div>
 

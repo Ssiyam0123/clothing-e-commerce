@@ -70,7 +70,7 @@ function UnifiedSettlementContent() {
   const { lang } = useAppStore();
   const { cart, buyNowItem, updateCartItem, updateBuyNowQuantity, removeFromCart, clearCart } =
     useProductStore();
-  const { settings, isLoading: settingsLoading } = useSettings();
+  const { settings, isLoading: settingsLoading, refetch: refetchSettings } = useSettings();
   const { initOrder } = useOrders();
   const { validateCoupon } = useCoupons();
   const trackPurchase = useTrackingStore((state) => state.trackPurchase);
@@ -81,15 +81,23 @@ function UnifiedSettlementContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("ssl");
   const [couponCode, setCouponCode] = useState("");
-  const [deliveryZone, setDeliveryZone] = useState("dhaka");
+  const [deliveryZone, setDeliveryZone] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState(null);
 
+  // Force fetch fresh settings from backend on mount
   useEffect(() => {
-    const activeCouriers = settings?.shipping?.couriers?.filter(c => c.isActive) || [];
-    if (activeCouriers.length > 0 && deliveryZone === "dhaka") {
+    refetchSettings();
+  }, [refetchSettings]);
+
+  const activeCouriers = useMemo(() => {
+    return settings?.shipping?.couriers?.filter(c => c.isActive) || [];
+  }, [settings]);
+
+  useEffect(() => {
+    if (activeCouriers.length > 0 && (!deliveryZone || !activeCouriers.some(c => c.name === deliveryZone))) {
       setDeliveryZone(activeCouriers[0].name);
     }
-  }, [settings, deliveryZone]);
+  }, [activeCouriers, deliveryZone]);
 
   const [shippingInfo, setShippingInfo] = useState({
     name: "",
@@ -156,15 +164,9 @@ function UnifiedSettlementContent() {
   }, [paymentOptions, settingsLoading]);
 
   const shippingCharge = useMemo(() => {
-    const activeCouriers = settings?.shipping?.couriers?.filter(c => c.isActive) || [];
-    if (activeCouriers.length > 0) {
-      const selected = activeCouriers.find(c => c.name === deliveryZone);
-      if (selected) return selected.charge;
-    }
-    const inside = settings?.shipping?.insideDhaka ?? 60;
-    const outside = settings?.shipping?.outsideDhaka ?? 120;
-    return deliveryZone === "dhaka" ? inside : outside;
-  }, [deliveryZone, settings]);
+    const selected = activeCouriers.find(c => c.name === deliveryZone);
+    return selected ? selected.charge : 0;
+  }, [deliveryZone, activeCouriers]);
   const finalTotal =
     subtotal - (appliedCoupon?.discountAmount || 0) + shippingCharge;
 
@@ -252,7 +254,32 @@ function UnifiedSettlementContent() {
     }
   };
 
-  if (items.length === 0 && !authLoading) return <EmptyCartState t={t} />;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || settingsLoading || authLoading) {
+    return (
+      <div className="min-h-screen bg-background p-4 sm:p-12 lg:p-24 space-y-12 animate-pulse">
+        <div className="flex items-center gap-6">
+          <div className="h-14 w-14 rounded-2xl bg-muted" />
+          <div className="h-20 w-[60%] rounded-2xl bg-muted" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-7 space-y-8">
+            <div className="h-[200px] w-full rounded-[2.5rem] bg-muted" />
+            <div className="h-[200px] w-full rounded-[2.5rem] bg-muted" />
+          </div>
+          <div className="lg:col-span-5">
+            <div className="h-[400px] w-full rounded-[3.5rem] bg-muted" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (items.length === 0) return <EmptyCartState t={t} />;
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-700">

@@ -163,8 +163,8 @@ export default function RolesPage() {
 
   const handleDelete = async (id) => {
     const confirmed = await notify.confirm(
-      "Terminate Role?",
-      "This action will immediately revoke all associated administrative privileges. This protocol cannot be easily reversed."
+      "Delete Role?",
+      "This action will permanently delete this role and revoke all associated privileges."
     );
     
     if (confirmed) {
@@ -176,23 +176,10 @@ export default function RolesPage() {
     return (
       <div className="admin-page-container space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
         {/* 🚀 Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3 text-primary">
-              <Shield size={20} className="animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-70">Admin Access</span>
-            </div>
-            <h1 className="text-5xl sm:text-6xl font-black uppercase italic tracking-tighter text-gradient leading-none">
-              Role Management
-            </h1>
-            <p className="text-muted-foreground text-sm font-medium tracking-tight max-w-xl">
-              Create and manage administrative roles and their access permissions.
-            </p>
-          </div>
-
+        <div className="flex justify-end gap-6 mb-6">
           <Button 
             onClick={handleStartAdd}
-            className="h-14 px-8 rounded-[1.5rem] bg-foreground text-background font-black uppercase tracking-widest text-[10px] shadow-2xl hover:bg-primary hover:text-background transition-all group"
+            className="h-14 px-8 rounded-[1.5rem] bg-foreground text-background font-bold uppercase tracking-wider text-xs shadow-2xl hover:bg-primary hover:text-background transition-all group"
           >
             <Plus size={16} className="mr-2 group-hover:rotate-90 transition-transform" />
             Create New Role
@@ -298,16 +285,16 @@ export default function RolesPage() {
           <Button 
             variant="ghost" 
             onClick={() => setView("list")}
-            className="w-12 h-12 rounded-full hover:bg-accent/10 border border-border/10"
+            className="w-12 h-12 rounded-full hover:bg-accent/10 border border-border/10 animate-in fade-in"
           >
             <ArrowLeft size={20} />
           </Button>
           <div className="space-y-1">
-            <h1 className="text-4xl font-black uppercase italic tracking-tighter text-gradient">
+            <h2 className="text-2xl font-bold text-foreground">
               {view === "edit" ? "Edit Role" : "Create New Role"}
-            </h1>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground">
-              {view === "edit" ? "Modify access permissions" : "Setup a new administrative role"}
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              {view === "edit" ? "Modify access permissions for this role" : "Setup a new administrative role"}
             </p>
           </div>
         </div>
@@ -316,14 +303,14 @@ export default function RolesPage() {
           <Button 
             variant="ghost" 
             onClick={() => setView("list")}
-            className="h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px]"
+            className="h-14 px-8 rounded-2xl font-bold text-xs uppercase tracking-wider"
           >
             Cancel
           </Button>
           <Button 
             onClick={handleSubmit}
             disabled={createMutation.isLoading || updateMutation.isLoading}
-            className="h-14 px-10 rounded-2xl bg-primary text-background font-black uppercase tracking-widest text-[10px] shadow-2xl hover:scale-[1.02] transition-all"
+            className="h-14 px-10 rounded-2xl bg-primary text-background font-bold text-xs uppercase tracking-wider shadow-2xl hover:scale-[1.02] transition-all"
           >
             <Save size={16} className="mr-2" />
             {view === "edit" ? "Save Changes" : "Create Role"}
@@ -336,7 +323,7 @@ export default function RolesPage() {
         <div className="bg-card/40 backdrop-blur-2xl rounded-[2.5rem] border border-border/10 p-8 md:p-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Role Name</label>
+              <label className="text-xs font-semibold text-muted-foreground ml-1">Role Name</label>
               <Input 
                 placeholder="e.g. Manager"
                 value={formData.name}
@@ -347,7 +334,7 @@ export default function RolesPage() {
             </div>
 
             <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Description</label>
+              <label className="text-xs font-semibold text-muted-foreground ml-1">Description</label>
               <textarea 
                 placeholder="What is this role for?"
                 value={formData.description}
@@ -362,9 +349,9 @@ export default function RolesPage() {
         <div className="bg-card/40 backdrop-blur-2xl rounded-[2.5rem] border border-border/10 p-8 md:p-12">
           <div className="flex items-center justify-between mb-10">
             <div className="space-y-1">
-              <h2 className="text-2xl font-black uppercase italic tracking-tight">Permissions Matrix</h2>
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                Selected Permissions: <span className="text-primary font-black">{formData.permissions.length}</span>
+              <h2 className="text-lg font-bold text-foreground">Permissions Matrix</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Selected Permissions: <span className="text-primary font-bold">{formData.permissions.length}</span>
               </p>
             </div>
           </div>

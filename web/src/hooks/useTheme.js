@@ -18,6 +18,34 @@ const FONT_MAPPING = {
   "Syncopate": "var(--font-syncopate)"
 };
 
+const disableTransitions = () => {
+  if (typeof window === "undefined") return () => {};
+  const css = document.createElement('style');
+  css.type = 'text/css';
+  css.appendChild(
+    document.createTextNode(
+      `* {
+         -webkit-transition: none !important;
+         -moz-transition: none !important;
+         -o-transition: none !important;
+         -ms-transition: none !important;
+         transition: none !important;
+      }`
+    )
+  );
+  document.head.appendChild(css);
+  
+  return () => {
+    // Force reflow to flush style updates
+    const _ = window.getComputedStyle(css).opacity;
+    requestAnimationFrame(() => {
+      try {
+        document.head.removeChild(css);
+      } catch (e) {}
+    });
+  };
+};
+
 export function useTheme() {
   const pathname = usePathname();
   const { theme, themeColor, themeFont, identityTheme } = useAppStore();
@@ -25,6 +53,7 @@ export function useTheme() {
   useEffect(() => {
     const applyTheme = (targetTheme, targetColor, targetFont) => {
       if (typeof window === "undefined") return;
+      const enable = disableTransitions();
       const root = document.documentElement;
       
       // 1️⃣ Determine Mode
@@ -48,6 +77,8 @@ export function useTheme() {
         const fontValue = FONT_MAPPING[targetFont] || "var(--font-inter)";
         root.style.setProperty("--font-theme", `${fontValue}, sans-serif`);
       }
+      
+      enable();
     };
 
     applyTheme(theme, themeColor, themeFont);
@@ -63,6 +94,7 @@ export function useTheme() {
 
   // Handle Identity Themes (executive, streetwear, etc.)
   useEffect(() => {
+    const enable = disableTransitions();
     const root = document.documentElement;
     // Remove previous identity themes
     root.classList.remove(...IDENTITY_THEMES);
@@ -71,5 +103,6 @@ export function useTheme() {
       root.classList.add(identityTheme);
       root.setAttribute("data-theme", identityTheme);
     }
+    enable();
   }, [identityTheme]);
 }

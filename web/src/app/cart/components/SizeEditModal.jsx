@@ -1,8 +1,5 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect, useMemo } from "react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Loader from "@/components/common/Loader";
 import api from "@/lib/api";
@@ -14,9 +11,26 @@ export default function SizeEditModal({ isOpen, onClose, item, isAuth, t }) {
   const [productData, setProductData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [prevItem, setPrevItem] = useState(null);
+  const [prevIsOpen, setPrevIsOpen] = useState(false);
+  const [selectedSize, setSelectedSize] = useState(null);
+
+  if (item !== prevItem || isOpen !== prevIsOpen) {
+    setPrevItem(item);
+    setPrevIsOpen(isOpen);
+    if (isOpen && item && item.size) {
+      setSelectedSize({
+        _id: item.size._id || item.size,
+        name: item.size.name || "Standard"
+      });
+      setIsLoading(true);
+    } else {
+      setSelectedSize(null);
+    }
+  }
+
   useEffect(() => {
     if (isOpen && item) {
-      setIsLoading(true);
       api.get(`/products/${item.product._id}`)
         .then(res => {
           setProductData(res.data);
@@ -26,94 +40,105 @@ export default function SizeEditModal({ isOpen, onClose, item, isAuth, t }) {
     }
   }, [isOpen, item]);
 
+  const discountedPrice = useMemo(() => {
+    if (!productData) return 0;
+    return productData.price - (productData.price * (productData.discount || 0)) / 100;
+  }, [productData]);
+
   if (!isOpen) return null;
 
-  const handleSizeSelect = async (newSizeId, newSizeName) => {
-    const sId = typeof newSizeId === 'object' ? newSizeId._id : newSizeId;
-    await changeItemSize(item.product._id, item.size._id, sId, newSizeName, isAuth);
+  const handleUpdate = async () => {
+    if (!selectedSize) return;
+    await changeItemSize(item.product._id, item.size._id, selectedSize._id, selectedSize.name, isAuth);
     onClose();
     swalToast(t.attributeRecalibrated || "Attribute Re-calibrated", "success");
   };
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-background/60 backdrop-blur-2xl"
-        />
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="relative w-full max-w-lg bg-card/50 backdrop-blur-3xl border border-white/10 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] overflow-hidden"
-        >
-          <div className="p-10 sm:p-14 space-y-10">
-            <div className="space-y-3 text-center">
-              <Badge variant="outline" className="text-[8px] font-black uppercase tracking-[0.4em] border-accent-secondary/30 text-accent-secondary bg-accent-secondary/5 mb-4">
-                 {t.manifest || "Update Item"}
-              </Badge>
-              <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter italic text-gradient leading-none">
-                {t.modifyAttribute || "Adjust Size"}
-              </h3>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 italic">
-                {t.recalibrating || "Optimizing"} {item.product.name}
-              </p>
+    <div className="fixed inset-0 z-[999] flex items-end sm:items-center justify-center p-3 sm:p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={onClose}
+          />
+
+          {/* Modal Container */}
+          <div className="quick-select-modal-container">
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              className="quick-select-close-btn"
+              aria-label="Close modal"
+            >
+              <X size={20} />
+            </button>
+
+            {/* Product Title */}
+            <div className="pr-8">
+              <h4 className="quick-select-title">
+                {item.product.name}
+              </h4>
             </div>
 
             {isLoading ? (
-              <div className="h-48 flex items-center justify-center">
+              <div className="h-40 flex items-center justify-center">
                 <Loader size="small" />
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {productData?.sizes?.map((s) => {
-                  const sId = s.size?._id || s.size;
-                  const sName = s.size?.name || "Standard";
-                  const isSelected = String(item.size._id || item.size) === String(sId);
-                  
-                  return (
-                    <button
-                      key={sId}
-                      type="button"
-                      disabled={s.stock <= 0}
-                      onClick={() => handleSizeSelect(sId, sName)}
-                      className={cn(
-                        "group relative h-20 rounded-2xl border-2 flex flex-col items-center justify-center transition-all duration-500 overflow-hidden",
-                        isSelected
-                          ? "border-accent-secondary bg-accent-secondary text-white shadow-lg shadow-accent-secondary/20" 
-                          : "border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/20",
-                        s.stock <= 0 && "opacity-20 cursor-not-allowed grayscale"
-                      )}
-                    >
-                      <span className="text-sm font-black uppercase tracking-widest italic">{sName}</span>
-                      {isSelected && (
-                        <div className="absolute top-1 right-1">
-                          <Check size={10} className="text-white opacity-50" />
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+              <>
+                {/* Price Info */}
+                <div className="flex flex-col">
+                  <span className="quick-select-price-label">
+                    {t.price || "Price"}
+                  </span>
+                  <span className="quick-select-price-val">
+                    {discountedPrice.toFixed(0)} BDT
+                  </span>
+                </div>
 
-            <div className="pt-6">
-              <Button 
-                onClick={onClose}
-                variant="ghost" 
-                className="w-full h-16 rounded-[1.5rem] font-black uppercase tracking-[0.3em] text-[10px] hover:bg-white/5 text-muted-foreground transition-all"
-              >
-                {t.abortModification || "Cancel"}
-              </Button>
-            </div>
+                {/* Size Section */}
+                <div className="flex flex-col gap-2">
+                  <span className="quick-select-size-label">
+                    Select New Size
+                  </span>
+                  <div className="flex flex-wrap gap-2.5 mt-1">
+                    {productData?.sizes?.map((s, index) => {
+                      const sId = s.size?._id || s.size;
+                      const sName = s.size?.name || "Standard";
+                      const outOfStock = s.stock <= 0;
+                      const isSelected = selectedSize?._id === sId;
+
+                      return (
+                        <button
+                          key={sId || index}
+                          type="button"
+                          disabled={outOfStock}
+                          onClick={() => setSelectedSize({ _id: sId, name: sName })}
+                          className={cn(
+                            "quick-select-size-btn",
+                            isSelected && "quick-select-size-btn-active",
+                            outOfStock && "quick-select-size-btn-disabled"
+                          )}
+                        >
+                          {sName}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Confirm Update Button */}
+                <div className="mt-4">
+                  <button
+                    onClick={handleUpdate}
+                    className="quick-select-buy-btn"
+                  >
+                    {t.modifyAttribute || "Update Size"}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
-        </motion.div>
-      </div>
-    </AnimatePresence>
+        </div>
   );
 }

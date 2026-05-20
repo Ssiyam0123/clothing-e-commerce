@@ -102,10 +102,74 @@ export const uploadImage = async (file, folder, oldUrl = null) => {
 
     if (oldUrl) await deleteImage(oldUrl);
 
+    let processedBuffer = file.buffer;
+    let processedName = file.originalname;
+
+    try {
+        console.log(`[Image Processing] Reading uploaded image: ${file.originalname} (${file.size || file.buffer.length} bytes)`);
+        const sharp = (await import('sharp')).default;
+        
+        const isLogoOrFavicon = folder === 'settings';
+        
+        if (isLogoOrFavicon) {
+            console.log(`[Image Processing] Site setting logo/favicon detected. Automatically removing background using AI (Isolated Process)...`);
+            try {
+                const tempDir = path.join(__dirname, '../../temp');
+                await fs.mkdir(tempDir, { recursive: true });
+                
+                const tempInput = path.join(tempDir, `input_${Date.now()}_${Math.random().toString(36).substring(7)}.png`);
+                const tempOutput = path.join(tempDir, `output_${Date.now()}_${Math.random().toString(36).substring(7)}.png`);
+                
+                await fs.writeFile(tempInput, processedBuffer);
+                
+                const runnerPath = path.join(__dirname, 'bgRemoverRunner.js');
+                const { exec } = await import('child_process');
+                const util = await import('util');
+                const execPromise = util.promisify(exec);
+                
+                console.log(`[Image Processing] Executing isolated background remover process...`);
+                await execPromise(`node "${runnerPath}" "${tempInput}" "${tempOutput}"`);
+                
+                processedBuffer = await fs.readFile(tempOutput);
+                console.log(`[Image Processing] AI Background removal completed successfully.`);
+                
+                // Cleanup temp files asynchronously
+                fs.unlink(tempInput).catch(() => {});
+                fs.unlink(tempOutput).catch(() => {});
+            } catch (err) {
+                console.error("❌ [Image Processing] AI Background removal failed, uploading original background:", err.message);
+            }
+        }
+
+        const isPng = file.mimetype === 'image/png' || file.mimetype === 'image/webp' || file.originalname.endsWith('.png') || file.originalname.endsWith('.webp') || isLogoOrFavicon;
+        const MAX_WIDTH = 1200;
+        
+        let sharpInstance = sharp(processedBuffer).resize({ width: MAX_WIDTH, withoutEnlargement: true });
+        
+        if (isPng) {
+            console.log(`[Image Processing] Compressing as PNG using sharp`);
+            processedBuffer = await sharpInstance
+                .png({ compressionLevel: 8 })
+                .toBuffer();
+            processedName = path.basename(file.originalname, path.extname(file.originalname)) + '.png';
+        } else {
+            console.log(`[Image Processing] Compressing as JPEG using sharp`);
+            processedBuffer = await sharpInstance
+                .jpeg({ quality: 80, mozjpeg: true })
+                .toBuffer();
+            processedName = path.basename(file.originalname, path.extname(file.originalname)) + '.jpg';
+        }
+        
+        const originalSize = file.size || file.buffer.length;
+        console.log(`[Image Processing] Compressed size: ${processedBuffer.length} bytes (Saved ${Math.round((originalSize - processedBuffer.length) / originalSize * 100)}%)`);
+    } catch (e) {
+        console.error("❌ [Image Processing] Failed to compress image using sharp, falling back to original:", e.message);
+    }
+
     if (storageType === 'cloudinary') {
-        return await uploadToCloudinary(file.buffer, folder);
+        return await uploadToCloudinary(processedBuffer, folder);
     } else {
-        return await saveToLocal(file.buffer, folder, file.originalname);
+        return await saveToLocal(processedBuffer, folder, processedName);
     }
 };
 
