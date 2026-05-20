@@ -32,9 +32,12 @@ export const useProducts = (initialFilters = {}, initialData = undefined) => {
       });
       if (newFilters.page === undefined) params.set("page", "1");
       const queryString = params.toString();
-      router.push(`${pathname}${queryString ? `?${queryString}` : ""}`, { scroll: false });
+      const newUrl = `${pathname}${queryString ? `?${queryString}` : ""}`;
+      
+      // Shallow routing: updates URL without hitting Server Component network roundtrip
+      window.history.pushState(null, "", newUrl);
     },
-    [searchParams, pathname, router],
+    [searchParams, pathname],
   );
 
   const setSearch = useCallback((search) => updateFilters({ search }), [updateFilters]);
