@@ -35,8 +35,25 @@ if (redisClient) {
   pubClient.on("error", (err) => console.error("❌ Redis Pub Error:", err.message));
   subClient.on("error", (err) => console.error("❌ Redis Sub Error:", err.message));
 
-  io.adapter(createAdapter(pubClient, subClient));
-  console.log("📡 Redis Adapter Linked: Horizontal Scaling Enabled");
+  let isAdapterLinked = false;
+  const trySetupAdapter = () => {
+    if (isAdapterLinked) return;
+    if (pubClient.status === 'ready' && subClient.status === 'ready') {
+      try {
+        io.adapter(createAdapter(pubClient, subClient));
+        console.log("📡 Redis Adapter Linked: Horizontal Scaling Enabled");
+        isAdapterLinked = true;
+      } catch (err) {
+        console.error("❌ Failed to link Redis Adapter:", err.message);
+      }
+    }
+  };
+
+  pubClient.on('ready', trySetupAdapter);
+  subClient.on('ready', trySetupAdapter);
+
+  // Fallback check in case they are already connected
+  trySetupAdapter();
 }
 
 // 🛡️ Socket Middleware
