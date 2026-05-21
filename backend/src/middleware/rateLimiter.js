@@ -53,6 +53,7 @@ export const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   store: createRedisStore('rl:api:'),
+  passOnStoreError: true,
   skip: () => isDev, // development এ সম্পূর্ণ skip
   handler: rateLimitHandler
 });
@@ -69,6 +70,7 @@ export const loginLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   store: createRedisStore('rl:login:'),
+  passOnStoreError: true,
   keyGenerator: (req, res) => {
     const email = req.body?.email ? String(req.body.email).toLowerCase().trim() : '';
     const ip = ipKeyGenerator(req, res);
@@ -89,6 +91,7 @@ export const registerLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   store: createRedisStore('rl:register:'),
+  passOnStoreError: true,
   handler: rateLimitHandler
 });
 
@@ -104,6 +107,7 @@ export const checkoutLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   store: createRedisStore('rl:checkout:'),
+  passOnStoreError: true,
   keyGenerator: (req, res) => {
     const userId = req.user?._id || req.user?.id;
     const ip = ipKeyGenerator(req, res);

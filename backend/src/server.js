@@ -42,6 +42,21 @@ if (redisClient) {
 // 🛡️ Socket Middleware
 io.use(socketAuth);
 
+// ⚡ Keep-alive self-ping mechanism to keep Render instance awake
+const pingSelf = () => {
+  const backendUrl = process.env.BACKEND_URL;
+  if (!backendUrl || process.env.NODE_ENV !== 'production') return;
+
+  setInterval(async () => {
+    try {
+      const res = await fetch(backendUrl);
+      console.log(`📡 Keep-Alive Ping Status: ${res.status} - ${new Date().toISOString()}`);
+    } catch (err) {
+      console.error('❌ Keep-Alive Ping Failed:', err.message);
+    }
+  }, 10 * 60 * 1000); // every 10 minutes
+};
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ Vanguard DB Linked');
@@ -50,5 +65,8 @@ mongoose.connect(process.env.MONGO_URI)
     initSocketEvents(io);
     app.set('io', io);
 
-    server.listen(PORT, () => console.log(`🚀 System Live & Socket Ready: ${PORT}`));
+    server.listen(PORT, () => {
+      console.log(`🚀 System Live & Socket Ready: ${PORT}`);
+      pingSelf();
+    });
   });

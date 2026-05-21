@@ -19,6 +19,8 @@ const createClient = () => {
   const client = new Redis(process.env.REDIS_URL, {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
+    enableOfflineQueue: false,
+    connectTimeout: 5000,
     reconnectOnError: (err) => {
       const targetError = "READONLY";
       return err.message.includes(targetError);
