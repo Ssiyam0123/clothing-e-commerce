@@ -22,7 +22,7 @@ export async function generateMetadata() {
   try {
     const res = await fetch(`${API_URL}/blogs?fields=category`, {
       next: { revalidate: 3600 },
-      signal: AbortSignal.timeout(3000)
+      signal: AbortSignal.timeout(15000)
     });
     if (res.ok) {
       const data = await res.json();
@@ -68,7 +68,7 @@ export default async function BlogPage() {
     `${API_URL}/blogs?fields=title,slug,featuredImage,category,readingTime,author,createdAt`,
     { 
       next: { revalidate: 3600 },
-      signal: AbortSignal.timeout(3000)
+      signal: AbortSignal.timeout(15000)
     }
   ).then(res => res.ok ? res.json().then(data => data.blogs || []) : []);
 

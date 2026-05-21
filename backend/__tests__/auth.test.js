@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import app from '../src/app.js';
@@ -10,8 +11,9 @@ const testUser = {
 };
 
 beforeAll(async () => {
-  // Connect to the DB using process.env.MONGO_URI
-  const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/clothing-e-commerce';
+  // Use a local database for testing to ensure speed and safety
+  const mongoUri = 'mongodb://localhost:27017/clothing-e-commerce-test';
+  process.env.JWT_SECRET = process.env.JWT_SECRET || 'testsecret';
   await mongoose.connect(mongoUri);
 });
 

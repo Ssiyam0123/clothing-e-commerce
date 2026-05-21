@@ -6,7 +6,7 @@ export const getSectionData = async (endpoint, tags = []) => {
   try {
     const res = await fetch(`${API_URL}${endpoint}`, {
       next: { revalidate: 60, tags: ['home-data', ...tags] },
-      signal: AbortSignal.timeout(3000)
+      signal: AbortSignal.timeout(15000)
     });
     if (!res.ok) return null;
     return res.json();
@@ -21,7 +21,7 @@ export const getLayoutData = unstable_cache(
     try {
       const res = await fetch(`${API_URL}/home-layouts/active`, { 
         next: { revalidate: 60, tags: ['layout'] },
-        signal: AbortSignal.timeout(3000)
+        signal: AbortSignal.timeout(15000)
       });
       return res.ok ? await res.json() : { sections: [] };
     } catch (e) {

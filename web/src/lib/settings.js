@@ -9,13 +9,13 @@ import api from './api';
 export const getSettings = cache(async () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
   try {
-    // ⏰ Prevent Vercel build hang by adding a 3s timeout to unreachable local backend fetch
+    // ⏰ Prevent Vercel build hang by adding a 15s timeout to unreachable local backend fetch
     const res = await fetch(`${apiUrl}/settings`, { 
       next: { 
         revalidate: 3600, // Cache for 1 hour, bust with revalidateTag('settings')
         tags: ['settings']
       }, 
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(15000),
     });
     
     if (!res.ok) {

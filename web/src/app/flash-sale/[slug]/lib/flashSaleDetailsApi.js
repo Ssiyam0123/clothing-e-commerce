@@ -4,7 +4,7 @@ export const getFlashSaleDetails = cache(async (slug) => {
   try {
     const res = await fetch(`${API_URL}/flash-sales/slug/${slug}`, {
       next: { revalidate: 60 },
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) {
       if (res.status === 404) return { error: 404 };

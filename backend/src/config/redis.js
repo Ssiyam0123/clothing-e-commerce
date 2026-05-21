@@ -5,6 +5,10 @@ let redisClient = null;
 let hasLoggedConnection = false;
 
 const createClient = () => {
+  if (process.env.NODE_ENV === 'test') {
+    return null;
+  }
+
   if (!process.env.REDIS_URL) {
     if (process.env.NODE_ENV === 'production') {
       console.warn('⚠️ Redis not configured. Performance will be degraded.');
