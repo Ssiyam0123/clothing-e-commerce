@@ -131,6 +131,11 @@ export const createOrderAdmin = asyncHandler(async (req, res) => {
   
   clearCache('cache:/api/admin/dashboard*');
   
+  const io = req.app.get('io');
+  if (io) {
+    io.emit('new_order', createdOrder);
+  }
+  
   res.status(201).json(createdOrder);
 });
 
@@ -197,6 +202,16 @@ export const updateOrder = asyncHandler(async (req, res) => {
       .populate({ path: "user", select: "name email avatar role", populate: { path: "role" } })
       .populate("orderItems.product", "name images slug");
 
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('order_updated', {
+        orderId: updatedOrder._id,
+        orderStatus: updatedOrder.orderStatus,
+        paymentStatus: updatedOrder.paymentResult?.status,
+        order: updatedOrder
+      });
+    }
+
     try {
       await sendOrderStatusUpdateEmail(updatedOrder);
       console.log(`📧 Status update email sent to ${updatedOrder.shippingAddress.email} (Cancelled)`);
@@ -219,6 +234,16 @@ export const updateOrder = asyncHandler(async (req, res) => {
   await order.save();
 
   clearCache('cache:/api/admin/dashboard*');
+
+  const io = req.app.get('io');
+  if (io) {
+    io.emit('order_updated', {
+      orderId: order._id,
+      orderStatus: order.orderStatus,
+      paymentStatus: order.paymentResult?.status,
+      order
+    });
+  }
 
   // 📧 TRIGGER STATUS UPDATE EMAIL
   if (req.body.orderStatus && req.body.orderStatus !== oldStatus) {

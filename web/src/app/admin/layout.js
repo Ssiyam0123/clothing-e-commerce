@@ -16,6 +16,8 @@ import api from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
 import { hasPermission, hasAnyAdminPermission } from "@/utils/rbacUtils";
+import { useQueryClient } from "@tanstack/react-query";
+import { swalToast } from "@/utils/swal";
 
 export default function AdminLayout({ children }) {
   const { user, token, isLoading: authLoading, logout } = useAuthStore();
@@ -23,7 +25,8 @@ export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { theme, toggleTheme, isMounted, isAdminSidebarCollapsed } = useAppStore();
-  const { initSocket, disconnectSocket, fetchUnreadCount } = useChatStore();
+  const { socket, initSocket, disconnectSocket, fetchUnreadCount } = useChatStore();
+  const queryClient = useQueryClient();
   useTheme();
 
   const [counts, setCounts] = useState(null);
@@ -72,6 +75,54 @@ export default function AdminLayout({ children }) {
       disconnectSocket();
     };
   }, [user, authLoading, router, token, initSocket, disconnectSocket, fetchUnreadCount]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewOrder = (order) => {
+      // Play a premium notification sound
+      try {
+        const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav");
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+      } catch (err) {
+        console.error("Audio playback error:", err);
+      }
+
+      // Show Toast Notification
+      swalToast(`New Order Received! #${order._id ? order._id.slice(-8).toUpperCase() : "SUCCESS"}`, "success");
+
+      // Invalidate dashboard stats and orders queries
+      queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-dashboard-recent-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-dashboard-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
+      
+      // Auto-update stats counts
+      api.get("/admin/counts")
+        .then((res) => setCounts(res.data))
+        .catch((err) => console.error("Error refreshing counts:", err));
+    };
+
+    const handleOrderUpdated = (data) => {
+      // Invalidate specific order and lists
+      queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-dashboard-recent-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-dashboard-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
+      if (data.orderId) {
+        queryClient.invalidateQueries({ queryKey: ["adminOrder", data.orderId] });
+      }
+    };
+
+    socket.on("new_order", handleNewOrder);
+    socket.on("order_updated", handleOrderUpdated);
+
+    return () => {
+      socket.off("new_order", handleNewOrder);
+      socket.off("order_updated", handleOrderUpdated);
+    };
+  }, [socket, queryClient]);
 
   const handleLogout = () => {
     logout();

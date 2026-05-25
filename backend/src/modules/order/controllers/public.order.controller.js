@@ -103,6 +103,12 @@ export const initPayment = asyncHandler(async (req, res) => {
     if (paymentMethod === "cod") {
       const order = await createOrderWithTransaction(orderPayload, true);
       clearCache('cache:/api/admin/dashboard*');
+      
+      const io = req.app.get('io');
+      if (io) {
+        io.emit('new_order', order);
+      }
+      
       res.json(await handleCODGateway(order));
     } else if (paymentMethod === "bkash") {
       const order = await createOrderWithTransaction(orderPayload, false);
@@ -144,6 +150,11 @@ export const paymentSuccess = asyncHandler(async (req, res) => {
     await order.save();
     await finalizeOrderProcessing(order);
     clearCache('cache:/api/admin/dashboard*');
+    
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('new_order', order);
+    }
   }
   res.redirect(`${frontendUrl}/payment/success?orderId=${order._id}`);
 });
@@ -175,6 +186,12 @@ export const bkashSuccess = asyncHandler(async (req, res) => {
         await order.save();
         await finalizeOrderProcessing(order);
         clearCache('cache:/api/admin/dashboard*');
+        
+        const io = req.app.get('io');
+        if (io) {
+          io.emit('new_order', order);
+        }
+        
         return res.redirect(`${frontendUrl}/payment/success?orderId=${order._id}`);
       }
     } catch (err) {
@@ -208,6 +225,11 @@ export const ipn = asyncHandler(async (req, res) => {
     await order.save();
     await finalizeOrderProcessing(order);
     clearCache('cache:/api/admin/dashboard*');
+    
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('new_order', order);
+    }
   }
   res.status(200).send("OK");
 });
