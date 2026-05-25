@@ -102,7 +102,7 @@ export default function ProductCard({ product, className }) {
           </Link>
 
           {/* Rating */}
-          {(product.showReviews !== false) ? (
+          {(product.showReviews !== false && product.showReviews !== "false") ? (
             <div className="flex items-center gap-1 mb-4">
               <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
               <span className="text-xs font-medium">

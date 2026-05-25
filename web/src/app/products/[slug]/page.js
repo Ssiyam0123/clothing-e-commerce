@@ -178,7 +178,7 @@ export default async function ProductDetailsPage({ params }) {
       <div className="max-w-[1800px] mx-auto pt-10 lg:pt-24 px-4 sm:px-6 lg:px-12">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-20 xl:gap-32">
           {/* LEFT: Media Section */}
-          <div className="lg:col-span-7 animate-in fade-in slide-in-from-left-4 duration-1000">
+          <div className="lg:col-span-7 min-w-0 animate-in fade-in slide-in-from-left-4 duration-1000">
             <ProductImageGallery
               images={product.images}
               name={product.name}
@@ -205,7 +205,7 @@ export default async function ProductDetailsPage({ params }) {
                       {product.discount}% {t.off || "OFF"}
                     </Badge>
                   )}
-                  {product.showReviews !== false && product.totalReviews > 0 && (
+                  {product.showReviews !== false && product.showReviews !== "false" && product.totalReviews > 0 && (
                     <div className="flex items-center gap-2 glass px-3 py-1 rounded-xl">
                       <StarRating rating={product.averageRating || 0} size="small" />
                       <span className="text-[9px] font-black text-foreground">
@@ -404,7 +404,7 @@ export default async function ProductDetailsPage({ params }) {
 
       <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-12 mt-20 lg:mt-32 pb-24 lg:pb-32 space-y-20 lg:space-y-32">
         {/* Reviews */}
-        {product.showReviews !== false && (
+        {product.showReviews !== false && product.showReviews !== "false" && (
           <Suspense fallback={<div className="h-40 animate-pulse bg-muted rounded-3xl" />}>
              <ReviewSectionWrapper productId={product._id} />
           </Suspense>

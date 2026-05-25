@@ -11,8 +11,8 @@ export default function ProductImageGallery({ images, name, discount, isFeatured
   const [selectedImage, setSelectedImage] = useState(0);
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <div className="lg:sticky lg:top-32 w-full">
+    <div className="flex flex-col items-center w-full min-w-0 overflow-hidden">
+      <div className="lg:sticky lg:top-32 w-full min-w-0">
         {/* Main Display Engine */}
         <div className="relative aspect-[4/5] overflow-hidden rounded-[3rem] bg-accent/20 shadow-2xl group cursor-crosshair">
           {images && images.length > 0 ? (
