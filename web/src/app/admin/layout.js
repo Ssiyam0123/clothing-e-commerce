@@ -80,11 +80,12 @@ export default function AdminLayout({ children }) {
     if (!socket) return;
 
     const handleNewOrder = (order) => {
+      console.log("⚡ SOCKET: new_order event received!", order);
       // Play a premium notification sound
       try {
         const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav");
         audio.volume = 0.5;
-        audio.play().catch(() => {});
+        audio.play().catch((err) => console.log("Audio play blocked/failed:", err));
       } catch (err) {
         console.error("Audio playback error:", err);
       }
@@ -93,6 +94,7 @@ export default function AdminLayout({ children }) {
       swalToast(`New Order Received! #${order._id ? order._id.slice(-8).toUpperCase() : "SUCCESS"}`, "success");
 
       // Invalidate dashboard stats and orders queries
+      console.log("⚡ SOCKET: Invalidating React Query keys...");
       queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
       queryClient.invalidateQueries({ queryKey: ["admin-dashboard-recent-orders"] });
       queryClient.invalidateQueries({ queryKey: ["admin-dashboard-stats"] });
@@ -100,11 +102,15 @@ export default function AdminLayout({ children }) {
       
       // Auto-update stats counts
       api.get("/admin/counts")
-        .then((res) => setCounts(res.data))
+        .then((res) => {
+          console.log("⚡ SOCKET: Refetched counts:", res.data);
+          setCounts(res.data);
+        })
         .catch((err) => console.error("Error refreshing counts:", err));
     };
 
     const handleOrderUpdated = (data) => {
+      console.log("⚡ SOCKET: order_updated event received!", data);
       // Invalidate specific order and lists
       queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
       queryClient.invalidateQueries({ queryKey: ["admin-dashboard-recent-orders"] });
