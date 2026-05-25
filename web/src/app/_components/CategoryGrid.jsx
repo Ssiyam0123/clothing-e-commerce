@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode } from "swiper/modules";
+import { FreeMode, Mousewheel, Navigation } from "swiper/modules";
 import { getImageUrl } from "@/utils/imageUtils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Swiper Styles
 import "swiper/css";
@@ -17,12 +18,28 @@ export default function CategoryGrid({ categories }) {
   if (!categories || categories.length === 0) return null;
 
   return (
-    <div className="w-full overflow-hidden px-4 md:px-0">
+    <div className="w-full overflow-hidden px-4 md:px-0 relative group/swiper">
+      {/* Premium Glassmorphic Left Arrow */}
+      <button className="swiper-button-prev-custom absolute left-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center w-12 h-12 rounded-full backdrop-blur-md bg-white/20 dark:bg-black/30 border border-white/30 dark:border-white/10 text-white shadow-2xl opacity-0 group-hover/swiper:opacity-100 transition-all duration-300 hover:bg-white/30 dark:hover:bg-black/50 hover:scale-110 active:scale-95 disabled:opacity-0 cursor-pointer disabled:pointer-events-none">
+        <ChevronLeft className="w-6 h-6 transition-transform duration-300" />
+      </button>
+
+      {/* Premium Glassmorphic Right Arrow */}
+      <button className="swiper-button-next-custom absolute right-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center w-12 h-12 rounded-full backdrop-blur-md bg-white/20 dark:bg-black/30 border border-white/30 dark:border-white/10 text-white shadow-2xl opacity-0 group-hover/swiper:opacity-100 transition-all duration-300 hover:bg-white/30 dark:hover:bg-black/50 hover:scale-110 active:scale-95 disabled:opacity-0 cursor-pointer disabled:pointer-events-none">
+        <ChevronRight className="w-6 h-6 transition-transform duration-300" />
+      </button>
+
       <Swiper
         slidesPerView={1.8}
         spaceBetween={12}
         freeMode={true}
-        modules={[FreeMode]}
+        mousewheel={{ forceToAxis: true }}
+        simulateTouch={true}
+        navigation={{
+          nextEl: ".swiper-button-next-custom",
+          prevEl: ".swiper-button-prev-custom",
+        }}
+        modules={[FreeMode, Mousewheel, Navigation]}
         breakpoints={{
           640: {
             slidesPerView: 2.2,
@@ -37,7 +54,7 @@ export default function CategoryGrid({ categories }) {
             spaceBetween: 24,
           },
         }}
-        className="category-swiper [&_.swiper-slide]:!w-[55%] sm:[&_.swiper-slide]:!w-[45%] md:[&_.swiper-slide]:!w-[31%] lg:[&_.swiper-slide]:!w-[23%]"
+        className="category-swiper w-full"
       >
         {categories.filter(cat => cat.slug !== 'on-sale').map((cat, idx) => (
           <SwiperSlide key={cat._id || idx}>
