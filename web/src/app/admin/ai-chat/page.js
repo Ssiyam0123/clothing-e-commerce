@@ -44,6 +44,8 @@ export default function AdminAiChatPage() {
   const [activeTab, setActiveTab] = useState("chat"); // chat or commands
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
   const messagesEndRef = useRef(null);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const inputContainerRef = useRef(null);
 
   const suggestionChips = [
     { label: "📊 Store Summary", prompt: "Give me the store business summary and dashboard metrics" },
@@ -67,6 +69,29 @@ export default function AdminAiChatPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, loading]);
+
+  // Mobile keyboard avoidance using visualViewport API
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const handleResize = () => {
+      const offset = window.innerHeight - vv.height;
+      setKeyboardOffset(offset > 50 ? offset : 0);
+      // Scroll to bottom when keyboard opens
+      if (offset > 50) {
+        setTimeout(() => scrollToBottom(), 100);
+      }
+    };
+
+    vv.addEventListener("resize", handleResize);
+    vv.addEventListener("scroll", handleResize);
+    return () => {
+      vv.removeEventListener("resize", handleResize);
+      vv.removeEventListener("scroll", handleResize);
+    };
+  }, []);
 
   const handleSendMessage = async (textToSend) => {
     const query = (textToSend || inputValue).trim();
@@ -348,17 +373,17 @@ export default function AdminAiChatPage() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen border border-border bg-background shadow-2xl overflow-hidden relative text-foreground transition-colors duration-500">
+    <div className="flex flex-col lg:flex-row border border-border bg-background shadow-2xl overflow-hidden relative text-foreground transition-colors duration-500" style={{ height: "100dvh" }}>
       
       {/* Dynamic glow backdrops */}
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-tr from-primary/5 to-secondary/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Main chat viewport */}
-      <div className={`flex-1 flex-col h-full border-r border-border/80 ${showSidebarMobile ? "hidden lg:flex" : "flex"}`}>
+      <div className={`flex-1 flex-col border-r border-border/80 min-h-0 ${showSidebarMobile ? "hidden lg:flex" : "flex"}`} style={{ height: "100%" }}>
         
         {/* Console Header */}
-        <div className="px-4 py-3 border-b border-border/80 bg-card/60 backdrop-blur-xl flex items-center justify-between z-10">
+        <div className="px-4 py-3 border-b border-border/80 bg-card/60 backdrop-blur-xl flex items-center justify-between z-20 shrink-0 sticky top-0">
           <div className="flex items-center gap-2">
             <Link href="/admin">
               <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">
@@ -401,7 +426,7 @@ export default function AdminAiChatPage() {
         </div>
 
         {/* Chat Feed */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 z-10 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 z-10 scrollbar-thin min-h-0">
           <AnimatePresence initial={false}>
             {messages.map((msg, i) => (
               <motion.div
@@ -465,9 +490,21 @@ export default function AdminAiChatPage() {
           {error && (
             <div className="p-4 border border-destructive/20 bg-destructive/10 text-destructive rounded-xl flex items-start gap-3 text-xs max-w-xl mx-auto">
               <AlertCircle size={16} className="shrink-0 mt-0.5" />
-              <div>
+              <div className="flex-1">
                 <p className="font-bold">Session Notice</p>
                 <p className="text-muted-foreground mt-0.5">{error}</p>
+                <button
+                  onClick={() => {
+                    const lastUserMsg = [...messages].reverse().find(m => m.role === "user");
+                    if (lastUserMsg) {
+                      setError(null);
+                      handleSendMessage(lastUserMsg.content);
+                    }
+                  }}
+                  className="mt-2 px-3 py-1.5 text-[11px] font-semibold rounded-lg bg-destructive/15 hover:bg-destructive/25 text-destructive border border-destructive/20 transition-all flex items-center gap-1.5"
+                >
+                  <RefreshCw size={11} /> Retry
+                </button>
               </div>
             </div>
           )}
@@ -492,8 +529,16 @@ export default function AdminAiChatPage() {
         )}
 
         {/* User Input Bar */}
-        <div className="p-4 sm:p-5 border-t border-border bg-card/85 backdrop-blur-xl z-10">
-          <div className="max-w-4xl mx-auto flex items-end gap-3 bg-background border border-border rounded-2xl p-2.5 focus-within:ring-1 focus-within:ring-primary/45 transition-all shadow-sm">
+        <div
+          ref={inputContainerRef}
+          className="p-3 sm:p-5 border-t border-border bg-card/85 backdrop-blur-xl z-20 shrink-0 sticky bottom-0 transition-all"
+          style={{
+            paddingBottom: keyboardOffset > 0
+              ? `calc(${keyboardOffset}px + env(safe-area-inset-bottom, 8px))`
+              : `max(12px, env(safe-area-inset-bottom, 8px))`
+          }}
+        >
+          <div className="max-w-4xl mx-auto flex items-end gap-2 sm:gap-3 bg-background border border-border rounded-2xl p-2 sm:p-2.5 focus-within:ring-1 focus-within:ring-primary/45 transition-all shadow-sm">
             <textarea
               rows={1}
               value={inputValue}
@@ -501,6 +546,7 @@ export default function AdminAiChatPage() {
               onKeyDown={handleKeyPress}
               placeholder="Ask AI to query products, list orders, create discounts..."
               className="flex-1 bg-transparent border-0 resize-none max-h-24 py-1.5 px-2 text-sm focus:outline-none text-foreground placeholder:text-muted-foreground transition-all"
+              style={{ fontSize: "16px" }}
             />
             <Button
               onClick={() => handleSendMessage()}
@@ -515,7 +561,18 @@ export default function AdminAiChatPage() {
       </div>
 
       {/* Telemetry Control Panel Sidebar */}
-      <div className={`w-full lg:w-72 bg-card/45 backdrop-blur-2xl p-5 flex-col h-full border-t lg:border-t-0 border-border ${showSidebarMobile ? "flex" : "hidden lg:flex"}`}>
+      <div className={`w-full lg:w-72 bg-card/45 backdrop-blur-2xl p-5 flex-col border-t lg:border-t-0 border-border ${showSidebarMobile ? "flex" : "hidden lg:flex"}`} style={{ height: showSidebarMobile ? "100%" : undefined }}>
+
+        {/* Mobile Back Button */}
+        {showSidebarMobile && (
+          <button
+            onClick={() => setShowSidebarMobile(false)}
+            className="lg:hidden flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground mb-4 py-2 px-3 rounded-lg bg-muted/50 hover:bg-muted border border-border transition-all w-fit"
+          >
+            <ArrowLeft size={14} />
+            Back to Chat
+          </button>
+        )}
         
         {/* Tabs */}
         <div className="flex border border-border rounded-lg p-1 bg-background text-xs gap-1">

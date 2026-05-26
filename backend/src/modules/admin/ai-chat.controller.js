@@ -610,9 +610,38 @@ export const handleAdminAiChat = asyncHandler(async (req, res) => {
     parts: [{ text: msg.content }]
   }));
 
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  // Helper: call Gemini API with retry + model fallback
+  const MODELS = ["gemini-2.0-flash", "gemini-2.5-flash"];
+  const MAX_RETRIES = 3;
 
+  const callGeminiWithRetry = async (payload) => {
+    let lastError = null;
+    for (const model of MODELS) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          const response = await axios.post(url, payload, { timeout: 30000 });
+          return response;
+        } catch (err) {
+          lastError = err;
+          const status = err.response?.status;
+          // Only retry on transient errors (429, 500, 502, 503, 504)
+          if ([429, 500, 502, 503, 504].includes(status) && attempt < MAX_RETRIES) {
+            const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
+            console.warn(`⏳ Gemini ${model} returned ${status}, retrying in ${delay}ms (attempt ${attempt}/${MAX_RETRIES})...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            continue;
+          }
+          // Non-retryable error or max retries exhausted for this model — try next model
+          break;
+        }
+      }
+    }
+    // All models and retries exhausted
+    throw lastError;
+  };
+
+  try {
     let keepLooping = true;
     let iterations = 0;
     const maxIterations = 5; // Prevent infinite loops
@@ -627,7 +656,7 @@ export const handleAdminAiChat = asyncHandler(async (req, res) => {
         tools: [{ functionDeclarations: toolDeclarations }]
       };
 
-      const response = await axios.post(url, payload);
+      const response = await callGeminiWithRetry(payload);
       const candidate = response?.data?.candidates?.[0];
       const parts = candidate?.content?.parts;
 
@@ -670,7 +699,7 @@ export const handleAdminAiChat = asyncHandler(async (req, res) => {
 
         // Push the tool results back into the conversation history
         contents.push({
-          role: "user", // The role for function responses is "user" (or system/tool depending on API version, but "user" is standard for functionResponse content)
+          role: "user",
           parts: responseParts
         });
 
@@ -689,13 +718,20 @@ export const handleAdminAiChat = asyncHandler(async (req, res) => {
 
   } catch (err) {
     console.error("❌ Gemini AI Admin Chat error:", err.message);
+    const status = err.response?.status;
     const isQuotaError = err.response?.data?.error?.message?.includes("quota") || 
                          err.message?.includes("429") || 
-                         err.response?.status === 429;
-    const errMsg = isQuotaError 
-      ? "Gemini API Quota Exceeded (429). You are on the free tier limit (15 RPM). Please wait a minute before retrying, or configure a premium/higher-limit API key."
-      : `Failed to communicate with AI Assistant: ${err.message}`;
-    res.status(err.response?.status || 500).json({
+                         status === 429;
+    const is503 = status === 503;
+    let errMsg;
+    if (isQuotaError) {
+      errMsg = "Gemini API Quota Exceeded (429). You are on the free tier limit (15 RPM). Please wait a minute before retrying, or configure a premium/higher-limit API key.";
+    } else if (is503) {
+      errMsg = "Gemini API is temporarily unavailable (503). The service may be experiencing high demand. Please try again in a few seconds.";
+    } else {
+      errMsg = `Failed to communicate with AI Assistant: ${err.response?.data?.error?.message || err.message}`;
+    }
+    res.status(status || 500).json({
       success: false,
       message: errMsg
     });
