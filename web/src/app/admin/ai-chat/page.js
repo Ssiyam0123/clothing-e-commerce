@@ -492,31 +492,38 @@ export default function AdminAiChatPage() {
       </div>
 
       {/* Telemetry Control Panel Sidebar */}
-      <div className="w-full lg:w-72 bg-card/45 backdrop-blur-2xl p-5 flex flex-col gap-5 z-10 border-t lg:border-t-0 border-border">
+      <div className="w-full lg:w-72 bg-card/45 backdrop-blur-2xl p-5 flex flex-col h-full border-t lg:border-t-0 border-border">
         
         {/* Tabs */}
-        <div className="flex border border-border rounded-lg p-1 bg-background text-xs">
+        <div className="flex border border-border rounded-lg p-1 bg-background text-xs gap-1">
           <button
             onClick={() => setActiveTab("chat")}
-            className={`flex-1 py-1.5 rounded-md font-semibold transition-all ${
+            className={`flex-1 py-1.5 rounded-md font-semibold transition-all text-center ${
               activeTab === "chat" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Terminal Status
+            Terminal
+          </button>
+          <button
+            onClick={() => setActiveTab("tools")}
+            className={`flex-1 py-1.5 rounded-md font-semibold transition-all text-center ${
+              activeTab === "tools" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            AI Tools
           </button>
           <button
             onClick={() => setActiveTab("commands")}
-            className={`flex-1 py-1.5 rounded-md font-semibold transition-all ${
+            className={`flex-1 py-1.5 rounded-md font-semibold transition-all text-center ${
               activeTab === "commands" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Quick Actions
+            Shortcuts
           </button>
         </div>
 
         {activeTab === "chat" ? (
-          <div className="flex-1 flex flex-col gap-4">
-            
+          <div className="flex-1 flex flex-col gap-4 overflow-hidden">
             {/* Status indicators */}
             <div className="border border-border rounded-xl p-4 bg-background/50 space-y-3.5 shadow-sm">
               <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5"><Activity size={12} /> System Telemetry</h3>
@@ -537,22 +544,48 @@ export default function AdminAiChatPage() {
             </div>
 
             {/* Quick Stats Panel */}
-            <div className="border border-border rounded-xl p-4 bg-background/50 flex-1 flex flex-col shadow-sm">
+            <div className="border border-border rounded-xl p-4 bg-background/50 flex-1 flex flex-col shadow-sm overflow-hidden">
               <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5 mb-2.5"><Terminal size={12} /> System Details</h3>
-              <div className="text-[11px] font-mono text-muted-foreground space-y-1.5 overflow-y-auto max-h-56 lg:max-h-none flex-1">
+              <div className="text-[11px] font-mono text-muted-foreground space-y-1.5 overflow-y-auto flex-1 scrollbar-thin">
                 <p className="text-primary font-bold"># auth token status verified</p>
                 <p># database: clothing-ecommerce</p>
                 <p># schema: mongoose-prod-v9</p>
                 <p># model: gemini-2.5-flash</p>
-                <p># function tools registered: 12</p>
+                <p># function tools registered: 13</p>
                 <p className="text-emerald-600 dark:text-emerald-400"># ready for instructions</p>
               </div>
             </div>
           </div>
+        ) : activeTab === "tools" ? (
+          <div className="flex-1 flex flex-col gap-3 overflow-hidden">
+            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5"><Cpu size={12} /> Registered Tools</h3>
+            <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 scrollbar-thin">
+              {[
+                { name: "searchProducts", desc: "Search products in catalog" },
+                { name: "updateProductStock", desc: "Update product stock levels" },
+                { name: "getDashboardSummary", desc: "Retrieve dashboard business metrics" },
+                { name: "getRecentOrders", desc: "List recent sales transactions" },
+                { name: "createProduct", desc: "Create new product in catalog" },
+                { name: "updateProductSeo", desc: "Save optimized SEO metadata" },
+                { name: "updateOrderStatus", desc: "Update order delivery status" },
+                { name: "createCoupon", desc: "Create discount coupon code" },
+                { name: "listCoupons", desc: "List active discount coupons" },
+                { name: "toggleFlashSale", desc: "Add/remove item from flash sale" },
+                { name: "searchCustomer", desc: "Search customer profiles" },
+                { name: "toggleUserStatus", desc: "Block or activate customer" },
+                { name: "createBlogDraft", desc: "Draft marketing blog post" }
+              ].map((tool, idx) => (
+                <div key={idx} className="p-2.5 border border-border bg-background/50 rounded-lg hover:border-primary/20 transition-all flex flex-col gap-0.5">
+                  <span className="text-[11px] font-mono font-bold text-primary">{tool.name}()</span>
+                  <span className="text-[10px] text-muted-foreground leading-snug">{tool.desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         ) : (
-          <div className="flex-1 flex flex-col gap-3">
+          <div className="flex-1 flex flex-col gap-3 overflow-hidden">
             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5 mb-1"><Terminal size={12} /> Command Shortcuts</h3>
-            <div className="space-y-2.5">
+            <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 scrollbar-thin">
               {quickCommands.map((item, idx) => (
                 <button
                   key={idx}
