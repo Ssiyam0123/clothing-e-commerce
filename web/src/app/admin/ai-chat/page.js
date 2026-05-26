@@ -99,7 +99,8 @@ export default function AdminAiChatPage() {
       }
     } catch (err) {
       console.error(err);
-      setError("AI connection failure. Please confirm your GEMINI_API_KEY is configured in your Settings or environment variables.");
+      const errMsg = err.response?.data?.message || err.message || "AI connection failure. Please confirm your GEMINI_API_KEY is configured in your Settings or environment variables.";
+      setError(errMsg);
     } finally {
       setLoading(false);
     }
