@@ -6,7 +6,7 @@ import redis from "../config/redis.js";
  */
 export const cacheMiddleware = (ttl = 300) => {
   return async (req, res, next) => {
-    if (!redis || req.method !== "GET") {
+    if (!redis || req.method !== "GET" || req.headers.authorization) {
       return next();
     }
 

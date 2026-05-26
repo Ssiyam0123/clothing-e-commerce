@@ -43,8 +43,7 @@ export const optionalAuth = async (req, res, next) => {
   }
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id).select("-password");
+      const user = await User.findById(decoded.id).select("-password").populate("role");
       if (user) req.user = user;
     } catch (error) {
     }

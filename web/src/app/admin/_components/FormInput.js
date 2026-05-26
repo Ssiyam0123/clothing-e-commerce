@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
 
 export default function FormInput({
@@ -18,6 +19,9 @@ export default function FormInput({
   ...props
 }) {
   const error = errors[name];
+  const { user } = useAuthStore();
+  const isSuperAdmin = user?.role?.name === "superadmin";
+
   const isSecretField = 
     type === "password" || 
     /key|token|secret|pass|password|id|pixel|credential/i.test(name) ||
@@ -25,7 +29,7 @@ export default function FormInput({
 
   const [showSecret, setShowSecret] = useState(false);
 
-  const inputType = isSecretField ? (showSecret ? "text" : "password") : type;
+  const inputType = isSecretField ? (showSecret && isSuperAdmin ? "text" : "password") : type;
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -53,7 +57,7 @@ export default function FormInput({
           )}
           {...props}
         />
-        {isSecretField && (
+        {isSecretField && isSuperAdmin && (
           <button
             type="button"
             onClick={() => setShowSecret(!showSecret)}

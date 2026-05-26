@@ -13,12 +13,59 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Globe, Search, Plus, Trash2, HelpCircle } from "lucide-react";
+import { Globe, Search, Plus, Trash2, HelpCircle, Zap } from "lucide-react";
 import { swalToast, swalError } from "@/utils/swal";
+import api from "@/lib/api";
 
 export default function ManageSeoTab({ product, updateProduct }) {
   const { register, handleSubmit, setValue, control, getValues } = useForm();
   const [faqsList, setFaqsList] = useState([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleAiGenerate = async () => {
+    if (!product?.name) return;
+    setIsGenerating(true);
+    try {
+      const { data } = await api.post("/admin/products/generate-ai-content", {
+        name: product.name,
+        categoryName: product.category?.name || "Apparel",
+        brand: product.brand || getValues("brand") || ""
+      });
+
+      if (data?.success && data?.data) {
+        const ai = data.data;
+        setValue("metaTitle", ai.metaTitle || "", { shouldDirty: true });
+        setValue("metaDescription", ai.metaDescription || "", { shouldDirty: true });
+        setValue("keywords", ai.keywords || "", { shouldDirty: true });
+
+        setValue("specifications.fit", ai.fit || "", { shouldDirty: true });
+        setValue("specifications.sleeve", ai.sleeve || "", { shouldDirty: true });
+        setValue("specifications.pattern", ai.pattern || "", { shouldDirty: true });
+        setValue("specifications.collar", ai.collar || "", { shouldDirty: true });
+
+        setValue("material", ai.material || "", { shouldDirty: true });
+        setValue("color", ai.color || "", { shouldDirty: true });
+        if (ai.gender) {
+          setValue("gender", ai.gender, { shouldDirty: true });
+        }
+
+        setValue("description", ai.description || "", { shouldDirty: true });
+        setValue("tags", Array.isArray(ai.tags) ? ai.tags.join(", ") : (ai.tags || ""), { shouldDirty: true });
+
+        if (ai.faqs && Array.isArray(ai.faqs)) {
+          setFaqsList(ai.faqs);
+          setValue("faqs", ai.faqs, { shouldDirty: true });
+        }
+
+        swalToast("AI Generation Complete! Form populated.", "success");
+      }
+    } catch (err) {
+      console.error(err);
+      swalError("AI Generation Failed", err.response?.data?.message || err.message);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   useEffect(() => {
     if (product) {
@@ -32,6 +79,8 @@ export default function ManageSeoTab({ product, updateProduct }) {
       setValue("material", product.material || "");
       setValue("color", product.color || "");
       setValue("gender", product.gender || "Unisex");
+      setValue("description", product.description || "");
+      setValue("tags", Array.isArray(product.tags) ? product.tags.join(", ") : "");
 
       setValue("specifications.fit", product.specifications?.fit || "");
       setValue("specifications.sleeve", product.specifications?.sleeve || "");
@@ -91,6 +140,8 @@ export default function ManageSeoTab({ product, updateProduct }) {
       await updateProduct({ 
         id: product._id, 
         data: { 
+          description: data.description,
+          tags: data.tags ? data.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
           seo: {
             metaTitle: data.metaTitle,
             metaDescription: data.metaDescription,
@@ -119,19 +170,53 @@ export default function ManageSeoTab({ product, updateProduct }) {
 
   return (
     <form onSubmit={handleSubmit(onSeoSubmit)} className="p-0 space-y-12">
-      {/* Search Engine Optimization (SEO) */}
       <div className="space-y-10">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">
-            <Search size={20} className="text-indigo-600" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 flex items-center justify-center border border-indigo-600/20">
+              <Search size={20} className="text-indigo-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-[0.2em]">SEO Configuration</h3>
+              <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-80">Optimize search engine snippet details</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-[0.2em]">SEO Configuration</h3>
-            <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-80">Optimize search engine snippet details</p>
-          </div>
+
+          <Button
+            type="button"
+            onClick={handleAiGenerate}
+            disabled={isGenerating}
+            className="h-12 px-6 bg-indigo-600 text-white rounded-xl font-bold uppercase tracking-widest text-[9px] hover:bg-indigo-700 shadow-xl transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            {isGenerating ? (
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Zap size={14} className="fill-current text-white" />
+            )}
+            <span>Generate with AI</span>
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 gap-8">
+          <div className="space-y-4">
+            <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Product Description</Label>
+            <Textarea 
+              placeholder="Detailed description of the product"
+              {...register("description")}
+              rows={4}
+              className="bg-muted/30 border-border/10 rounded-3xl px-6 py-5 font-medium focus:ring-2 focus:ring-indigo-600/20 resize-none"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Product Tags (Comma separated)</Label>
+            <Input 
+              placeholder="e.g. t-shirt, summer, streetwear"
+              {...register("tags")}
+              className="h-16 bg-muted/30 border-border/10 rounded-2xl px-6 font-bold text-sm tracking-tight focus:ring-2 focus:ring-indigo-600/20"
+            />
+          </div>
+
           <div className="space-y-4">
             <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">Meta Title</Label>
             <Input 

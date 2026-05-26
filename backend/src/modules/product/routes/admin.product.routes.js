@@ -10,6 +10,7 @@ import {
     deleteProductBanner,
     patchProduct
 } from '../controllers/admin.product.controller.js';
+import { generateProductAiContent } from '../controllers/ai.product.controller.js';
 import { protect } from '../../../middleware/auth.js';
 import { authorize } from '../../../middleware/rbac.js';
 import upload from '../../../middleware/upload.js';
@@ -18,6 +19,8 @@ const router = express.Router();
 
 // 🛡️ Base protection for all admin routes
 router.use(protect);
+
+router.post('/generate-ai-content', authorize('products:update'), generateProductAiContent);
 
 router.route('/')
     .get(authorize('products:view'), getAdminProducts)

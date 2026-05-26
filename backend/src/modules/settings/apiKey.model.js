@@ -43,6 +43,7 @@ const apiKeySchema = new mongoose.Schema({
     cloudinaryCloudName: { type: String, default: "" },
     cloudinaryApiKey: { type: String, default: "" },
     cloudinaryApiSecret: { type: String, default: "" },
+    geminiApiKey: { type: String, default: "" },
 }, { timestamps: true });
 
 const ApiKey = mongoose.model('ApiKey', apiKeySchema);

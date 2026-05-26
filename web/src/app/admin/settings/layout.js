@@ -8,7 +8,7 @@ import AdminPageHeader from "@/app/admin/_components/AdminPageHeader";
 import {
   Globe, Palette, Share2, Mail, Settings2,
   Cpu, MessageSquare, Layout as LayoutIcon,
-  Truck, Shield, Key
+  Truck, Shield, Key, Sparkles
 } from "lucide-react";
 
 export default function SettingsLayout({ children }) {
@@ -25,6 +25,7 @@ export default function SettingsLayout({ children }) {
     { id: "marketing", label: "Marketing", href: "/admin/settings/marketing", icon: Cpu },
     { id: "roles", label: "Access", href: "/admin/settings/roles", icon: Shield },
     { id: "auth", label: "Auth", href: "/admin/settings/auth", icon: Key },
+    { id: "ai", label: "AI Engine", href: "/admin/settings/ai", icon: Sparkles },
     { id: "smtp", label: "Email", href: "/admin/settings/smtp", icon: Mail },
     { id: "sms", label: "SMS", href: "/admin/settings/sms", icon: MessageSquare },
   ];
