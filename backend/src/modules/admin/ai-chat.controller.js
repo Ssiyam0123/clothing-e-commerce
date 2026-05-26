@@ -26,9 +26,6 @@ const getApiKey = async () => {
     console.error("Error reading geminiApiKey from DB:", error.message);
   }
 
-  if (!apiKey) {
-    apiKey = process.env.GEMINI_API_KEY;
-  }
   return apiKey;
 };
 

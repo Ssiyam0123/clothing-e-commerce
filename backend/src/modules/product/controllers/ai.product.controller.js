@@ -37,10 +37,6 @@ export const generateProductAiContent = asyncHandler(async (req, res) => {
   }
 
   if (!apiKey) {
-    apiKey = process.env.GEMINI_API_KEY;
-  }
-
-  if (!apiKey) {
     return res.status(500).json({
       success: false,
       message: "GEMINI_API_KEY is not configured on the server. Please add it to your Settings or environment variables.",
