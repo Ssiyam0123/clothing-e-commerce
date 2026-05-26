@@ -397,7 +397,10 @@ export default function AdminAiChatPage() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row border border-border bg-background shadow-2xl overflow-hidden relative text-foreground transition-colors duration-500" style={{ height: viewportHeight }}>
+    <div 
+      className="flex flex-col lg:flex-row border border-border bg-background shadow-2xl overflow-hidden text-foreground transition-colors duration-500 fixed lg:relative inset-x-0 top-0 lg:top-auto" 
+      style={{ height: viewportHeight }}
+    >
       
       {/* Dynamic glow backdrops */}
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-tr from-primary/5 to-secondary/5 rounded-full blur-[120px] pointer-events-none" />
