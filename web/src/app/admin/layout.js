@@ -83,7 +83,7 @@ export default function AdminLayout({ children }) {
       console.log("⚡ SOCKET: new_order event received!", order);
       // Play a premium notification sound
       try {
-        const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav");
+        const audio = new Audio("/notification.wav");
         audio.volume = 0.5;
         audio.play().catch((err) => console.log("Audio play blocked/failed:", err));
       } catch (err) {
