@@ -23,7 +23,9 @@ import {
   Terminal,
   Activity,
   ArrowLeft,
-  Package
+  Package,
+  Menu,
+  X
 } from "lucide-react";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -40,6 +42,7 @@ export default function AdminAiChatPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("chat"); // chat or commands
+  const [showSidebarMobile, setShowSidebarMobile] = useState(false);
   const messagesEndRef = useRef(null);
 
   const suggestionChips = [
@@ -352,7 +355,7 @@ export default function AdminAiChatPage() {
       <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Main chat viewport */}
-      <div className="flex-1 flex flex-col h-full border-r border-border/80">
+      <div className={`flex-1 flex-col h-full border-r border-border/80 ${showSidebarMobile ? "hidden lg:flex" : "flex"}`}>
         
         {/* Console Header */}
         <div className="px-6 py-4 border-b border-border/80 bg-card/60 backdrop-blur-xl flex items-center justify-between z-10">
@@ -375,9 +378,29 @@ export default function AdminAiChatPage() {
               <p className="text-[11px] text-muted-foreground">Agentic business telemetry live session</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full text-[10px] text-emerald-600 dark:text-emerald-400 font-bold tracking-wide uppercase">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
-            Live Bridge
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full text-[10px] text-emerald-600 dark:text-emerald-400 font-bold tracking-wide uppercase">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
+              Live Bridge
+            </div>
+            
+            {/* Mobile Sidebar Toggle */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold border-primary/20 hover:bg-muted"
+              onClick={() => setShowSidebarMobile(!showSidebarMobile)}
+            >
+              {showSidebarMobile ? (
+                <>
+                  <X size={14} /> Close
+                </>
+              ) : (
+                <>
+                  <Terminal size={14} /> Console
+                </>
+              )}
+            </Button>
           </div>
         </div>
 
@@ -492,7 +515,7 @@ export default function AdminAiChatPage() {
       </div>
 
       {/* Telemetry Control Panel Sidebar */}
-      <div className="w-full lg:w-72 bg-card/45 backdrop-blur-2xl p-5 flex flex-col h-full border-t lg:border-t-0 border-border">
+      <div className={`w-full lg:w-72 bg-card/45 backdrop-blur-2xl p-5 flex-col h-full border-t lg:border-t-0 border-border ${showSidebarMobile ? "flex" : "hidden lg:flex"}`}>
         
         {/* Tabs */}
         <div className="flex border border-border rounded-lg p-1 bg-background text-xs gap-1">
