@@ -56,7 +56,9 @@ export default function AdminLayout({ children }) {
   ];
 
   const isChatRoute = pathname?.startsWith("/admin/chat");
-  const isFullPage = isChatRoute;
+  const isAiChatRoute = pathname === "/admin/ai-chat";
+  const isFullPage = isChatRoute || isAiChatRoute;
+
 
   // 🛡️ Redirect non-admins
   useEffect(() => {

@@ -24,7 +24,11 @@ const calculateCartTotals = (cart) => {
 };
 
 export const getCart = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    return res.json({ items: [], totalItems: 0, totalPrice: 0 });
+  }
   const userId = req.user.id || req.user._id;
+
 
   let cart = await Cart.findOne({ user: userId })
     .populate('items.product', 'name price discount images slug isActive')

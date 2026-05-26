@@ -11,7 +11,11 @@ const populateConfig = {
 
 // FIX Issue 11: All functions wrapped in asyncHandler for proper error propagation
 export const getWishlist = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    return res.json({ products: [] });
+  }
   const userId = req.user.id || req.user._id;
+
   let wishlist = await Wishlist.findOne({ user: userId })
     .populate(populateConfig);
   

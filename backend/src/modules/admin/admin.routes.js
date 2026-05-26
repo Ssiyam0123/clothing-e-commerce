@@ -11,6 +11,7 @@ import {
   getDashboardCustomerGrowth,
   getDashboardRetention
 } from './admin.controller.js';
+import { handleAdminAiChat } from './ai-chat.controller.js';
 import { protect } from '../../middleware/auth.js';
 import { authorize } from '../../middleware/rbac.js';
 import { cacheMiddleware } from '../../middleware/cacheMiddleware.js';
@@ -22,8 +23,12 @@ import adminOrderRoutes from '../order/routes/admin.order.routes.js';
 
 const router = express.Router();
 
+
 // Base protection for admin entry points
 router.use(protect);
+
+router.post('/ai-chat', authorize(['dashboard:view']), handleAdminAiChat);
+
 
 router.get('/dashboard', authorize(['dashboard:view', 'reports:view']), cacheMiddleware(300), getDashboardData);
 router.get('/dashboard/stats', authorize(['dashboard:view', 'reports:view']), cacheMiddleware(300), getDashboardStats);

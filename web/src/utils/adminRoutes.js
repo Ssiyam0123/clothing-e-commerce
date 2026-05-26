@@ -25,6 +25,7 @@ export const navGroups = [
       { name: "Products", href: "/admin/products", icon: <Shirt size={18} />, permission: "products:view" },
       { name: "Categories", href: "/admin/categories", icon: <FolderTree size={18} />, permission: "categories:view" },
       { name: "Live Chat", href: "/admin/chat", icon: <MessageCircle size={18} />, permission: "chat:view" },
+      { name: "Manage with AI", href: "/admin/ai-chat", icon: <Sparkles size={18} className="text-purple-500 animate-pulse" />, permission: ["dashboard:view"] },
     ]
   },
   {
