@@ -46,6 +46,8 @@ export default function AdminAiChatPage() {
   const messagesEndRef = useRef(null);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const inputContainerRef = useRef(null);
+  const [cooldown, setCooldown] = useState(0);
+  const cooldownRef = useRef(null);
 
   const suggestionChips = [
     { label: "📊 Store Summary", prompt: "Give me the store business summary and dashboard metrics" },
@@ -95,7 +97,7 @@ export default function AdminAiChatPage() {
 
   const handleSendMessage = async (textToSend) => {
     const query = (textToSend || inputValue).trim();
-    if (!query) return;
+    if (!query || cooldown > 0) return;
 
     if (!textToSend) setInputValue("");
     setError(null);
@@ -122,16 +124,38 @@ export default function AdminAiChatPage() {
             toolExecutions: response.data.toolExecutions || []
           }
         ]);
+        // Short cooldown between successful requests to stay under free tier limits
+        startCooldown(4);
       } else {
         throw new Error(response.data?.message || "Failed to get reply from AI");
       }
     } catch (err) {
       console.error(err);
+      const status = err.response?.status;
       const errMsg = err.response?.data?.message || err.message || "AI connection failure. Please confirm your GEMINI_API_KEY is configured in your Settings or environment variables.";
       setError(errMsg);
+      // Longer cooldown on rate limit to let quota reset
+      if (status === 429) {
+        startCooldown(30);
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const startCooldown = (seconds) => {
+    setCooldown(seconds);
+    if (cooldownRef.current) clearInterval(cooldownRef.current);
+    cooldownRef.current = setInterval(() => {
+      setCooldown(prev => {
+        if (prev <= 1) {
+          clearInterval(cooldownRef.current);
+          cooldownRef.current = null;
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   const handleKeyPress = (e) => {
@@ -550,11 +574,15 @@ export default function AdminAiChatPage() {
             />
             <Button
               onClick={() => handleSendMessage()}
-              disabled={loading || !inputValue.trim()}
+              disabled={loading || !inputValue.trim() || cooldown > 0}
               size="icon"
               className="h-9 w-9 rounded-xl bg-primary hover:opacity-95 shadow-md text-primary-foreground shrink-0 flex items-center justify-center"
             >
-              <Send size={14} />
+              {cooldown > 0 ? (
+                <span className="text-[10px] font-bold">{cooldown}</span>
+              ) : (
+                <Send size={14} />
+              )}
             </Button>
           </div>
       </div>

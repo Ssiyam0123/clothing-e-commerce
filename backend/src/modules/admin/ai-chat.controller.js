@@ -625,14 +625,27 @@ export const handleAdminAiChat = asyncHandler(async (req, res) => {
         } catch (err) {
           lastError = err;
           const status = err.response?.status;
-          // Only retry on transient errors (429, 500, 502, 503, 504)
-          if ([429, 500, 502, 503, 504].includes(status) && attempt < MAX_RETRIES) {
+
+          // 429 = rate limit — wait longer (15s base), and don't bother switching models
+          if (status === 429 && attempt < MAX_RETRIES) {
+            const delay = 15000 * attempt; // 15s, 30s
+            console.warn(`⏳ Rate limited (429), waiting ${delay / 1000}s before retry (attempt ${attempt}/${MAX_RETRIES})...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            continue;
+          }
+          if (status === 429) {
+            // All 429 retries exhausted — throw immediately, don't try next model
+            throw lastError;
+          }
+
+          // Other transient errors (500, 502, 503, 504) — short backoff, then try next model
+          if ([500, 502, 503, 504].includes(status) && attempt < MAX_RETRIES) {
             const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
             console.warn(`⏳ Gemini ${model} returned ${status}, retrying in ${delay}ms (attempt ${attempt}/${MAX_RETRIES})...`);
             await new Promise(resolve => setTimeout(resolve, delay));
             continue;
           }
-          // Non-retryable error or max retries exhausted for this model — try next model
+          // Non-retryable error or max retries exhausted — try next model
           break;
         }
       }
