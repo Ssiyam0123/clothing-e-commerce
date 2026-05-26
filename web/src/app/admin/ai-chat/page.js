@@ -358,46 +358,42 @@ export default function AdminAiChatPage() {
       <div className={`flex-1 flex-col h-full border-r border-border/80 ${showSidebarMobile ? "hidden lg:flex" : "flex"}`}>
         
         {/* Console Header */}
-        <div className="px-6 py-4 border-b border-border/80 bg-card/60 backdrop-blur-xl flex items-center justify-between z-10">
-          <div className="flex items-center gap-3.5">
+        <div className="px-4 py-3 border-b border-border/80 bg-card/60 backdrop-blur-xl flex items-center justify-between z-10">
+          <div className="flex items-center gap-2">
             <Link href="/admin">
-              <Button variant="ghost" size="icon" className="rounded-full mr-1 hover:bg-muted">
-                <ArrowLeft size={18} />
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">
+                <ArrowLeft size={16} />
               </Button>
             </Link>
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/10 border border-white/10">
-              <Cpu size={20} className="text-white animate-pulse" />
-            </div>
             <div>
-              <h1 className="text-sm font-bold text-foreground flex items-center gap-2">
-                Store Command AI
-                <span className="text-[9px] font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  DB Terminal
+              <h1 className="text-xs sm:text-sm font-bold text-foreground flex items-center gap-1.5 leading-none">
+                Command AI
+                <span className="hidden sm:inline-flex text-[9px] font-bold text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                  Terminal
                 </span>
               </h1>
-              <p className="text-[11px] text-muted-foreground">Agentic business telemetry live session</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full text-[10px] text-emerald-600 dark:text-emerald-400 font-bold tracking-wide uppercase">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
-              Live Bridge
+          <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded text-[9px] text-emerald-600 dark:text-emerald-400 font-bold uppercase">
+              <span className="h-1 w-1 rounded-full bg-emerald-500 animate-ping shrink-0" />
+              Live
             </div>
             
             {/* Mobile Sidebar Toggle */}
             <Button
               variant="outline"
               size="sm"
-              className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold border-primary/20 hover:bg-muted"
+              className="lg:hidden flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold border-primary/20 hover:bg-muted h-7"
               onClick={() => setShowSidebarMobile(!showSidebarMobile)}
             >
               {showSidebarMobile ? (
                 <>
-                  <X size={14} /> Close
+                  <X size={12} /> Close
                 </>
               ) : (
                 <>
-                  <Terminal size={14} /> Console
+                  <Terminal size={12} /> Console
                 </>
               )}
             </Button>
