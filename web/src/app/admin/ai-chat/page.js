@@ -418,13 +418,15 @@ export default function AdminAiChatPage() {
                 <div className={`flex gap-3 max-w-[85%] ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                   
                   {/* Avatar */}
-                  <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 border text-[11px] font-bold ${
-                    msg.role === "user" 
-                      ? "bg-zinc-800 border-zinc-700 text-zinc-300 dark:bg-muted dark:border-border dark:text-foreground" 
-                      : "bg-primary/10 border-primary/20 text-primary"
-                  }`}>
-                    {msg.role === "user" ? "OP" : "AI"}
-                  </div>
+                  {msg.role === "user" ? (
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-900 border border-zinc-600 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm">
+                      <User size={14} />
+                    </div>
+                  ) : (
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-md shadow-violet-500/10">
+                      <Sparkles size={14} className="text-white animate-pulse" />
+                    </div>
+                  )}
 
                   {/* Message card */}
                   <div
@@ -479,12 +481,12 @@ export default function AdminAiChatPage() {
 
         {/* Suggestion Chips */}
         {messages.length === 1 && !loading && (
-          <div className="px-6 py-2.5 flex flex-wrap gap-2 z-10 border-t border-border bg-muted/20 backdrop-blur-md">
+          <div className="px-4 sm:px-6 py-3 flex flex-nowrap overflow-x-auto gap-2.5 z-10 border-t border-border bg-muted/10 backdrop-blur-md scrollbar-none">
             {suggestionChips.map((chip, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSendMessage(chip.prompt)}
-                className="text-[11px] px-3.5 py-2 rounded-full border border-border hover:border-primary/40 bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all font-semibold flex items-center gap-1 shadow-sm"
+                className="text-[11px] px-4 py-2.5 rounded-full border border-border hover:border-primary/40 bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all font-semibold flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0"
               >
                 {chip.label}
                 <ArrowUpRight size={11} className="opacity-50" />
@@ -494,24 +496,26 @@ export default function AdminAiChatPage() {
         )}
 
         {/* User Input Bar */}
-        <div className="p-4 border-t border-border bg-card/85 backdrop-blur-xl flex items-center gap-3 z-10">
-          <textarea
-            rows={1}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Ask AI to query products, list orders, create discounts, block users..."
-            className="flex-1 bg-background border border-border hover:border-muted rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 resize-none max-h-24 scrollbar-none text-foreground placeholder:text-muted-foreground transition-all"
-          />
-          <Button
-            onClick={() => handleSendMessage()}
-            disabled={loading || !inputValue.trim()}
-            size="icon"
-            className="h-10 w-10 rounded-xl bg-primary hover:opacity-95 shadow-md text-primary-foreground shrink-0"
-          >
-            <Send size={15} />
-          </Button>
-        </div>
+        <div className="p-4 sm:p-5 border-t border-border bg-card/85 backdrop-blur-xl z-10">
+          <div className="max-w-4xl mx-auto flex items-end gap-3 bg-background border border-border rounded-2xl p-2.5 focus-within:ring-1 focus-within:ring-primary/45 transition-all shadow-sm">
+            <textarea
+              rows={1}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Ask AI to query products, list orders, create discounts..."
+              className="flex-1 bg-transparent border-0 resize-none max-h-24 py-1.5 px-2 text-sm focus:outline-none text-foreground placeholder:text-muted-foreground transition-all"
+            />
+            <Button
+              onClick={() => handleSendMessage()}
+              disabled={loading || !inputValue.trim()}
+              size="icon"
+              className="h-9 w-9 rounded-xl bg-primary hover:opacity-95 shadow-md text-primary-foreground shrink-0 flex items-center justify-center"
+            >
+              <Send size={14} />
+            </Button>
+          </div>
+      </div>
       </div>
 
       {/* Telemetry Control Panel Sidebar */}
