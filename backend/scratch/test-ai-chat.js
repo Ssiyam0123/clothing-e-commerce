@@ -29,35 +29,14 @@ const run = async () => {
   const apiKey = await getApiKey();
   console.log("API Key loaded:", apiKey ? "YES" : "NO");
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-  const payload = {
-    contents: [
-      {
-        role: "user",
-        parts: [{ text: "Check for any critical or low stock inventory alerts" }]
-      }
-    ],
-    tools: [
-      {
-        functionDeclarations: [
-          {
-            name: "getDashboardSummary",
-            description: "Get general store business metrics, total completed sales revenue, order count, and low stock inventory alerts",
-            parameters: {
-              type: "OBJECT",
-              properties: {}
-            }
-          }
-        ]
-      }
-    ]
-  };
+  const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
 
   try {
-    const response = await axios.post(url, payload);
-    console.log("Response status:", response.status);
-    console.log("Response data candidates:", JSON.stringify(response.data.candidates?.[0], null, 2));
+    const response = await axios.get(url);
+    console.log("Supported models:");
+    response.data.models.forEach(m => {
+      console.log(`- ${m.name}`);
+    });
   } catch (err) {
     console.error("Gemini Error:", err.response ? err.response.data : err.message);
   }

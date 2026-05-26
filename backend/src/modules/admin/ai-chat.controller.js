@@ -611,8 +611,8 @@ export const handleAdminAiChat = asyncHandler(async (req, res) => {
   }));
 
   // Helper: call Gemini API with retry + model fallback
-  const MODELS = ["gemini-2.0-flash", "gemini-2.5-flash"];
-  const MAX_RETRIES = 3;
+  const MODELS = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-2.0-flash", "gemini-flash-latest"];
+  const MAX_RETRIES = 2;
 
   const callGeminiWithRetry = async (payload) => {
     let lastError = null;
@@ -620,27 +620,28 @@ export const handleAdminAiChat = asyncHandler(async (req, res) => {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
       for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
-          const response = await axios.post(url, payload, { timeout: 30000 });
+          const response = await axios.post(url, payload, { timeout: 25000 });
           return response;
         } catch (err) {
           lastError = err;
           const status = err.response?.status;
 
-          // 429 = rate limit — wait longer (15s base), and don't bother switching models
+          // 429 = rate limit — wait short delay (2s, 4s) to avoid request timeouts
           if (status === 429 && attempt < MAX_RETRIES) {
-            const delay = 15000 * attempt; // 15s, 30s
-            console.warn(`⏳ Rate limited (429), waiting ${delay / 1000}s before retry (attempt ${attempt}/${MAX_RETRIES})...`);
+            const delay = 2000 * attempt;
+            console.warn(`⏳ Rate limited (429) on ${model}, waiting ${delay / 1000}s before retry (attempt ${attempt}/${MAX_RETRIES})...`);
             await new Promise(resolve => setTimeout(resolve, delay));
             continue;
           }
           if (status === 429) {
-            // All 429 retries exhausted — throw immediately, don't try next model
-            throw lastError;
+            // Rate limit retries exhausted for this model — fall back immediately to next model
+            console.warn(`❌ Model ${model} rate limited (429). Trying next model...`);
+            break;
           }
 
           // Other transient errors (500, 502, 503, 504) — short backoff, then try next model
           if ([500, 502, 503, 504].includes(status) && attempt < MAX_RETRIES) {
-            const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
+            const delay = 1000 * attempt;
             console.warn(`⏳ Gemini ${model} returned ${status}, retrying in ${delay}ms (attempt ${attempt}/${MAX_RETRIES})...`);
             await new Promise(resolve => setTimeout(resolve, delay));
             continue;

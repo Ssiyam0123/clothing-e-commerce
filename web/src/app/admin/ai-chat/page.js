@@ -44,7 +44,7 @@ export default function AdminAiChatPage() {
   const [activeTab, setActiveTab] = useState("chat"); // chat or commands
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
   const messagesEndRef = useRef(null);
-  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [viewportHeight, setViewportHeight] = useState("100dvh");
   const inputContainerRef = useRef(null);
   const [cooldown, setCooldown] = useState(0);
   const cooldownRef = useRef(null);
@@ -79,14 +79,14 @@ export default function AdminAiChatPage() {
     if (!vv) return;
 
     const handleResize = () => {
-      const offset = window.innerHeight - vv.height;
-      setKeyboardOffset(offset > 50 ? offset : 0);
+      setViewportHeight(`${vv.height}px`);
       // Scroll to bottom when keyboard opens
-      if (offset > 50) {
+      if (window.innerHeight - vv.height > 50) {
         setTimeout(() => scrollToBottom(), 100);
       }
     };
 
+    handleResize();
     vv.addEventListener("resize", handleResize);
     vv.addEventListener("scroll", handleResize);
     return () => {
@@ -397,7 +397,7 @@ export default function AdminAiChatPage() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row border border-border bg-background shadow-2xl overflow-hidden relative text-foreground transition-colors duration-500" style={{ height: "100dvh" }}>
+    <div className="flex flex-col lg:flex-row border border-border bg-background shadow-2xl overflow-hidden relative text-foreground transition-colors duration-500" style={{ height: viewportHeight }}>
       
       {/* Dynamic glow backdrops */}
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-tr from-primary/5 to-secondary/5 rounded-full blur-[120px] pointer-events-none" />
@@ -557,9 +557,7 @@ export default function AdminAiChatPage() {
           ref={inputContainerRef}
           className="p-3 sm:p-5 border-t border-border bg-card/85 backdrop-blur-xl z-20 shrink-0 sticky bottom-0 transition-all"
           style={{
-            paddingBottom: keyboardOffset > 0
-              ? `calc(${keyboardOffset}px + env(safe-area-inset-bottom, 8px))`
-              : `max(12px, env(safe-area-inset-bottom, 8px))`
+            paddingBottom: "max(12px, env(safe-area-inset-bottom, 8px))"
           }}
         >
           <div className="max-w-4xl mx-auto flex items-end gap-2 sm:gap-3 bg-background border border-border rounded-2xl p-2 sm:p-2.5 focus-within:ring-1 focus-within:ring-primary/45 transition-all shadow-sm">
