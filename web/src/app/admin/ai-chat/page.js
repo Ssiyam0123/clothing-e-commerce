@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 export default function AdminAiChatPage() {
@@ -44,8 +46,6 @@ export default function AdminAiChatPage() {
   const [activeTab, setActiveTab] = useState("chat"); // chat or commands
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
   const messagesEndRef = useRef(null);
-  const [viewportHeight, setViewportHeight] = useState("100dvh");
-  const inputContainerRef = useRef(null);
   const [cooldown, setCooldown] = useState(0);
   const cooldownRef = useRef(null);
 
@@ -72,26 +72,58 @@ export default function AdminAiChatPage() {
     scrollToBottom();
   }, [messages, loading]);
 
-  // Mobile keyboard avoidance using visualViewport API
+  // Lock body/html scroll on mobile devices and adjust container size via Visual Viewport API
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const vv = window.visualViewport;
-    if (!vv) return;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const originalBodyHeight = document.body.style.height;
+    const originalHtmlHeight = document.documentElement.style.height;
 
-    const handleResize = () => {
-      setViewportHeight(`${vv.height}px`);
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.height = "100%";
+    document.documentElement.style.height = "100%";
+
+    // Prevent body/document scrolling
+    const preventScroll = () => {
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener("scroll", preventScroll);
+
+    // Visual Viewport resize handler for mobile keyboards
+    const handleVisualResize = () => {
+      if (!window.visualViewport) return;
+      const viewport = window.visualViewport;
+      const container = document.getElementById("admin-ai-chat-container");
+      if (container) {
+        container.style.height = `${viewport.height}px`;
+        container.style.top = `${viewport.offsetTop}px`;
+      }
       // Scroll to bottom when keyboard opens
-      if (window.innerHeight - vv.height > 50) {
+      if (window.innerHeight - viewport.height > 50) {
         setTimeout(() => scrollToBottom(), 100);
       }
     };
 
-    handleResize();
-    vv.addEventListener("resize", handleResize);
-    vv.addEventListener("scroll", handleResize);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleVisualResize);
+      window.visualViewport.addEventListener("scroll", handleVisualResize);
+      // Run once
+      handleVisualResize();
+    }
+
     return () => {
-      vv.removeEventListener("resize", handleResize);
-      vv.removeEventListener("scroll", handleResize);
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.height = originalBodyHeight;
+      document.documentElement.style.height = originalHtmlHeight;
+      
+      window.removeEventListener("scroll", preventScroll);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleVisualResize);
+        window.visualViewport.removeEventListener("scroll", handleVisualResize);
+      }
     };
   }, []);
 
@@ -398,8 +430,9 @@ export default function AdminAiChatPage() {
 
   return (
     <div 
-      className="flex flex-col lg:flex-row border border-border bg-background shadow-2xl overflow-hidden text-foreground transition-colors duration-500 fixed lg:relative inset-x-0 top-0 lg:top-auto" 
-      style={{ height: viewportHeight }}
+      id="admin-ai-chat-container"
+      className="flex flex-col lg:flex-row border border-border bg-background shadow-2xl overflow-hidden text-foreground transition-colors duration-500 fixed lg:relative inset-x-0 top-0 lg:top-auto z-50" 
+      style={{ height: "100dvh" }}
     >
       
       {/* Dynamic glow backdrops */}
@@ -410,47 +443,48 @@ export default function AdminAiChatPage() {
       <div className={`flex-1 flex-col border-r border-border/80 min-h-0 ${showSidebarMobile ? "hidden lg:flex" : "flex"}`} style={{ height: "100%" }}>
         
         {/* Console Header */}
-        <div className="px-4 py-3 border-b border-border/80 bg-card/60 backdrop-blur-xl flex items-center justify-between z-20 shrink-0 sticky top-0">
-          <div className="flex items-center gap-2">
-            <Link href="/admin">
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">
-                <ArrowLeft size={16} />
-              </Button>
-            </Link>
+        <header className="h-[64px] bg-white dark:bg-[#202c33] px-4 md:px-8 flex items-center justify-between border-b border-border/10 shrink-0 z-20 shadow-sm">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className="rounded-full hover:bg-black/5 dark:hover:bg-white/5"
+            >
+              <Link href="/admin">
+                <ArrowLeft size={20} className="text-foreground/70" />
+              </Link>
+            </Button>
+
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <Sparkles size={20} />
+              </div>
+              <div className={cn(
+                "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-[#202c33]",
+                loading ? "bg-amber-500" : "bg-emerald-500"
+              )} />
+            </div>
             <div>
-              <h1 className="text-xs sm:text-sm font-bold text-foreground flex items-center gap-1.5 leading-none">
-                Command AI
-                <span className="hidden sm:inline-flex text-[9px] font-bold text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded uppercase tracking-wider">
-                  Terminal
-                </span>
-              </h1>
+              <h2 className="text-[15px] font-bold leading-tight">Command AI</h2>
+              <p className="text-[11px] font-medium text-emerald-500">
+                {loading ? "AI is processing..." : "System Live"}
+              </p>
             </div>
           </div>
+
           <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded text-[9px] text-emerald-600 dark:text-emerald-400 font-bold uppercase">
-              <span className="h-1 w-1 rounded-full bg-emerald-500 animate-ping shrink-0" />
-              Live
-            </div>
-            
             {/* Mobile Sidebar Toggle */}
             <Button
-              variant="outline"
-              size="sm"
-              className="lg:hidden flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold border-primary/20 hover:bg-muted h-7"
+              variant="ghost"
+              size="icon"
+              className="lg:hidden rounded-full hover:bg-black/5 dark:hover:bg-white/5"
               onClick={() => setShowSidebarMobile(!showSidebarMobile)}
             >
-              {showSidebarMobile ? (
-                <>
-                  <X size={12} /> Close
-                </>
-              ) : (
-                <>
-                  <Terminal size={12} /> Console
-                </>
-              )}
+              {showSidebarMobile ? <X size={20} className="text-foreground/70" /> : <Terminal size={20} className="text-foreground/70" />}
             </Button>
           </div>
-        </div>
+        </header>
 
         {/* Chat Feed */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 z-10 scrollbar-thin min-h-0">
@@ -556,37 +590,33 @@ export default function AdminAiChatPage() {
         )}
 
         {/* User Input Bar */}
-        <div
-          ref={inputContainerRef}
-          className="p-3 sm:p-5 border-t border-border bg-card/85 backdrop-blur-xl z-20 shrink-0 sticky bottom-0 transition-all"
-          style={{
-            paddingBottom: "max(12px, env(safe-area-inset-bottom, 8px))"
-          }}
-        >
-          <div className="max-w-4xl mx-auto flex items-end gap-2 sm:gap-3 bg-background border border-border rounded-2xl p-2 sm:p-2.5 focus-within:ring-1 focus-within:ring-primary/45 transition-all shadow-sm">
-            <textarea
-              rows={1}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder="Ask AI to query products, list orders, create discounts..."
-              className="flex-1 bg-transparent border-0 resize-none max-h-24 py-1.5 px-2 text-sm focus:outline-none text-foreground placeholder:text-muted-foreground transition-all"
-              style={{ fontSize: "16px" }}
-            />
+        <footer className="p-3 md:p-6 bg-white dark:bg-[#202c33] border-t border-border/10 shrink-0 z-20 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)]">
+          <div className="max-w-3xl mx-auto flex items-center gap-2 md:gap-4">
+            <div className="flex-1 relative">
+              <Input
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder="Ask AI to query products, list orders, create discounts..."
+                className="w-full h-11 md:h-12 bg-[#f0f2f5] dark:bg-[#2a3942] border-none rounded-2xl px-4 md:px-5 text-[14px] md:text-[15px] focus-visible:ring-0 placeholder:text-muted-foreground/50 shadow-inner"
+              />
+            </div>
             <Button
               onClick={() => handleSendMessage()}
               disabled={loading || !inputValue.trim() || cooldown > 0}
-              size="icon"
-              className="h-9 w-9 rounded-xl bg-primary hover:opacity-95 shadow-md text-primary-foreground shrink-0 flex items-center justify-center"
+              className={cn(
+                "h-11 w-11 md:h-12 md:w-12 rounded-full shadow-md transition-all duration-300 shrink-0 flex items-center justify-center",
+                inputValue.trim() ? "bg-primary hover:opacity-95 scale-100" : "bg-muted text-muted-foreground scale-95 opacity-50"
+              )}
             >
               {cooldown > 0 ? (
                 <span className="text-[10px] font-bold">{cooldown}</span>
               ) : (
-                <Send size={14} />
+                <Send size={18} className={cn("transition-transform", inputValue.trim() && "translate-x-0.5 -translate-y-0.5")} />
               )}
             </Button>
           </div>
-      </div>
+        </footer>
       </div>
 
       {/* Telemetry Control Panel Sidebar */}
