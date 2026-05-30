@@ -139,7 +139,7 @@ export default function AdminLayout({ children }) {
 
   if (authLoading || !isMounted) {
     return (
-      <div className="flex h-screen bg-background transition-colors duration-700">
+      <div className="flex h-[100dvh] bg-background transition-colors duration-700">
         {/* Sidebar Skeleton */}
         {!isFullPage && (
           <div className={cn(
@@ -196,7 +196,7 @@ export default function AdminLayout({ children }) {
   if (!user || !hasAdminAccess) return null;
 
   return (
-    <div className="flex h-screen bg-background text-foreground transition-colors duration-700 overflow-hidden">
+    <div className="flex h-[100dvh] bg-background text-foreground transition-colors duration-700 overflow-hidden">
       {/* 🖥️ Desktop Sidebar */}
       {!isFullPage && <Sidebar className="hidden lg:flex shrink-0 border-r border-sidebar-border" />}
 
@@ -340,7 +340,7 @@ export default function AdminLayout({ children }) {
           </header>
         )}
 
-        <main className={cn("flex-1 overflow-y-auto no-scrollbar bg-background/50", !isFullPage ? "min-h-0" : "p-0 overflow-hidden")}>
+        <main className={cn("flex-1 overflow-y-auto no-scrollbar bg-background/50 overscroll-y-contain", !isFullPage ? "min-h-0" : "p-0 overflow-hidden")}>
           <div className={cn("mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700", !isFullPage ? "max-w-none" : "max-w-none h-full")}>
             {children}
           </div>

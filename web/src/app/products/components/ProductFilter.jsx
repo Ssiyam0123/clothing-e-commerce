@@ -82,7 +82,7 @@ export default function ProductFilter({ initialCategories }) {
 
       {/* 🏷️ Main Category Navigation */}
       <div className="space-y-6">
-        <div className="w-full overflow-x-auto no-scrollbar pb-4 -webkit-overflow-scrolling-touch scrollbar-none">
+        <div className="w-full overflow-x-auto no-scrollbar pb-4 scrollbar-none">
           <div className="flex w-max gap-4 px-2">
             <CategoryItem
               isSelected={filters.category === "all"}
@@ -122,7 +122,7 @@ export default function ProductFilter({ initialCategories }) {
           >
 
             
-            <div className="w-full overflow-x-auto no-scrollbar pb-2 -webkit-overflow-scrolling-touch scrollbar-none">
+            <div className="w-full overflow-x-auto no-scrollbar pb-2 scrollbar-none">
               <div className="flex w-max gap-3 px-2">
                 {filteredSubcategories.map((sub) => {
                   const isSubSelected = filters.subcategory === sub.slug;
