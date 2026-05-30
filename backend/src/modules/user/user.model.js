@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
   },
   googleId: { type: String, default: "" },
   facebookId: { type: String, default: "" },
+  isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 
 userSchema.index({ createdAt: -1 });

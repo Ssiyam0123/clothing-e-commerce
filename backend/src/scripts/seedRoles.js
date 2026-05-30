@@ -19,7 +19,8 @@ const roles = [
       "products:view", "products:create", "products:update", "products:delete",
       "orders:view", "orders:update",
       "users:view", "users:update",
-      "categories:view", "categories:manage"
+      "categories:view", "categories:manage",
+      "ai-chat:view"
     ],
   },
   {

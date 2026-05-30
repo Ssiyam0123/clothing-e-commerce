@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useAdminUsers } from "@/app/admin/users/lib/useAdminUsers";
+import { useAuthStore } from "@/store/authStore";
 import { useFilters } from "@/app/admin/_hooks/useFilters";
 import DataTable from "@/app/admin/_components/DataTable";
 import TableSkeleton from "@/components/common/TableSkeleton";
@@ -14,7 +15,9 @@ import {
   Users as UsersIcon, 
   Trash2, 
   Edit3, 
-  Eye
+  Eye,
+  ShieldAlert,
+  ShieldCheck
 } from "lucide-react";
 
 // Shadcn UI Imports
@@ -38,19 +41,44 @@ function UsersContent() {
     initialSort: "-createdAt"
   });
 
+  const { user: currentUser } = useAuthStore();
+
   const { 
     users, 
     total, 
     pages: totalPages, 
     isLoading, 
     isFetching,
-    deleteUser 
+    deleteUser,
+    updateUser
   } = useAdminUsers(queryParams);
 
   const handleSearch = useCallback((val) => {
     setSearch(val);
     setPage(1);
   }, [setSearch, setPage]);
+
+  const handleToggleStatus = async (item) => {
+    if (item._id === currentUser?._id) {
+      return notify.error("Action Denied", "You cannot block your own account.");
+    }
+    if (item.role?.name === "superadmin") {
+      return notify.error("Action Denied", "Superadmin status cannot be modified.");
+    }
+    const action = item.isActive !== false ? "Block" : "Activate";
+    const isConfirmed = await notify.confirm(
+      `${action} User?`,
+      `Are you sure you want to ${action.toLowerCase()} this user's account?`
+    );
+    if (isConfirmed) {
+      try {
+        await updateUser.mutateAsync({ id: item._id, data: { isActive: item.isActive === false } });
+        notify.success(`User status updated to ${item.isActive === false ? "ACTIVE" : "BLOCKED"}`);
+      } catch (err) {
+        notify.error("Error", "Could not update user status.");
+      }
+    }
+  };
 
   const handleDelete = async (id, role) => {
     if (role?.name === "admin") {
@@ -101,19 +129,32 @@ function UsersContent() {
     {
       label: "Role",
       render: (item) => (
-        <Badge
-          variant="outline"
-          className={cn(
-            "px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-full",
-            item.role?.name === "superadmin" 
-              ? "bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.1)]"
-              : item.role?.name === "admin"
-                ? "bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.1)]"
-                : "bg-zinc-500/10 text-zinc-500 border-zinc-500/20"
-          )}
-        >
-          {item.role?.name || "Customer"}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge
+            variant="outline"
+            className={cn(
+              "px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-full",
+              item.role?.name === "superadmin" 
+                ? "bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.1)]"
+                : item.role?.name === "admin"
+                  ? "bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.1)]"
+                  : "bg-zinc-500/10 text-zinc-500 border-zinc-500/20"
+            )}
+          >
+            {item.role?.name || "Customer"}
+          </Badge>
+          <Badge
+            variant="outline"
+            className={cn(
+              "px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] rounded-full",
+              item.isActive !== false
+                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                : "bg-amber-500/10 text-amber-500 border-amber-500/20 animate-pulse"
+            )}
+          >
+            {item.isActive !== false ? "Active" : "Blocked"}
+          </Badge>
+        </div>
       ),
     },
     {
@@ -156,6 +197,20 @@ function UsersContent() {
             <Link href={`/admin/users/${item._id}/edit`}>
               <Edit3 size={16} />
             </Link>
+          </Button>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => handleToggleStatus(item)}
+            className={cn(
+              "h-10 w-10 rounded-xl transition-all active:scale-95 border",
+              item.isActive !== false 
+                ? "border-border/10 bg-background/50 text-foreground hover:border-amber-600/50 hover:bg-amber-600 hover:text-white" 
+                : "bg-amber-500/10 text-amber-500 border-amber-500/20 hover:border-emerald-600/50 hover:bg-emerald-600 hover:text-white"
+            )}
+            title={item.isActive !== false ? "Block User" : "Activate User"}
+          >
+            {item.isActive !== false ? <ShieldAlert size={16} /> : <ShieldCheck size={16} />}
           </Button>
           <Button 
             variant="outline" 

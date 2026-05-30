@@ -1713,6 +1713,54 @@ export const toolDeclarations = [
 
 
 
+const toolPermissions = {
+  searchProducts: "products:view",
+  updateProductStock: "products:update",
+  getRecentOrders: "orders:view",
+  createProduct: "products:create",
+  updateProductSeo: "products:update",
+  updateOrderStatus: "orders:update",
+  createCoupon: "coupons:create",
+  toggleFlashSale: "flash-sales:update",
+  searchCustomer: "users:view",
+  toggleUserStatus: "users:update",
+  createBlogDraft: "blogs:create",
+  createCategory: "categories:create",
+  createOrder: "orders:create",
+  updateOrder: "orders:update",
+  getOrderDetails: "orders:view",
+  listOrders: "orders:view",
+  syncOrderToPathao: "orders:update",
+  editProduct: "products:update",
+  updateProductSettings: "products:update",
+  editCategory: "categories:update",
+  createSubcategory: "categories:create",
+  editSubcategory: "categories:update",
+  createBannerCampaign: "banner-campaigns:create",
+  editBannerCampaign: "banner-campaigns:update",
+  createFlashSaleCampaign: "flash-sales:create",
+  editFlashSaleCampaign: "flash-sales:update",
+  editCoupon: "coupons:update",
+  editBlog: "blogs:update",
+  listCategories: "categories:view",
+  listSubcategories: "categories:view",
+  listCoupons: "coupons:view",
+  listBlogs: "blogs:view",
+  listUsers: "users:view",
+  listFlashSales: "flash-sales:view",
+  listBannerCampaigns: "banner-campaigns:view",
+  getDashboardSummary: "dashboard:view"
+};
+
+const hasToolPermission = (user, requiredPermission) => {
+  if (!user) return true;
+  if (!user.role) return false;
+  if (user.role.name === "superadmin" || user.role.permissions?.includes("all")) {
+    return true;
+  }
+  return user.role.permissions?.includes(requiredPermission) || false;
+};
+
 export const handleAdminAiChat = asyncHandler(async (req, res) => {
   const { messages } = req.body;
 
@@ -1871,9 +1919,15 @@ export const handleAdminAiChat = asyncHandler(async (req, res) => {
 
           let result;
           if (toolFn) {
-            toolExecutionLog.push({ name, args, status: "executing" });
-            result = await toolFn(args);
-            toolExecutionLog.push({ name, args, status: "completed", result });
+            const requiredPerm = toolPermissions[name];
+            if (requiredPerm && !hasToolPermission(req.user, requiredPerm)) {
+              result = { success: false, error: `Access denied. You do not have permission (${requiredPerm}) to execute this action.` };
+              toolExecutionLog.push({ name, args, status: "denied", result });
+            } else {
+              toolExecutionLog.push({ name, args, status: "executing" });
+              result = await toolFn(args, req.user);
+              toolExecutionLog.push({ name, args, status: "completed", result });
+            }
           } else {
             result = { error: `Tool ${name} not found` };
           }
@@ -1938,8 +1992,13 @@ export const handleAdminAiChatUndo = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: `Tool ${tool} not found.` });
   }
 
+  const requiredPerm = toolPermissions[tool];
+  if (requiredPerm && !hasToolPermission(req.user, requiredPerm)) {
+    return res.status(403).json({ success: false, message: `Access denied. You do not have permission (${requiredPerm}) to revert this action.` });
+  }
+
   try {
-    const result = await toolFn(args);
+    const result = await toolFn(args, req.user);
     return res.json({ success: true, result });
   } catch (err) {
     console.error("❌ Failed to undo action:", err.message);

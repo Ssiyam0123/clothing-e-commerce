@@ -57,7 +57,9 @@ export default function AdminLayout({ children }) {
 
   const isChatRoute = pathname?.startsWith("/admin/chat");
   const isAiChatRoute = pathname === "/admin/ai-chat";
-  const isFullPage = isChatRoute || isAiChatRoute;
+  const showSidebar = !isChatRoute;
+  const showHeader = !isChatRoute && !isAiChatRoute;
+  const isFullPageStyle = isChatRoute || isAiChatRoute;
 
 
   // 🛡️ Redirect non-admins
@@ -141,7 +143,7 @@ export default function AdminLayout({ children }) {
     return (
       <div className="flex min-h-[100dvh] lg:h-[100dvh] bg-background transition-colors duration-700">
         {/* Sidebar Skeleton */}
-        {!isFullPage && (
+        {showSidebar && (
           <div className={cn(
             "hidden lg:flex flex-col border-r border-border p-8 space-y-8 transition-all duration-500",
             isAdminSidebarCollapsed ? "w-24" : "w-72"
@@ -157,7 +159,7 @@ export default function AdminLayout({ children }) {
 
         <div className="flex-1 flex flex-col lg:overflow-hidden">
           {/* Header Skeleton */}
-          {!isFullPage && (
+          {showHeader && (
             <div className="h-20 border-b border-border px-10 flex items-center justify-between">
               <Skeleton className="h-8 w-48 rounded-full" />
               <div className="flex items-center gap-6">
@@ -172,8 +174,8 @@ export default function AdminLayout({ children }) {
           )}
 
           {/* Main Content Skeleton */}
-          <div className={cn("flex-1 space-y-10", !isFullPage ? "p-10" : "p-0")}>
-            {!isFullPage && (
+          <div className={cn("flex-1 space-y-10", !isFullPageStyle ? "p-10" : "p-0")}>
+            {!isFullPageStyle && (
               <>
                 <Skeleton className="h-16 w-1/2 rounded-2xl" />
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -184,7 +186,7 @@ export default function AdminLayout({ children }) {
                 <Skeleton className="h-[400px] w-full rounded-[3rem]" />
               </>
             )}
-            {isFullPage && <Skeleton className="h-full w-full rounded-none" />}
+            {isFullPageStyle && <Skeleton className="h-full w-full rounded-none" />}
           </div>
         </div>
       </div>
@@ -198,11 +200,11 @@ export default function AdminLayout({ children }) {
   return (
     <div className="flex min-h-[100dvh] lg:h-[100dvh] bg-background text-foreground transition-colors duration-700 lg:overflow-hidden">
       {/* 🖥️ Desktop Sidebar */}
-      {!isFullPage && <Sidebar className="hidden lg:flex shrink-0 border-r border-sidebar-border" />}
+      {showSidebar && <Sidebar className="hidden lg:flex shrink-0 border-r border-sidebar-border" />}
 
       <div className="flex-1 flex flex-col min-w-0 relative lg:h-full">
         {/* 🛰️ Top Header Bar */}
-        {!isFullPage && (
+        {showHeader && (
           <header className="bg-background/70 backdrop-blur-2xl border-b border-border z-40 shrink-0">
             <div className="flex justify-between items-center px-4 md:px-10 py-3 md:py-6">
               <div className="flex items-center gap-3 md:gap-5">
@@ -340,8 +342,8 @@ export default function AdminLayout({ children }) {
           </header>
         )}
 
-        <main className={cn("flex-1 lg:overflow-y-auto no-scrollbar bg-background/50 lg:overscroll-y-contain", !isFullPage ? "min-h-0" : "p-0 overflow-hidden")}>
-          <div className={cn("mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700", !isFullPage ? "max-w-none" : "max-w-none h-full")}>
+        <main className={cn("flex-1 lg:overflow-y-auto no-scrollbar bg-background/50 lg:overscroll-y-contain", !isFullPageStyle ? "min-h-0" : "p-0 overflow-hidden")}>
+          <div className={cn("mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700", !isFullPageStyle ? "max-w-none" : "max-w-none h-full")}>
             {children}
           </div>
         </main>

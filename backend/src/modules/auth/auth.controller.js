@@ -104,6 +104,10 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    if (user.isActive === false) {
+      return res.status(403).json({ message: "Your account has been deactivated/blocked by admin" });
+    }
+
     if (!user.isEmailVerified && process.env.SMTP_HOST) {
       return res.status(401).json({ message: "Please verify your email before logging in" });
     }
@@ -318,6 +322,9 @@ export const googleLogin = async (req, res) => {
     let user = await User.findOne({ email: email.toLowerCase() }).populate("role");
 
     if (user) {
+      if (user.isActive === false) {
+        return res.status(403).json({ message: "Your account has been deactivated/blocked by admin" });
+      }
       // Merge/update google information if missing
       user.googleId = googleId;
       user.provider = "google";
@@ -392,6 +399,9 @@ export const facebookLogin = async (req, res) => {
     const avatarUrl = picture?.data?.url || "";
 
     if (user) {
+      if (user.isActive === false) {
+        return res.status(403).json({ message: "Your account has been deactivated/blocked by admin" });
+      }
       // Merge/update facebook information
       user.facebookId = facebookId;
       user.provider = "facebook";

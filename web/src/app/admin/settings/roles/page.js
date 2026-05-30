@@ -35,7 +35,7 @@ import { cn } from "@/lib/utils";
 
 const RESOURCES = [
   "dashboard", "products", "categories", "orders", "users", "roles", 
-  "coupons", "blogs", "settings", "banner-campaigns", "flash-sales", "chat", "reports", "homeLayout"
+  "coupons", "blogs", "settings", "banner-campaigns", "flash-sales", "chat", "ai-chat", "reports", "homeLayout"
 ];
 
 const ACTIONS = ["view", "create", "update", "delete", "manage"];
@@ -53,6 +53,7 @@ const RESOURCE_LABELS = {
   "banner-campaigns": "Banners",
   "flash-sales": "Flash Sales",
   "chat": "Live Chat",
+  "ai-chat": "Manage with AI",
   "reports": "Reports",
   "homeLayout": "Layout Builder"
 };

@@ -28,7 +28,6 @@ const blogSchema = new mongoose.Schema({
   viewCount: { type: Number, default: 0 }
 }, { timestamps: true });
 
-blogSchema.index({ slug: 1 });
 blogSchema.index({ status: 1, createdAt: -1 });
 
 export default mongoose.models.Blog || mongoose.model("Blog", blogSchema);

@@ -29,9 +29,9 @@ const router = express.Router();
 // Base protection for admin entry points
 router.use(protect);
 
-router.post('/ai-chat', authorize(['dashboard:view']), handleAdminAiChat);
-router.post('/ai-chat/undo', authorize(['dashboard:view']), handleAdminAiChatUndo);
-router.post('/ai-chat/upload', authorize(['dashboard:view']), upload.single('image'), async (req, res) => {
+router.post('/ai-chat', authorize(['ai-chat:view']), handleAdminAiChat);
+router.post('/ai-chat/undo', authorize(['ai-chat:view']), handleAdminAiChatUndo);
+router.post('/ai-chat/upload', authorize(['ai-chat:view']), upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: 'No file provided' });
     const imageUrl = await uploadImage(req.file, 'ai');

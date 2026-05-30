@@ -20,7 +20,7 @@ const createClient = () => {
   const redisOptions = {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
-    enableOfflineQueue: true,
+    enableOfflineQueue: false,
     connectTimeout: 10000,
     keepAlive: 10000,
     retryStrategy: (times) => {

@@ -33,8 +33,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import { hasPermission } from "@/utils/rbacUtils";
 
 export default function AdminAiChatPage() {
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user && !hasPermission(user, ["ai-chat:view", "all"])) {
+      router.replace("/admin");
+    }
+  }, [user, router]);
+
   const [messages, setMessages] = useState([
     {
       role: "model",

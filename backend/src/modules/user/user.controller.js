@@ -157,6 +157,9 @@ export const updateUser = asyncHandler(async (req, res) => {
   user.role = req.body.role || user.role;
   user.phone = req.body.phone || user.phone;
   user.bio = req.body.bio || user.bio;
+  if (req.body.isActive !== undefined) {
+    user.isActive = req.body.isActive === "true" || req.body.isActive === true;
+  }
 
   if (req.body.addresses) {
     try {
@@ -185,6 +188,7 @@ export const updateUser = asyncHandler(async (req, res) => {
     bio: updatedUser.bio,
     avatar: updatedUser.avatar,
     addresses: updatedUser.addresses,
+    isActive: updatedUser.isActive,
   });
 });
 

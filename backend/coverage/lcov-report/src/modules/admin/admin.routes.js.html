@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">72% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>15/15</span>
+                <span class='fraction'>18/25</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/15</span>
+                <span class='fraction'>18/24</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -107,7 +107,28 @@
 <a name='L42'></a><a href='#L42'>42</a>
 <a name='L43'></a><a href='#L43'>43</a>
 <a name='L44'></a><a href='#L44'>44</a>
-<a name='L45'></a><a href='#L45'>45</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -132,7 +153,22 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -164,9 +200,12 @@ import {
   getDashboardCustomerGrowth,
   getDashboardRetention
 } from './admin.controller.js';
+import { handleAdminAiChat, handleAdminAiChatUndo } from './ai-chat.controller.js';
 import { protect } from '../../middleware/auth.js';
 import { authorize } from '../../middleware/rbac.js';
 import { cacheMiddleware } from '../../middleware/cacheMiddleware.js';
+import upload from '../../middleware/upload.js';
+import { uploadImage } from '../../services/imageUploadService.js';
 &nbsp;
 import adminProductRoutes from '../product/routes/admin.product.routes.js';
 import adminCategoryRoutes from '../category/routes/admin.category.routes.js';
@@ -175,8 +214,23 @@ import adminOrderRoutes from '../order/routes/admin.order.routes.js';
 &nbsp;
 const router = express.Router();
 &nbsp;
+&nbsp;
 // Base protection for admin entry points
 router.use(protect);
+&nbsp;
+router.post('/ai-chat', authorize(['ai-chat:view']), handleAdminAiChat);
+router.post('/ai-chat/undo', authorize(['ai-chat:view']), handleAdminAiChatUndo);
+router.post('/ai-chat/upload', authorize(['ai-chat:view']), upload.single('image'), <span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    if (!req.file) <span class="cstat-no" title="statement not covered" >return res.status(400).json({ success: false, message: 'No file provided' });</span></span>
+    const imageUrl = <span class="cstat-no" title="statement not covered" >await uploadImage(req.file, 'ai');</span>
+<span class="cstat-no" title="statement not covered" >    res.json({ success: true, url: imageUrl });</span>
+  } catch (error) {
+<span class="cstat-no" title="statement not covered" >    console.error("AI image upload error:", error);</span>
+<span class="cstat-no" title="statement not covered" >    res.status(500).json({ success: false, message: 'Image upload failed' });</span>
+  }
+});
+&nbsp;
 &nbsp;
 router.get('/dashboard', authorize(['dashboard:view', 'reports:view']), cacheMiddleware(300), getDashboardData);
 router.get('/dashboard/stats', authorize(['dashboard:view', 'reports:view']), cacheMiddleware(300), getDashboardStats);
@@ -202,7 +256,7 @@ export default router;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-21T08:42:20.918Z
+                at 2026-05-30T20:14:43.002Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -160,20 +160,6 @@ export default function UserEditPage() {
               </select>
             </div>
           </div>
-
-          <div className="flex items-center gap-4 bg-accent/5 p-8 rounded-[2.5rem] border border-border/5">
-            <input
-              type="checkbox"
-              {...register("isEmailVerified")}
-              className="w-8 h-8 rounded-xl bg-background border-border/20 text-blue-600 focus:ring-0 cursor-pointer"
-            />
-            <div className="space-y-1">
-               <p className="text-[10px] font-black uppercase tracking-widest text-foreground">
-                 Verified Operational Status
-               </p>
-               <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Manual override for account security validation</p>
-            </div>
-          </div>
         </div>
 
         <button

@@ -20,6 +20,9 @@ export const protect = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
+    if (user.isActive === false) {
+      return res.status(403).json({ message: "Your account has been deactivated/blocked by admin" });
+    }
     req.user = user;
     next();
   } catch (error) {
@@ -45,7 +48,7 @@ export const optionalAuth = async (req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const user = await User.findById(decoded.id).select("-password").populate("role");
-      if (user) req.user = user;
+      if (user && user.isActive !== false) req.user = user;
     } catch (error) {
     }
   }
