@@ -139,7 +139,7 @@ export default function AdminLayout({ children }) {
 
   if (authLoading || !isMounted) {
     return (
-      <div className="flex h-[100dvh] bg-background transition-colors duration-700">
+      <div className="flex min-h-[100dvh] lg:h-[100dvh] bg-background transition-colors duration-700">
         {/* Sidebar Skeleton */}
         {!isFullPage && (
           <div className={cn(
@@ -155,7 +155,7 @@ export default function AdminLayout({ children }) {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col lg:overflow-hidden">
           {/* Header Skeleton */}
           {!isFullPage && (
             <div className="h-20 border-b border-border px-10 flex items-center justify-between">
@@ -196,11 +196,11 @@ export default function AdminLayout({ children }) {
   if (!user || !hasAdminAccess) return null;
 
   return (
-    <div className="flex h-[100dvh] bg-background text-foreground transition-colors duration-700 overflow-hidden">
+    <div className="flex min-h-[100dvh] lg:h-[100dvh] bg-background text-foreground transition-colors duration-700 lg:overflow-hidden">
       {/* 🖥️ Desktop Sidebar */}
       {!isFullPage && <Sidebar className="hidden lg:flex shrink-0 border-r border-sidebar-border" />}
 
-      <div className="flex-1 flex flex-col min-w-0 relative h-full">
+      <div className="flex-1 flex flex-col min-w-0 relative lg:h-full">
         {/* 🛰️ Top Header Bar */}
         {!isFullPage && (
           <header className="bg-background/70 backdrop-blur-2xl border-b border-border z-40 shrink-0">
@@ -340,7 +340,7 @@ export default function AdminLayout({ children }) {
           </header>
         )}
 
-        <main className={cn("flex-1 overflow-y-auto no-scrollbar bg-background/50 overscroll-y-contain", !isFullPage ? "min-h-0" : "p-0 overflow-hidden")}>
+        <main className={cn("flex-1 lg:overflow-y-auto no-scrollbar bg-background/50 lg:overscroll-y-contain", !isFullPage ? "min-h-0" : "p-0 overflow-hidden")}>
           <div className={cn("mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700", !isFullPage ? "max-w-none" : "max-w-none h-full")}>
             {children}
           </div>
