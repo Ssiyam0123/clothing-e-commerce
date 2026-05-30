@@ -67,7 +67,15 @@ export default function AdminAiChatPage() {
     { cmd: "Dashboard Summary", desc: "View total revenue, orders, and stock warnings", prompt: "Give me the store business summary" },
     { cmd: "Recent Sales List", desc: "List recent orders with status", prompt: "Show me the last 5 recent orders" },
     { cmd: "Low Stock Alert", desc: "Check if any items are running low", prompt: "Check for any critical or low stock inventory alerts" },
-    { cmd: "Active Coupons List", desc: "Check current store promotions", prompt: "List active coupons in the store" },
+    { cmd: "Create Coupon", desc: "Generate a new active store coupon code", prompt: "Create a 15% discount coupon 'FLASH15' with 100 usage limits valid for 30 days" },
+    { cmd: "Active Coupons List", desc: "Check current store coupon promotions", prompt: "List active coupons in the store" },
+    { cmd: "List Orders", desc: "Retrieve list of all store orders", prompt: "List all orders" },
+    { cmd: "Search Products", desc: "Search clothing products in the catalog", prompt: "Search products for 'Shirt'" },
+    { cmd: "List Categories", desc: "Show all existing product categories", prompt: "List all existing product categories" },
+    { cmd: "List Subcategories", desc: "Show all subcategories in the system", prompt: "List all subcategories" },
+    { cmd: "Banner Campaigns", desc: "View sliding home banner campaigns", prompt: "List all banner campaigns" },
+    { cmd: "Flash Sales List", desc: "List all flash sale campaigns", prompt: "List all flash sales" },
+    { cmd: "List Blogs", desc: "Review fashion and marketing blog posts", prompt: "List all blog articles" }
   ];
 
   const scrollToBottom = () => {
@@ -309,6 +317,20 @@ export default function AdminAiChatPage() {
             updateProductSeo: { label: "SEO Metadata Live", icon: <Sparkles size={16} className="text-purple-500" />, color: "border-purple-500/20 bg-purple-500/5 text-purple-800 dark:text-purple-400" },
             createBlogDraft: { label: "Blog Drafted", icon: <BookOpen size={16} className="text-emerald-500" />, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-400" },
             createProduct: { label: "Product Created", icon: <CheckCircle2 size={16} className="text-emerald-500" />, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-400" },
+            createOrder: { label: "Order Created", icon: <ShoppingCart size={16} className="text-emerald-500" />, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-400" },
+            updateOrder: { label: "Order Updated", icon: <ShoppingCart size={16} className="text-emerald-500" />, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-400" },
+            syncOrderToPathao: { label: "Pathao Synced", icon: <RefreshCw size={16} className="text-emerald-500" />, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-400" },
+            editProduct: { label: "Product Edited", icon: <Package size={16} className="text-emerald-500" />, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-400" },
+            updateProductSettings: { label: "Settings Updated", icon: <Package size={16} className="text-emerald-500" />, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-400" },
+            editCategory: { label: "Category Updated", icon: <CheckCircle2 size={16} className="text-emerald-500" />, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-400" },
+            createSubcategory: { label: "Subcategory Created", icon: <CheckCircle2 size={16} className="text-emerald-500" />, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-400" },
+            editSubcategory: { label: "Subcategory Updated", icon: <CheckCircle2 size={16} className="text-emerald-500" />, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-400" },
+            createBannerCampaign: { label: "Banner Created", icon: <Sparkles size={16} className="text-purple-500" />, color: "border-purple-500/20 bg-purple-500/5 text-purple-800 dark:text-purple-400" },
+            editBannerCampaign: { label: "Banner Updated", icon: <Sparkles size={16} className="text-purple-500" />, color: "border-purple-500/20 bg-purple-500/5 text-purple-800 dark:text-purple-400" },
+            createFlashSaleCampaign: { label: "Flash Sale Created", icon: <Zap size={16} className="text-purple-500" />, color: "border-purple-500/20 bg-purple-500/5 text-purple-800 dark:text-purple-400" },
+            editFlashSaleCampaign: { label: "Flash Sale Updated", icon: <Zap size={16} className="text-purple-500" />, color: "border-purple-500/20 bg-purple-500/5 text-purple-800 dark:text-purple-400" },
+            editCoupon: { label: "Coupon Updated", icon: <Ticket size={16} className="text-emerald-500" />, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-400" },
+            editBlog: { label: "Blog Updated", icon: <BookOpen size={16} className="text-emerald-500" />, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-400" }
           };
 
           if (successWidgets[name]) {
@@ -786,7 +808,7 @@ export default function AdminAiChatPage() {
                 <p># database: clothing-ecommerce</p>
                 <p># schema: mongoose-prod-v9</p>
                 <p># model: gemini-2.5-flash</p>
-                <p># function tools registered: 15</p>
+                <p># function tools registered: 35</p>
                 <p className="text-emerald-600 dark:text-emerald-400"># ready for instructions</p>
               </div>
             </div>
@@ -810,7 +832,27 @@ export default function AdminAiChatPage() {
                 { name: "toggleUserStatus", desc: "Block or activate customer" },
                 { name: "createBlogDraft", desc: "Draft marketing blog post" },
                 { name: "createCategory", desc: "Create new product category" },
-                { name: "listCategories", desc: "List all existing product categories" }
+                { name: "listCategories", desc: "List all existing product categories" },
+                { name: "createOrder", desc: "Create a new customer order manually" },
+                { name: "updateOrder", desc: "Update shipping/payment/status details of an order" },
+                { name: "getOrderDetails", desc: "View detailed information of an order" },
+                { name: "listOrders", desc: "List all orders with status/search filtering" },
+                { name: "syncOrderToPathao", desc: "Dispatch consignment details directly to Pathao Courier" },
+                { name: "editProduct", desc: "Edit core settings/names/prices of catalog products" },
+                { name: "updateProductSettings", desc: "Change visibility flags on products" },
+                { name: "editCategory", desc: "Edit category titles/descriptions" },
+                { name: "listSubcategories", desc: "View all subcategories" },
+                { name: "createSubcategory", desc: "Create subcategory nested inside parent" },
+                { name: "editSubcategory", desc: "Edit subcategory values" },
+                { name: "listBannerCampaigns", desc: "View promotional banner lists" },
+                { name: "createBannerCampaign", desc: "Launch new home slideshow" },
+                { name: "editBannerCampaign", desc: "Configure slide links/images" },
+                { name: "listFlashSales", desc: "View existing active flash sales" },
+                { name: "createFlashSaleCampaign", desc: "Launch timed flash sale promotion" },
+                { name: "editFlashSaleCampaign", desc: "Adjust duration/discount percentages of a sale" },
+                { name: "editCoupon", desc: "Update properties/expiry details of coupon codes" },
+                { name: "listBlogs", desc: "View editorial articles draft/live list" },
+                { name: "editBlog", desc: "Modify title, slug, html or cover image of articles" }
               ].map((tool, idx) => (
                 <div key={idx} className="p-2.5 border border-border bg-background/50 rounded-lg hover:border-primary/20 transition-all flex flex-col gap-0.5">
                   <span className="text-[11px] font-mono font-bold text-primary">{tool.name}()</span>

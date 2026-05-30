@@ -10,11 +10,20 @@ import Product from "../product/product.model.js";
 import Order from "../order/order.model.js";
 import Size from "../size/size.model.js";
 import Category from "../category/category.model.js";
+import Subcategory from "../subcategory/subcategory.model.js";
 import Coupon from "../coupon/coupon.model.js";
 import User from "../user/user.model.js";
 import FlashSale from "../flashSale/flashSale.model.js";
 import Blog from "../blog/blog.model.js";
+import BannerCampaign from "../bannerCampaign/bannerCampaign.model.js";
 import { decrypt } from "../../utils/encryption.js";
+import pathaoService from "../../services/pathao.service.js";
+import { clearCache } from "../../middleware/cacheMiddleware.js";
+import {
+  calculateValidatedOrder,
+  normalizeShippingAddress,
+  finalizeOrderProcessing
+} from "../order/order.utils.js";
 
 
 // Helper function to resolve API key
@@ -33,7 +42,7 @@ const getApiKey = async () => {
 };
 
 // Define tool functions
-const localTools = {
+export const localTools = {
   searchProducts: async ({ query }) => {
     try {
       let products = await Product.find({ $text: { $search: query } })
@@ -437,11 +446,467 @@ const localTools = {
     } catch (error) {
       return { success: false, error: error.message };
     }
+  },
+
+  createOrder: async ({ customerEmail, orderItems, shippingAddress, couponCode, paymentMethod = "COD", orderStatus = "Processing", paymentStatus = "Pending" }) => {
+    try {
+      let customerId;
+      if (customerEmail) {
+        const userObj = await User.findOne({ email: customerEmail });
+        if (userObj) customerId = userObj._id;
+      }
+      
+      const resolvedItems = [];
+      for (const item of orderItems) {
+        let prod = null;
+        if (item.productId) {
+          prod = await Product.findById(item.productId);
+        }
+        if (!prod && item.productName) {
+          prod = await Product.findOne({ name: { $regex: `^${item.productName}$`, $options: "i" } });
+        }
+        if (!prod) {
+          return { success: false, error: `Product "${item.productName || item.productId}" not found.` };
+        }
+        
+        let matchedSize = null;
+        if (item.sizeId) {
+          matchedSize = prod.sizes.find(s => String(s.size) === String(item.sizeId));
+        }
+        if (!matchedSize && item.sizeName) {
+          const sizeDoc = await Size.findOne({ name: { $regex: `^${item.sizeName}$`, $options: "i" } });
+          if (sizeDoc) {
+            matchedSize = prod.sizes.find(s => String(s.size) === String(sizeDoc._id));
+          }
+        }
+        if (!matchedSize) {
+          return { success: false, error: `Size "${item.sizeName || item.sizeId}" not available for product "${prod.name}"` };
+        }
+        
+        resolvedItems.push({
+          product: prod._id,
+          name: prod.name,
+          size: matchedSize.size,
+          price: prod.price,
+          quantity: parseInt(item.quantity)
+        });
+      }
+
+      const orderData = await calculateValidatedOrder(
+        resolvedItems,
+        couponCode,
+        shippingAddress.pathao_city_id
+      );
+
+      const order = new Order({
+        user: customerId || undefined,
+        isGuest: !customerId,
+        orderItems: orderData.validatedItems,
+        shippingAddress: normalizeShippingAddress(shippingAddress),
+        itemsPrice: orderData.itemsPrice,
+        discountAmount: orderData.discountAmount,
+        shippingPrice: orderData.shippingPrice,
+        totalPrice: orderData.totalPrice,
+        couponCode: orderData.couponCode,
+        paymentMethod,
+        orderStatus,
+        paymentResult: {
+          transactionId: `ADMIN-AI-${new mongoose.Types.ObjectId().toString()}`,
+          status: paymentStatus,
+        },
+      });
+
+      const createdOrder = await order.save();
+      await finalizeOrderProcessing(createdOrder);
+      clearCache('cache:/api/admin/dashboard*');
+      return {
+        success: true,
+        message: `Successfully created order #${createdOrder._id} for ${shippingAddress.name}!`,
+        orderId: createdOrder._id,
+        totalPrice: createdOrder.totalPrice
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  updateOrder: async ({ orderId, orderStatus, shippingAddress, paymentMethod, paymentStatus }) => {
+    try {
+      const order = await Order.findById(orderId);
+      if (!order) return { success: false, error: "Order not found." };
+      if (shippingAddress) {
+        order.shippingAddress = { ...order.shippingAddress, ...shippingAddress };
+      }
+      if (orderStatus) order.orderStatus = orderStatus;
+      if (paymentMethod) order.paymentMethod = paymentMethod;
+      if (paymentStatus) {
+        order.paymentResult = { ...order.paymentResult, status: paymentStatus };
+      }
+      await order.save();
+      clearCache('cache:/api/admin/dashboard*');
+      return {
+        success: true,
+        message: `Successfully updated order #${orderId}`,
+        order
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  getOrderDetails: async ({ orderId }) => {
+    try {
+      const order = await Order.findById(orderId)
+        .populate("user", "name email")
+        .populate("orderItems.product", "name price");
+      if (!order) return { success: false, error: "Order not found." };
+      return { success: true, order };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  listOrders: async ({ status, search, limit = 10, page = 1 }) => {
+    try {
+      const filter = {};
+      if (status && status !== "all") filter.orderStatus = status;
+      if (search && search.trim()) {
+        const safeSearch = search.trim();
+        if (mongoose.Types.ObjectId.isValid(safeSearch)) {
+          filter._id = safeSearch;
+        } else {
+          filter.$or = [
+            { "shippingAddress.phone": { $regex: safeSearch, $options: "i" } },
+            { "shippingAddress.name": { $regex: safeSearch, $options: "i" } },
+          ];
+        }
+      }
+      const skip = (Math.max(1, page) - 1) * limit;
+      const orders = await Order.find(filter)
+        .sort("-createdAt")
+        .skip(skip)
+        .limit(limit)
+        .lean();
+      const total = await Order.countDocuments(filter);
+      return { success: true, count: orders.length, total, orders };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  syncOrderToPathao: async ({ orderId }) => {
+    try {
+      const order = await Order.findById(orderId);
+      if (!order) return { success: false, error: "Order not found." };
+      
+      const pKeys = {
+        clientId: process.env.PATHAO_CLIENT_ID,
+        clientSecret: process.env.PATHAO_CLIENT_SECRET,
+        username: process.env.PATHAO_USERNAME,
+        password: process.env.PATHAO_PASSWORD,
+        storeId: process.env.PATHAO_STORE_ID,
+        isActive: !!process.env.PATHAO_CLIENT_ID
+      };
+      if (!pKeys?.isActive) return { success: false, error: "Pathao service is currently inactive in settings." };
+
+      let cityId = order.shippingAddress.pathao_city_id;
+      let zoneId = order.shippingAddress.pathao_zone_id;
+      let areaId = order.shippingAddress.pathao_area_id;
+
+      if (!cityId || !zoneId || !areaId) {
+        const addressToSearch = `${order.shippingAddress.street}, ${order.shippingAddress.city}`;
+        const resolved = await pathaoService.autoResolveAddress(addressToSearch, pKeys);
+        if (resolved) {
+          cityId = resolved.city_id;
+          zoneId = resolved.zone_id;
+          areaId = resolved.area_id;
+          order.shippingAddress.pathao_city_id = String(cityId);
+          order.shippingAddress.pathao_zone_id = String(zoneId);
+          order.shippingAddress.pathao_area_id = String(areaId);
+          await order.save();
+        } else {
+          return { success: false, error: "Pathao couldn't auto-resolve address. Set City/Zone/Area manually." };
+        }
+      }
+
+      const payload = {
+        store_id: parseInt(pKeys.storeId),
+        merchant_order_id: order._id.toString(),
+        recipient_name: order.shippingAddress.name,
+        recipient_phone: order.shippingAddress.phone,
+        recipient_address: order.shippingAddress.street,
+        recipient_city: parseInt(cityId),
+        recipient_zone: parseInt(zoneId),
+        recipient_area: parseInt(areaId),
+        delivery_type: 48,
+        item_type: 2,
+        item_weight: "0.5",
+        amount_to_collect: order.paymentResult.status === "Completed" ? 0 : Math.round(order.totalPrice),
+        item_quantity: order.orderItems.length,
+        item_description: order.orderItems.map((i) => i.name).join(", "),
+      };
+
+      const pRes = await pathaoService.createOrder(payload, pKeys);
+      order.pathaoConsignmentId = pRes.consignment_id;
+      order.pathaoStatus = "Synced";
+      await order.save();
+
+      return {
+        success: true,
+        message: "Pathao Synchronized successfully.",
+        consignmentId: pRes.consignment_id,
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  editProduct: async ({ productId, name, price, description, categoryName, subcategoryName, brand, color, material, gender, imageUrl }) => {
+    try {
+      const product = await Product.findById(productId);
+      if (!product) return { success: false, error: "Product not found" };
+
+      if (name) {
+        product.name = name;
+        product.slug = name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+      }
+      if (price) product.price = parseFloat(price);
+      if (description !== undefined) product.description = description;
+      if (brand) product.brand = brand;
+      if (color) product.color = color;
+      if (material) product.material = material;
+      if (gender) product.gender = gender;
+      if (imageUrl) product.images = [imageUrl];
+
+      if (categoryName) {
+        const categoryObj = await Category.findOne({ name: { $regex: `^${categoryName}$`, $options: "i" } });
+        if (categoryObj) product.category = categoryObj._id;
+      }
+
+      if (subcategoryName) {
+        const subcatObj = await Subcategory.findOne({ name: { $regex: `^${subcategoryName}$`, $options: "i" } });
+        if (subcatObj) product.subcategory = subcatObj._id;
+      }
+
+      await product.save();
+      return { success: true, message: `Successfully updated product "${product.name}"!`, product };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  updateProductSettings: async ({ productId, isFeatured, isActive, showReviews }) => {
+    try {
+      const product = await Product.findById(productId);
+      if (!product) return { success: false, error: "Product not found" };
+      if (isFeatured !== undefined) product.isFeatured = isFeatured;
+      if (isActive !== undefined) product.isActive = isActive;
+      if (showReviews !== undefined) product.showReviews = showReviews;
+      await product.save();
+      return { success: true, message: `Successfully updated product settings for "${product.name}"` };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  editCategory: async ({ categoryId, name, description, imageUrl }) => {
+    try {
+      const category = await Category.findById(categoryId);
+      if (!category) return { success: false, error: "Category not found" };
+      if (name) {
+        category.name = name;
+        category.slug = name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+      }
+      if (description !== undefined) category.description = description;
+      if (imageUrl) category.image = imageUrl;
+      await category.save();
+      return { success: true, message: `Successfully updated category "${category.name}"` };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  listSubcategories: async () => {
+    try {
+      const subcategories = await Subcategory.find({}).populate("category", "name").lean();
+      return { success: true, count: subcategories.length, subcategories };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  createSubcategory: async ({ name, categoryName, description, imageUrl }) => {
+    try {
+      const categoryObj = await Category.findOne({ name: { $regex: `^${categoryName}$`, $options: "i" } });
+      if (!categoryObj) return { success: false, error: `Category "${categoryName}" not found.` };
+      const existing = await Subcategory.findOne({ name: { $regex: `^${name}$`, $options: "i" }, category: categoryObj._id });
+      if (existing) return { success: false, error: `Subcategory "${name}" already exists in "${categoryName}".` };
+      const slug = name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+      const subcat = await Subcategory.create({
+        name,
+        slug,
+        category: categoryObj._id,
+        description: description || "",
+        image: imageUrl || ""
+      });
+      return { success: true, message: `Successfully created subcategory "${subcat.name}" under category "${categoryObj.name}"!`, subcategoryId: subcat._id };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  editSubcategory: async ({ subcategoryId, name, categoryName, description, imageUrl }) => {
+    try {
+      const subcat = await Subcategory.findById(subcategoryId);
+      if (!subcat) return { success: false, error: "Subcategory not found." };
+      if (name) {
+        subcat.name = name;
+        subcat.slug = name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+      }
+      if (categoryName) {
+        const categoryObj = await Category.findOne({ name: { $regex: `^${categoryName}$`, $options: "i" } });
+        if (categoryObj) subcat.category = categoryObj._id;
+      }
+      if (description !== undefined) subcat.description = description;
+      if (imageUrl) subcat.image = imageUrl;
+      await subcat.save();
+      return { success: true, message: `Successfully updated subcategory "${subcat.name}"` };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  listBannerCampaigns: async () => {
+    try {
+      const campaigns = await BannerCampaign.find({}).lean();
+      return { success: true, count: campaigns.length, campaigns };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  createBannerCampaign: async ({ name, description, slides, isActive = false }) => {
+    try {
+      const campaign = await BannerCampaign.create({ name, description, slides, isActive });
+      return { success: true, message: `Successfully created banner campaign "${campaign.name}"!`, campaignId: campaign._id };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  editBannerCampaign: async ({ campaignId, name, description, slides, isActive }) => {
+    try {
+      const campaign = await BannerCampaign.findById(campaignId);
+      if (!campaign) return { success: false, error: "Campaign not found" };
+      if (name) campaign.name = name;
+      if (description !== undefined) campaign.description = description;
+      if (slides) campaign.slides = slides;
+      if (isActive !== undefined) campaign.isActive = isActive;
+      await campaign.save();
+      return { success: true, message: `Successfully updated campaign "${campaign.name}"` };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  listFlashSales: async () => {
+    try {
+      const sales = await FlashSale.find({}).populate("products", "name").lean();
+      return { success: true, count: sales.length, sales };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  createFlashSaleCampaign: async ({ name, description, discount, productIds, startDate, endDate, isActive = true, bannerImage, startImmediately = false }) => {
+    try {
+      const campaign = await FlashSale.create({ name, description, discount, products: productIds, startDate, endDate, isActive, bannerImage, startImmediately });
+      return { success: true, message: `Successfully created flash sale campaign "${campaign.name}"!`, campaignId: campaign._id };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  editFlashSaleCampaign: async ({ campaignId, name, description, discount, productIds, startDate, endDate, isActive, bannerImage }) => {
+    try {
+      const campaign = await FlashSale.findById(campaignId);
+      if (!campaign) return { success: false, error: "Flash sale campaign not found" };
+      if (name) campaign.name = name;
+      if (description !== undefined) campaign.description = description;
+      if (discount) campaign.discount = discount;
+      if (productIds) campaign.products = productIds;
+      if (startDate) campaign.startDate = startDate;
+      if (endDate) campaign.endDate = endDate;
+      if (isActive !== undefined) campaign.isActive = isActive;
+      if (bannerImage) campaign.bannerImage = bannerImage;
+      await campaign.save();
+      return { success: true, message: `Successfully updated flash sale "${campaign.name}"` };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  editCoupon: async ({ couponId, code, discountType, discountValue, usageLimit, daysValid, isActive }) => {
+    try {
+      const coupon = await Coupon.findById(couponId);
+      if (!coupon) {
+        const cCode = code ? code.toUpperCase() : "";
+        const couponByCode = await Coupon.findOne({ code: cCode });
+        if (!couponByCode) return { success: false, error: "Coupon not found" };
+        return await editCouponDoc(couponByCode);
+      }
+      return await editCouponDoc(coupon);
+
+      async function editCouponDoc(doc) {
+        if (code) doc.code = code.toUpperCase();
+        if (discountType) doc.discountType = discountType;
+        if (discountValue) doc.discountValue = parseFloat(discountValue);
+        if (usageLimit !== undefined) doc.usageLimit = parseInt(usageLimit);
+        if (daysValid) {
+          const expiry = new Date();
+          expiry.setDate(expiry.getDate() + parseInt(daysValid));
+          doc.endDate = expiry;
+        }
+        if (isActive !== undefined) doc.isActive = isActive;
+        await doc.save();
+        return { success: true, message: `Successfully updated coupon "${doc.code}"` };
+      }
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  listBlogs: async () => {
+    try {
+      const blogs = await Blog.find({}).populate("author", "name").lean();
+      return { success: true, count: blogs.length, blogs };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  editBlog: async ({ blogId, title, content, category, imageUrl, status }) => {
+    try {
+      const blog = await Blog.findById(blogId);
+      if (!blog) return { success: false, error: "Blog not found" };
+      if (title) {
+        blog.title = title;
+        blog.slug = title.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+      }
+      if (content) blog.content = content;
+      if (category) blog.category = category.toUpperCase();
+      if (imageUrl) blog.featuredImage = imageUrl;
+      if (status) blog.status = status.toUpperCase();
+      await blog.save();
+      return { success: true, message: `Successfully updated blog post "${blog.title}"` };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
   }
 };
 
 // Define Gemini tool declarations (Function Declarations)
-const toolDeclarations = [
+export const toolDeclarations = [
   {
     name: "searchProducts",
     description: "Search for clothing products in the catalog by a text query or product name",
@@ -647,6 +1112,345 @@ const toolDeclarations = [
     parameters: {
       type: "OBJECT",
       properties: {}
+    }
+  },
+  {
+    name: "createOrder",
+    description: "Create a new customer order with details such as customer email, items, sizes, quantities, and shipping address.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        customerEmail: { type: "STRING", description: "Optional customer email" },
+        couponCode: { type: "STRING", description: "Optional promo coupon code applied to order" },
+        paymentMethod: { type: "STRING", description: "Payment method, e.g. 'COD' (default) or 'Card'" },
+        orderStatus: { type: "STRING", description: "Initial status, defaults to 'Processing'" },
+        paymentStatus: { type: "STRING", description: "Payment status, defaults to 'Pending'" },
+        orderItems: {
+          type: "ARRAY",
+          description: "List of order items with quantities and sizes",
+          items: {
+            type: "OBJECT",
+            properties: {
+              productId: { type: "STRING", description: "MongoDB object ID of the product" },
+              productName: { type: "STRING", description: "Exact name of the product if productId is not specified" },
+              sizeId: { type: "STRING", description: "Size MongoDB ID" },
+              sizeName: { type: "STRING", description: "Size name (e.g. 'S', 'M', 'L')" },
+              quantity: { type: "INTEGER", description: "Quantity of items" }
+            },
+            required: ["quantity"]
+          }
+        },
+        shippingAddress: {
+          type: "OBJECT",
+          description: "Customer shipping details",
+          properties: {
+            name: { type: "STRING", description: "Recipient name" },
+            phone: { type: "STRING", description: "Contact number" },
+            street: { type: "STRING", description: "Street address" },
+            city: { type: "STRING", description: "City name" },
+            pathao_city_id: { type: "STRING", description: "Pathao delivery City ID (optional)" },
+            pathao_zone_id: { type: "STRING", description: "Pathao delivery Zone ID (optional)" },
+            pathao_area_id: { type: "STRING", description: "Pathao delivery Area ID (optional)" }
+          },
+          required: ["name", "phone", "street", "city"]
+        }
+      },
+      required: ["orderItems", "shippingAddress"]
+    }
+  },
+  {
+    name: "updateOrder",
+    description: "Update details of an existing order like status, address, or payment state.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        orderId: { type: "STRING", description: "MongoDB order ID" },
+        orderStatus: { type: "STRING", description: "New order status ('Processing', 'Shipped', 'Delivered', 'Cancelled')" },
+        paymentMethod: { type: "STRING", description: "Updated payment method" },
+        paymentStatus: { type: "STRING", description: "Updated payment status" },
+        shippingAddress: {
+          type: "OBJECT",
+          properties: {
+            name: { type: "STRING" },
+            phone: { type: "STRING" },
+            street: { type: "STRING" },
+            city: { type: "STRING" },
+            pathao_city_id: { type: "STRING" },
+            pathao_zone_id: { type: "STRING" },
+            pathao_area_id: { type: "STRING" }
+          }
+        }
+      },
+      required: ["orderId"]
+    }
+  },
+  {
+    name: "getOrderDetails",
+    description: "Retrieve comprehensive details of a specific order by ID",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        orderId: { type: "STRING", description: "MongoDB order ID" }
+      },
+      required: ["orderId"]
+    }
+  },
+  {
+    name: "listOrders",
+    description: "Retrieve a paginated list of orders optionally filtered by status or phone/name search.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        status: { type: "STRING", description: "Filter by status or 'all'" },
+        search: { type: "STRING", description: "Search by phone number, name or order ID" },
+        limit: { type: "INTEGER", description: "Number of orders per page" },
+        page: { type: "INTEGER", description: "Page number" }
+      }
+    }
+  },
+  {
+    name: "syncOrderToPathao",
+    description: "Send order info to the Pathao Courier API and save consignment ID",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        orderId: { type: "STRING", description: "MongoDB order ID" }
+      },
+      required: ["orderId"]
+    }
+  },
+  {
+    name: "editProduct",
+    description: "Modify general properties of an existing product in the catalog.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        productId: { type: "STRING", description: "MongoDB ID of product" },
+        name: { type: "STRING", description: "Updated product name" },
+        price: { type: "NUMBER", description: "Updated price" },
+        description: { type: "STRING", description: "Updated description" },
+        categoryName: { type: "STRING", description: "Updated category name" },
+        subcategoryName: { type: "STRING", description: "Updated subcategory name" },
+        brand: { type: "STRING" },
+        color: { type: "STRING" },
+        material: { type: "STRING" },
+        gender: { type: "STRING" },
+        imageUrl: { type: "STRING", description: "New image URL to overwrite images array" }
+      },
+      required: ["productId"]
+    }
+  },
+  {
+    name: "updateProductSettings",
+    description: "Change status flags on a product such as featured, active status, or reviews visibility.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        productId: { type: "STRING", description: "MongoDB product ID" },
+        isFeatured: { type: "BOOLEAN" },
+        isActive: { type: "BOOLEAN" },
+        showReviews: { type: "BOOLEAN" }
+      },
+      required: ["productId"]
+    }
+  },
+  {
+    name: "editCategory",
+    description: "Modify fields of an existing category like name, description, or image.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        categoryId: { type: "STRING", description: "Category MongoDB ID" },
+        name: { type: "STRING", description: "Updated name" },
+        description: { type: "STRING", description: "Updated description" },
+        imageUrl: { type: "STRING", description: "Updated image URL" }
+      },
+      required: ["categoryId"]
+    }
+  },
+  {
+    name: "listSubcategories",
+    description: "List all existing product subcategories along with their parent categories.",
+    parameters: {
+      type: "OBJECT",
+      properties: {}
+    }
+  },
+  {
+    name: "createSubcategory",
+    description: "Create a new subcategory inside a parent category.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        name: { type: "STRING", description: "Subcategory name" },
+        categoryName: { type: "STRING", description: "Parent category name" },
+        description: { type: "STRING" },
+        imageUrl: { type: "STRING" }
+      },
+      required: ["name", "categoryName"]
+    }
+  },
+  {
+    name: "editSubcategory",
+    description: "Modify an existing subcategory's properties.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        subcategoryId: { type: "STRING", description: "Subcategory ID" },
+        name: { type: "STRING" },
+        categoryName: { type: "STRING", description: "Parent category name" },
+        description: { type: "STRING" },
+        imageUrl: { type: "STRING" }
+      },
+      required: ["subcategoryId"]
+    }
+  },
+  {
+    name: "listBannerCampaigns",
+    description: "List all sliding home banner campaigns in the store.",
+    parameters: {
+      type: "OBJECT",
+      properties: {}
+    }
+  },
+  {
+    name: "createBannerCampaign",
+    description: "Create a new sliding banner campaign with slides.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        name: { type: "STRING", description: "Campaign name" },
+        description: { type: "STRING" },
+        isActive: { type: "BOOLEAN" },
+        slides: {
+          type: "ARRAY",
+          description: "List of banner slides",
+          items: {
+            type: "OBJECT",
+            properties: {
+              image: { type: "STRING", description: "Image URL for slide" },
+              link: { type: "STRING", description: "Redirect link" },
+              title: { type: "STRING" },
+              subtitle: { type: "STRING" }
+            },
+            required: ["image", "link"]
+          }
+        }
+      },
+      required: ["name"]
+    }
+  },
+  {
+    name: "editBannerCampaign",
+    description: "Update an existing banner campaign's slides or activation status.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        campaignId: { type: "STRING", description: "Banner campaign ID" },
+        name: { type: "STRING" },
+        description: { type: "STRING" },
+        isActive: { type: "BOOLEAN" },
+        slides: {
+          type: "ARRAY",
+          items: {
+            type: "OBJECT",
+            properties: {
+              image: { type: "STRING" },
+              link: { type: "STRING" },
+              title: { type: "STRING" },
+              subtitle: { type: "STRING" }
+            },
+            required: ["image", "link"]
+          }
+        }
+      },
+      required: ["campaignId"]
+    }
+  },
+  {
+    name: "listFlashSales",
+    description: "List all flash sale campaigns in the store database.",
+    parameters: {
+      type: "OBJECT",
+      properties: {}
+    }
+  },
+  {
+    name: "createFlashSaleCampaign",
+    description: "Create a new flash sale campaign.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        name: { type: "STRING" },
+        description: { type: "STRING" },
+        discount: { type: "NUMBER", description: "Discount percentage (e.g. 20 for 20%)" },
+        productIds: { type: "ARRAY", items: { type: "STRING" }, description: "IDs of products in flash sale" },
+        startDate: { type: "STRING", description: "Start Date ISO string" },
+        endDate: { type: "STRING", description: "End Date ISO string" },
+        isActive: { type: "BOOLEAN" },
+        bannerImage: { type: "STRING" },
+        startImmediately: { type: "BOOLEAN" }
+      },
+      required: ["name", "discount", "productIds", "startDate", "endDate"]
+    }
+  },
+  {
+    name: "editFlashSaleCampaign",
+    description: "Edit properties of an existing flash sale campaign.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        campaignId: { type: "STRING" },
+        name: { type: "STRING" },
+        description: { type: "STRING" },
+        discount: { type: "NUMBER" },
+        productIds: { type: "ARRAY", items: { type: "STRING" } },
+        startDate: { type: "STRING" },
+        endDate: { type: "STRING" },
+        isActive: { type: "BOOLEAN" },
+        bannerImage: { type: "STRING" }
+      },
+      required: ["campaignId"]
+    }
+  },
+  {
+    name: "editCoupon",
+    description: "Update fields of a coupon by ID or by matching its code.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        couponId: { type: "STRING", description: "Optional coupon ID" },
+        code: { type: "STRING", description: "Coupon code (e.g. FLASH15)" },
+        discountType: { type: "STRING", description: "'percentage' or 'fixed'" },
+        discountValue: { type: "NUMBER" },
+        usageLimit: { type: "INTEGER" },
+        daysValid: { type: "INTEGER" },
+        isActive: { type: "BOOLEAN" }
+      }
+    }
+  },
+  {
+    name: "listBlogs",
+    description: "List all blog articles available in the store database.",
+    parameters: {
+      type: "OBJECT",
+      properties: {}
+    }
+  },
+  {
+    name: "editBlog",
+    description: "Update an existing blog article's content, title, category, image, or status.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        blogId: { type: "STRING" },
+        title: { type: "STRING" },
+        content: { type: "STRING" },
+        category: { type: "STRING" },
+        imageUrl: { type: "STRING" },
+        status: { type: "STRING", description: "'DRAFT' or 'PUBLISHED'" }
+      },
+      required: ["blogId"]
     }
   }
 ];
