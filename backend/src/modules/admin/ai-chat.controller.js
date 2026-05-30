@@ -1478,7 +1478,8 @@ export const handleAdminAiChat = asyncHandler(async (req, res) => {
   // Format incoming messages into Gemini contents structure with vision support
   const contents = [];
   for (const msg of messages) {
-    const parts = [{ text: msg.content }];
+    const textContent = msg.content + (msg.image ? `\n\n[Uploaded Image URL: ${msg.image}]` : "");
+    const parts = [{ text: textContent }];
     if (msg.image) {
       try {
         let buffer;
