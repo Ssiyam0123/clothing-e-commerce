@@ -16,16 +16,35 @@ const createClient = () => {
     return null;
   }
 
-  const client = new Redis(process.env.REDIS_URL, {
+  const isTls = process.env.REDIS_URL.startsWith('rediss://');
+  const redisOptions = {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
-    enableOfflineQueue: false,
-    connectTimeout: 5000,
+    enableOfflineQueue: true,
+    connectTimeout: 10000,
+    keepAlive: 10000,
+    retryStrategy: (times) => {
+      return Math.min(times * 200, 3000);
+    },
     reconnectOnError: (err) => {
       const targetError = "READONLY";
-      return err.message.includes(targetError);
+      if (err.message.includes(targetError)) {
+        return true;
+      }
+      if (err.message.includes("ECONNRESET") || err.message.includes("closed")) {
+        return true;
+      }
+      return false;
     },
-  });
+  };
+
+  if (isTls) {
+    redisOptions.tls = {
+      rejectUnauthorized: false
+    };
+  }
+
+  const client = new Redis(process.env.REDIS_URL, redisOptions);
 
   client.on('connect', () => {
     if (!hasLoggedConnection) {
