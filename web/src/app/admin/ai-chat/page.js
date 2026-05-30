@@ -786,7 +786,7 @@ export default function AdminAiChatPage() {
                 <p># database: clothing-ecommerce</p>
                 <p># schema: mongoose-prod-v9</p>
                 <p># model: gemini-2.5-flash</p>
-                <p># function tools registered: 14</p>
+                <p># function tools registered: 15</p>
                 <p className="text-emerald-600 dark:text-emerald-400"># ready for instructions</p>
               </div>
             </div>
@@ -809,7 +809,8 @@ export default function AdminAiChatPage() {
                 { name: "searchCustomer", desc: "Search customer profiles" },
                 { name: "toggleUserStatus", desc: "Block or activate customer" },
                 { name: "createBlogDraft", desc: "Draft marketing blog post" },
-                { name: "createCategory", desc: "Create new product category" }
+                { name: "createCategory", desc: "Create new product category" },
+                { name: "listCategories", desc: "List all existing product categories" }
               ].map((tool, idx) => (
                 <div key={idx} className="p-2.5 border border-border bg-background/50 rounded-lg hover:border-primary/20 transition-all flex flex-col gap-0.5">
                   <span className="text-[11px] font-mono font-bold text-primary">{tool.name}()</span>

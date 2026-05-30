@@ -419,6 +419,24 @@ const localTools = {
     } catch (error) {
       return { success: false, error: error.message };
     }
+  },
+
+  listCategories: async () => {
+    try {
+      const categories = await Category.find({}).lean();
+      return {
+        success: true,
+        count: categories.length,
+        categories: categories.map(c => ({
+          id: c._id,
+          name: c.name,
+          slug: c.slug,
+          description: c.description
+        }))
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
   }
 };
 
@@ -622,6 +640,14 @@ const toolDeclarations = [
       type: "OBJECT",
       properties: {}
     }
+  },
+  {
+    name: "listCategories",
+    description: "List all existing product categories in the store database catalog",
+    parameters: {
+      type: "OBJECT",
+      properties: {}
+    }
   }
 ];
 
@@ -750,7 +776,12 @@ export const handleAdminAiChat = asyncHandler(async (req, res) => {
       
       const payload = {
         contents,
-        tools: [{ functionDeclarations: toolDeclarations }]
+        tools: [{ functionDeclarations: toolDeclarations }],
+        systemInstruction: {
+          parts: [{
+            text: "You are Command AI, a helpful administrator assistant. You have tools to query and manage the e-commerce database. ALWAYS query listCategories() to find out what categories exist in the store before telling the user a category does not exist, or when you are creating a product and need to match a categoryName. Do not assume categories."
+          }]
+        }
       };
 
       const response = await callGeminiWithRetry(payload);
