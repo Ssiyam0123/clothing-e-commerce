@@ -86,6 +86,8 @@ export const localTools = {
         s => s.size && s.size.name.toLowerCase() === sizeName.toLowerCase()
       );
 
+      const oldStock = matchedSize ? matchedSize.stock : 0;
+
       if (!matchedSize) {
         // Fallback: If not found in current product, find the size document globally
         const sizeDoc = await Size.findOne({ name: { $regex: `^${sizeName}$`, $options: "i" } });
@@ -95,7 +97,11 @@ export const localTools = {
           await product.save();
           return {
             success: true,
-            message: `Added size ${sizeName} to ${product.name} with stock ${newStock}`
+            message: `Added size ${sizeName} to ${product.name} with stock ${newStock}`,
+            undoAction: {
+              tool: "updateProductStock",
+              args: { productId, sizeName, newStock: 0 }
+            }
           };
         }
         return {
@@ -109,7 +115,11 @@ export const localTools = {
 
       return {
         success: true,
-        message: `Successfully updated stock of "${product.name}" (Size: ${sizeName}) to ${newStock}.`
+        message: `Successfully updated stock of "${product.name}" (Size: ${sizeName}) to ${newStock}.`,
+        undoAction: {
+          tool: "updateProductStock",
+          args: { productId, sizeName, newStock: oldStock }
+        }
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -223,11 +233,14 @@ export const localTools = {
         isActive: true
       });
 
-
       return {
         success: true,
         message: `Successfully created product "${product.name}" under category "${categoryObj.name}"!`,
-        productId: product._id
+        productId: product._id,
+        undoAction: {
+          tool: "updateProductSettings",
+          args: { productId: String(product._id), isActive: false }
+        }
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -239,13 +252,27 @@ export const localTools = {
       const product = await Product.findById(productId);
       if (!product) return { success: false, error: "Product not found" };
 
+      const oldSeo = {
+        productId,
+        metaTitle: product.seo?.metaTitle || "",
+        metaDescription: product.seo?.metaDescription || "",
+        keywords: product.seo?.keywords || ""
+      };
+
       product.seo = {
         metaTitle: metaTitle || "",
         metaDescription: metaDescription || "",
         keywords: keywords || ""
       };
       await product.save();
-      return { success: true, message: `Successfully updated SEO/AEO tags for product "${product.name}"` };
+      return {
+        success: true,
+        message: `Successfully updated SEO/AEO tags for product "${product.name}"`,
+        undoAction: {
+          tool: "updateProductSeo",
+          args: oldSeo
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -255,9 +282,17 @@ export const localTools = {
     try {
       const order = await Order.findById(orderId);
       if (!order) return { success: false, error: "Order not found" };
+      const oldStatus = order.orderStatus;
       order.orderStatus = status;
       await order.save();
-      return { success: true, message: `Successfully updated order #${orderId} status to "${status}"` };
+      return {
+        success: true,
+        message: `Successfully updated order #${orderId} status to "${status}"`,
+        undoAction: {
+          tool: "updateOrderStatus",
+          args: { orderId, status: oldStatus }
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -282,7 +317,11 @@ export const localTools = {
 
       return {
         success: true,
-        message: `Successfully created coupon "${coupon.code}" (${coupon.discountValue}${coupon.discountType === "percentage" ? "%" : "$"} off, expires on ${coupon.endDate.toLocaleDateString()})`
+        message: `Successfully created coupon "${coupon.code}" (${coupon.discountValue}${coupon.discountType === "percentage" ? "%" : "$"} off, expires on ${coupon.endDate.toLocaleDateString()})`,
+        undoAction: {
+          tool: "editCoupon",
+          args: { code: coupon.code, isActive: false }
+        }
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -308,16 +347,37 @@ export const localTools = {
           startImmediately: true,
           isActive: true
         });
-        return { success: true, message: `Created new flash sale "${name}" and added ${product.name}` };
+        return {
+          success: true,
+          message: `Created new flash sale "${name}" and added ${product.name}`,
+          undoAction: {
+            tool: "toggleFlashSale",
+            args: { productId, discountPercentage, name }
+          }
+        };
       } else {
         if (flashSale.products.includes(productId)) {
           flashSale.products = flashSale.products.filter(id => String(id) !== productId);
           await flashSale.save();
-          return { success: true, message: `Removed "${product.name}" from active flash sale "${flashSale.name}"` };
+          return {
+            success: true,
+            message: `Removed "${product.name}" from active flash sale "${flashSale.name}"`,
+            undoAction: {
+              tool: "toggleFlashSale",
+              args: { productId, discountPercentage, name }
+            }
+          };
         } else {
           flashSale.products.push(productId);
           await flashSale.save();
-          return { success: true, message: `Added "${product.name}" to active flash sale "${flashSale.name}"` };
+          return {
+            success: true,
+            message: `Added "${product.name}" to active flash sale "${flashSale.name}"`,
+            undoAction: {
+              tool: "toggleFlashSale",
+              args: { productId, discountPercentage, name }
+            }
+          };
         }
       }
     } catch (error) {
@@ -352,7 +412,11 @@ export const localTools = {
       await user.save();
       return {
         success: true,
-        message: `Successfully changed status of customer "${user.name}" to ${user.isActive ? "ACTIVE" : "BLOCKED"}`
+        message: `Successfully changed status of customer "${user.name}" to ${user.isActive ? "ACTIVE" : "BLOCKED"}`,
+        undoAction: {
+          tool: "toggleUserStatus",
+          args: { userId }
+        }
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -380,7 +444,11 @@ export const localTools = {
       return {
         success: true,
         message: `Successfully created blog draft "${blog.title}" under category "${blog.category}"!`,
-        blogId: blog._id
+        blogId: blog._id,
+        undoAction: {
+          tool: "editBlog",
+          args: { blogId: String(blog._id), status: "DRAFT" } // Or set status to hidden/draft
+        }
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -493,9 +561,9 @@ export const localTools = {
       }
 
       const orderData = await calculateValidatedOrder(
-        resolvedItems,
-        couponCode,
-        shippingAddress.pathao_city_id
+          resolvedItems,
+          couponCode,
+          shippingAddress.pathao_city_id
       );
 
       const order = new Order({
@@ -523,7 +591,11 @@ export const localTools = {
         success: true,
         message: `Successfully created order #${createdOrder._id} for ${shippingAddress.name}!`,
         orderId: createdOrder._id,
-        totalPrice: createdOrder.totalPrice
+        totalPrice: createdOrder.totalPrice,
+        undoAction: {
+          tool: "updateOrderStatus",
+          args: { orderId: String(createdOrder._id), status: "Cancelled" }
+        }
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -534,6 +606,23 @@ export const localTools = {
     try {
       const order = await Order.findById(orderId);
       if (!order) return { success: false, error: "Order not found." };
+      
+      const oldState = {
+        orderId,
+        orderStatus: order.orderStatus,
+        paymentMethod: order.paymentMethod,
+        paymentStatus: order.paymentResult?.status || "Pending",
+        shippingAddress: {
+          name: order.shippingAddress.name,
+          phone: order.shippingAddress.phone,
+          street: order.shippingAddress.street,
+          city: order.shippingAddress.city,
+          pathao_city_id: order.shippingAddress.pathao_city_id || "",
+          pathao_zone_id: order.shippingAddress.pathao_zone_id || "",
+          pathao_area_id: order.shippingAddress.pathao_area_id || ""
+        }
+      };
+
       if (shippingAddress) {
         order.shippingAddress = { ...order.shippingAddress, ...shippingAddress };
       }
@@ -547,7 +636,11 @@ export const localTools = {
       return {
         success: true,
         message: `Successfully updated order #${orderId}`,
-        order
+        order,
+        undoAction: {
+          tool: "updateOrder",
+          args: oldState
+        }
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -663,8 +756,22 @@ export const localTools = {
 
   editProduct: async ({ productId, name, price, description, categoryName, subcategoryName, brand, color, material, gender, imageUrl }) => {
     try {
-      const product = await Product.findById(productId);
+      const product = await Product.findById(productId).populate("category subcategory");
       if (!product) return { success: false, error: "Product not found" };
+
+      const oldState = {
+        productId,
+        name: product.name,
+        price: product.price,
+        description: product.description,
+        categoryName: product.category?.name || "",
+        subcategoryName: product.subcategory?.name || "",
+        brand: product.brand,
+        color: product.color,
+        material: product.material,
+        gender: product.gender,
+        imageUrl: product.images?.[0] || ""
+      };
 
       if (name) {
         product.name = name;
@@ -689,7 +796,15 @@ export const localTools = {
       }
 
       await product.save();
-      return { success: true, message: `Successfully updated product "${product.name}"!`, product };
+      return {
+        success: true,
+        message: `Successfully updated product "${product.name}"!`,
+        product,
+        undoAction: {
+          tool: "editProduct",
+          args: oldState
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -699,11 +814,26 @@ export const localTools = {
     try {
       const product = await Product.findById(productId);
       if (!product) return { success: false, error: "Product not found" };
+      
+      const oldState = {
+        productId,
+        isFeatured: product.isFeatured,
+        isActive: product.isActive,
+        showReviews: product.showReviews
+      };
+
       if (isFeatured !== undefined) product.isFeatured = isFeatured;
       if (isActive !== undefined) product.isActive = isActive;
       if (showReviews !== undefined) product.showReviews = showReviews;
       await product.save();
-      return { success: true, message: `Successfully updated product settings for "${product.name}"` };
+      return {
+        success: true,
+        message: `Successfully updated product settings for "${product.name}"`,
+        undoAction: {
+          tool: "updateProductSettings",
+          args: oldState
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -713,6 +843,14 @@ export const localTools = {
     try {
       const category = await Category.findById(categoryId);
       if (!category) return { success: false, error: "Category not found" };
+      
+      const oldState = {
+        categoryId,
+        name: category.name,
+        description: category.description,
+        imageUrl: category.image
+      };
+
       if (name) {
         category.name = name;
         category.slug = name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
@@ -720,7 +858,14 @@ export const localTools = {
       if (description !== undefined) category.description = description;
       if (imageUrl) category.image = imageUrl;
       await category.save();
-      return { success: true, message: `Successfully updated category "${category.name}"` };
+      return {
+        success: true,
+        message: `Successfully updated category "${category.name}"`,
+        undoAction: {
+          tool: "editCategory",
+          args: oldState
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -749,7 +894,15 @@ export const localTools = {
         description: description || "",
         image: imageUrl || ""
       });
-      return { success: true, message: `Successfully created subcategory "${subcat.name}" under category "${categoryObj.name}"!`, subcategoryId: subcat._id };
+      return {
+        success: true,
+        message: `Successfully created subcategory "${subcat.name}" under category "${categoryObj.name}"!`,
+        subcategoryId: subcat._id,
+        undoAction: {
+          tool: "editSubcategory",
+          args: { subcategoryId: String(subcat._id) } // Mark it or deactivate it
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -757,8 +910,17 @@ export const localTools = {
 
   editSubcategory: async ({ subcategoryId, name, categoryName, description, imageUrl }) => {
     try {
-      const subcat = await Subcategory.findById(subcategoryId);
+      const subcat = await Subcategory.findById(subcategoryId).populate("category");
       if (!subcat) return { success: false, error: "Subcategory not found." };
+      
+      const oldState = {
+        subcategoryId,
+        name: subcat.name,
+        categoryName: subcat.category?.name || "",
+        description: subcat.description,
+        imageUrl: subcat.image
+      };
+
       if (name) {
         subcat.name = name;
         subcat.slug = name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
@@ -770,7 +932,14 @@ export const localTools = {
       if (description !== undefined) subcat.description = description;
       if (imageUrl) subcat.image = imageUrl;
       await subcat.save();
-      return { success: true, message: `Successfully updated subcategory "${subcat.name}"` };
+      return {
+        success: true,
+        message: `Successfully updated subcategory "${subcat.name}"`,
+        undoAction: {
+          tool: "editSubcategory",
+          args: oldState
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -788,7 +957,15 @@ export const localTools = {
   createBannerCampaign: async ({ name, description, slides, isActive = false }) => {
     try {
       const campaign = await BannerCampaign.create({ name, description, slides, isActive });
-      return { success: true, message: `Successfully created banner campaign "${campaign.name}"!`, campaignId: campaign._id };
+      return {
+        success: true,
+        message: `Successfully created banner campaign "${campaign.name}"!`,
+        campaignId: campaign._id,
+        undoAction: {
+          tool: "editBannerCampaign",
+          args: { campaignId: String(campaign._id), isActive: false }
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -798,12 +975,28 @@ export const localTools = {
     try {
       const campaign = await BannerCampaign.findById(campaignId);
       if (!campaign) return { success: false, error: "Campaign not found" };
+
+      const oldState = {
+        campaignId,
+        name: campaign.name,
+        description: campaign.description,
+        slides: campaign.slides,
+        isActive: campaign.isActive
+      };
+
       if (name) campaign.name = name;
       if (description !== undefined) campaign.description = description;
       if (slides) campaign.slides = slides;
       if (isActive !== undefined) campaign.isActive = isActive;
       await campaign.save();
-      return { success: true, message: `Successfully updated campaign "${campaign.name}"` };
+      return {
+        success: true,
+        message: `Successfully updated campaign "${campaign.name}"`,
+        undoAction: {
+          tool: "editBannerCampaign",
+          args: oldState
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -821,7 +1014,15 @@ export const localTools = {
   createFlashSaleCampaign: async ({ name, description, discount, productIds, startDate, endDate, isActive = true, bannerImage, startImmediately = false }) => {
     try {
       const campaign = await FlashSale.create({ name, description, discount, products: productIds, startDate, endDate, isActive, bannerImage, startImmediately });
-      return { success: true, message: `Successfully created flash sale campaign "${campaign.name}"!`, campaignId: campaign._id };
+      return {
+        success: true,
+        message: `Successfully created flash sale campaign "${campaign.name}"!`,
+        campaignId: campaign._id,
+        undoAction: {
+          tool: "editFlashSaleCampaign",
+          args: { campaignId: String(campaign._id), isActive: false }
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -831,6 +1032,19 @@ export const localTools = {
     try {
       const campaign = await FlashSale.findById(campaignId);
       if (!campaign) return { success: false, error: "Flash sale campaign not found" };
+
+      const oldState = {
+        campaignId,
+        name: campaign.name,
+        description: campaign.description,
+        discount: campaign.discount,
+        productIds: campaign.products?.map(id => String(id)) || [],
+        startDate: campaign.startDate?.toISOString() || "",
+        endDate: campaign.endDate?.toISOString() || "",
+        isActive: campaign.isActive,
+        bannerImage: campaign.bannerImage
+      };
+
       if (name) campaign.name = name;
       if (description !== undefined) campaign.description = description;
       if (discount) campaign.discount = discount;
@@ -840,7 +1054,14 @@ export const localTools = {
       if (isActive !== undefined) campaign.isActive = isActive;
       if (bannerImage) campaign.bannerImage = bannerImage;
       await campaign.save();
-      return { success: true, message: `Successfully updated flash sale "${campaign.name}"` };
+      return {
+        success: true,
+        message: `Successfully updated flash sale "${campaign.name}"`,
+        undoAction: {
+          tool: "editFlashSaleCampaign",
+          args: oldState
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -858,6 +1079,17 @@ export const localTools = {
       return await editCouponDoc(coupon);
 
       async function editCouponDoc(doc) {
+        const oldState = {
+          couponId: String(doc._id),
+          code: doc.code,
+          discountType: doc.discountType,
+          discountValue: doc.discountValue,
+          usageLimit: doc.usageLimit,
+          isActive: doc.isActive
+        };
+        const oldDaysValid = Math.max(1, Math.round((doc.endDate - new Date()) / (1000 * 60 * 60 * 24)));
+        oldState.daysValid = oldDaysValid;
+
         if (code) doc.code = code.toUpperCase();
         if (discountType) doc.discountType = discountType;
         if (discountValue) doc.discountValue = parseFloat(discountValue);
@@ -869,7 +1101,14 @@ export const localTools = {
         }
         if (isActive !== undefined) doc.isActive = isActive;
         await doc.save();
-        return { success: true, message: `Successfully updated coupon "${doc.code}"` };
+        return {
+          success: true,
+          message: `Successfully updated coupon "${doc.code}"`,
+          undoAction: {
+            tool: "editCoupon",
+            args: oldState
+          }
+        };
       }
     } catch (error) {
       return { success: false, error: error.message };
@@ -889,6 +1128,16 @@ export const localTools = {
     try {
       const blog = await Blog.findById(blogId);
       if (!blog) return { success: false, error: "Blog not found" };
+
+      const oldState = {
+        blogId,
+        title: blog.title,
+        content: blog.content,
+        category: blog.category,
+        imageUrl: blog.featuredImage,
+        status: blog.status
+      };
+
       if (title) {
         blog.title = title;
         blog.slug = title.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
@@ -898,7 +1147,14 @@ export const localTools = {
       if (imageUrl) blog.featuredImage = imageUrl;
       if (status) blog.status = status.toUpperCase();
       await blog.save();
-      return { success: true, message: `Successfully updated blog post "${blog.title}"` };
+      return {
+        success: true,
+        message: `Successfully updated blog post "${blog.title}"`,
+        undoAction: {
+          tool: "editBlog",
+          args: oldState
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -1670,3 +1926,24 @@ export const handleAdminAiChat = asyncHandler(async (req, res) => {
     });
   }
 });
+
+export const handleAdminAiChatUndo = asyncHandler(async (req, res) => {
+  const { tool, args } = req.body;
+  if (!tool || !args) {
+    return res.status(400).json({ success: false, message: "Tool and arguments are required." });
+  }
+
+  const toolFn = localTools[tool];
+  if (!toolFn) {
+    return res.status(404).json({ success: false, message: `Tool ${tool} not found.` });
+  }
+
+  try {
+    const result = await toolFn(args);
+    return res.json({ success: true, result });
+  } catch (err) {
+    console.error("❌ Failed to undo action:", err.message);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+

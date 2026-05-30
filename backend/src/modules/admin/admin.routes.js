@@ -11,7 +11,7 @@ import {
   getDashboardCustomerGrowth,
   getDashboardRetention
 } from './admin.controller.js';
-import { handleAdminAiChat } from './ai-chat.controller.js';
+import { handleAdminAiChat, handleAdminAiChatUndo } from './ai-chat.controller.js';
 import { protect } from '../../middleware/auth.js';
 import { authorize } from '../../middleware/rbac.js';
 import { cacheMiddleware } from '../../middleware/cacheMiddleware.js';
@@ -30,6 +30,7 @@ const router = express.Router();
 router.use(protect);
 
 router.post('/ai-chat', authorize(['dashboard:view']), handleAdminAiChat);
+router.post('/ai-chat/undo', authorize(['dashboard:view']), handleAdminAiChatUndo);
 router.post('/ai-chat/upload', authorize(['dashboard:view']), upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: 'No file provided' });

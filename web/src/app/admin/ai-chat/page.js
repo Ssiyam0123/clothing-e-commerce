@@ -54,6 +54,27 @@ export default function AdminAiChatPage() {
   const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef(null);
+  
+  const [undoneActions, setUndoneActions] = useState({});
+  const [undoing, setUndoing] = useState({});
+
+  const handleUndo = async (msgIdx, execIdx, undoAction) => {
+    const actionKey = `${msgIdx}_${execIdx}`;
+    setUndoing(prev => ({ ...prev, [actionKey]: true }));
+    try {
+      const response = await api.post("/admin/ai-chat/undo", undoAction);
+      if (response.data && response.data.success) {
+        setUndoneActions(prev => ({ ...prev, [actionKey]: true }));
+      } else {
+        throw new Error(response.data?.message || "Failed to revert action");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Undo failed: " + (err.response?.data?.message || err.message));
+    } finally {
+      setUndoing(prev => ({ ...prev, [actionKey]: false }));
+    }
+  };
 
   const suggestionChips = [
     { label: "📊 Store Summary", prompt: "Give me the store business summary and dashboard metrics" },
@@ -247,7 +268,7 @@ export default function AdminAiChatPage() {
     }
   };
 
-  const renderToolWidgets = (executions) => {
+  const renderToolWidgets = (executions, msgIdx) => {
     if (!executions || executions.length === 0) return null;
 
     return (
@@ -340,11 +361,35 @@ export default function AdminAiChatPage() {
                 {result.success ? (
                   <>
                     <div className="mt-0.5 shrink-0">{config.icon}</div>
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="font-bold tracking-wide uppercase text-[10px] text-muted-foreground">{config.label}</p>
                       <p className="mt-0.5 font-medium">{result.message}</p>
                       {result.productId && <p className="text-[9px] font-mono text-muted-foreground mt-1">ID: {result.productId}</p>}
                       {result.blogId && <p className="text-[9px] font-mono text-muted-foreground mt-1">ID: {result.blogId}</p>}
+                      {result.undoAction && (
+                        <div className="mt-2.5 flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleUndo(msgIdx, idx, result.undoAction)}
+                            disabled={undoneActions[`${msgIdx}_${idx}`] || undoing[`${msgIdx}_${idx}`]}
+                            className={cn(
+                              "text-[10px] h-7 px-3 rounded-lg font-bold border transition-all bg-background text-foreground",
+                              undoneActions[`${msgIdx}_${idx}`] 
+                                ? "bg-muted text-muted-foreground border-border cursor-not-allowed" 
+                                : "border-primary/25 hover:bg-muted hover:border-primary text-primary"
+                            )}
+                          >
+                            {undoing[`${msgIdx}_${idx}`] ? (
+                              <span className="flex items-center gap-1"><Loader2 size={10} className="animate-spin" /> Undoing...</span>
+                            ) : undoneActions[`${msgIdx}_${idx}`] ? (
+                              <span className="flex items-center gap-1"><CheckCircle2 size={10} className="text-emerald-500" /> Reverted</span>
+                            ) : (
+                              "Undo Action"
+                            )}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </>
                 ) : (
@@ -592,7 +637,7 @@ export default function AdminAiChatPage() {
                       </div>
                     )}
                     <p className="whitespace-pre-wrap">{msg.content}</p>
-                    {msg.role === "model" && msg.toolExecutions && renderToolWidgets(msg.toolExecutions)}
+                    {msg.role === "model" && msg.toolExecutions && renderToolWidgets(msg.toolExecutions, i)}
                   </div>
                 </div>
               </motion.div>
