@@ -42,24 +42,6 @@ const app = express();
 // Without this, all requests appear to come from the same proxy IP
 app.set("trust proxy", 1);
 
-// 📝 Swagger API Documentation
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
-
-// 🛡️ Global Rate Limiting for all API endpoints
-app.use("/api", apiLimiter);
-
-app.use(compression());
-
-// 📝 Request Logger Middleware
-app.use((req, res, next) => {
-  const start = Date.now();
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
-  });
-  next();
-});
-
 // 🛡️ Tactical CORS Configuration
 const allowedOrigins = [
   "http://localhost:3000",
@@ -105,6 +87,24 @@ app.use(
     exposedHeaders: ["set-cookie"],
   })
 );
+
+// 📝 Swagger API Documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+
+// 🛡️ Global Rate Limiting for all API endpoints
+app.use("/api", apiLimiter);
+
+app.use(compression());
+
+// 📝 Request Logger Middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
+  });
+  next();
+});
 
 app.use(contextMiddleware);
 

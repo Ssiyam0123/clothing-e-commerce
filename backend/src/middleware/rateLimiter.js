@@ -54,7 +54,7 @@ export const apiLimiter = rateLimit({
   legacyHeaders: false,
   store: createRedisStore('rl:api:'),
   passOnStoreError: true,
-  skip: () => isDev, // development এ সম্পূর্ণ skip
+  skip: (req) => req.method === 'OPTIONS' || isDev, // OPTIONS request অথবা development এ সম্পূর্ণ skip
   handler: rateLimitHandler
 });
 
