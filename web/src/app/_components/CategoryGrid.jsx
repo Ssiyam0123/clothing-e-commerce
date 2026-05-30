@@ -35,6 +35,8 @@ export default function CategoryGrid({ categories }) {
         freeMode={true}
         mousewheel={{ forceToAxis: true }}
         simulateTouch={true}
+        touchStartPreventDefault={false}
+        touchReleaseOnEdges={true}
         navigation={{
           nextEl: ".swiper-button-next-custom",
           prevEl: ".swiper-button-prev-custom",

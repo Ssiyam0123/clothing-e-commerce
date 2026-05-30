@@ -89,6 +89,8 @@ export default function BannerSlider({ slides = [], buttonText = "Shop Now", lan
         }}
         loop={slides.length > 1}
         grabCursor={true}
+        touchStartPreventDefault={false}
+        touchReleaseOnEdges={true}
         className="banner-swiper w-full"
       >
         {slides.map((slide, idx) => (

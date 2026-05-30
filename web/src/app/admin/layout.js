@@ -340,7 +340,7 @@ export default function AdminLayout({ children }) {
           </header>
         )}
 
-        <main className={cn("flex-1 overflow-y-auto no-scrollbar bg-background/50", !isFullPage ? "h-full" : "p-0 overflow-hidden")}>
+        <main className={cn("flex-1 overflow-y-auto no-scrollbar bg-background/50", !isFullPage ? "min-h-0" : "p-0 overflow-hidden")}>
           <div className={cn("mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700", !isFullPage ? "max-w-none" : "max-w-none h-full")}>
             {children}
           </div>

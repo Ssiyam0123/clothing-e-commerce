@@ -9,7 +9,6 @@ import { getImageUrl } from "@/utils/imageUtils";
 import FilterBar from "@/components/common/FilterBar";
 import { useTrackingStore } from "@/store/trackingStore";
 import { cn } from "@/lib/utils";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, LayoutGrid, ChevronRight, Hash } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
@@ -83,7 +82,7 @@ export default function ProductFilter({ initialCategories }) {
 
       {/* 🏷️ Main Category Navigation */}
       <div className="space-y-6">
-        <ScrollArea className="w-full whitespace-nowrap pb-4">
+        <div className="w-full overflow-x-auto no-scrollbar pb-4 -webkit-overflow-scrolling-touch scrollbar-none">
           <div className="flex w-max gap-4 px-2">
             <CategoryItem
               isSelected={filters.category === "all"}
@@ -109,8 +108,7 @@ export default function ProductFilter({ initialCategories }) {
               />
             ))}
           </div>
-          <ScrollBar orientation="horizontal" className="h-1" />
-        </ScrollArea>
+        </div>
       </div>
 
       {/* 🔗 Sub-Category Section */}
@@ -124,7 +122,7 @@ export default function ProductFilter({ initialCategories }) {
           >
 
             
-            <ScrollArea className="w-full whitespace-nowrap pb-2">
+            <div className="w-full overflow-x-auto no-scrollbar pb-2 -webkit-overflow-scrolling-touch scrollbar-none">
               <div className="flex w-max gap-3 px-2">
                 {filteredSubcategories.map((sub) => {
                   const isSubSelected = filters.subcategory === sub.slug;
@@ -168,8 +166,7 @@ export default function ProductFilter({ initialCategories }) {
                   );
                 })}
               </div>
-              <ScrollBar orientation="horizontal" className="h-1" />
-            </ScrollArea>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
