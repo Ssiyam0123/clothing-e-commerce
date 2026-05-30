@@ -60,7 +60,7 @@ export default function Sidebar({ className, onItemClick }) {
       </div>
 
       {/* 🧭 Navigation */}
-      <nav className="flex-1 overflow-y-auto no-scrollbar px-6 py-4 space-y-10">
+      <nav className="flex-1 overflow-y-auto no-scrollbar px-6 py-4 space-y-10 overscroll-y-contain">
         {filteredGroups.map((group, groupIdx) => (
           <div key={groupIdx}>
             {!isAdminSidebarCollapsed && (
