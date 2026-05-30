@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import axios from "axios";
+import fs from "fs/promises";
+import path from "path";
 import { asyncHandler } from "../../middleware/asyncHandler.js";
 import ApiKey from "../settings/apiKey.model.js";
 import PageSetting from "../settings/settings.model.js";
@@ -162,7 +164,7 @@ const localTools = {
     }
   },
 
-  createProduct: async ({ name, price, description, categoryName, sizeStockList, brand, color, material, gender }) => {
+  createProduct: async ({ name, price, description, categoryName, sizeStockList, brand, color, material, gender, imageUrl }) => {
     try {
       let categoryObj = await Category.findOne({ name: { $regex: `^${categoryName}$`, $options: "i" } });
       if (!categoryObj) {
@@ -208,6 +210,7 @@ const localTools = {
         color: color || "",
         material: material || "",
         gender: gender || "Unisex",
+        images: imageUrl ? [imageUrl] : [],
         isActive: true
       });
 
@@ -347,7 +350,7 @@ const localTools = {
     }
   },
 
-  createBlogDraft: async ({ title, content, category = "NEWS" }) => {
+  createBlogDraft: async ({ title, content, category = "NEWS", imageUrl }) => {
     try {
       const slug = title.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
       
@@ -360,7 +363,7 @@ const localTools = {
         content,
         category: category.toUpperCase(),
         author: authorId || new mongoose.Types.ObjectId(),
-        featuredImage: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f",
+        featuredImage: imageUrl || "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f",
         status: "DRAFT",
         readingTime: "3 min read"
       });
@@ -369,6 +372,28 @@ const localTools = {
         success: true,
         message: `Successfully created blog draft "${blog.title}" under category "${blog.category}"!`,
         blogId: blog._id
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  createCategory: async ({ name, description, imageUrl }) => {
+    try {
+      const existing = await Category.findOne({ name: { $regex: `^${name}$`, $options: "i" } });
+      if (existing) return { success: false, error: `Category "${name}" already exists.` };
+      
+      const slug = name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+      const category = await Category.create({
+        name,
+        slug,
+        description: description || "",
+        image: imageUrl || ""
+      });
+      return {
+        success: true,
+        message: `Successfully created category "${category.name}"!`,
+        categoryId: category._id
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -465,6 +490,7 @@ const toolDeclarations = [
         name: { type: "STRING", description: "Name of the clothing product" },
         price: { type: "NUMBER", description: "Retail price of the product" },
         description: { type: "STRING", description: "Detailed description of the product" },
+        imageUrl: { type: "STRING", description: "The image URL link to associate with this product" },
         categoryName: { type: "STRING", description: "Category name (e.g., 'T-Shirt', 'Pants', 'Outerwear')" },
         sizeStockList: {
           type: "ARRAY",
@@ -570,9 +596,23 @@ const toolDeclarations = [
       properties: {
         title: { type: "STRING", description: "Blog title" },
         content: { type: "STRING", description: "Full HTML content/article body text" },
+        imageUrl: { type: "STRING", description: "The image URL link to associate with this blog post" },
         category: { type: "STRING", description: "Category: 'LIFESTYLE', 'COLLECTION', 'FABRIC', 'CULTURE', 'NEWS'" }
       },
       required: ["title", "content"]
+    }
+  },
+  {
+    name: "createCategory",
+    description: "Create a new product category in the store database catalog",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        name: { type: "STRING", description: "Name of the category (e.g., Shirts, Pants, Accessories)" },
+        description: { type: "STRING", description: "Brief description of the category" },
+        imageUrl: { type: "STRING", description: "The image URL link for the category image" }
+      },
+      required: ["name"]
     }
   },
   {
@@ -605,11 +645,53 @@ export const handleAdminAiChat = asyncHandler(async (req, res) => {
     });
   }
 
-  // Format incoming messages into Gemini contents structure
-  const contents = messages.map(msg => ({
-    role: msg.role === "user" ? "user" : "model",
-    parts: [{ text: msg.content }]
-  }));
+  // Format incoming messages into Gemini contents structure with vision support
+  const contents = [];
+  for (const msg of messages) {
+    const parts = [{ text: msg.content }];
+    if (msg.image) {
+      try {
+        let buffer;
+        let mimeType = "image/jpeg"; // default
+        
+        if (msg.image.startsWith("data:")) {
+          const match = msg.image.match(/^data:([^;]+);base64,(.*)$/);
+          if (match) {
+            mimeType = match[1];
+            buffer = Buffer.from(match[2], 'base64');
+          }
+        } else if (msg.image.startsWith("/") || msg.image.startsWith("uploads/") || msg.image.startsWith("backend/uploads/")) {
+          const relativePath = msg.image.startsWith("/") ? msg.image.substring(1) : msg.image;
+          const fullPath = path.join(process.cwd(), relativePath);
+          buffer = await fs.readFile(fullPath);
+          const ext = path.extname(fullPath).toLowerCase();
+          if (ext === ".png") mimeType = "image/png";
+          else if (ext === ".webp") mimeType = "image/webp";
+          else if (ext === ".gif") mimeType = "image/gif";
+        } else {
+          const imgResponse = await axios.get(msg.image, { responseType: 'arraybuffer' });
+          buffer = Buffer.from(imgResponse.data);
+          mimeType = imgResponse.headers['content-type'] || "image/jpeg";
+        }
+        
+        if (buffer) {
+          parts.push({
+            inlineData: {
+              mimeType: mimeType,
+              data: buffer.toString("base64")
+            }
+          });
+        }
+      } catch (err) {
+        console.error("⚠️ Failed to load image for Gemini vision processing:", err.message);
+      }
+    }
+    
+    contents.push({
+      role: msg.role === "user" ? "user" : "model",
+      parts
+    });
+  }
 
   // Helper: call Gemini API with retry + model fallback
   const MODELS = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-2.0-flash", "gemini-flash-latest"];

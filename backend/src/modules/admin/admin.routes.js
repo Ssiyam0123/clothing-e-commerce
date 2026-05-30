@@ -15,6 +15,8 @@ import { handleAdminAiChat } from './ai-chat.controller.js';
 import { protect } from '../../middleware/auth.js';
 import { authorize } from '../../middleware/rbac.js';
 import { cacheMiddleware } from '../../middleware/cacheMiddleware.js';
+import upload from '../../middleware/upload.js';
+import { uploadImage } from '../../services/imageUploadService.js';
 
 import adminProductRoutes from '../product/routes/admin.product.routes.js';
 import adminCategoryRoutes from '../category/routes/admin.category.routes.js';
@@ -28,6 +30,16 @@ const router = express.Router();
 router.use(protect);
 
 router.post('/ai-chat', authorize(['dashboard:view']), handleAdminAiChat);
+router.post('/ai-chat/upload', authorize(['dashboard:view']), upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No file provided' });
+    const imageUrl = await uploadImage(req.file, 'ai');
+    res.json({ success: true, url: imageUrl });
+  } catch (error) {
+    console.error("AI image upload error:", error);
+    res.status(500).json({ success: false, message: 'Image upload failed' });
+  }
+});
 
 
 router.get('/dashboard', authorize(['dashboard:view', 'reports:view']), cacheMiddleware(300), getDashboardData);

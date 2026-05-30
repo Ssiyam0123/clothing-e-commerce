@@ -25,7 +25,8 @@ import {
   ArrowLeft,
   Package,
   Menu,
-  X
+  X,
+  Paperclip
 } from "lucide-react";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,11 @@ export default function AdminAiChatPage() {
   const messagesEndRef = useRef(null);
   const [cooldown, setCooldown] = useState(0);
   const cooldownRef = useRef(null);
+  
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef(null);
 
   const suggestionChips = [
     { label: "📊 Store Summary", prompt: "Give me the store business summary and dashboard metrics" },
@@ -127,6 +133,36 @@ export default function AdminAiChatPage() {
     };
   }, []);
 
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    setError(null);
+    setImagePreview(URL.createObjectURL(file));
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await api.post("/admin/ai-chat/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      if (res.data && res.data.success) {
+        setUploadedImageUrl(res.data.url);
+      } else {
+        throw new Error(res.data?.message || "Upload failed");
+      }
+    } catch (err) {
+      console.error("Image upload failed:", err);
+      setError("Failed to upload image. Please try again.");
+      setImagePreview(null);
+      setUploadedImageUrl(null);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleSendMessage = async (textToSend) => {
     const query = (textToSend || inputValue).trim();
     if (!query || cooldown > 0) return;
@@ -135,15 +171,21 @@ export default function AdminAiChatPage() {
     setError(null);
     setLoading(true);
 
-    const userMessage = { role: "user", content: query };
+    const userMessage = { role: "user", content: query, image: uploadedImageUrl || null };
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
+
+    // Reset image states immediately
+    setImagePreview(null);
+    setUploadedImageUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
 
     try {
       const response = await api.post("/admin/ai-chat", {
         messages: updatedMessages.map(msg => ({
           role: msg.role,
-          content: msg.content
+          content: msg.content,
+          image: msg.image || null
         }))
       });
 
@@ -518,6 +560,15 @@ export default function AdminAiChatPage() {
                         : "bg-card/90 backdrop-blur-md text-foreground border-border rounded-tl-none"
                     }`}
                   >
+                    {msg.image && (
+                      <div className="mb-2 max-w-sm rounded-lg overflow-hidden border border-border/30 bg-black/5 dark:bg-white/5">
+                        <img 
+                          src={msg.image} 
+                          alt="Uploaded attachment" 
+                          className="max-h-48 w-full object-contain rounded-md" 
+                        />
+                      </div>
+                    )}
                     <p className="whitespace-pre-wrap">{msg.content}</p>
                     {msg.role === "model" && msg.toolExecutions && renderToolWidgets(msg.toolExecutions)}
                   </div>
@@ -591,30 +642,75 @@ export default function AdminAiChatPage() {
 
         {/* User Input Bar */}
         <footer className="p-3 md:p-6 bg-white dark:bg-[#202c33] border-t border-border/10 shrink-0 z-20 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)]">
-          <div className="max-w-3xl mx-auto flex items-center gap-2 md:gap-4">
-            <div className="flex-1 relative">
-              <Input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyPress}
-                placeholder="Ask AI to query products, list orders, create discounts..."
-                className="w-full h-11 md:h-12 bg-[#f0f2f5] dark:bg-[#2a3942] border-none rounded-2xl px-4 md:px-5 text-[14px] md:text-[15px] focus-visible:ring-0 placeholder:text-muted-foreground/50 shadow-inner"
+          <div className="max-w-3xl mx-auto space-y-3">
+            {imagePreview && (
+              <div className="flex items-center gap-2 bg-[#f0f2f5] dark:bg-[#2a3942] p-2 rounded-xl w-fit border border-border/10">
+                <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-border bg-background">
+                  <img src={imagePreview} alt="Upload preview" className="h-full w-full object-cover" />
+                  {uploadingImage && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <Loader2 size={14} className="animate-spin text-white" />
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImagePreview(null);
+                    setUploadedImageUrl(null);
+                    if (fileInputRef.current) fileInputRef.current.value = "";
+                  }}
+                  className="p-1 rounded-full bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 md:gap-4">
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+                disabled={loading || uploadingImage}
               />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={loading || uploadingImage}
+                className="h-11 w-11 md:h-12 md:w-12 rounded-full hover:bg-[#f0f2f5] dark:hover:bg-[#2a3942] text-muted-foreground hover:text-foreground shrink-0"
+              >
+                <Paperclip size={18} />
+              </Button>
+
+              <div className="flex-1 relative">
+                <Input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Ask AI to query products, list orders, create discounts..."
+                  className="w-full h-11 md:h-12 bg-[#f0f2f5] dark:bg-[#2a3942] border-none rounded-2xl px-4 md:px-5 text-[14px] md:text-[15px] focus-visible:ring-0 placeholder:text-muted-foreground/50 shadow-inner"
+                />
+              </div>
+              <Button
+                onClick={() => handleSendMessage()}
+                disabled={loading || uploadingImage || (!inputValue.trim() && !uploadedImageUrl) || cooldown > 0}
+                className={cn(
+                  "h-11 w-11 md:h-12 md:w-12 rounded-full shadow-md transition-all duration-300 shrink-0 flex items-center justify-center",
+                  (inputValue.trim() || uploadedImageUrl) ? "bg-primary hover:opacity-95 scale-100" : "bg-muted text-muted-foreground scale-95 opacity-50"
+                )}
+              >
+                {cooldown > 0 ? (
+                  <span className="text-[10px] font-bold">{cooldown}</span>
+                ) : (
+                  <Send size={18} className={cn("transition-transform", (inputValue.trim() || uploadedImageUrl) && "translate-x-0.5 -translate-y-0.5")} />
+                )}
+              </Button>
             </div>
-            <Button
-              onClick={() => handleSendMessage()}
-              disabled={loading || !inputValue.trim() || cooldown > 0}
-              className={cn(
-                "h-11 w-11 md:h-12 md:w-12 rounded-full shadow-md transition-all duration-300 shrink-0 flex items-center justify-center",
-                inputValue.trim() ? "bg-primary hover:opacity-95 scale-100" : "bg-muted text-muted-foreground scale-95 opacity-50"
-              )}
-            >
-              {cooldown > 0 ? (
-                <span className="text-[10px] font-bold">{cooldown}</span>
-              ) : (
-                <Send size={18} className={cn("transition-transform", inputValue.trim() && "translate-x-0.5 -translate-y-0.5")} />
-              )}
-            </Button>
           </div>
         </footer>
       </div>
@@ -690,7 +786,7 @@ export default function AdminAiChatPage() {
                 <p># database: clothing-ecommerce</p>
                 <p># schema: mongoose-prod-v9</p>
                 <p># model: gemini-2.5-flash</p>
-                <p># function tools registered: 13</p>
+                <p># function tools registered: 14</p>
                 <p className="text-emerald-600 dark:text-emerald-400"># ready for instructions</p>
               </div>
             </div>
@@ -712,7 +808,8 @@ export default function AdminAiChatPage() {
                 { name: "toggleFlashSale", desc: "Add/remove item from flash sale" },
                 { name: "searchCustomer", desc: "Search customer profiles" },
                 { name: "toggleUserStatus", desc: "Block or activate customer" },
-                { name: "createBlogDraft", desc: "Draft marketing blog post" }
+                { name: "createBlogDraft", desc: "Draft marketing blog post" },
+                { name: "createCategory", desc: "Create new product category" }
               ].map((tool, idx) => (
                 <div key={idx} className="p-2.5 border border-border bg-background/50 rounded-lg hover:border-primary/20 transition-all flex flex-col gap-0.5">
                   <span className="text-[11px] font-mono font-bold text-primary">{tool.name}()</span>
