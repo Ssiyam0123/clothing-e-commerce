@@ -183,8 +183,19 @@
   }
 
   /* Force momentum scrolling and GPU acceleration for mobile WebViews */
-  .overflow-x-auto, .overflow-y-auto, .overflow-auto {
+  .overflow-x-auto {
     -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-x !important;
+  }
+
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+
+  .overflow-auto {
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: auto !important;
   }
 
   .swiper, .swiper-wrapper, .swiper-slide {
