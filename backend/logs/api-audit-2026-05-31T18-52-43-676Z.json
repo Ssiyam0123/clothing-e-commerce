@@ -1,0 +1,11 @@
+[
+  {
+    "path": "/",
+    "testedUrl": "/",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 24,
+    "timestamp": "2026-05-31T18:52:43.610Z",
+    "responseSnippet": "{\"success\":true,\"message\":\"Vanguard System Engine is Active.\",\"environment\":\"development\"}"
+  }
+]

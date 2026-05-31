@@ -1,0 +1,479 @@
+[
+  {
+    "path": "/",
+    "testedUrl": "/",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 26,
+    "timestamp": "2026-05-31T18:59:04.415Z",
+    "responseSnippet": "{\"success\":true,\"message\":\"Vanguard System Engine is Active.\",\"environment\":\"development\"}"
+  },
+  {
+    "path": "/api/auth/register",
+    "testedUrl": "/api/auth/register",
+    "method": "POST",
+    "statusCode": 201,
+    "durationMs": 575,
+    "timestamp": "2026-05-31T18:59:04.990Z",
+    "responseSnippet": "{\"message\":\"Registration successful! (Email verification skipped)\",\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMWM4NGY4OGMyZjg2YWMxMDE5Y"
+  },
+  {
+    "path": "/api/auth/login",
+    "testedUrl": "/api/auth/login",
+    "method": "POST",
+    "statusCode": 200,
+    "durationMs": 194,
+    "timestamp": "2026-05-31T18:59:05.184Z",
+    "responseSnippet": "{\"message\":\"Login successful\",\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMWM4NGU2YjM0NzIwYWI5MjQ4MDNmZSIsImlhdCI6MTc4MDI1Mzk0NSwiZXhwIj"
+  },
+  {
+    "path": "/api/auth/google-login",
+    "testedUrl": "/api/auth/google-login",
+    "method": "POST",
+    "statusCode": 500,
+    "durationMs": 4,
+    "timestamp": "2026-05-31T18:59:05.189Z",
+    "responseSnippet": "{\"success\":false,\"message\":\"Cannot destructure property 'idToken' of 'req.body' as it is undefined.\",\"timestamp\":\"2026-05-31T18:59:05.188Z\"}"
+  },
+  {
+    "path": "/api/auth/facebook-login",
+    "testedUrl": "/api/auth/facebook-login",
+    "method": "POST",
+    "statusCode": 500,
+    "durationMs": 4,
+    "timestamp": "2026-05-31T18:59:05.193Z",
+    "responseSnippet": "{\"success\":false,\"message\":\"Cannot destructure property 'accessToken' of 'req.body' as it is undefined.\",\"timestamp\":\"2026-05-31T18:59:05.192Z\"}"
+  },
+  {
+    "path": "/api/auth/verify-email",
+    "testedUrl": "/api/auth/verify-email",
+    "method": "GET",
+    "statusCode": 302,
+    "durationMs": 3,
+    "timestamp": "2026-05-31T18:59:05.196Z",
+    "responseSnippet": "Found. Redirecting to http://localhost:3000/login?error=invalid_token"
+  },
+  {
+    "path": "/api/auth/forgot-password",
+    "testedUrl": "/api/auth/forgot-password",
+    "method": "POST",
+    "statusCode": 500,
+    "durationMs": 4,
+    "timestamp": "2026-05-31T18:59:05.200Z",
+    "responseSnippet": "{\"success\":false,\"message\":\"Cannot destructure property 'email' of 'req.body' as it is undefined.\",\"timestamp\":\"2026-05-31T18:59:05.199Z\"}"
+  },
+  {
+    "path": "/api/auth/reset-password",
+    "testedUrl": "/api/auth/reset-password",
+    "method": "POST",
+    "statusCode": 500,
+    "durationMs": 3,
+    "timestamp": "2026-05-31T18:59:05.203Z",
+    "responseSnippet": "{\"success\":false,\"message\":\"Cannot destructure property 'password' of 'req.body' as it is undefined.\",\"timestamp\":\"2026-05-31T18:59:05.202Z\"}"
+  },
+  {
+    "path": "/api/auth/me",
+    "testedUrl": "/api/auth/me",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 178,
+    "timestamp": "2026-05-31T18:59:05.381Z",
+    "responseSnippet": "{\"_id\":\"6a1c84e6b34720ab924803fe\",\"name\":\"Audit Admin\",\"email\":\"audit-admin@example.com\",\"avatar\":\"\",\"role\":{\"_id\":\"6a032c6419f8ce1b5ea5e283\",\"name\":\""
+  },
+  {
+    "path": "/api/users/me",
+    "testedUrl": "/api/users/me",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 181,
+    "timestamp": "2026-05-31T18:59:05.562Z",
+    "responseSnippet": "{\"_id\":\"6a1c84e6b34720ab924803fe\",\"name\":\"Audit Admin\",\"email\":\"audit-admin@example.com\",\"avatar\":\"\",\"role\":{\"_id\":\"6a032c6419f8ce1b5ea5e283\",\"name\":\""
+  },
+  {
+    "path": "/api/users/profile",
+    "testedUrl": "/api/users/profile",
+    "method": "PUT",
+    "statusCode": 500,
+    "durationMs": 139,
+    "timestamp": "2026-05-31T18:59:05.701Z",
+    "responseSnippet": "{\"success\":false,\"message\":\"Cannot read properties of undefined (reading 'name')\",\"timestamp\":\"2026-05-31T18:59:05.699Z\"}"
+  },
+  {
+    "path": "/api/users/change-password",
+    "testedUrl": "/api/users/change-password",
+    "method": "PUT",
+    "statusCode": 500,
+    "durationMs": 97,
+    "timestamp": "2026-05-31T18:59:05.798Z",
+    "responseSnippet": "{\"success\":false,\"message\":\"Cannot destructure property 'currentPassword' of 'req.body' as it is undefined.\",\"timestamp\":\"2026-05-31T18:59:05.796Z\"}"
+  },
+  {
+    "path": "/api/users",
+    "testedUrl": "/api/users",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 411,
+    "timestamp": "2026-05-31T18:59:06.210Z",
+    "responseSnippet": "{\"users\":[{\"_id\":\"6a1c84f88c2f86ac1019b1d8\",\"name\":\"Audit Bot\",\"email\":\"audit-1780253942889@example.com\",\"avatar\":\"\",\"role\":{\"_id\":\"6a032c6419f8ce1b5e"
+  },
+  {
+    "path": "/api/users/:id",
+    "testedUrl": "/api/users/650c198570c19abcdef12345",
+    "method": "GET",
+    "statusCode": 404,
+    "durationMs": 224,
+    "timestamp": "2026-05-31T18:59:06.435Z",
+    "responseSnippet": "{\"message\":\"User not found\"}"
+  },
+  {
+    "path": "/api/users/:id",
+    "testedUrl": "/api/users/650c198570c19abcdef12345",
+    "method": "PUT",
+    "statusCode": 404,
+    "durationMs": 214,
+    "timestamp": "2026-05-31T18:59:06.649Z",
+    "responseSnippet": "{\"message\":\"User not found\"}"
+  },
+  {
+    "path": "/api/users/:id",
+    "testedUrl": "/api/users/650c198570c19abcdef12345",
+    "method": "DELETE",
+    "statusCode": 404,
+    "durationMs": 219,
+    "timestamp": "2026-05-31T18:59:06.869Z",
+    "responseSnippet": "{\"message\":\"User not found\"}"
+  },
+  {
+    "path": "/api/categories",
+    "testedUrl": "/api/categories",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 65,
+    "timestamp": "2026-05-31T18:59:06.934Z",
+    "responseSnippet": "[{\"_id\":\"virtual-on-sale\",\"name\":\"On Sale\",\"slug\":\"on-sale\",\"description\":\"Tactical valuations on premium artifacts.\",\"image\":null},{\"_id\":\"69c78e0919"
+  },
+  {
+    "path": "/api/categories/:slug",
+    "testedUrl": "/api/categories/test-slug",
+    "method": "GET",
+    "statusCode": 404,
+    "durationMs": 247,
+    "timestamp": "2026-05-31T18:59:07.181Z",
+    "responseSnippet": "{\"message\":\"Category not found\"}"
+  },
+  {
+    "path": "/api/subcategories",
+    "testedUrl": "/api/subcategories",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 139,
+    "timestamp": "2026-05-31T18:59:07.320Z",
+    "responseSnippet": "{\"subcategories\":[{\"_id\":\"69c7925619bd3d5aa54fa577\",\"name\":\"Active Tops\",\"slug\":\"active-tops\",\"category\":{\"_id\":\"69c78e0919bd3d5aa54fa561\",\"name\":\"Spo"
+  },
+  {
+    "path": "/api/subcategories",
+    "testedUrl": "/api/subcategories",
+    "method": "POST",
+    "statusCode": 400,
+    "durationMs": 95,
+    "timestamp": "2026-05-31T18:59:07.415Z",
+    "responseSnippet": "{\"message\":\"Invalid input: expected object, received undefined\",\"errors\":[{\"field\":\"\",\"message\":\"Invalid input: expected object, received undefined\"}]"
+  },
+  {
+    "path": "/api/subcategories/:id",
+    "testedUrl": "/api/subcategories/650c198570c19abcdef12345",
+    "method": "GET",
+    "statusCode": 500,
+    "durationMs": 46,
+    "timestamp": "2026-05-31T18:59:07.462Z",
+    "responseSnippet": "{\"success\":false,\"message\":\"Subcategory not found\",\"timestamp\":\"2026-05-31T18:59:07.461Z\"}"
+  },
+  {
+    "path": "/api/subcategories/:id",
+    "testedUrl": "/api/subcategories/650c198570c19abcdef12345",
+    "method": "PUT",
+    "statusCode": 400,
+    "durationMs": 93,
+    "timestamp": "2026-05-31T18:59:07.555Z",
+    "responseSnippet": "{\"message\":\"Invalid input: expected object, received undefined\",\"errors\":[{\"field\":\"\",\"message\":\"Invalid input: expected object, received undefined\"}]"
+  },
+  {
+    "path": "/api/subcategories/:id",
+    "testedUrl": "/api/subcategories/650c198570c19abcdef12345",
+    "method": "DELETE",
+    "statusCode": 404,
+    "durationMs": 134,
+    "timestamp": "2026-05-31T18:59:07.689Z",
+    "responseSnippet": "{\"message\":\"Subcategory not found\"}"
+  },
+  {
+    "path": "/api/sizes",
+    "testedUrl": "/api/sizes",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 133,
+    "timestamp": "2026-05-31T18:59:07.823Z",
+    "responseSnippet": "{\"sizes\":[{\"_id\":\"69c79515dd74230ef1720c6e\",\"name\":\"XS\",\"description\":\"Extra Small\",\"category\":{\"_id\":\"69c78e0919bd3d5aa54fa55c\",\"name\":\"Men\",\"slug\":\""
+  },
+  {
+    "path": "/api/sizes",
+    "testedUrl": "/api/sizes",
+    "method": "POST",
+    "statusCode": 400,
+    "durationMs": 90,
+    "timestamp": "2026-05-31T18:59:07.913Z",
+    "responseSnippet": "{\"message\":\"Invalid input: expected object, received undefined\",\"errors\":[{\"field\":\"\",\"message\":\"Invalid input: expected object, received undefined\"}]"
+  },
+  {
+    "path": "/api/sizes/:id",
+    "testedUrl": "/api/sizes/650c198570c19abcdef12345",
+    "method": "GET",
+    "statusCode": 404,
+    "durationMs": 49,
+    "timestamp": "2026-05-31T18:59:07.962Z",
+    "responseSnippet": "{\"message\":\"Size not found\"}"
+  },
+  {
+    "path": "/api/sizes/:id",
+    "testedUrl": "/api/sizes/650c198570c19abcdef12345",
+    "method": "PUT",
+    "statusCode": 400,
+    "durationMs": 93,
+    "timestamp": "2026-05-31T18:59:08.055Z",
+    "responseSnippet": "{\"message\":\"Invalid input: expected object, received undefined\",\"errors\":[{\"field\":\"\",\"message\":\"Invalid input: expected object, received undefined\"}]"
+  },
+  {
+    "path": "/api/sizes/:id",
+    "testedUrl": "/api/sizes/650c198570c19abcdef12345",
+    "method": "DELETE",
+    "statusCode": 404,
+    "durationMs": 131,
+    "timestamp": "2026-05-31T18:59:08.186Z",
+    "responseSnippet": "{\"message\":\"Size not found\"}"
+  },
+  {
+    "path": "/api/products",
+    "testedUrl": "/api/products",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 80,
+    "timestamp": "2026-05-31T18:59:08.266Z",
+    "responseSnippet": "{\"success\":true,\"total\":251,\"pages\":11,\"currentPage\":1,\"products\":[{\"_id\":\"69c797f6dd74230ef1720c96\",\"name\":\"Men's Flannel Winter Shirt 8\",\"slug\":\"men"
+  },
+  {
+    "path": "/api/products/:slug",
+    "testedUrl": "/api/products/test-slug",
+    "method": "GET",
+    "statusCode": 400,
+    "durationMs": 3,
+    "timestamp": "2026-05-31T18:59:08.270Z",
+    "responseSnippet": "{\"message\":\"Invalid product identity protocol\"}"
+  },
+  {
+    "path": "/api/cart",
+    "testedUrl": "/api/cart",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 134,
+    "timestamp": "2026-05-31T18:59:08.404Z",
+    "responseSnippet": "{\"_id\":\"6a1c84eab34720ab92480466\",\"user\":\"6a1c84e6b34720ab924803fe\",\"items\":[],\"createdAt\":\"2026-05-31T18:58:50.617Z\",\"updatedAt\":\"2026-05-31T18:58:50"
+  },
+  {
+    "path": "/api/cart",
+    "testedUrl": "/api/cart",
+    "method": "POST",
+    "statusCode": 404,
+    "durationMs": 96,
+    "timestamp": "2026-05-31T18:59:08.501Z",
+    "responseSnippet": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /api/cart</pre>\n</body>\n</html>\n"
+  },
+  {
+    "path": "/api/cart",
+    "testedUrl": "/api/cart",
+    "method": "PUT",
+    "statusCode": 404,
+    "durationMs": 90,
+    "timestamp": "2026-05-31T18:59:08.591Z",
+    "responseSnippet": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PUT /api/cart</pre>\n</body>\n</html>\n"
+  },
+  {
+    "path": "/api/cart/:productId",
+    "testedUrl": "/api/cart/650c198570c19abcdef12345",
+    "method": "DELETE",
+    "statusCode": 404,
+    "durationMs": 91,
+    "timestamp": "2026-05-31T18:59:08.682Z",
+    "responseSnippet": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot DELETE /api/cart/650c198570c19abcdef123"
+  },
+  {
+    "path": "/api/wishlist",
+    "testedUrl": "/api/wishlist",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 171,
+    "timestamp": "2026-05-31T18:59:08.853Z",
+    "responseSnippet": "{\"_id\":\"6a1c84ebb34720ab92480471\",\"user\":\"6a1c84e6b34720ab924803fe\",\"products\":[],\"createdAt\":\"2026-05-31T18:58:51.056Z\",\"updatedAt\":\"2026-05-31T18:58"
+  },
+  {
+    "path": "/api/wishlist",
+    "testedUrl": "/api/wishlist",
+    "method": "POST",
+    "statusCode": 404,
+    "durationMs": 91,
+    "timestamp": "2026-05-31T18:59:08.944Z",
+    "responseSnippet": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /api/wishlist</pre>\n</body>\n</html"
+  },
+  {
+    "path": "/api/wishlist/:productId",
+    "testedUrl": "/api/wishlist/650c198570c19abcdef12345",
+    "method": "DELETE",
+    "statusCode": 404,
+    "durationMs": 93,
+    "timestamp": "2026-05-31T18:59:09.037Z",
+    "responseSnippet": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot DELETE /api/wishlist/650c198570c19abcde"
+  },
+  {
+    "path": "/api/orders",
+    "testedUrl": "/api/orders",
+    "method": "GET",
+    "statusCode": 404,
+    "durationMs": 4,
+    "timestamp": "2026-05-31T18:59:09.041Z",
+    "responseSnippet": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /api/orders</pre>\n</body>\n</html>\n"
+  },
+  {
+    "path": "/api/orders",
+    "testedUrl": "/api/orders",
+    "method": "POST",
+    "statusCode": 404,
+    "durationMs": 2,
+    "timestamp": "2026-05-31T18:59:09.043Z",
+    "responseSnippet": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /api/orders</pre>\n</body>\n</html>\n"
+  },
+  {
+    "path": "/api/orders/:id",
+    "testedUrl": "/api/orders/650c198570c19abcdef12345",
+    "method": "GET",
+    "statusCode": 404,
+    "durationMs": 134,
+    "timestamp": "2026-05-31T18:59:09.177Z",
+    "responseSnippet": "{\"message\":\"Protocol not found.\"}"
+  },
+  {
+    "path": "/api/orders/:id",
+    "testedUrl": "/api/orders/650c198570c19abcdef12345",
+    "method": "PUT",
+    "statusCode": 404,
+    "durationMs": 5,
+    "timestamp": "2026-05-31T18:59:09.183Z",
+    "responseSnippet": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PUT /api/orders/650c198570c19abcdef1234"
+  },
+  {
+    "path": "/api/orders/:id",
+    "testedUrl": "/api/orders/650c198570c19abcdef12345",
+    "method": "DELETE",
+    "statusCode": 404,
+    "durationMs": 2,
+    "timestamp": "2026-05-31T18:59:09.185Z",
+    "responseSnippet": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot DELETE /api/orders/650c198570c19abcdef1"
+  },
+  {
+    "path": "/api/reviews",
+    "testedUrl": "/api/reviews",
+    "method": "GET",
+    "statusCode": 404,
+    "durationMs": 96,
+    "timestamp": "2026-05-31T18:59:09.281Z",
+    "responseSnippet": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /api/reviews</pre>\n</body>\n</html>\n"
+  },
+  {
+    "path": "/api/reviews",
+    "testedUrl": "/api/reviews",
+    "method": "POST",
+    "statusCode": 500,
+    "durationMs": 93,
+    "timestamp": "2026-05-31T18:59:09.374Z",
+    "responseSnippet": "{\"success\":false,\"message\":\"Cannot destructure property 'productId' of 'req.body' as it is undefined.\",\"timestamp\":\"2026-05-31T18:59:09.372Z\"}"
+  },
+  {
+    "path": "/api/reviews/:id",
+    "testedUrl": "/api/reviews/650c198570c19abcdef12345",
+    "method": "PUT",
+    "statusCode": 500,
+    "durationMs": 108,
+    "timestamp": "2026-05-31T18:59:09.482Z",
+    "responseSnippet": "{\"success\":false,\"message\":\"Cannot destructure property 'rating' of 'req.body' as it is undefined.\",\"timestamp\":\"2026-05-31T18:59:09.479Z\"}"
+  },
+  {
+    "path": "/api/reviews/:id",
+    "testedUrl": "/api/reviews/650c198570c19abcdef12345",
+    "method": "DELETE",
+    "statusCode": 404,
+    "durationMs": 131,
+    "timestamp": "2026-05-31T18:59:09.613Z",
+    "responseSnippet": "{\"message\":\"Review not found\"}"
+  },
+  {
+    "path": "/api/coupons",
+    "testedUrl": "/api/coupons",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 636,
+    "timestamp": "2026-05-31T18:59:10.250Z",
+    "responseSnippet": "{\"coupons\":[{\"_id\":\"6a1b30ef5e155e1bddfd5f0e\",\"code\":\"AUDIT150\",\"discountType\":\"percentage\",\"discountValue\":10,\"minOrderAmount\":0,\"usageLimit\":100,\"us"
+  },
+  {
+    "path": "/api/coupons",
+    "testedUrl": "/api/coupons",
+    "method": "POST",
+    "statusCode": 400,
+    "durationMs": 178,
+    "timestamp": "2026-05-31T18:59:10.428Z",
+    "responseSnippet": "{\"success\":false,\"message\":\"Validation Error\",\"errors\":[{\"field\":\"discountValue\",\"message\":\"Path `discountValue` is required.\"},{\"field\":\"discountType"
+  },
+  {
+    "path": "/api/coupons/:id",
+    "testedUrl": "/api/coupons/650c198570c19abcdef12345",
+    "method": "GET",
+    "statusCode": 404,
+    "durationMs": 211,
+    "timestamp": "2026-05-31T18:59:10.639Z",
+    "responseSnippet": "{\"message\":\"Coupon not found\"}"
+  },
+  {
+    "path": "/api/coupons/:id",
+    "testedUrl": "/api/coupons/650c198570c19abcdef12345",
+    "method": "PUT",
+    "statusCode": 200,
+    "durationMs": 216,
+    "timestamp": "2026-05-31T18:59:10.855Z",
+    "responseSnippet": "null"
+  },
+  {
+    "path": "/api/coupons/:id",
+    "testedUrl": "/api/coupons/650c198570c19abcdef12345",
+    "method": "DELETE",
+    "statusCode": 200,
+    "durationMs": 229,
+    "timestamp": "2026-05-31T18:59:11.084Z",
+    "responseSnippet": "{\"message\":\"Coupon deleted\"}"
+  },
+  {
+    "path": "/api/settings",
+    "testedUrl": "/api/settings",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 186,
+    "timestamp": "2026-05-31T18:59:11.270Z",
+    "responseSnippet": "{\"branding\":{\"activeTheme\":\"executive\",\"defaultTheme\":\"dark\",\"defaultThemeColor\":\"Rose\",\"defaultThemeFont\":\"Inter\",\"defaultLanguage\":\"en\",\"siteName\":\""
+  },
+  {
+    "path": "/api/settings",
+    "testedUrl": "/api/settings",
+    "method": "PUT",
+    "statusCode": 500,
+    "durationMs": 94,
+    "timestamp": "2026-05-31T18:59:11.364Z",
+    "responseSnippet": "{\"success\":false,\"message\":\"Cannot read properties of undefined (reading 'config')\",\"timestamp\":\"2026-05-31T18:59:11.361Z\"}"
+  }
+]

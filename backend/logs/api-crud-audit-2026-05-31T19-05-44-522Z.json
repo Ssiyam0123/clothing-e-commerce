@@ -1,0 +1,1118 @@
+[
+  {
+    "name": "Root ping",
+    "path": "/",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 40,
+    "timestamp": "2026-05-31T19:05:32.726Z",
+    "responseSnippet": "{\"success\":true,\"message\":\"Vanguard System Engine is Active.\",\"environment\":\"development\"}",
+    "rawBody": {
+      "success": true,
+      "message": "Vanguard System Engine is Active.",
+      "environment": "development"
+    }
+  },
+  {
+    "name": "Create Category",
+    "path": "/api/admin/categories",
+    "method": "POST",
+    "statusCode": 201,
+    "durationMs": 351,
+    "timestamp": "2026-05-31T19:05:33.077Z",
+    "responseSnippet": "{\"name\":\"Audit Category 1780254332726\",\"slug\":\"audit-cat-1780254332726\",\"description\":\"Audit category description\",\"image\":null,\"_id\":\"6a1c867d4ca22ca",
+    "rawBody": {
+      "name": "Audit Category 1780254332726",
+      "slug": "audit-cat-1780254332726",
+      "description": "Audit category description",
+      "image": null,
+      "_id": "6a1c867d4ca22cab5b375239",
+      "createdAt": "2026-05-31T19:05:33.022Z",
+      "updatedAt": "2026-05-31T19:05:33.022Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Get Category by ID (Admin)",
+    "path": "/api/admin/categories/6a1c867d4ca22cab5b375239",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 331,
+    "timestamp": "2026-05-31T19:05:33.408Z",
+    "responseSnippet": "{\"_id\":\"6a1c867d4ca22cab5b375239\",\"name\":\"Audit Category 1780254332726\",\"slug\":\"audit-cat-1780254332726\",\"description\":\"Audit category description\",\"i",
+    "rawBody": {
+      "_id": "6a1c867d4ca22cab5b375239",
+      "name": "Audit Category 1780254332726",
+      "slug": "audit-cat-1780254332726",
+      "description": "Audit category description",
+      "image": null,
+      "createdAt": "2026-05-31T19:05:33.022Z",
+      "updatedAt": "2026-05-31T19:05:33.022Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Get Category by Slug (Public)",
+    "path": "/api/categories/audit-cat-1780254332726",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 60,
+    "timestamp": "2026-05-31T19:05:33.468Z",
+    "responseSnippet": "{\"_id\":\"6a1c867d4ca22cab5b375239\",\"name\":\"Audit Category 1780254332726\",\"slug\":\"audit-cat-1780254332726\",\"description\":\"Audit category description\",\"i",
+    "rawBody": {
+      "_id": "6a1c867d4ca22cab5b375239",
+      "name": "Audit Category 1780254332726",
+      "slug": "audit-cat-1780254332726",
+      "description": "Audit category description",
+      "image": null
+    }
+  },
+  {
+    "name": "Update Category",
+    "path": "/api/admin/categories/6a1c867d4ca22cab5b375239",
+    "method": "PUT",
+    "statusCode": 200,
+    "durationMs": 369,
+    "timestamp": "2026-05-31T19:05:33.837Z",
+    "responseSnippet": "{\"_id\":\"6a1c867d4ca22cab5b375239\",\"name\":\"Audit Category Updated 1780254333468\",\"slug\":\"audit-cat-1780254332726\",\"description\":\"Audit category descrip",
+    "rawBody": {
+      "_id": "6a1c867d4ca22cab5b375239",
+      "name": "Audit Category Updated 1780254333468",
+      "slug": "audit-cat-1780254332726",
+      "description": "Audit category description updated",
+      "image": null,
+      "createdAt": "2026-05-31T19:05:33.022Z",
+      "updatedAt": "2026-05-31T19:05:33.785Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Create Subcategory",
+    "path": "/api/subcategories",
+    "method": "POST",
+    "statusCode": 201,
+    "durationMs": 140,
+    "timestamp": "2026-05-31T19:05:33.977Z",
+    "responseSnippet": "{\"name\":\"Audit Subcategory 1780254333837\",\"slug\":\"audit-sub-1780254333837\",\"category\":\"6a1c867d4ca22cab5b375239\",\"description\":\"Audit subcategory desc",
+    "rawBody": {
+      "name": "Audit Subcategory 1780254333837",
+      "slug": "audit-sub-1780254333837",
+      "category": "6a1c867d4ca22cab5b375239",
+      "description": "Audit subcategory description",
+      "image": null,
+      "_id": "6a1c867d4ca22cab5b375255",
+      "createdAt": "2026-05-31T19:05:33.929Z",
+      "updatedAt": "2026-05-31T19:05:33.929Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Get Subcategory by ID",
+    "path": "/api/subcategories/6a1c867d4ca22cab5b375255",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 94,
+    "timestamp": "2026-05-31T19:05:34.071Z",
+    "responseSnippet": "{\"_id\":\"6a1c867d4ca22cab5b375255\",\"name\":\"Audit Subcategory 1780254333837\",\"slug\":\"audit-sub-1780254333837\",\"category\":{\"_id\":\"6a1c867d4ca22cab5b37523",
+    "rawBody": {
+      "_id": "6a1c867d4ca22cab5b375255",
+      "name": "Audit Subcategory 1780254333837",
+      "slug": "audit-sub-1780254333837",
+      "category": {
+        "_id": "6a1c867d4ca22cab5b375239",
+        "name": "Audit Category Updated 1780254333468"
+      },
+      "description": "Audit subcategory description",
+      "image": null,
+      "createdAt": "2026-05-31T19:05:33.929Z",
+      "updatedAt": "2026-05-31T19:05:33.929Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Update Subcategory",
+    "path": "/api/subcategories/6a1c867d4ca22cab5b375255",
+    "method": "PUT",
+    "statusCode": 200,
+    "durationMs": 184,
+    "timestamp": "2026-05-31T19:05:34.256Z",
+    "responseSnippet": "{\"_id\":\"6a1c867d4ca22cab5b375255\",\"name\":\"Audit Subcategory Updated 1780254334071\",\"slug\":\"audit-sub-1780254333837\",\"category\":\"6a1c867d4ca22cab5b3752",
+    "rawBody": {
+      "_id": "6a1c867d4ca22cab5b375255",
+      "name": "Audit Subcategory Updated 1780254334071",
+      "slug": "audit-sub-1780254333837",
+      "category": "6a1c867d4ca22cab5b375239",
+      "description": "Audit subcategory description",
+      "image": null,
+      "createdAt": "2026-05-31T19:05:33.929Z",
+      "updatedAt": "2026-05-31T19:05:34.209Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Create Size",
+    "path": "/api/sizes",
+    "method": "POST",
+    "statusCode": 201,
+    "durationMs": 185,
+    "timestamp": "2026-05-31T19:05:34.441Z",
+    "responseSnippet": "{\"name\":\"SZ-4256\",\"description\":\"Audit size description\",\"category\":\"6a1c867d4ca22cab5b375239\",\"_id\":\"6a1c867e4ca22cab5b375263\",\"createdAt\":\"2026-05-3",
+    "rawBody": {
+      "name": "SZ-4256",
+      "description": "Audit size description",
+      "category": "6a1c867d4ca22cab5b375239",
+      "_id": "6a1c867e4ca22cab5b375263",
+      "createdAt": "2026-05-31T19:05:34.394Z",
+      "updatedAt": "2026-05-31T19:05:34.394Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Get Size by ID",
+    "path": "/api/sizes/6a1c867e4ca22cab5b375263",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 95,
+    "timestamp": "2026-05-31T19:05:34.536Z",
+    "responseSnippet": "{\"_id\":\"6a1c867e4ca22cab5b375263\",\"name\":\"SZ-4256\",\"description\":\"Audit size description\",\"category\":{\"_id\":\"6a1c867d4ca22cab5b375239\",\"name\":\"Audit C",
+    "rawBody": {
+      "_id": "6a1c867e4ca22cab5b375263",
+      "name": "SZ-4256",
+      "description": "Audit size description",
+      "category": {
+        "_id": "6a1c867d4ca22cab5b375239",
+        "name": "Audit Category Updated 1780254333468",
+        "slug": "audit-cat-1780254332726"
+      },
+      "createdAt": "2026-05-31T19:05:34.394Z",
+      "updatedAt": "2026-05-31T19:05:34.394Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Update Size",
+    "path": "/api/sizes/6a1c867e4ca22cab5b375263",
+    "method": "PUT",
+    "statusCode": 200,
+    "durationMs": 185,
+    "timestamp": "2026-05-31T19:05:34.721Z",
+    "responseSnippet": "{\"_id\":\"6a1c867e4ca22cab5b375263\",\"name\":\"SZ-U-4536\",\"description\":\"Audit size description\",\"category\":\"6a1c867d4ca22cab5b375239\",\"createdAt\":\"2026-05",
+    "rawBody": {
+      "_id": "6a1c867e4ca22cab5b375263",
+      "name": "SZ-U-4536",
+      "description": "Audit size description",
+      "category": "6a1c867d4ca22cab5b375239",
+      "createdAt": "2026-05-31T19:05:34.394Z",
+      "updatedAt": "2026-05-31T19:05:34.668Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Create Product",
+    "path": "/api/admin/products",
+    "method": "POST",
+    "statusCode": 201,
+    "durationMs": 339,
+    "timestamp": "2026-05-31T19:05:35.060Z",
+    "responseSnippet": "{\"name\":\"Audit Product 1780254334721\",\"slug\":\"audit-prod-1780254334721\",\"description\":\"Audit product description\",\"price\":99.99,\"discount\":0,\"images\":",
+    "rawBody": {
+      "name": "Audit Product 1780254334721",
+      "slug": "audit-prod-1780254334721",
+      "description": "Audit product description",
+      "price": 99.99,
+      "discount": 0,
+      "images": [],
+      "category": "6a1c867d4ca22cab5b375239",
+      "subcategory": "6a1c867d4ca22cab5b375255",
+      "sizes": [
+        {
+          "size": "6a1c867e4ca22cab5b375263",
+          "stock": 50,
+          "_id": "6a1c867f4ca22cab5b375272"
+        }
+      ],
+      "tags": [],
+      "isActive": true,
+      "isFeatured": false,
+      "featuredOrder": 0,
+      "views": 0,
+      "averageRating": 0,
+      "totalReviews": 0,
+      "showReviews": true,
+      "gender": "Unisex",
+      "seo": {
+        "metaTitle": "",
+        "metaDescription": "",
+        "keywords": ""
+      },
+      "_id": "6a1c867f4ca22cab5b375271",
+      "faqs": [],
+      "createdAt": "2026-05-31T19:05:35.010Z",
+      "updatedAt": "2026-05-31T19:05:35.010Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Get Product by ID (Admin)",
+    "path": "/api/admin/products/6a1c867f4ca22cab5b375271",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 365,
+    "timestamp": "2026-05-31T19:05:35.425Z",
+    "responseSnippet": "{\"_id\":\"6a1c867f4ca22cab5b375271\",\"name\":\"Audit Product 1780254334721\",\"slug\":\"audit-prod-1780254334721\",\"description\":\"Audit product description\",\"pr",
+    "rawBody": {
+      "_id": "6a1c867f4ca22cab5b375271",
+      "name": "Audit Product 1780254334721",
+      "slug": "audit-prod-1780254334721",
+      "description": "Audit product description",
+      "price": 99.99,
+      "discount": 0,
+      "images": [],
+      "category": {
+        "_id": "6a1c867d4ca22cab5b375239",
+        "name": "Audit Category Updated 1780254333468",
+        "slug": "audit-cat-1780254332726",
+        "description": "Audit category description updated",
+        "image": null,
+        "createdAt": "2026-05-31T19:05:33.022Z",
+        "updatedAt": "2026-05-31T19:05:33.785Z",
+        "__v": 0
+      },
+      "subcategory": {
+        "_id": "6a1c867d4ca22cab5b375255",
+        "name": "Audit Subcategory Updated 1780254334071",
+        "slug": "audit-sub-1780254333837",
+        "category": "6a1c867d4ca22cab5b375239",
+        "description": "Audit subcategory description",
+        "image": null,
+        "createdAt": "2026-05-31T19:05:33.929Z",
+        "updatedAt": "2026-05-31T19:05:34.209Z",
+        "__v": 0
+      },
+      "sizes": [
+        {
+          "size": {
+            "_id": "6a1c867e4ca22cab5b375263",
+            "name": "SZ-U-4536",
+            "description": "Audit size description",
+            "category": "6a1c867d4ca22cab5b375239",
+            "createdAt": "2026-05-31T19:05:34.394Z",
+            "updatedAt": "2026-05-31T19:05:34.668Z",
+            "__v": 0
+          },
+          "stock": 50,
+          "_id": "6a1c867f4ca22cab5b375272"
+        }
+      ],
+      "tags": [],
+      "isActive": true,
+      "isFeatured": false,
+      "featuredOrder": 0,
+      "views": 0,
+      "averageRating": 0,
+      "totalReviews": 0,
+      "showReviews": true,
+      "gender": "Unisex",
+      "seo": {
+        "metaTitle": "",
+        "metaDescription": "",
+        "keywords": ""
+      },
+      "faqs": [],
+      "createdAt": "2026-05-31T19:05:35.010Z",
+      "updatedAt": "2026-05-31T19:05:35.010Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Get Product by Slug (Public)",
+    "path": "/api/products/details/audit-prod-1780254334721",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 58,
+    "timestamp": "2026-05-31T19:05:35.483Z",
+    "responseSnippet": "{\"_id\":\"6a1c867f4ca22cab5b375271\",\"name\":\"Audit Product 1780254334721\",\"slug\":\"audit-prod-1780254334721\",\"description\":\"Audit product description\",\"pr",
+    "rawBody": {
+      "_id": "6a1c867f4ca22cab5b375271",
+      "name": "Audit Product 1780254334721",
+      "slug": "audit-prod-1780254334721",
+      "description": "Audit product description",
+      "price": 99.99,
+      "discount": 0,
+      "images": [],
+      "category": {
+        "_id": "6a1c867d4ca22cab5b375239",
+        "name": "Audit Category Updated 1780254333468",
+        "slug": "audit-cat-1780254332726"
+      },
+      "subcategory": {
+        "_id": "6a1c867d4ca22cab5b375255",
+        "name": "Audit Subcategory Updated 1780254334071",
+        "slug": "audit-sub-1780254333837"
+      },
+      "sizes": [
+        {
+          "size": {
+            "_id": "6a1c867e4ca22cab5b375263",
+            "name": "SZ-U-4536"
+          },
+          "stock": 50,
+          "_id": "6a1c867f4ca22cab5b375272"
+        }
+      ],
+      "tags": [],
+      "isFeatured": false,
+      "views": 0,
+      "averageRating": 0,
+      "totalReviews": 0,
+      "showReviews": true,
+      "gender": "Unisex",
+      "seo": {
+        "metaTitle": "",
+        "metaDescription": "",
+        "keywords": ""
+      },
+      "faqs": [],
+      "createdAt": "2026-05-31T19:05:35.010Z",
+      "updatedAt": "2026-05-31T19:05:35.010Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Get Product by ID (Public)",
+    "path": "/api/products/6a1c867f4ca22cab5b375271",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 222,
+    "timestamp": "2026-05-31T19:05:35.705Z",
+    "responseSnippet": "{\"_id\":\"6a1c867f4ca22cab5b375271\",\"name\":\"Audit Product 1780254334721\",\"slug\":\"audit-prod-1780254334721\",\"description\":\"Audit product description\",\"pr",
+    "rawBody": {
+      "_id": "6a1c867f4ca22cab5b375271",
+      "name": "Audit Product 1780254334721",
+      "slug": "audit-prod-1780254334721",
+      "description": "Audit product description",
+      "price": 99.99,
+      "discount": 0,
+      "images": [],
+      "category": {
+        "_id": "6a1c867d4ca22cab5b375239",
+        "name": "Audit Category Updated 1780254333468",
+        "slug": "audit-cat-1780254332726"
+      },
+      "subcategory": {
+        "_id": "6a1c867d4ca22cab5b375255",
+        "name": "Audit Subcategory Updated 1780254334071",
+        "slug": "audit-sub-1780254333837"
+      },
+      "sizes": [
+        {
+          "size": {
+            "_id": "6a1c867e4ca22cab5b375263",
+            "name": "SZ-U-4536"
+          },
+          "stock": 50,
+          "_id": "6a1c867f4ca22cab5b375272"
+        }
+      ],
+      "tags": [],
+      "isFeatured": false,
+      "views": 0,
+      "averageRating": 0,
+      "totalReviews": 0,
+      "showReviews": true,
+      "gender": "Unisex",
+      "seo": {
+        "metaTitle": "",
+        "metaDescription": "",
+        "keywords": ""
+      },
+      "faqs": [],
+      "createdAt": "2026-05-31T19:05:35.010Z",
+      "updatedAt": "2026-05-31T19:05:35.010Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Update Product",
+    "path": "/api/admin/products/6a1c867f4ca22cab5b375271",
+    "method": "PUT",
+    "statusCode": 200,
+    "durationMs": 816,
+    "timestamp": "2026-05-31T19:05:36.521Z",
+    "responseSnippet": "{\"seo\":{\"metaTitle\":\"\",\"metaDescription\":\"\",\"keywords\":\"\"},\"_id\":\"6a1c867f4ca22cab5b375271\",\"name\":\"Audit Product Updated 1780254335705\",\"slug\":\"audit",
+    "rawBody": {
+      "seo": {
+        "metaTitle": "",
+        "metaDescription": "",
+        "keywords": ""
+      },
+      "_id": "6a1c867f4ca22cab5b375271",
+      "name": "Audit Product Updated 1780254335705",
+      "slug": "audit-product-updated-1780254335705",
+      "description": "Audit product description",
+      "price": 109.99,
+      "discount": 0,
+      "images": [],
+      "category": "6a1c867d4ca22cab5b375239",
+      "subcategory": "6a1c867d4ca22cab5b375255",
+      "sizes": [
+        {
+          "size": "6a1c867e4ca22cab5b375263",
+          "stock": 50,
+          "_id": "6a1c867f4ca22cab5b375272"
+        }
+      ],
+      "tags": [],
+      "isActive": true,
+      "isFeatured": false,
+      "featuredOrder": 0,
+      "views": 0,
+      "averageRating": 0,
+      "totalReviews": 0,
+      "showReviews": true,
+      "gender": "Unisex",
+      "faqs": [],
+      "createdAt": "2026-05-31T19:05:35.010Z",
+      "updatedAt": "2026-05-31T19:05:36.419Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Add to Cart",
+    "path": "/api/cart/add",
+    "method": "POST",
+    "statusCode": 200,
+    "durationMs": 821,
+    "timestamp": "2026-05-31T19:05:37.342Z",
+    "responseSnippet": "{\"_id\":\"6a1c84eab34720ab92480466\",\"user\":\"6a1c84e6b34720ab924803fe\",\"items\":[{\"product\":{\"_id\":\"6a1c867f4ca22cab5b375271\",\"name\":\"Audit Product Update",
+    "rawBody": {
+      "_id": "6a1c84eab34720ab92480466",
+      "user": "6a1c84e6b34720ab924803fe",
+      "items": [
+        {
+          "product": {
+            "_id": "6a1c867f4ca22cab5b375271",
+            "name": "Audit Product Updated 1780254335705",
+            "slug": "audit-product-updated-1780254335705",
+            "price": 109.99,
+            "discount": 0,
+            "images": [],
+            "isActive": true
+          },
+          "size": {
+            "_id": "6a1c867e4ca22cab5b375263",
+            "name": "SZ-U-4536"
+          },
+          "quantity": 2
+        }
+      ],
+      "createdAt": "2026-05-31T18:58:50.617Z",
+      "updatedAt": "2026-05-31T19:05:37.034Z",
+      "__v": 2,
+      "totalItems": 2,
+      "totalPrice": 219.98
+    }
+  },
+  {
+    "name": "Get Cart",
+    "path": "/api/cart",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 255,
+    "timestamp": "2026-05-31T19:05:37.597Z",
+    "responseSnippet": "{\"_id\":\"6a1c84eab34720ab92480466\",\"user\":\"6a1c84e6b34720ab924803fe\",\"items\":[{\"product\":{\"_id\":\"6a1c867f4ca22cab5b375271\",\"name\":\"Audit Product Update",
+    "rawBody": {
+      "_id": "6a1c84eab34720ab92480466",
+      "user": "6a1c84e6b34720ab924803fe",
+      "items": [
+        {
+          "product": {
+            "_id": "6a1c867f4ca22cab5b375271",
+            "name": "Audit Product Updated 1780254335705",
+            "slug": "audit-product-updated-1780254335705",
+            "price": 109.99,
+            "discount": 0,
+            "images": [],
+            "isActive": true
+          },
+          "size": {
+            "_id": "6a1c867e4ca22cab5b375263",
+            "name": "SZ-U-4536"
+          },
+          "quantity": 2
+        }
+      ],
+      "createdAt": "2026-05-31T18:58:50.617Z",
+      "updatedAt": "2026-05-31T19:05:37.034Z",
+      "__v": 2,
+      "totalItems": 2,
+      "totalPrice": 219.98
+    }
+  },
+  {
+    "name": "Update Cart Item",
+    "path": "/api/cart/update",
+    "method": "PUT",
+    "statusCode": 200,
+    "durationMs": 355,
+    "timestamp": "2026-05-31T19:05:37.952Z",
+    "responseSnippet": "{\"_id\":\"6a1c84eab34720ab92480466\",\"user\":\"6a1c84e6b34720ab924803fe\",\"items\":[{\"product\":{\"_id\":\"6a1c867f4ca22cab5b375271\",\"name\":\"Audit Product Update",
+    "rawBody": {
+      "_id": "6a1c84eab34720ab92480466",
+      "user": "6a1c84e6b34720ab924803fe",
+      "items": [
+        {
+          "product": {
+            "_id": "6a1c867f4ca22cab5b375271",
+            "name": "Audit Product Updated 1780254335705",
+            "slug": "audit-product-updated-1780254335705",
+            "price": 109.99,
+            "discount": 0,
+            "images": [],
+            "isActive": true
+          },
+          "size": {
+            "_id": "6a1c867e4ca22cab5b375263",
+            "name": "SZ-U-4536"
+          },
+          "quantity": 5
+        }
+      ],
+      "createdAt": "2026-05-31T18:58:50.617Z",
+      "updatedAt": "2026-05-31T19:05:37.800Z",
+      "__v": 2,
+      "totalItems": 5,
+      "totalPrice": 549.9499999999999
+    }
+  },
+  {
+    "name": "Add to Wishlist",
+    "path": "/api/wishlist/add",
+    "method": "POST",
+    "statusCode": 200,
+    "durationMs": 354,
+    "timestamp": "2026-05-31T19:05:38.307Z",
+    "responseSnippet": "{\"_id\":\"6a1c84ebb34720ab92480471\",\"user\":\"6a1c84e6b34720ab924803fe\",\"products\":[{\"_id\":\"6a1c867f4ca22cab5b375271\",\"name\":\"Audit Product Updated 178025",
+    "rawBody": {
+      "_id": "6a1c84ebb34720ab92480471",
+      "user": "6a1c84e6b34720ab924803fe",
+      "products": [
+        {
+          "_id": "6a1c867f4ca22cab5b375271",
+          "name": "Audit Product Updated 1780254335705",
+          "slug": "audit-product-updated-1780254335705",
+          "price": 109.99,
+          "discount": 0,
+          "images": [],
+          "category": "6a1c867d4ca22cab5b375239",
+          "sizes": [
+            {
+              "size": {
+                "_id": "6a1c867e4ca22cab5b375263",
+                "name": "SZ-U-4536"
+              },
+              "stock": 50,
+              "_id": "6a1c867f4ca22cab5b375272"
+            }
+          ]
+        }
+      ],
+      "createdAt": "2026-05-31T18:58:51.056Z",
+      "updatedAt": "2026-05-31T19:05:38.155Z",
+      "__v": 2
+    }
+  },
+  {
+    "name": "Get Wishlist",
+    "path": "/api/wishlist",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 254,
+    "timestamp": "2026-05-31T19:05:38.561Z",
+    "responseSnippet": "{\"_id\":\"6a1c84ebb34720ab92480471\",\"user\":\"6a1c84e6b34720ab924803fe\",\"products\":[{\"_id\":\"6a1c867f4ca22cab5b375271\",\"name\":\"Audit Product Updated 178025",
+    "rawBody": {
+      "_id": "6a1c84ebb34720ab92480471",
+      "user": "6a1c84e6b34720ab924803fe",
+      "products": [
+        {
+          "_id": "6a1c867f4ca22cab5b375271",
+          "name": "Audit Product Updated 1780254335705",
+          "slug": "audit-product-updated-1780254335705",
+          "price": 109.99,
+          "discount": 0,
+          "images": [],
+          "category": "6a1c867d4ca22cab5b375239",
+          "sizes": [
+            {
+              "size": {
+                "_id": "6a1c867e4ca22cab5b375263",
+                "name": "SZ-U-4536"
+              },
+              "stock": 50,
+              "_id": "6a1c867f4ca22cab5b375272"
+            }
+          ]
+        }
+      ],
+      "createdAt": "2026-05-31T18:58:51.056Z",
+      "updatedAt": "2026-05-31T19:05:38.155Z",
+      "__v": 2
+    }
+  },
+  {
+    "name": "Create Product Review",
+    "path": "/api/reviews",
+    "method": "POST",
+    "statusCode": 201,
+    "durationMs": 622,
+    "timestamp": "2026-05-31T19:05:39.183Z",
+    "responseSnippet": "{\"product\":\"6a1c867f4ca22cab5b375271\",\"user\":{\"_id\":\"6a1c84e6b34720ab924803fe\",\"name\":\"Audit Admin\",\"avatar\":\"\"},\"rating\":5,\"comment\":\"Great quality t",
+    "rawBody": {
+      "product": "6a1c867f4ca22cab5b375271",
+      "user": {
+        "_id": "6a1c84e6b34720ab924803fe",
+        "name": "Audit Admin",
+        "avatar": ""
+      },
+      "rating": 5,
+      "comment": "Great quality test product!",
+      "images": [],
+      "isEdited": false,
+      "_id": "6a1c86824ca22cab5b3752b5",
+      "createdAt": "2026-05-31T19:05:38.725Z",
+      "updatedAt": "2026-05-31T19:05:38.725Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Get Reviews",
+    "path": "/api/reviews/product/6a1c867f4ca22cab5b375271",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 745,
+    "timestamp": "2026-05-31T19:05:39.928Z",
+    "responseSnippet": "{\"reviews\":[{\"_id\":\"6a1c86824ca22cab5b3752b5\",\"product\":\"6a1c867f4ca22cab5b375271\",\"user\":{\"_id\":\"6a1c84e6b34720ab924803fe\",\"name\":\"Audit Admin\",\"avat",
+    "rawBody": {
+      "reviews": [
+        {
+          "_id": "6a1c86824ca22cab5b3752b5",
+          "product": "6a1c867f4ca22cab5b375271",
+          "user": {
+            "_id": "6a1c84e6b34720ab924803fe",
+            "name": "Audit Admin",
+            "avatar": ""
+          },
+          "rating": 5,
+          "comment": "Great quality test product!",
+          "images": [],
+          "isEdited": false,
+          "createdAt": "2026-05-31T19:05:38.725Z",
+          "updatedAt": "2026-05-31T19:05:38.725Z",
+          "__v": 0
+        }
+      ],
+      "userReview": {
+        "_id": "6a1c86824ca22cab5b3752b5",
+        "product": "6a1c867f4ca22cab5b375271",
+        "user": {
+          "_id": "6a1c84e6b34720ab924803fe",
+          "name": "Audit Admin",
+          "avatar": ""
+        },
+        "rating": 5,
+        "comment": "Great quality test product!",
+        "images": [],
+        "isEdited": false,
+        "createdAt": "2026-05-31T19:05:38.725Z",
+        "updatedAt": "2026-05-31T19:05:38.725Z",
+        "__v": 0
+      },
+      "total": 1,
+      "pages": 1,
+      "currentPage": 1,
+      "averageRating": 5,
+      "totalReviews": 1
+    }
+  },
+  {
+    "name": "Create Coupon",
+    "path": "/api/coupons",
+    "method": "POST",
+    "statusCode": 201,
+    "durationMs": 487,
+    "timestamp": "2026-05-31T19:05:40.415Z",
+    "responseSnippet": "{\"code\":\"AUDIT9928\",\"discountType\":\"percentage\",\"discountValue\":15,\"minOrderAmount\":100,\"usageLimit\":50,\"usedCount\":0,\"isActive\":true,\"applicableProdu",
+    "rawBody": {
+      "code": "AUDIT9928",
+      "discountType": "percentage",
+      "discountValue": 15,
+      "minOrderAmount": 100,
+      "usageLimit": 50,
+      "usedCount": 0,
+      "isActive": true,
+      "applicableProducts": [],
+      "applicableCategories": [],
+      "_id": "6a1c86844ca22cab5b3752c5",
+      "startDate": "2026-05-31T19:05:40.311Z",
+      "createdAt": "2026-05-31T19:05:40.312Z",
+      "updatedAt": "2026-05-31T19:05:40.312Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Get Coupon by ID",
+    "path": "/api/coupons/6a1c86844ca22cab5b3752c5",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 920,
+    "timestamp": "2026-05-31T19:05:41.336Z",
+    "responseSnippet": "{\"_id\":\"6a1c86844ca22cab5b3752c5\",\"code\":\"AUDIT9928\",\"discountType\":\"percentage\",\"discountValue\":15,\"minOrderAmount\":100,\"usageLimit\":50,\"usedCount\":0",
+    "rawBody": {
+      "_id": "6a1c86844ca22cab5b3752c5",
+      "code": "AUDIT9928",
+      "discountType": "percentage",
+      "discountValue": 15,
+      "minOrderAmount": 100,
+      "usageLimit": 50,
+      "usedCount": 0,
+      "isActive": true,
+      "applicableProducts": [],
+      "applicableCategories": [],
+      "startDate": "2026-05-31T19:05:40.311Z",
+      "createdAt": "2026-05-31T19:05:40.312Z",
+      "updatedAt": "2026-05-31T19:05:40.312Z",
+      "__v": 0,
+      "usageHistory": [],
+      "uniqueProductsCount": 0,
+      "usagePagination": {
+        "total": 0,
+        "page": 1,
+        "pages": 0,
+        "limit": 10
+      }
+    }
+  },
+  {
+    "name": "Update Coupon",
+    "path": "/api/coupons/6a1c86844ca22cab5b3752c5",
+    "method": "PUT",
+    "statusCode": 200,
+    "durationMs": 261,
+    "timestamp": "2026-05-31T19:05:41.597Z",
+    "responseSnippet": "{\"_id\":\"6a1c86844ca22cab5b3752c5\",\"code\":\"AUDIT9928\",\"discountType\":\"percentage\",\"discountValue\":20,\"minOrderAmount\":100,\"usageLimit\":50,\"usedCount\":0",
+    "rawBody": {
+      "_id": "6a1c86844ca22cab5b3752c5",
+      "code": "AUDIT9928",
+      "discountType": "percentage",
+      "discountValue": 20,
+      "minOrderAmount": 100,
+      "usageLimit": 50,
+      "usedCount": 0,
+      "isActive": true,
+      "applicableProducts": [],
+      "applicableCategories": [],
+      "startDate": "2026-05-31T19:05:40.311Z",
+      "createdAt": "2026-05-31T19:05:40.312Z",
+      "updatedAt": "2026-05-31T19:05:41.547Z",
+      "__v": 0
+    }
+  },
+  {
+    "name": "Update Settings",
+    "path": "/api/settings",
+    "method": "PUT",
+    "statusCode": 200,
+    "durationMs": 201,
+    "timestamp": "2026-05-31T19:05:41.798Z",
+    "responseSnippet": "{\"message\":\"Site protocol updated successfully.\",\"settings\":{\"branding\":{\"activeTheme\":\"executive\",\"defaultTheme\":\"dark\",\"defaultThemeColor\":\"Rose\",\"d",
+    "rawBody": {
+      "message": "Site protocol updated successfully.",
+      "settings": {
+        "branding": {
+          "activeTheme": "executive",
+          "defaultTheme": "dark",
+          "defaultThemeColor": "Rose",
+          "defaultThemeFont": "Inter",
+          "defaultLanguage": "en",
+          "siteName": "Drip Nation",
+          "siteTitle": "Drip Nation | Premium Streetwear & Urban Fashion",
+          "description": "Discover premium streetwear, urban fashion, and trendsetting apparel at Drip Nation. Unleash your unique style with our curated high-quality collections.",
+          "logo": "https://res.cloudinary.com/ds4hwq3hb/image/upload/v1780036347/ecowear/settings/ftbgfsvhfnucyxlyrrmb.png",
+          "logoDark": "https://res.cloudinary.com/ds4hwq3hb/image/upload/v1779275550/ecowear/settings/k0vykltuysseszccha6j.png",
+          "favicon": "https://res.cloudinary.com/ds4hwq3hb/image/upload/v1779273037/ecowear/settings/nmbwdpul49tumpld9qsw.jpg"
+        },
+        "config": {
+          "storageMethod": "cloudinary",
+          "maintenanceMode": false
+        },
+        "contact": {
+          "phone": "0946753759",
+          "email": "Spectacular @gmail.com",
+          "address": "Dhaka,bangladesh",
+          "whatsapp": "012839817649"
+        },
+        "paymentOptions": {
+          "cod": true,
+          "online": false,
+          "bkash": false
+        },
+        "shipping": {
+          "insideDhaka": 60,
+          "outsideDhaka": 120,
+          "couriers": [
+            {
+              "name": "INSIDE DHAKA",
+              "charge": 60,
+              "estimatedDays": "Standard Delivery",
+              "isActive": true,
+              "_id": "6a0d8ae118a26af2e74b72a5"
+            },
+            {
+              "name": "OUTSIDE DHAKA",
+              "charge": 120,
+              "estimatedDays": "Standard Delivery",
+              "isActive": true,
+              "_id": "6a0d8ae118a26af2e74b72a6"
+            }
+          ]
+        },
+        "_id": "69cd522bc38e0ceafd5cf4b5",
+        "socialLinks": [
+          {
+            "platform": "facebook",
+            "url": "Rerum incididunt bea",
+            "isActive": true,
+            "_id": "6a0775766f3b3f45cc4bdaae"
+          },
+          {
+            "platform": "instagram",
+            "url": "Anim quisquam maxime",
+            "isActive": true,
+            "_id": "6a0775766f3b3f45cc4bdaaf"
+          },
+          {
+            "platform": "twitter",
+            "url": "Obcaecati reprehende",
+            "isActive": true,
+            "_id": "6a0775766f3b3f45cc4bdab0"
+          },
+          {
+            "platform": "linkedin",
+            "url": "Omnis nostrum placea",
+            "isActive": true,
+            "_id": "6a0775766f3b3f45cc4bdab1"
+          },
+          {
+            "platform": "tiktok",
+            "url": "Error quia ab volupt",
+            "isActive": true,
+            "_id": "6a0775766f3b3f45cc4bdab2"
+          }
+        ],
+        "createdAt": "2026-04-01T17:13:15.062Z",
+        "updatedAt": "2026-05-31T19:05:41.745Z",
+        "__v": 2
+      }
+    }
+  },
+  {
+    "name": "Get Settings",
+    "path": "/api/settings",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 205,
+    "timestamp": "2026-05-31T19:05:42.003Z",
+    "responseSnippet": "{\"branding\":{\"activeTheme\":\"executive\",\"defaultTheme\":\"dark\",\"defaultThemeColor\":\"Rose\",\"defaultThemeFont\":\"Inter\",\"defaultLanguage\":\"en\",\"siteName\":\"",
+    "rawBody": {
+      "branding": {
+        "activeTheme": "executive",
+        "defaultTheme": "dark",
+        "defaultThemeColor": "Rose",
+        "defaultThemeFont": "Inter",
+        "defaultLanguage": "en",
+        "siteName": "Drip Nation",
+        "siteTitle": "Drip Nation | Premium Streetwear & Urban Fashion",
+        "description": "Discover premium streetwear, urban fashion, and trendsetting apparel at Drip Nation. Unleash your unique style with our curated high-quality collections.",
+        "logo": "https://res.cloudinary.com/ds4hwq3hb/image/upload/v1780036347/ecowear/settings/ftbgfsvhfnucyxlyrrmb.png",
+        "logoDark": "https://res.cloudinary.com/ds4hwq3hb/image/upload/v1779275550/ecowear/settings/k0vykltuysseszccha6j.png",
+        "favicon": "https://res.cloudinary.com/ds4hwq3hb/image/upload/v1779273037/ecowear/settings/nmbwdpul49tumpld9qsw.jpg"
+      },
+      "config": {
+        "storageMethod": "cloudinary",
+        "maintenanceMode": false
+      },
+      "contact": {
+        "phone": "0946753759",
+        "email": "Spectacular @gmail.com",
+        "address": "Dhaka,bangladesh",
+        "whatsapp": "012839817649"
+      },
+      "paymentOptions": {
+        "cod": true,
+        "online": false,
+        "bkash": false
+      },
+      "shipping": {
+        "insideDhaka": 60,
+        "outsideDhaka": 120,
+        "couriers": [
+          {
+            "name": "INSIDE DHAKA",
+            "charge": 60,
+            "estimatedDays": "Standard Delivery",
+            "isActive": true,
+            "_id": "6a0d8ae118a26af2e74b72a5"
+          },
+          {
+            "name": "OUTSIDE DHAKA",
+            "charge": 120,
+            "estimatedDays": "Standard Delivery",
+            "isActive": true,
+            "_id": "6a0d8ae118a26af2e74b72a6"
+          }
+        ]
+      },
+      "_id": "69cd522bc38e0ceafd5cf4b5",
+      "socialLinks": [
+        {
+          "platform": "facebook",
+          "url": "Rerum incididunt bea",
+          "isActive": true,
+          "_id": "6a0775766f3b3f45cc4bdaae"
+        },
+        {
+          "platform": "instagram",
+          "url": "Anim quisquam maxime",
+          "isActive": true,
+          "_id": "6a0775766f3b3f45cc4bdaaf"
+        },
+        {
+          "platform": "twitter",
+          "url": "Obcaecati reprehende",
+          "isActive": true,
+          "_id": "6a0775766f3b3f45cc4bdab0"
+        },
+        {
+          "platform": "linkedin",
+          "url": "Omnis nostrum placea",
+          "isActive": true,
+          "_id": "6a0775766f3b3f45cc4bdab1"
+        },
+        {
+          "platform": "tiktok",
+          "url": "Error quia ab volupt",
+          "isActive": true,
+          "_id": "6a0775766f3b3f45cc4bdab2"
+        }
+      ],
+      "createdAt": "2026-04-01T17:13:15.062Z",
+      "updatedAt": "2026-05-31T19:05:41.745Z",
+      "__v": 2,
+      "marketing": {
+        "fbPixelId": "1578316914337510",
+        "fbAccessToken": "EAAXqQai2HGcBRMyeXmiDwRiykI5yZABtOp4w2I8xRonzIugkqyyzZA5efJKZAuwZASv4Xn7JgJX4L4qZBN703QvbyIuxojPacxPwGMx76ExnQHjItCUrvZCV0RP1vaaOKDp4i3UdkmPjhf01bYmFZAoktaA5y1fXKy6CZAqlDZBWTutbdVzi2XBKNRBZChzTCqYwkrfAZDZD",
+        "fbTestEventCode": "TEST92710",
+        "gtmId": "GTM-WH5GB8W8",
+        "tiktokPixelId": "",
+        "tiktokAccessToken": "",
+        "snapPixelId": "",
+        "pinterestTagId": "",
+        "googleAdsId": "",
+        "clarityId": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ4M0FCMDhFNUYwRDMxNjdEOTRFMTQ3M0FEQTk2RTcyRDkwRUYwRkYiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiI2OThmYzc4NC1jOTFkLTRmYzQtODcxZC0yZmMyMzhmNzRhN2QiLCJzdWIiOiIzMzI3NzE1Mzk0NDU1Nzk4Iiwic2NvcGUiOiJEYXRhLkV4cG9ydCIsIm5iZiI6MTc3ODg2MjcxMywiZXhwIjo0OTMyNDYyNzEzLCJpYXQiOjE3Nzg4NjI3MTMsImlzcyI6ImNsYXJpdHkiLCJhdWQiOiJjbGFyaXR5LmRhdGEtZXhwb3J0ZXIifQ.NLvuOnXa8qHXQiijNg-O2cIBlD6H0732gUor3ay16gueGquAhpRY2EXV71EfrE0f_33gBkYRE5jNnJkq2EmYmGmtBTZuNyjWdmAMJ4Z7_hrxP3eUd-l02ASvT6mnqNDMZfCBVxfjT3bbJOGa5_TuHWcy6yNfEEQQ7ESbekru2q-xU1FwjWAqNm5xf6dPjuwPmGqDhKsF5fv6O7cbTjbg39Fg38kTTzw3Gh0beOVulKEM7zv9rgRFCRys6yGX-WJr6C25v-IKpG7wKyHqRj3fYADcf3T4C8wURBZgI00GwlrDHpn44OC7VZ2iaKOfnDDrp7RRLLlafXtTa3c1-eEO0w"
+      },
+      "payment": {
+        "sslStoreId": "savio69c1238570c19",
+        "sslStorePassword": "savio69c1238570c19@ssl",
+        "sslIsTest": true,
+        "bkashAppKey": "",
+        "bkashAppSecret": "",
+        "bkashUsername": "",
+        "bkashPassword": "",
+        "bkashIsTest": true
+      },
+      "smtp": {
+        "mailHost": "",
+        "mailPort": "",
+        "mailUser": "",
+        "mailPass": "",
+        "mailFrom": ""
+      },
+      "sms": {
+        "smsApiKey": "",
+        "smsSenderId": ""
+      },
+      "auth": {
+        "googleClientId": "881161059123-tcuoiqvg8cco3hdl8u0nbtvb325dol4m.apps.googleusercontent.com",
+        "facebookAppId": "EAAXqQai2HGcBRMyeXmiDwRiykI5yZABtOp4w2I8xRonzIugkqyyzZA5efJKZAuwZASv4Xn7JgJX4L4qZBN703QvbyIuxojPacxPwGMx76ExnQHjItCUrvZCV0RP1vaaOKDp4i3UdkmPjhf01bYmFZAoktaA5y1fXKy6CZAqlDZBWTutbdVzi2XBKNRBZChzTCqYwkrfAZDZD"
+      },
+      "cloudinary": {
+        "cloudinaryCloudName": "ds4hwq3hb",
+        "cloudinaryApiKey": "615465272372143",
+        "cloudinaryApiSecret": "Z47Y58yPfj6eaVyMnym_dXJcnxc"
+      },
+      "ai": {
+        "geminiApiKey": "AIzaSyB_ds7O799OUBfStXGbi_JH-ncWo-aXNQ0"
+      }
+    }
+  },
+  {
+    "name": "Cleanup Coupon",
+    "path": "/api/coupons/6a1c86844ca22cab5b3752c5",
+    "method": "DELETE",
+    "statusCode": 200,
+    "durationMs": 254,
+    "timestamp": "2026-05-31T19:05:42.257Z",
+    "responseSnippet": "{\"message\":\"Coupon deleted\"}",
+    "rawBody": {
+      "message": "Coupon deleted"
+    }
+  },
+  {
+    "name": "Cleanup Product",
+    "path": "/api/admin/products/6a1c867f4ca22cab5b375271",
+    "method": "DELETE",
+    "statusCode": 200,
+    "durationMs": 564,
+    "timestamp": "2026-05-31T19:05:42.821Z",
+    "responseSnippet": "{\"message\":\"Product purged.\"}",
+    "rawBody": {
+      "message": "Product purged."
+    }
+  },
+  {
+    "name": "Cleanup Size",
+    "path": "/api/sizes/6a1c867e4ca22cab5b375263",
+    "method": "DELETE",
+    "statusCode": 200,
+    "durationMs": 387,
+    "timestamp": "2026-05-31T19:05:43.208Z",
+    "responseSnippet": "{\"message\":\"Size removed\"}",
+    "rawBody": {
+      "message": "Size removed"
+    }
+  },
+  {
+    "name": "Cleanup Subcategory",
+    "path": "/api/subcategories/6a1c867d4ca22cab5b375255",
+    "method": "DELETE",
+    "statusCode": 200,
+    "durationMs": 252,
+    "timestamp": "2026-05-31T19:05:43.460Z",
+    "responseSnippet": "{\"message\":\"Subcategory removed\"}",
+    "rawBody": {
+      "message": "Subcategory removed"
+    }
+  },
+  {
+    "name": "Cleanup Category",
+    "path": "/api/admin/categories/6a1c867d4ca22cab5b375239",
+    "method": "DELETE",
+    "statusCode": 200,
+    "durationMs": 1049,
+    "timestamp": "2026-05-31T19:05:44.509Z",
+    "responseSnippet": "{\"message\":\"Category purged.\"}",
+    "rawBody": {
+      "message": "Category purged."
+    }
+  }
+]
