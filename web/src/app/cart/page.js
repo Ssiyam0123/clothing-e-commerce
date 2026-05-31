@@ -285,7 +285,7 @@ function UnifiedSettlementContent() {
     <div className="min-h-screen bg-background text-foreground transition-colors duration-700">
       <div className="max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-0 lg:divide-x divide-border/20">
         {/* 📦 LEFT: Manifest & Logistics */}
-        <div className="lg:col-span-7 p-4 sm:p-12 lg:p-16 xl:p-20 space-y-12 sm:space-y-20 pt-20 sm:pt-24 lg:pt-32">
+        <div className="lg:col-span-7 p-4 sm:p-12 lg:p-16 xl:p-20 space-y-12 sm:space-y-20 pt-6 sm:pt-12 lg:pt-16">
           <header className="flex items-center gap-4 sm:gap-6">
             <Button
               variant="outline"

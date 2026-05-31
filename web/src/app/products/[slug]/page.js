@@ -175,7 +175,7 @@ export default async function ProductDetailsPage({ params }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
-      <div className="max-w-[1800px] mx-auto pt-10 lg:pt-24 px-4 sm:px-6 lg:px-12">
+      <div className="max-w-[1800px] mx-auto pt-4 lg:pt-10 px-4 sm:px-6 lg:px-12">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-20 xl:gap-32">
           {/* LEFT: Media Section */}
           <div className="lg:col-span-7 min-w-0 animate-in fade-in slide-in-from-left-4 duration-1000">
