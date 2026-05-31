@@ -337,7 +337,7 @@ export default function AdminChatPage() {
   if (!activeConversation) return null;
 
   return (
-    <div id="admin-chat-detail-container" className="absolute inset-0 flex flex-col bg-[#f0f2f5] dark:bg-[#0b141a] overflow-hidden">
+    <div id="admin-chat-detail-container" className="relative w-full h-full flex flex-col bg-[#f0f2f5] dark:bg-[#0b141a] overflow-hidden">
       {/* Chat Header */}
       <header className="h-[60px] bg-[#f0f2f5] dark:bg-[#202c33] px-4 flex items-center justify-between border-l border-border/5 shrink-0 z-10 shadow-sm">
         <div className="flex items-center gap-3">
