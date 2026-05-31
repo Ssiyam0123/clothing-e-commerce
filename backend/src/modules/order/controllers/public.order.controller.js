@@ -253,6 +253,27 @@ export const getMyOrders = asyncHandler(async (req, res) => {
     }
   }
 
+  const page = parseInt(req.query.page, 10);
+  const limit = parseInt(req.query.limit, 10) || 5;
+
+  if (!isNaN(page) && page > 0) {
+    const skip = (page - 1) * limit;
+    const total = await Order.countDocuments(query);
+    const orders = await Order.find(query)
+      .sort("-createdAt")
+      .skip(skip)
+      .limit(limit)
+      .populate("orderItems.product", "name images slug")
+      .populate("orderItems.size", "name");
+    
+    return res.json({
+      orders,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit)
+    });
+  }
+
   const orders = await Order.find(query)
     .sort("-createdAt")
     .populate("orderItems.product", "name images slug")

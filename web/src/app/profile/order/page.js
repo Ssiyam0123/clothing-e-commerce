@@ -28,7 +28,10 @@ const DICTIONARY = {
 
 export default function ProfileOrdersPage() {
   const searchParams = useSearchParams();
-  const { myOrders, myOrdersLoading } = useProfileOrders();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const { myOrders: ordersData, myOrdersLoading } = useProfileOrders(null, null, currentPage, itemsPerPage);
   const { lang } = useAppStore();
   
   // Order Details Modal State
@@ -37,24 +40,23 @@ export default function ProfileOrdersPage() {
 
   const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY["en"], [lang]);
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const orders = useMemo(() => {
+    if (Array.isArray(ordersData)) return ordersData;
+    return ordersData?.orders || [];
+  }, [ordersData]);
 
   const totalPages = useMemo(() => {
-    return Math.ceil((myOrders?.length || 0) / itemsPerPage);
-  }, [myOrders]);
+    if (Array.isArray(ordersData)) {
+      return Math.ceil(ordersData.length / itemsPerPage);
+    }
+    return ordersData?.totalPages || 0;
+  }, [ordersData]);
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
     }
   }, [totalPages, currentPage]);
-
-  const paginatedOrders = useMemo(() => {
-    if (!myOrders) return [];
-    return myOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  }, [myOrders, currentPage]);
 
   useEffect(() => {
     const status = searchParams.get("status");
@@ -80,7 +82,7 @@ export default function ProfileOrdersPage() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
       <ProfileOrders 
-        orders={paginatedOrders} 
+        orders={orders} 
         ui={ui} 
         loading={myOrdersLoading} 
         onOpenDetails={handleOpenDetails}
