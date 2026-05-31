@@ -16,7 +16,10 @@ import { getImageUrl } from "@/utils/imageUtils";
 import api from "@/lib/api";
 import Link from "next/link";
 
-const ChatMessage = ({ message, isMe, showStatus }) => {
+const ChatMessage = ({ message, isMe, showStatus, onEdit, onDelete }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editVal, setEditVal] = useState(message.text || "");
+
   const timeStr = useMemo(() => {
     const date = new Date(message.createdAt || new Date());
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -27,40 +30,92 @@ const ChatMessage = ({ message, isMe, showStatus }) => {
 
   return (
     <div className={cn("flex w-full mb-3", isMe ? "justify-end" : "justify-start")}>
-      <div className={cn("relative max-w-[75%]", isMe ? "items-end" : "items-start")}>
-        {isAdmin && senderName && !isMe && (
-          <p className="text-[10px] font-bold text-accent-secondary mb-1 px-1.5 opacity-80 uppercase tracking-tighter">
-            {senderName}
-          </p>
+      <div className={cn("relative max-w-[75%] flex items-center gap-1 group", isMe ? "flex-row-reverse" : "flex-row")}>
+        {/* Dropdown Menu Trigger (Shows on Hover) */}
+        {isMe && !isEditing && (
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-black/5 dark:hover:bg-white/5">
+                  <MoreVertical size={14} className="text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-24 rounded-lg shadow-md">
+                {message.text && (
+                  <DropdownMenuItem className="cursor-pointer font-medium text-xs py-2" onClick={() => setIsEditing(true)}>
+                    Edit
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive font-medium text-xs py-2" onClick={() => onDelete(message._id)}>
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         )}
-        <div className={cn(
-          "overflow-hidden shadow-sm transition-all duration-200",
-          isMe 
-            ? "bg-[#d9fdd3] dark:bg-[#005c4b] text-[#111b21] dark:text-[#e9edef] rounded-[10px] rounded-tr-none" 
-            : "bg-white dark:bg-[#202c33] text-[#111b21] dark:text-[#e9edef] rounded-[10px] rounded-tl-none border border-[#00000008] dark:border-white/5"
-        )}>
-          {message.image && (
-            <div className="p-1">
-              <img 
-                src={getImageUrl(message.image)} 
-                alt="Chat attachment" 
-                className="max-w-full rounded-[8px] object-cover cursor-pointer hover:opacity-95 transition-opacity max-h-[400px]"
-                onClick={() => window.open(getImageUrl(message.image), '_blank')}
-              />
-            </div>
+
+        <div className={cn("relative flex flex-col", isMe ? "items-end" : "items-start")}>
+          {isAdmin && senderName && !isMe && (
+            <p className="text-[10px] font-bold text-accent-secondary mb-1 px-1.5 opacity-80 uppercase tracking-tighter">
+              {senderName}
+            </p>
           )}
-          {message.text && (
-            <div className="px-3 py-1.5 md:px-4 md:py-2">
-              <p className="text-[14.2px] leading-[1.4] whitespace-pre-wrap break-words">
-                {message.text}
-              </p>
+          <div className={cn(
+            "overflow-hidden shadow-sm transition-all duration-200",
+            isMe 
+              ? "bg-[#d9fdd3] dark:bg-[#005c4b] text-[#111b21] dark:text-[#e9edef] rounded-[10px] rounded-tr-none" 
+              : "bg-white dark:bg-[#202c33] text-[#111b21] dark:text-[#e9edef] rounded-[10px] rounded-tl-none border border-[#00000008] dark:border-white/5"
+          )}>
+            {message.image && (
+              <div className="p-1">
+                <img 
+                  src={getImageUrl(message.image)} 
+                  alt="Chat attachment" 
+                  className="max-w-full rounded-[8px] object-cover cursor-pointer hover:opacity-95 transition-opacity max-h-[400px]"
+                  onClick={() => window.open(getImageUrl(message.image), '_blank')}
+                />
+              </div>
+            )}
+            
+            {isEditing ? (
+              <div className="p-2 flex items-center gap-1 bg-white dark:bg-[#202c33] min-w-[200px]">
+                <Input 
+                  value={editVal} 
+                  onChange={(e) => setEditVal(e.target.value)} 
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      onEdit(message._id, editVal);
+                      setIsEditing(false);
+                    } else if (e.key === "Escape") {
+                      setIsEditing(false);
+                    }
+                  }}
+                  className="h-8 py-1 text-xs focus-visible:ring-1 focus-visible:ring-accent-secondary"
+                  autoFocus
+                />
+                <Button size="sm" variant="ghost" className="h-8 px-2 text-xs font-bold text-accent-secondary" onClick={() => {
+                  onEdit(message._id, editVal);
+                  setIsEditing(false);
+                }}>Save</Button>
+                <Button size="sm" variant="ghost" className="h-8 px-2 text-xs text-muted-foreground" onClick={() => setIsEditing(false)}>Cancel</Button>
+              </div>
+            ) : (
+              message.text && (
+                <div className="px-3 py-1.5 md:px-4 md:py-2">
+                  <p className="text-[14.2px] leading-[1.4] whitespace-pre-wrap break-words">
+                    {message.text}
+                  </p>
+                </div>
+              )
+            )}
+            
+            <div className="flex items-center justify-end gap-1 px-2 pb-1 opacity-50">
+               {message.isEdited && <span className="text-[9px] italic mr-1">edited</span>}
+               <span className="text-[10px]">{timeStr}</span>
+               {isMe && (
+                 message.isRead ? <CheckCheck size={14} className="text-[#53bdeb]" /> : <Check size={14} />
+               )}
             </div>
-          )}
-          <div className="flex items-center justify-end gap-1 px-2 pb-1 opacity-50">
-             <span className="text-[10px]">{timeStr}</span>
-             {isMe && (
-               message.isRead ? <CheckCheck size={14} className="text-[#53bdeb]" /> : <Check size={14} />
-             )}
           </div>
         </div>
       </div>
@@ -71,22 +126,36 @@ const ChatMessage = ({ message, isMe, showStatus }) => {
 export default function AdminChatPage() {
   const { id } = useParams();
   const { user } = useAuthStore();
-  const { socket, conversations, fetchConversations } = useChat();
+  const { socket, conversations, fetchConversations, onlineUsers } = useChat();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const scrollRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  const conversation = useMemo(() => 
-    conversations.find(c => c._id === id), 
-    [conversations, id]
-  );
+  const [activeConversation, setActiveConversation] = useState(null);
 
-  const customer = useMemo(() => 
-    conversation?.participants?.find(p => p.role?.name === "customer"),
-    [conversation]
-  );
+  useEffect(() => {
+    const found = conversations.find(c => c._id === id);
+    if (found) {
+      setActiveConversation(found);
+    } else if (id) {
+      api.get(`/chat/conversations/${id}`)
+        .then(res => {
+          if (res.data.success) {
+            setActiveConversation(res.data.conversation);
+          }
+        })
+        .catch(err => console.error("Error fetching single conversation", err));
+    }
+  }, [conversations, id]);
+
+  const customer = useMemo(() => {
+    if (!activeConversation) return null;
+    const myId = user?._id || user?.id;
+    let other = activeConversation.participants?.find(p => String(p._id || p.id) !== String(myId));
+    return other || activeConversation.participants?.[0] || null;
+  }, [activeConversation, user]);
 
   useEffect(() => {
     if (!id) return;
@@ -128,11 +197,27 @@ export default function AdminChatPage() {
         }
       };
 
+      const editHandler = (data) => {
+        if (data.conversationId === id) {
+          setMessages(prev => prev.map(m => m._id === data.messageId ? { ...m, text: data.text, isEdited: true } : m));
+        }
+      };
+
+      const deleteHandler = (data) => {
+        if (data.conversationId === id) {
+          setMessages(prev => prev.filter(m => m._id !== data.messageId));
+        }
+      };
+
       socket.on("new_message", handler);
       socket.on("messages_seen", seenHandler);
+      socket.on("message_edited", editHandler);
+      socket.on("message_deleted", deleteHandler);
       return () => {
         socket.off("new_message", handler);
         socket.off("messages_seen", seenHandler);
+        socket.off("message_edited", editHandler);
+        socket.off("message_deleted", deleteHandler);
       };
     }
   }, [id, socket]);
@@ -199,6 +284,20 @@ export default function AdminChatPage() {
     }
   };
 
+  const handleEditMessage = (messageId, newText) => {
+    if (socket && newText.trim()) {
+      socket.emit("edit_message", { messageId, text: newText });
+    }
+  };
+
+  const handleDeleteMessage = async (messageId) => {
+    const { notify } = await import("@/utils/swal");
+    const confirmed = await notify.confirm("Delete Message?", "Are you sure you want to delete this message?");
+    if (confirmed && socket) {
+      socket.emit("delete_message", { messageId });
+    }
+  };
+
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !socket) return;
@@ -234,7 +333,7 @@ export default function AdminChatPage() {
     }
   };
 
-  if (!conversation) return null;
+  if (!activeConversation) return null;
 
   return (
     <div id="admin-chat-detail-container" className="absolute inset-0 flex flex-col bg-[#f0f2f5] dark:bg-[#0b141a] overflow-hidden">
@@ -259,7 +358,11 @@ export default function AdminChatPage() {
           </Avatar>
           <div className="min-w-0">
             <h2 className="text-[15px] font-bold truncate leading-tight">{customer?.name}</h2>
-            <p className="text-[11px] font-medium text-[#00a884]">Online</p>
+            {onlineUsers?.includes(String(customer?._id)) ? (
+              <p className="text-[11px] font-medium text-[#00a884]">Online</p>
+            ) : (
+              <p className="text-[11px] font-medium text-muted-foreground">Offline</p>
+            )}
           </div>
         </div>
 
@@ -304,7 +407,16 @@ export default function AdminChatPage() {
               const senderId = typeof msg.sender === "string" ? msg.sender : msg.sender?._id || msg.sender?.id;
               const isMe = senderId === myId;
               const showStatus = idx === messages.length - 1 && isMe;
-              return <ChatMessage key={msg._id || idx} message={msg} isMe={isMe} showStatus={showStatus} />;
+              return (
+                <ChatMessage 
+                  key={msg._id || idx} 
+                  message={msg} 
+                  isMe={isMe} 
+                  showStatus={showStatus} 
+                  onEdit={handleEditMessage}
+                  onDelete={handleDeleteMessage}
+                />
+              );
             })}
             <div ref={scrollRef} />
          </div>

@@ -15,6 +15,7 @@ import { ChatProvider, useChat } from "./ChatContext";
 import api from "@/lib/api";
 import { useChatStore } from "@/store/chatStore";
 import { ChatListSkeleton } from "@/components/common/Skeletons";
+import { useAuthStore } from "@/store/authStore";
 
 export default function ChatLayout({ children }) {
   return (
@@ -26,10 +27,11 @@ export default function ChatLayout({ children }) {
 
 function ChatContent({ children }) {
   const router = useRouter();
-  const { conversations, loading, startConversation } = useChat();
+  const { conversations, loading, startConversation, onlineUsers } = useChat();
   const { resetUnread } = useChatStore();
   const { id } = useParams();
-  
+
+  const { user } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [globalUsers, setGlobalUsers] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -38,10 +40,14 @@ function ChatContent({ children }) {
   const filteredConversations = useMemo(() => {
     if (!searchQuery.trim()) return conversations;
     return conversations.filter((conv) => {
-      const customer = conv.participants?.find((p) => p.role?.name === "customer");
-      return customer?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+      const otherParticipant = conv.participants?.find((p) => p._id !== user?._id);
+      return (
+        otherParticipant?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        otherParticipant?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        otherParticipant?.phone?.includes(searchQuery)
+      );
     });
-  }, [conversations, searchQuery]);
+  }, [conversations, searchQuery, user]);
 
   // Global user search
   useEffect(() => {
@@ -93,17 +99,17 @@ function ChatContent({ children }) {
         {/* Sidebar Header */}
         <div className="h-[60px] bg-[#f0f2f5] dark:bg-[#202c33] px-4 flex items-center justify-between shrink-0 border-b border-border/5">
           <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="rounded-full hover:bg-black/5 dark:hover:bg-white/5" 
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-black/5 dark:hover:bg-white/5"
               onClick={() => router.push("/admin")}
             >
               <ArrowLeft size={20} className="text-foreground/70" />
             </Button>
             <h2 className="text-lg font-bold tracking-tight text-foreground/90 ml-1">Messages</h2>
           </div>
-          
+
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5 dark:hover:bg-white/5">
               <MessageSquarePlus size={20} className="text-foreground/70" />
@@ -167,14 +173,14 @@ function ChatContent({ children }) {
                 {filteredConversations.length === 0 && globalUsers.length === 0 && (
                   <div className="py-20 text-center space-y-3 px-6">
                     <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto opacity-20">
-                       <MessageSquarePlus size={24} />
+                      <MessageSquarePlus size={24} />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">
                       {searchQuery ? "No matching frequency found" : "No active transmissions"}
                     </p>
                   </div>
                 )}
-                
+
                 {filteredConversations.map((conv) => {
                   const customer = conv.participants?.find((p) => p.role?.name === "customer");
                   const isActive = id === conv._id;
@@ -199,7 +205,10 @@ function ChatContent({ children }) {
                             {customer?.name?.charAt(0) || "?"}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-[#111b21] rounded-full" />
+                        <div className={cn(
+                          "absolute bottom-0 right-0 w-3 h-3 border-2 border-white dark:border-[#111b21] rounded-full",
+                          onlineUsers.includes(String(customer?._id)) ? "bg-emerald-500" : "bg-gray-300 dark:bg-gray-600"
+                        )} />
                       </div>
 
                       <div className="flex-1 min-w-0 h-full flex flex-col justify-center border-b border-border/50 dark:border-white/5">

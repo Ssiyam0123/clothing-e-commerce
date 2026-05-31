@@ -38,7 +38,7 @@ export default function AdminLayout({ children }) {
         .then((res) => setCounts(res.data))
         .catch((err) => console.error("Error fetching admin counts", err));
     }
-  }, [token, pathname]);
+  }, [token]);
 
   useEffect(() => {
     setShowStatsDropdown(false);

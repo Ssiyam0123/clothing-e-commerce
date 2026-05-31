@@ -11,10 +11,13 @@ const messageSchema = new mongoose.Schema({
   text: { type: String },
   image: { type: String },
   isRead: { type: Boolean, default: false },
+  isEdited: { type: Boolean, default: false },
 }, { timestamps: true });
 
 // 🚀 Compound index for super-fast sorted retrieval
 messageSchema.index({ conversationId: 1, createdAt: -1 });
+messageSchema.index({ conversationId: 1, isRead: 1 });
+messageSchema.index({ isRead: 1, sender: 1 });
 
 const conversationSchema = new mongoose.Schema({
   participants: [{ 

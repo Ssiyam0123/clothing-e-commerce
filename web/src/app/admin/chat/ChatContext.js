@@ -11,6 +11,7 @@ export function ChatProvider({ children }) {
   const { token } = useAuthStore();
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const socketRef = useRef();
 
   useEffect(() => {
@@ -31,6 +32,10 @@ export function ChatProvider({ children }) {
 
     socketRef.current.on("new_message", (data) => {
       fetchConversations();
+    });
+
+    socketRef.current.on("online_users", (users) => {
+      setOnlineUsers(users);
     });
 
     fetchConversations();
@@ -57,7 +62,7 @@ export function ChatProvider({ children }) {
     try {
       // Find if conversation already exists in our local state
       const existing = conversations.find(c => 
-        c.participants.some(p => p._id === participantId)
+        c.participants.some(p => String(p._id) === String(participantId))
       );
 
       if (existing) return existing._id;
@@ -80,7 +85,8 @@ export function ChatProvider({ children }) {
       loading,
       socket: socketRef.current, 
       fetchConversations,
-      startConversation 
+      startConversation,
+      onlineUsers
     }}>
       {children}
     </ChatContext.Provider>

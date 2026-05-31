@@ -49,18 +49,56 @@ export const getAllConversations = asyncHandler(async (req, res) => {
     .sort("-updatedAt")
     .lean();
 
-  // 🚀 Parallel Execution for Unread Counts
-  const conversations = await Promise.all(rawConversations.map(async (conv) => {
-    const unreadCount = await Message.countDocuments({
-      conversationId: conv._id,
-      isRead: false,
-      sender: { $in: conv.participants.filter(p => (p.role?.name || p.role) === "customer").map(p => p._id) }
-    });
+  // 🚀 Single Aggregation Query for Unread Counts (Eliminates N+1 queries)
+  const convIds = rawConversations.map(c => c._id);
+  const unreadAggregation = await Message.aggregate([
+    {
+      $match: {
+        conversationId: { $in: convIds },
+        isRead: false,
+        sender: { $ne: req.user._id }
+      }
+    },
+    {
+      $group: {
+        _id: "$conversationId",
+        count: { $sum: 1 }
+      }
+    }
+  ]);
 
-    return { ...conv, unreadCount };
+  const unreadMap = unreadAggregation.reduce((acc, curr) => {
+    acc[curr._id.toString()] = curr.count;
+    return acc;
+  }, {});
+
+  const conversations = rawConversations.map(conv => ({
+    ...conv,
+    unreadCount: unreadMap[conv._id.toString()] || 0
   }));
 
   res.json({ success: true, conversations });
+});
+
+/**
+ * @desc    Get single conversation by ID (Admin only)
+ * @route   GET /api/chat/conversations/:id
+ */
+export const getConversationById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const conversation = await Conversation.findById(id)
+    .populate({
+      path: "participants",
+      select: "name email avatar role",
+      populate: { path: "role" }
+    })
+    .lean();
+
+  if (!conversation) {
+    return res.status(404).json({ success: false, message: "Conversation not found" });
+  }
+
+  res.json({ success: true, conversation });
 });
 
 /**
@@ -155,9 +193,9 @@ export const getConversationMessages = asyncHandler(async (req, res) => {
     })
     .lean();
 
-  // 📝 Optimized Mark as Read: Bulk update
+  // 📝 Optimized Mark as Read: Bulk update only for messages not sent by req.user
   await Message.updateMany(
-    { conversationId: id, isRead: false },
+    { conversationId: id, isRead: false, sender: { $ne: req.user._id } },
     { $set: { isRead: true } }
   );
 
