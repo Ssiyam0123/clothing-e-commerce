@@ -8,6 +8,44 @@ import axios from "axios";
 import ApiKey from "../settings/apiKey.model.js";
 import { decrypt } from "../../utils/encryption.js";
 import { clearCache } from "../../middleware/cacheMiddleware.js";
+import Order from "../order/order.model.js";
+
+// Helper to sync guest orders in the background (Non-blocking)
+const syncGuestOrders = async (userId, email, phone) => {
+  if (!userId) return;
+  const conditions = [];
+  if (email) conditions.push({ "shippingAddress.email": email.toLowerCase() });
+  if (phone) conditions.push({ "shippingAddress.phone": phone });
+
+  if (conditions.length === 0) return;
+
+  try {
+    const result = await Order.updateMany(
+      {
+        $and: [
+          { $or: conditions },
+          {
+            $or: [
+              { user: { $exists: false } },
+              { user: null }
+            ]
+          }
+        ]
+      },
+      {
+        $set: {
+          user: userId,
+          isGuest: false
+        }
+      }
+    );
+    if (result.modifiedCount > 0) {
+      console.log(`Synced ${result.modifiedCount} guest orders for user ${userId}`);
+    }
+  } catch (error) {
+    console.error("Error syncing guest orders:", error);
+  }
+};
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -66,6 +104,9 @@ export const register = async (req, res) => {
       }
     }
 
+    // Sync guest orders in background (Non-blocking)
+    syncGuestOrders(user._id, user.email, user.phone);
+
     const token = generateToken(user._id);
 
     res.status(201).json({
@@ -116,6 +157,9 @@ export const login = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
+
+    // Sync guest orders in background (Non-blocking)
+    syncGuestOrders(user._id, user.email, user.phone);
 
     const token = generateToken(user._id);
 
@@ -347,6 +391,9 @@ export const googleLogin = async (req, res) => {
       user = await User.findById(user._id).populate("role");
     }
 
+    // Sync guest orders in background (Non-blocking)
+    syncGuestOrders(user._id, user.email, user.phone);
+
     const token = generateToken(user._id);
 
     res.json({
@@ -423,6 +470,9 @@ export const facebookLogin = async (req, res) => {
       // Populate role
       user = await User.findById(user._id).populate("role");
     }
+
+    // Sync guest orders in background (Non-blocking)
+    syncGuestOrders(user._id, user.email, user.phone);
 
     const token = generateToken(user._id);
 

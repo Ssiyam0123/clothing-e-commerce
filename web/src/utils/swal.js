@@ -80,6 +80,6 @@ export const notify = {
 
 // 🏛️ Legacy Support (Redirection to new notify system)
 export const swalConfirm = notify.confirm;
-export const swalToast = (title, icon) => notify[icon === 'success' ? 'success' : 'error'](title);
+export const swalToast = (title, icon = 'success') => notify[icon === 'error' ? 'error' : 'success'](title);
 export const swalError = (title, text) => notify.alert(title, text, 'error');
 export const swalSuccess = (title, text) => notify.alert(title, text, 'success');
