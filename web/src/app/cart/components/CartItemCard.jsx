@@ -49,7 +49,7 @@ export default function CartItemCard({
                 <p className="text-[7px] sm:text-[8px] font-black text-accent-secondary uppercase tracking-[0.2em] sm:tracking-[0.3em]">
                   {item.product.category?.name || "Premium Drop"}
                 </p>
-                <h3 className="text-xs sm:text-lg md:text-xl font-black uppercase tracking-tighter italic text-gradient line-clamp-1">
+                <h3 className="text-xs sm:text-lg md:text-xl font-black uppercase tracking-tighter italic text-gradient line-clamp-2">
                   {item.product.name}
                 </h3>
                 <Badge variant="outline" className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest border-border/20 rounded-full px-2 sm:px-2.5 h-5">
