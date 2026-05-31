@@ -86,10 +86,24 @@ export const useChat = (isOpen) => {
       setMessages(prev => prev.map(m => ({ ...m, isRead: true })));
     };
 
+    const handleMessageEdited = (data) => {
+      if (data.conversationId === conversationId) {
+        setMessages(prev => prev.map(m => m._id === data.messageId ? { ...m, text: data.text, isEdited: true } : m));
+      }
+    };
+
+    const handleMessageDeleted = (data) => {
+      if (data.conversationId === conversationId) {
+        setMessages(prev => prev.filter(m => m._id !== data.messageId));
+      }
+    };
+
     socket.on("new_message", handleNewMessage);
     socket.on("connect", handleConnect);
     socket.on("disconnect", handleDisconnect);
     socket.on("messages_seen", handleMessagesSeen);
+    socket.on("message_edited", handleMessageEdited);
+    socket.on("message_deleted", handleMessageDeleted);
     
     setIsConnected(socket.connected);
 
@@ -98,6 +112,8 @@ export const useChat = (isOpen) => {
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
       socket.off("messages_seen", handleMessagesSeen);
+      socket.off("message_edited", handleMessageEdited);
+      socket.off("message_deleted", handleMessageDeleted);
     };
   }, [socket, isOpen, fetchUnreadCount]);
 

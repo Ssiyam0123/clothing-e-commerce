@@ -57,6 +57,11 @@ const ChatMessage = ({ message, isMe }) => {
           "flex items-center gap-1.5 mt-1 px-1 opacity-40",
           isMe ? "justify-end" : "justify-start"
         )}>
+          {message.isEdited && (
+            <span className="text-[9px] italic font-semibold uppercase tracking-widest">
+              edited
+            </span>
+          )}
           <span className="text-[9px] font-bold uppercase tracking-widest">
             {timeStr}
           </span>
