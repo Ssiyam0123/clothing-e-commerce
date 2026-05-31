@@ -7,6 +7,7 @@ import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
 import ProfileOrders from "@/app/profile/components/ProfileOrders";
 import OrderDetailsDialog from "@/app/profile/components/OrderDetailsDialog";
+import Pagination from "@/components/common/Pagination";
 
 const DICTIONARY = {
   en: {
@@ -36,6 +37,25 @@ export default function ProfileOrdersPage() {
 
   const ui = useMemo(() => DICTIONARY[lang] || DICTIONARY["en"], [lang]);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const totalPages = useMemo(() => {
+    return Math.ceil((myOrders?.length || 0) / itemsPerPage);
+  }, [myOrders]);
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  const paginatedOrders = useMemo(() => {
+    if (!myOrders) return [];
+    return myOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  }, [myOrders, currentPage]);
+
   useEffect(() => {
     const status = searchParams.get("status");
 
@@ -60,11 +80,19 @@ export default function ProfileOrdersPage() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
       <ProfileOrders 
-        orders={myOrders} 
+        orders={paginatedOrders} 
         ui={ui} 
         loading={myOrdersLoading} 
         onOpenDetails={handleOpenDetails}
       />
+
+      {totalPages > 1 && (
+        <Pagination
+          page={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
 
       <OrderDetailsDialog 
         orderId={selectedOrder} 
