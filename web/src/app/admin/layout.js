@@ -57,7 +57,7 @@ export default function AdminLayout({ children }) {
 
   const isChatRoute = pathname?.startsWith("/admin/chat");
   const isAiChatRoute = pathname === "/admin/ai-chat";
-  const showSidebar = !isChatRoute;
+  const showSidebar = true;
   const showHeader = !isChatRoute && !isAiChatRoute;
   const isFullPageStyle = isChatRoute || isAiChatRoute;
 

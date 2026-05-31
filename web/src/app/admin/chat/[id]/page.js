@@ -253,7 +253,8 @@ export default function AdminChatPage() {
       }
     };
 
-    if (window.visualViewport) {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (window.visualViewport && isMobile) {
       window.visualViewport.addEventListener("resize", handleVisualResize);
       window.visualViewport.addEventListener("scroll", handleVisualResize);
       handleVisualResize();
@@ -266,7 +267,7 @@ export default function AdminChatPage() {
       document.documentElement.style.height = originalHtmlHeight;
       
       window.removeEventListener("scroll", preventScroll);
-      if (window.visualViewport) {
+      if (window.visualViewport && isMobile) {
         window.visualViewport.removeEventListener("resize", handleVisualResize);
         window.visualViewport.removeEventListener("scroll", handleVisualResize);
       }
