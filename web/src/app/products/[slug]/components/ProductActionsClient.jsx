@@ -51,7 +51,7 @@ export default function ProductActionsClient({ product }) {
 
   useEffect(() => {
     if (product) {
-      const available = product.sizes?.find((s) => s.stock > 0);
+      const available = product.sizes?.filter(Boolean).find((s) => s && s.stock > 0 && s.size);
       if (available && !selectedSize) setSelectedSize(available.size._id);
     }
   }, [product]);
@@ -115,7 +115,7 @@ export default function ProductActionsClient({ product }) {
           onValueChange={setSelectedSize}
           className="grid grid-cols-4 gap-3"
         >
-          {product.sizes?.map((s) => (
+          {product.sizes?.filter((s) => s && s.size).map((s) => (
             <div key={s.size._id}>
               <RadioGroupItem
                 value={s.size._id}

@@ -49,10 +49,14 @@ Next.js এবং Express এর সাথে ব্যবহার করা �
 
 সম্পূর্ণ সিস্টেমটি একটি মডার্ন গ্লাস মরফিজম থিম এবং ডার্ক মোড সাপোর্ট সহ প্রিমিয়াম ডিজাইনে তৈরি করা হয়েছে যা কাস্টমারদের প্রথম দেখাতেই মুগ্ধ করবে!
 
+⏳ বিগত প্রায় ২ মাস (৬০ দিন) ধরে প্রতিনিয়ত অক্লান্ত পরিশ্রম ও ডেডিকেশন নিয়ে আমি একা এই প্রজেক্টটি ডেভেলপ করেছি। প্রতিটি ছোটখাটো ডিটেইল নিখুঁত করার চেষ্টা করেছি যাতে এটি একটি প্রোডাকশন-রেডি প্ল্যাটফর্ম হয়ে ওঠে।
+
+💬 আপনার মতামত আমার কাছে অনেক মূল্যবান! দয়া করে ডেমোটি টেস্ট করে আপনার যেকোনো মূল্যবান রিভিউ (Review) এবং সাজেশন (Suggestion) কমেন্টে বা ইনবক্সে শেয়ার করুন। কোনো বাগ খুঁজে পেলে বা নতুন কোনো ফিচারের আইডিয়া থাকলে তা জানাতে দ্বিধা করবেন না!
+
 🌐 লাইভ ডেমো লিংক: https://clothing-e-commerce-web.vercel.app
 🔑 ডেমো অ্যাডমিন অ্যাক্সেস:
-Email: nayeemlisan@gmail.com
-Password: 123456
+*   Email: nayeemlisan@gmail.com
+*   Password: 123456
 (দ্রষ্টব্য: নিরাপত্তা রক্ষার্থে এই ডেমো অ্যাকাউন্টটিতে শুধুমাত্র ভিউ-অনলি (View-only) অ্যাক্সেস দেওয়া হয়েছে। প্রজেক্টটির ফুল অ্যাডমিন রাইটস এবং এআই একশনসমূহ নিজে টেস্ট করতে চাইলে সরাসরি ইনবক্সে মেসেজ করুন!) 👇
 
-#MERNStack #NextJS #AIinEcommerce #ConversionsAPI #PathaoAPI #bKashIntegration #SSLCommerz #COD #Cloudinary #CyberSecurity #WebDevelopment #JavaScript #AIOrchestration #Nodemailer #RealTimeEcom #SEO #MetaTags #DigitalMarketing #HomepageLayoutBuilder #LiveChat #SocketIO
+#MERNStack #NextJS #AIinEcommerce #ConversionsAPI #PathaoAPI #bKashIntegration #SSLCommerz #COD #Cloudinary #CyberSecurity #WebDevelopment #JavaScript #AIOrchestration #Nodemailer #RealTimeEcom #SEO #MetaTags #DigitalMarketing #HomepageLayoutBuilder #LiveChat #SocketIO #FeedbackWelcome #ProjectShowcase

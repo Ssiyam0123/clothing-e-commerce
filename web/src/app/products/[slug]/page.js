@@ -51,7 +51,7 @@ export default async function ProductDetailsPage({ params }) {
 
   const discountedPrice =
     product.price - (product.price * (product.discount || 0)) / 100;
-  const isAvailable = product.sizes?.some((s) => s.stock > 0);
+  const isAvailable = product.sizes?.filter(Boolean).some((s) => s && s.stock > 0) || false;
 
   const cookieStore = await cookies();
   const lang = cookieStore.get("vanguard-lang")?.value || "en";
@@ -438,7 +438,7 @@ export async function generateMetadata({ params }) {
 
     const discountedPrice =
       product.price - (product.price * (product.discount || 0)) / 100;
-    const isAvailable = product.sizes?.some((s) => s.stock > 0);
+    const isAvailable = product.sizes?.filter(Boolean).some((s) => s && s.stock > 0) || false;
     const imageUrl = product.images?.[0]
       ? product.images[0].startsWith("http")
         ? product.images[0]

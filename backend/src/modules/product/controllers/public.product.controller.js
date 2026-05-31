@@ -246,7 +246,14 @@ export const getPublicProductBySlug = asyncHandler(async (req, res) => {
                                 $filter: {
                                     input: '$sizes',
                                     as: 's',
-                                    cond: { $ne: ['$$s', {}] }
+                                    cond: {
+                                        $and: [
+                                            { $ne: ['$$s', null] },
+                                            { $ne: ['$$s', {}] },
+                                            { $ne: [{ $type: '$$s.size' }, 'missing'] },
+                                            { $ne: ['$$s.size', null] }
+                                        ]
+                                    }
                                 }
                             }
                         }
