@@ -115,7 +115,7 @@ async function BlogDataWrapper({ postsPromise, t }) {
 
 function BlogSkeleton() {
   return (
-    <div className="container mx-auto px-6 pt-32 space-y-20">
+    <div className="container mx-auto px-6 pt-4 lg:pt-10 space-y-20">
       <div className="space-y-4">
         <Skeleton className="h-24 w-2/3 rounded-3xl" />
         <Skeleton className="h-4 w-1/3 rounded-full" />

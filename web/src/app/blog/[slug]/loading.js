@@ -1,6 +1,6 @@
 export default function BlogPostLoading() {
   return (
-    <div className="min-h-screen bg-page pt-32 pb-20">
+    <div className="min-h-screen bg-page pt-4 lg:pt-10 pb-20">
       <div className="max-w-4xl mx-auto px-6">
         {/* Category & Title */}
         <div className="space-y-4 mb-12 text-center">

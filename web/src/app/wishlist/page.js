@@ -50,7 +50,7 @@ export default function WishlistPage() {
 
   if (!isMounted || authLoading) {
     return (
-      <div className="min-h-screen bg-background pt-32 px-4 sm:px-10 space-y-20">
+      <div className="min-h-screen bg-background pt-4 lg:pt-10 px-4 sm:px-10 space-y-20">
         <div className="space-y-6">
           <Skeleton className="h-24 w-2/3 rounded-3xl" />
           <Skeleton className="h-4 w-1/4 rounded-full" />
@@ -71,7 +71,7 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20 sm:pt-32 pb-24 sm:pb-32 relative overflow-hidden">
+    <div className="min-h-screen bg-background pt-4 lg:pt-10 pb-24 sm:pb-32 relative overflow-hidden">
       {/* 🔮 Background Aura */}
       <div
         className="absolute top-0 right-0 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-accent-secondary/5 blur-[100px] sm:blur-[150px] -z-10"

@@ -27,10 +27,10 @@ export default function BlogDetails({ blog, relatedPosts = [], siteUrl = '' }) {
   if (!blog) return null;
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pt-4 lg:pt-10 pb-20">
       <div className="max-w-screen-xl mx-auto px-6 relative">
         {/* 🔙 Back Navigation */}
-        <div className="pt-8 sm:pt-12">
+        <div className="pt-0">
           <Link
             href="/blog"
             className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-rose-600 transition-colors group"

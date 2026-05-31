@@ -11,9 +11,9 @@ export default function BlogListing({ posts, t }) {
   const remaining = safePosts?.slice(1) || [];
 
   return (
-    <div className="min-h-screen bg-background pb-32">
+    <div className="min-h-screen bg-background pt-4 lg:pt-10 pb-32">
       {/* Magazine Header */}
-      <header className="pt-16 pb-10 sm:pt-24 sm:pb-14">
+      <header className="pt-0 pb-10 sm:pt-0 sm:pb-14">
         <div className="max-w-screen-xl mx-auto px-6">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
