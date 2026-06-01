@@ -44,8 +44,9 @@ function ChatContent({ children }) {
   // local filter for existing conversations
   const filteredConversations = useMemo(() => {
     if (!searchQuery.trim()) return conversations;
+    const myId = String(user?._id || user?.id || "");
     return conversations.filter((conv) => {
-      const otherParticipant = conv.participants?.find((p) => p._id !== user?._id);
+      const otherParticipant = conv.participants?.find((p) => String(p._id || p.id || p) !== myId);
       return (
         otherParticipant?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         otherParticipant?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -66,9 +67,9 @@ function ChatContent({ children }) {
       try {
         const res = await api.get(`/chat/search-users?query=${searchQuery}`);
         const existingUserIds = new Set(
-          conversations.flatMap(c => c.participants.map(p => p._id))
+          conversations.flatMap(c => (c.participants || []).map(p => String(p._id || p.id || p)))
         );
-        const newUsers = res.data.filter(u => !existingUserIds.has(u._id));
+        const newUsers = res.data.filter(u => !existingUserIds.has(String(u._id || u.id)));
         setGlobalUsers(newUsers);
       } catch (err) {
         console.error("Global search failed", err);
@@ -186,7 +187,8 @@ function ChatContent({ children }) {
                 )}
 
                 {filteredConversations.map((conv) => {
-                  const customer = conv.participants?.find((p) => p.role?.name === "customer");
+                  const myId = String(user?._id || user?.id || "");
+                  const customer = conv.participants?.find((p) => String(p._id || p.id || p) !== myId) || conv.participants?.[0];
                   const isActive = id === conv._id;
                   const lastMsgTime = new Date(conv.updatedAt);
                   const isToday = lastMsgTime.toDateString() === new Date().toDateString();
