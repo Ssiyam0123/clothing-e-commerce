@@ -117,7 +117,7 @@ const ChatMessage = ({ message, isMe, showStatus, onEdit, onDelete }) => {
   );
 };
 
-export default function AdminChatPage() {
+export default function ChatDetailPage() {
   const { user } = useAuthStore();
   const { 
     activeConversation, 
@@ -134,31 +134,28 @@ export default function AdminChatPage() {
   if (!activeConversation) return null;
 
   return (
-    <div id="admin-chat-detail-container" className="relative w-full h-full flex flex-col bg-[#f0f2f5] dark:bg-[#0b141a] overflow-hidden">
-      {/* Messages Area */}
-      <main className="flex-1 overflow-y-auto p-4 md:p-6 no-scrollbar bg-[#efeae2] dark:bg-[#0b141a] relative">
-         <div className="absolute inset-0 opacity-[0.06] dark:opacity-[0.03] pointer-events-none bg-[url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-whatsapp-texture.jpg')] bg-repeat" />
-         
-         <div className="max-w-4xl mx-auto space-y-1 relative z-10">
-            {messages.map((msg, idx) => {
-              const myId = user?._id || user?.id;
-              const senderId = typeof msg.sender === "string" ? msg.sender : msg.sender?._id || msg.sender?.id;
-              const isMe = senderId === myId;
-              const showStatus = idx === messages.length - 1 && isMe;
-              return (
-                <ChatMessage 
-                  key={msg._id || idx} 
-                  message={msg} 
-                  isMe={isMe} 
-                  showStatus={showStatus} 
-                  onEdit={handleEditMessage}
-                  onDelete={handleDeleteMessage}
-                />
-              );
-            })}
-            <div ref={scrollRef} />
-         </div>
-      </main>
-    </div>
+    <main className="w-full h-full overflow-y-auto p-4 md:p-6 no-scrollbar bg-[#efeae2] dark:bg-[#0b141a] relative">
+       <div className="absolute inset-0 opacity-[0.06] dark:opacity-[0.03] pointer-events-none bg-[url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-whatsapp-texture.jpg')] bg-repeat" />
+       
+       <div className="max-w-4xl mx-auto space-y-1 relative z-10">
+          {messages.map((msg, idx) => {
+            const myId = user?._id || user?.id;
+            const senderId = typeof msg.sender === "string" ? msg.sender : msg.sender?._id || msg.sender?.id;
+            const isMe = senderId === myId;
+            const showStatus = idx === messages.length - 1 && isMe;
+            return (
+              <ChatMessage 
+                key={msg._id || idx} 
+                message={msg} 
+                isMe={isMe} 
+                showStatus={showStatus} 
+                onEdit={handleEditMessage}
+                onDelete={handleDeleteMessage}
+              />
+            );
+          })}
+          <div ref={scrollRef} />
+       </div>
+    </main>
   );
 }

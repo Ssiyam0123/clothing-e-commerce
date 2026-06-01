@@ -16,8 +16,6 @@ import api from "@/lib/api";
 import { useChatStore } from "@/store/chatStore";
 import { ChatListSkeleton } from "@/components/common/Skeletons";
 import { useAuthStore } from "@/store/authStore";
-import ChatHeader from "./_components/ChatHeader";
-import MessageInput from "./_components/MessageInput";
 
 export default function ChatLayout({ children }) {
   return (
@@ -29,23 +27,15 @@ export default function ChatLayout({ children }) {
 
 function ChatContent({ children }) {
   const router = useRouter();
-  const { 
-    conversations, 
-    loading, 
-    startConversation, 
+  const {
+    conversations,
+    loading,
+    startConversation,
     onlineUsers,
     activeConversation,
-    customer,
-    input,
-    setInput,
-    isUploading,
-    handleSend,
-    handleFileChange,
-    fileInputRef
   } = useChat();
   const { resetUnread } = useChatStore();
   const { id } = useParams();
-
   const { user } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [globalUsers, setGlobalUsers] = useState([]);
@@ -75,7 +65,6 @@ function ChatContent({ children }) {
       setIsSearching(true);
       try {
         const res = await api.get(`/chat/search-users?query=${searchQuery}`);
-        // Filter out users who are already in the filteredConversations to avoid duplicates
         const existingUserIds = new Set(
           conversations.flatMap(c => c.participants.map(p => p._id))
         );
@@ -251,25 +240,9 @@ function ChatContent({ children }) {
         </ScrollArea>
       </div>
 
-      <div className="flex-1 flex flex-col relative h-full overflow-hidden">
-        {activeConversation && (
-          <ChatHeader customer={customer} onlineUsers={onlineUsers} />
-        )}
-        
-        <div className="flex-1 relative overflow-hidden">
-          {children}
-        </div>
-
-        {activeConversation && (
-          <MessageInput 
-            input={input}
-            setInput={setInput}
-            handleSend={handleSend}
-            handleFileChange={handleFileChange}
-            isUploading={isUploading}
-            fileInputRef={fileInputRef}
-          />
-        )}
+      {/* Right panel – only renders children, NO header/input */}
+      <div className="flex-1 relative overflow-hidden">
+        {children}
       </div>
     </div>
   );

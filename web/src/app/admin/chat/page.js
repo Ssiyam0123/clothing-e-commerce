@@ -5,7 +5,7 @@ import { MessageCircle, Home, Smartphone, Monitor, Shield } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export default function ChatIdlePage() {
+function ChatIdlePage() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-12 text-center h-full">
       {/* Mobile Back Header */}
@@ -57,4 +57,8 @@ export default function ChatIdlePage() {
       </div>
     </div>
   );
+}
+
+export default function ChatIndexPage() {
+  return <ChatIdlePage />;
 }
