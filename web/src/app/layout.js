@@ -98,7 +98,7 @@ export default async function RootLayout({ children }) {
   const branding = settings?.branding || {};
   
   const identityTheme = cookieStore.get("vanguard-identity-theme")?.value || branding.activeTheme || "executive";
-  const colorMode = cookieStore.get("vanguard-theme-mode")?.value || branding.defaultTheme || "dark";
+  const colorMode = cookieStore.get("vanguard-theme-mode")?.value || branding.defaultTheme || "light";
   const lang = cookieStore.get("vanguard-lang")?.value || branding.defaultLanguage || "en";
 
   const headerList = await headers();

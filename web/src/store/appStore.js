@@ -9,7 +9,7 @@ const initialState = {
   user: null,
   isMounted: false,
   settings: null,
-  theme: "dark", 
+  theme: "light", 
   themeColor: "Zinc",
   themeFont: "Inter",
   identityTheme: "executive",
@@ -23,7 +23,7 @@ export const useAppStore = create((set, get) => ({
   
   initFromCookies: () => {
     if (typeof window === 'undefined') return;
-    const theme = getCookie("vanguard-theme-mode") || "dark";
+    const theme = getCookie("vanguard-theme-mode") || "light";
     const themeColor = getCookie("vanguard-theme-color") || "Zinc";
     const themeFont = getCookie("vanguard-theme-font") || "Inter";
     const identityTheme = getCookie("vanguard-identity-theme") || "executive";
@@ -61,7 +61,7 @@ export const useAppStore = create((set, get) => ({
     if (!data) return;
     const branding = data.branding || {};
     
-    const defaultTheme = branding.defaultTheme || "dark";
+    const defaultTheme = branding.defaultTheme || "light";
     const defaultThemeColor = branding.defaultThemeColor || "Zinc";
     const defaultThemeFont = branding.defaultThemeFont || "Inter";
     const identityTheme = branding.activeTheme || "executive";

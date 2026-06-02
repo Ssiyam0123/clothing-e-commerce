@@ -31,7 +31,7 @@ export default function ProfileOrdersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const { myOrders: ordersData, myOrdersLoading } = useProfileOrders(null, null, currentPage, itemsPerPage);
+  const { myOrders: ordersData, myOrdersLoading, myOrdersError } = useProfileOrders(null, null, currentPage, itemsPerPage);
   const { lang } = useAppStore();
   
   // Order Details Modal State
@@ -74,10 +74,30 @@ export default function ProfileOrdersPage() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    if (myOrdersError) {
+      console.error("❌ ORDER FETCH ERROR", myOrdersError);
+      toast.error("Failed to load orders", {
+        description: myOrdersError?.message || "Unable to fetch your orders"
+      });
+    }
+  }, [myOrdersError]);
+
   const handleOpenDetails = (id) => {
     setSelectedOrder(id);
     setDetailsOpen(true);
   };
+
+  if (myOrdersError) {
+    return (
+      <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+        <div className="py-24 text-center space-y-8 border-2 border-dashed border-red-500/30 rounded-[3rem] bg-red-500/5">
+          <div className="text-red-500 text-lg font-black">❌ Error Loading Orders</div>
+          <p className="text-muted-foreground">{myOrdersError?.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">

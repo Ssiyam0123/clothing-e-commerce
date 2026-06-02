@@ -41,6 +41,7 @@ export default function FilterBar({
   const router = useRouter();
   const [inputValue, setInputValue] = useState(search || "");
   const [isFocused, setIsFocused] = useState(false);
+  const hasSort = sortOptions?.length > 0 && onSortChange;
 
   // Suggestions state
   const [suggestions, setSuggestions] = useState([]);
@@ -155,7 +156,7 @@ export default function FilterBar({
   return (
     <div className="bg-card/40 backdrop-blur-3xl rounded-3xl shadow-xl border border-border/10 p-2 md:p-3 flex flex-col md:flex-row gap-3 items-center justify-between relative z-50 transition-all w-full">
       {/* Search Input Container */}
-      <div ref={containerRef} className="w-full md:w-1/2 relative group">
+      <div ref={containerRef} className={cn("w-full relative group", hasSort && "md:w-1/2")}>
         <div className="relative w-full">
           <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-all group-focus-within:text-primary z-10" />
           <input
@@ -274,7 +275,7 @@ export default function FilterBar({
                   {/* Price & Go link */}
                   <div className="flex items-center gap-3 shrink-0">
                     <span className="text-[10px] font-black text-accent-secondary">
-                      ${suggestion.price}
+                      ৳{suggestion.price}
                     </span>
                     <Link
                       href={`/products/${suggestion.slug}`}
@@ -294,6 +295,7 @@ export default function FilterBar({
       </div>
 
       {/* Sort Dropdown */}
+      {hasSort && (
       <div className="w-full md:w-auto flex items-center group gap-4 px-2">
         {sortLabel && (
           <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest hidden lg:block shrink-0 transition-colors group-hover:text-foreground">
@@ -317,6 +319,7 @@ export default function FilterBar({
           </SelectContent>
         </Select>
       </div>
+      )}
     </div>
   );
 }

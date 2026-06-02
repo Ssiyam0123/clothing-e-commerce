@@ -81,11 +81,17 @@ export default function AdminLayout({ children }) {
   }, [user, authLoading, router, token, initSocket, disconnectSocket, fetchUnreadCount]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) {
+      console.log('⚠️ SOCKET: Socket not available in admin layout');
+      return;
+    }
+
+    console.log('📌 SOCKET: Registering admin handlers');
 
     const handleNewOrder = (order) => {
-      console.log("⚡ SOCKET: new_order event received!", order);
-      // Play a premium notification sound
+      console.log('⚡ SOCKET ADMIN: new_order event received!', order);
+      
+      // Play notification sound
       try {
         const audio = new Audio("/notification.wav");
         audio.volume = 0.5;
@@ -97,25 +103,26 @@ export default function AdminLayout({ children }) {
       // Show Toast Notification
       swalToast(`New Order Received! #${order._id ? order._id.slice(-8).toUpperCase() : "SUCCESS"}`, "success");
 
-      // Invalidate dashboard stats and orders queries
-      console.log("⚡ SOCKET: Invalidating React Query keys...");
+      // Invalidate React Query
+      console.log('🔄 SOCKET ADMIN: Invalidating React Query keys...');
       queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
       queryClient.invalidateQueries({ queryKey: ["admin-dashboard-recent-orders"] });
       queryClient.invalidateQueries({ queryKey: ["admin-dashboard-stats"] });
       queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
       
-      // Auto-update stats counts
+      // Update stats counts
       api.get("/admin/counts")
         .then((res) => {
-          console.log("⚡ SOCKET: Refetched counts:", res.data);
+          console.log("⚡ SOCKET ADMIN: Refetched counts:", res.data);
           setCounts(res.data);
         })
         .catch((err) => console.error("Error refreshing counts:", err));
     };
 
     const handleOrderUpdated = (data) => {
-      console.log("⚡ SOCKET: order_updated event received!", data);
-      // Invalidate specific order and lists
+      console.log('⚡ SOCKET ADMIN: order_updated event received!', data);
+      
+      // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
       queryClient.invalidateQueries({ queryKey: ["admin-dashboard-recent-orders"] });
       queryClient.invalidateQueries({ queryKey: ["admin-dashboard-stats"] });
@@ -123,18 +130,37 @@ export default function AdminLayout({ children }) {
       if (data.orderId) {
         queryClient.invalidateQueries({ queryKey: ["adminOrder", data.orderId] });
       }
+      
+      // Update stats counts
+      api.get("/admin/counts")
+        .then((res) => {
+          console.log("⚡ SOCKET ADMIN: Refetched counts after order update:", res.data);
+          setCounts(res.data);
+        })
+        .catch((err) => console.error("Error refreshing counts:", err));
     };
 
+    // Attach listeners
     socket.on("new_order", handleNewOrder);
     socket.on("order_updated", handleOrderUpdated);
 
+    console.log('✅ SOCKET ADMIN: Handlers registered');
+
+    // Cleanup
     return () => {
+      console.log('🧹 SOCKET ADMIN: Removing handlers');
       socket.off("new_order", handleNewOrder);
       socket.off("order_updated", handleOrderUpdated);
     };
   }, [socket, queryClient]);
 
   const handleLogout = () => {
+    // Disconnect socket first
+    if (socket) {
+      socket.disconnect();
+      console.log('🔌 SOCKET: Disconnected before logout');
+    }
+    disconnectSocket();
     logout();
     router.push("/login");
   };

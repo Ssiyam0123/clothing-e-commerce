@@ -132,8 +132,17 @@ export const createOrderAdmin = asyncHandler(async (req, res) => {
   clearCache('cache:/api/admin/dashboard*');
   
   const io = req.app.get('io');
+  console.log('🚀 ORDER CREATED: Emitting socket event', {
+    hasIo: !!io,
+    orderId: createdOrder._id,
+    timestamp: new Date().toISOString()
+  });
+  
   if (io) {
     io.emit('new_order', createdOrder);
+    console.log('✅ ORDER CREATED: Socket.io "new_order" event emitted successfully');
+  } else {
+    console.error('❌ ORDER CREATED: Socket.io instance not available!');
   }
   
   res.status(201).json(createdOrder);
@@ -203,6 +212,13 @@ export const updateOrder = asyncHandler(async (req, res) => {
       .populate("orderItems.product", "name images slug");
 
     const io = req.app.get('io');
+    console.log('🔄 ORDER CANCELLED: Emitting socket event', {
+      hasIo: !!io,
+      orderId: updatedOrder._id,
+      status: updatedOrder.orderStatus,
+      timestamp: new Date().toISOString()
+    });
+    
     if (io) {
       io.emit('order_updated', {
         orderId: updatedOrder._id,
@@ -210,6 +226,9 @@ export const updateOrder = asyncHandler(async (req, res) => {
         paymentStatus: updatedOrder.paymentResult?.status,
         order: updatedOrder
       });
+      console.log('✅ ORDER CANCELLED: Socket.io "order_updated" event emitted successfully');
+    } else {
+      console.error('❌ ORDER CANCELLED: Socket.io instance not available!');
     }
 
     try {
@@ -236,6 +255,13 @@ export const updateOrder = asyncHandler(async (req, res) => {
   clearCache('cache:/api/admin/dashboard*');
 
   const io = req.app.get('io');
+  console.log('🔄 ORDER UPDATED: Emitting socket event', {
+    hasIo: !!io,
+    orderId: order._id,
+    status: order.orderStatus,
+    timestamp: new Date().toISOString()
+  });
+  
   if (io) {
     io.emit('order_updated', {
       orderId: order._id,
@@ -243,6 +269,9 @@ export const updateOrder = asyncHandler(async (req, res) => {
       paymentStatus: order.paymentResult?.status,
       order
     });
+    console.log('✅ ORDER UPDATED: Socket.io "order_updated" event emitted successfully');
+  } else {
+    console.error('❌ ORDER UPDATED: Socket.io instance not available!');
   }
 
   // 📧 TRIGGER STATUS UPDATE EMAIL

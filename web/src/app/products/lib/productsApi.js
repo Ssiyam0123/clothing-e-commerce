@@ -26,11 +26,10 @@ export const getInitialProducts = async (searchParams) => {
     apiParams.set("subcategory", params.get("subcategory"));
   }
 
-  // Optimize data transfer
-  apiParams.set(
-    "fields",
-    "name,slug,price,discount,images,category,subcategory,averageRating,sizes,isFeatured,isNew",
-  );
+  if (params.get("minPrice")) apiParams.set("minPrice", params.get("minPrice"));
+  if (params.get("maxPrice")) apiParams.set("maxPrice", params.get("maxPrice"));
+
+  // Backend already projects only necessary fields via aggregation pipeline
 
   try {
     const res = await fetch(`${API_URL}/products?${apiParams.toString()}`, {

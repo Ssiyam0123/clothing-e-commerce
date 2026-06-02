@@ -5,6 +5,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import StatusBadge from "@/app/admin/_components/StatusBadge";
 import { cn } from "@/lib/utils";
+import { Calendar, Clock } from "lucide-react";
+
+const formatDateTime = (dateString) => {
+  if (!dateString) return { date: "N/A", time: "N/A" };
+  const date = new Date(dateString);
+  const formattedDate = date.toLocaleDateString("en-GB", { 
+    day: "2-digit", 
+    month: "short", 
+    year: "numeric" 
+  });
+  const formattedTime = date.toLocaleTimeString("en-US", { 
+    hour: "2-digit", 
+    minute: "2-digit", 
+    hour12: true 
+  });
+  return { date: formattedDate, time: formattedTime };
+};
 
 export function RecentOrders({ recentOrders, isLoading }) {
   return (
@@ -34,38 +51,52 @@ export function RecentOrders({ recentOrders, isLoading }) {
               <div className="flex flex-col items-end gap-2">
                 <Skeleton className="h-4 w-12" />
                 <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-3 w-20" />
               </div>
             </div>
           ))
         ) : (
-          recentOrders.map((order) => (
-            <div
-              key={order._id}
-              className="flex items-center justify-between p-5 rounded-3xl bg-muted/30 border border-border hover:border-primary/30 transition-all group"
-            >
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-xl bg-background border border-border flex items-center justify-center font-black text-muted-foreground group-hover:text-primary transition-colors">
-                  {order.user?.name?.charAt(0) || "G"}
+          recentOrders.map((order) => {
+            const { date, time } = formatDateTime(order.createdAt);
+            return (
+              <div
+                key={order._id}
+                className="flex items-center justify-between p-5 rounded-3xl bg-muted/30 border border-border hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="h-10 w-10 rounded-xl bg-background border border-border flex items-center justify-center font-black text-muted-foreground group-hover:text-primary transition-colors">
+                    {order.user?.name?.charAt(0) || "G"}
+                  </div>
+                  <div>
+                    <p className="text-xs font-black uppercase text-foreground">
+                      {order.user?.name || "Guest"}
+                    </p>
+                    <p className="text-[8px] font-bold text-muted-foreground tracking-widest">
+                      #{order._id.slice(-6).toUpperCase()}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-black uppercase text-foreground">
-                    {order.user?.name || "Guest"}
-                  </p>
-                  <p className="text-[8px] font-bold text-muted-foreground tracking-widest">
-                    #{order._id.slice(-6).toUpperCase()}
-                  </p>
+                <div className="text-right space-y-2">
+                  <div className="flex gap-3 items-center justify-end">
+                    <p className="text-sm font-black text-foreground">
+                      ৳{order.totalPrice?.toFixed(0)}
+                    </p>
+                    <StatusBadge value={order.orderStatus} />
+                  </div>
+                  <div className="flex gap-4 items-center justify-end text-[8px] font-bold text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Calendar size={12} className="opacity-60" />
+                      <span>{date}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock size={12} className="opacity-60" />
+                      <span>{time}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-black text-foreground">
-                  ৳{order.totalPrice?.toFixed(0)}
-                </p>
-                <div className="mt-1">
-                   <StatusBadge value={order.orderStatus} />
-                </div>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </CardContent>
     </Card>

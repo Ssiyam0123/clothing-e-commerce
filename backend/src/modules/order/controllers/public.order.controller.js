@@ -105,14 +105,40 @@ export const initPayment = asyncHandler(async (req, res) => {
       clearCache('cache:/api/admin/dashboard*');
       
       const io = req.app.get('io');
+      console.log('🚀 COD ORDER CREATED: Emitting socket event', {
+        hasIo: !!io,
+        orderId: order._id,
+        paymentMethod: 'COD',
+        timestamp: new Date().toISOString()
+      });
+      
       if (io) {
         io.emit('new_order', order);
+        console.log('✅ COD ORDER: Socket.io "new_order" event emitted');
+      } else {
+        console.error('❌ COD ORDER: Socket.io instance not available!');
       }
       
       res.json(await handleCODGateway(order));
     } else if (paymentMethod === "bkash") {
       const order = await createOrderWithTransaction(orderPayload, false);
       clearCache('cache:/api/admin/dashboard*');
+      
+      const io = req.app.get('io');
+      console.log('🚀 bKASH ORDER CREATED: Emitting socket event', {
+        hasIo: !!io,
+        orderId: order._id,
+        paymentMethod: 'bKash',
+        timestamp: new Date().toISOString()
+      });
+      
+      if (io) {
+        io.emit('new_order', order);
+        console.log('✅ bKASH ORDER: Socket.io "new_order" event emitted');
+      } else {
+        console.error('❌ bKASH ORDER: Socket.io instance not available!');
+      }
+      
       const bkashData = await initiateBkash(order, bkashCreds);
       order.paymentResult.bkashPaymentID = bkashData.paymentID;
       await order.save();
@@ -120,6 +146,22 @@ export const initPayment = asyncHandler(async (req, res) => {
     } else {
       const order = await createOrderWithTransaction(orderPayload, false);
       clearCache('cache:/api/admin/dashboard*');
+      
+      const io = req.app.get('io');
+      console.log('🚀 SSL ORDER CREATED: Emitting socket event', {
+        hasIo: !!io,
+        orderId: order._id,
+        paymentMethod: 'SSLCommerz',
+        timestamp: new Date().toISOString()
+      });
+      
+      if (io) {
+        io.emit('new_order', order);
+        console.log('✅ SSL ORDER: Socket.io "new_order" event emitted');
+      } else {
+        console.error('❌ SSL ORDER: Socket.io instance not available!');
+      }
+      
       const sslUrl = await initiateSSLCommerz(order, sslCreds);
       res.json({ url: sslUrl });
     }
@@ -152,8 +194,18 @@ export const paymentSuccess = asyncHandler(async (req, res) => {
     clearCache('cache:/api/admin/dashboard*');
     
     const io = req.app.get('io');
+    console.log('🚀 PAYMENT SUCCESS (SSL): Emitting socket event', {
+      hasIo: !!io,
+      orderId: order._id,
+      paymentStatus: 'Completed',
+      timestamp: new Date().toISOString()
+    });
+    
     if (io) {
       io.emit('new_order', order);
+      console.log('✅ PAYMENT SUCCESS (SSL): Socket.io "new_order" event emitted');
+    } else {
+      console.error('❌ PAYMENT SUCCESS (SSL): Socket.io instance not available!');
     }
   }
   res.redirect(`${frontendUrl}/payment/success?orderId=${order._id}`);
@@ -188,8 +240,18 @@ export const bkashSuccess = asyncHandler(async (req, res) => {
         clearCache('cache:/api/admin/dashboard*');
         
         const io = req.app.get('io');
+        console.log('🚀 PAYMENT SUCCESS (bKash): Emitting socket event', {
+          hasIo: !!io,
+          orderId: order._id,
+          paymentStatus: 'Completed',
+          timestamp: new Date().toISOString()
+        });
+        
         if (io) {
           io.emit('new_order', order);
+          console.log('✅ PAYMENT SUCCESS (bKash): Socket.io "new_order" event emitted');
+        } else {
+          console.error('❌ PAYMENT SUCCESS (bKash): Socket.io instance not available!');
         }
         
         return res.redirect(`${frontendUrl}/payment/success?orderId=${order._id}`);
@@ -227,16 +289,39 @@ export const ipn = asyncHandler(async (req, res) => {
     clearCache('cache:/api/admin/dashboard*');
     
     const io = req.app.get('io');
+    console.log('🚀 IPN PAYMENT SUCCESS: Emitting socket event', {
+      hasIo: !!io,
+      orderId: order._id,
+      paymentStatus: 'Completed',
+      timestamp: new Date().toISOString()
+    });
+    
     if (io) {
       io.emit('new_order', order);
+      console.log('✅ IPN PAYMENT SUCCESS: Socket.io "new_order" event emitted');
+    } else {
+      console.error('❌ IPN PAYMENT SUCCESS: Socket.io instance not available!');
     }
   }
   res.status(200).send("OK");
 });
 
 export const getMyOrders = asyncHandler(async (req, res) => {
-  const userId = getUserIdFromReq(req); 
-  if (!userId) return res.status(401).json({ message: "Identification required." });
+  const userId = getUserIdFromReq(req);
+  
+  console.log("🔍 GET MY ORDERS DEBUG", {
+    userId,
+    authUser: req.user?._id,
+    headers: {
+      authorization: req.headers.authorization ? "✅ Present" : "❌ Missing",
+      guestId: req.headers["x-guest-id"]
+    }
+  });
+
+  if (!userId) {
+    console.warn("⚠️ NO USER ID FOUND");
+    return res.status(401).json({ message: "Identification required." });
+  }
 
   let query;
   if (mongoose.Types.ObjectId.isValid(userId)) {
@@ -256,6 +341,8 @@ export const getMyOrders = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page, 10);
   const limit = parseInt(req.query.limit, 10) || 5;
 
+  console.log("📦 ORDER QUERY", { query, page, limit });
+
   if (!isNaN(page) && page > 0) {
     const skip = (page - 1) * limit;
     const total = await Order.countDocuments(query);
@@ -266,6 +353,7 @@ export const getMyOrders = asyncHandler(async (req, res) => {
       .populate("orderItems.product", "name images slug")
       .populate("orderItems.size", "name");
     
+    console.log("✅ ORDERS FOUND (Paginated)", { count: orders.length, total });
     return res.json({
       orders,
       total,
@@ -278,6 +366,8 @@ export const getMyOrders = asyncHandler(async (req, res) => {
     .sort("-createdAt")
     .populate("orderItems.product", "name images slug")
     .populate("orderItems.size", "name");
+  
+  console.log("✅ ORDERS FOUND (All)", { count: orders.length });
   res.json(orders);
 });
 

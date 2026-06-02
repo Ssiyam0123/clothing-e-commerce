@@ -5,52 +5,48 @@ import { cn } from "@/lib/utils";
 export default function CategoryItem({ isSelected, onClick, label, icon, image }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center gap-3 group transition-all duration-500 outline-none",
-        isSelected ? "scale-105" : "hover:scale-105"
+        "group relative flex h-14 min-w-[112px] items-center gap-2 rounded-2xl border px-2 pr-4 text-left outline-none transition-all sm:h-16 sm:min-w-[140px]",
+        isSelected
+          ? "border-foreground bg-foreground text-background shadow-lg"
+          : "border-border bg-background text-foreground hover:border-foreground/30 hover:bg-muted/30",
       )}
     >
-      <div className={cn(
-        "w-20 h-20 sm:w-24 sm:h-24 rounded-[2rem] overflow-hidden flex items-center justify-center transition-all duration-500 border-2 relative shadow-sm",
-        isSelected 
-          ? "border-primary bg-primary/[0.03] shadow-lg shadow-primary/10" 
-          : "border-border/40 bg-card hover:border-primary/40 hover:shadow-md"
-      )}>
+      <span
+        className={cn(
+          "relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:size-11",
+          isSelected ? "bg-background/15" : "bg-muted",
+        )}
+      >
         {image ? (
           <Image
             src={image}
             alt={label}
-            width={96}
-            height={96}
-            className={cn(
-              "w-full h-full object-cover transition-transform duration-700",
-              isSelected ? "scale-110" : "group-hover:scale-110"
-            )}
+            width={52}
+            height={52}
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
-          <div className={cn(
-            "transition-colors duration-300",
-            isSelected ? "text-primary" : "text-muted-foreground group-hover:text-primary"
-          )}>
+          <span className={cn(isSelected ? "text-background" : "text-muted-foreground")}>
             {icon}
-          </div>
+          </span>
         )}
-        
-        {isSelected && (
-          <motion.div 
-            layoutId="active-category"
-            className="absolute inset-0 border-4 border-primary/20 pointer-events-none rounded-[1.8rem]"
-          />
-        )}
-      </div>
-      
-      <span className={cn(
-        "text-[10px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 text-center max-w-[100px] truncate",
-        isSelected ? "text-primary" : "text-foreground group-hover:text-primary"
-      )}>
-        {label}
       </span>
+
+      <span className="min-w-0">
+        <span className="block max-w-[86px] truncate text-[10px] font-black uppercase tracking-[0.14em] sm:max-w-[104px]">
+          {label}
+        </span>
+      </span>
+
+      {isSelected && (
+        <motion.span
+          layoutId="active-category"
+          className="absolute inset-0 rounded-2xl ring-2 ring-foreground/15"
+        />
+      )}
     </button>
   );
 }

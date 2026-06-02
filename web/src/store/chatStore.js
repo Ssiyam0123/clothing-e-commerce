@@ -44,11 +44,31 @@ export const useChatStore = create((set, get) => ({
     if (get().socket) return;
 
     const socketUrl = process.env.NEXT_PUBLIC_API_URL.replace('/api', '');
+    console.log('🔌 SOCKET: Initializing socket connection to:', socketUrl);
+    
     const socket = io(socketUrl, {
       auth: { token },
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
     });
 
+    // ✅ Connection Status Tracking
+    socket.on('connect', () => {
+      console.log('✅ SOCKET: Connected successfully', { socketId: socket.id });
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('❌ SOCKET: Connection error:', error.message);
+    });
+
+    socket.on('disconnect', (reason) => {
+      console.log('🔌 SOCKET: Disconnected -', reason);
+    });
+
+    // 💬 Chat Message Listener
     socket.on('new_message', (data) => {
       const { isChatOpen } = useAppStore.getState();
       const currentUser = useAuthStore.getState().user;
@@ -72,6 +92,15 @@ export const useChatStore = create((set, get) => ({
         // Refetch total unread count from server for 100% precision
         get().fetchUnreadCount();
       }
+    });
+
+    // 🏷️ Order Events Listeners (for admin)
+    socket.on('new_order', (order) => {
+      console.log('⚡ SOCKET: new_order event received:', order);
+    });
+
+    socket.on('order_updated', (data) => {
+      console.log('⚡ SOCKET: order_updated event received:', data);
     });
 
     set({ socket });

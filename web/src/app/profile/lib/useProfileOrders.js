@@ -8,7 +8,7 @@ export const useProfileOrders = (orderId = null, phone = null, page = null, limi
   const guestId = getGuestId();
   const userId = user?._id || guestId;
 
-  const { data: myOrders, isLoading: myOrdersLoading } = useQuery({
+  const { data: myOrders, isLoading: myOrdersLoading, error: myOrdersError } = useQuery({
     queryKey: ["myOrders", userId, phone, page, limit],
     queryFn: async () => {
       let url = "/orders/myorders";
@@ -22,7 +22,12 @@ export const useProfileOrders = (orderId = null, phone = null, page = null, limi
         url += `?${queryString}`;
       }
       
+      console.log("🔄 FETCHING ORDERS", { url, userId, phone, page, limit });
+      
       const { data } = await api.get(url);
+      
+      console.log("📦 ORDERS RESPONSE", { data });
+      
       return data;
     },
     enabled: (!!userId || !!phone) && !authLoading,
@@ -42,6 +47,7 @@ export const useProfileOrders = (orderId = null, phone = null, page = null, limi
   return {
     myOrders: myOrders || [],
     myOrdersLoading,
+    myOrdersError,
     orderDetails,
     orderDetailsLoading,
     isDetailsError,

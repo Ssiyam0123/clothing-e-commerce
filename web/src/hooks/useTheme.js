@@ -59,7 +59,7 @@ export function useTheme() {
       // 1️⃣ Determine Mode
       const resolvedMode = targetTheme === "system" 
         ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-        : (targetTheme || "dark");
+        : (targetTheme || "light");
 
       // 2️⃣ Sync Classes
       // Force remove all potential mode classes to avoid hybrid states

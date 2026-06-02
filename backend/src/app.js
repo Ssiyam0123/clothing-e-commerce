@@ -45,6 +45,8 @@ app.set("trust proxy", 1);
 // 🛡️ Tactical CORS Configuration
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://localhost:8081",
+  "http://localhost:8082",
   "https://clothing-e-commerce-web.vercel.app",
   process.env.FRONTEND_URL,
 ]

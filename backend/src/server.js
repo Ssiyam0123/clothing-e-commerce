@@ -59,6 +59,19 @@ if (redisClient) {
 // 🛡️ Socket Middleware
 io.use(socketAuth);
 
+// 📊 Socket Connection Tracking
+io.on('connection', (socket) => {
+  console.log(`📡 SOCKET CONNECTED: ${socket.id} (Total: ${io.engine.clientsCount})`);
+
+  socket.on('disconnect', (reason) => {
+    console.log(`🔌 SOCKET DISCONNECTED: ${socket.id} - Reason: ${reason} (Total: ${io.engine.clientsCount})`);
+  });
+
+  socket.on('error', (error) => {
+    console.error(`❌ SOCKET ERROR: ${socket.id} - ${error}`);
+  });
+});
+
 // ⚡ Keep-alive self-ping mechanism to keep Render instance awake
 const pingSelf = () => {
   const backendUrl = process.env.BACKEND_URL;
