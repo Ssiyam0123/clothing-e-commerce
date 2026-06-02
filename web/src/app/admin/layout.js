@@ -220,7 +220,11 @@ export default function AdminLayout({ children }) {
                       <SheetTitle>Admin Navigation</SheetTitle>
                       <SheetDescription>Access administrative control panels and settings.</SheetDescription>
                     </SheetHeader>
-                    <Sidebar className="border-none" onItemClick={() => setIsSidebarOpen(false)} />
+                    <Sidebar
+                      className="border-none"
+                      collapsible={false}
+                      onItemClick={() => setIsSidebarOpen(false)}
+                    />
                   </SheetContent>
                 </Sheet>
 

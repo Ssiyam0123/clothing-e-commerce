@@ -19,6 +19,7 @@ export function ChatProvider({ children }) {
 
   const [activeConversation, setActiveConversation] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
   const [input, setInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
@@ -85,26 +86,45 @@ export function ChatProvider({ children }) {
     }
   };
 
-  // Sync active conversation details and messages
+  // Sync active conversation details
   useEffect(() => {
     if (!id) {
       setActiveConversation(null);
-      setMessages([]);
       return;
     }
 
+    let cancelled = false;
     const found = conversations.find(c => c._id === id);
+
     if (found) {
       setActiveConversation(found);
     } else {
+      setActiveConversation(null);
       api.get(`/chat/conversations/${id}`)
         .then(res => {
-          if (res.data.success) {
+          if (!cancelled && res.data.success) {
             setActiveConversation(res.data.conversation);
           }
         })
         .catch(err => console.error("Error fetching single conversation", err));
     }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, conversations]);
+
+  // Sync messages only when the selected conversation changes.
+  useEffect(() => {
+    if (!id) {
+      setMessages([]);
+      setMessagesLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setMessages([]);
+    setMessagesLoading(true);
 
     const { resetUnread } = useChatStore.getState();
     resetUnread(id).then(() => {
@@ -114,9 +134,11 @@ export function ChatProvider({ children }) {
     const fetchMessages = async () => {
       try {
         const res = await api.get(`/chat/conversations/${id}/messages`);
-        setMessages(res.data);
+        if (!cancelled) setMessages(res.data);
       } catch (err) {
         console.error("Transmission Intercepted", err);
+      } finally {
+        if (!cancelled) setMessagesLoading(false);
       }
     };
     fetchMessages();
@@ -159,13 +181,18 @@ export function ChatProvider({ children }) {
       socket.on("message_edited", editHandler);
       socket.on("message_deleted", deleteHandler);
       return () => {
+        cancelled = true;
         socket.off("new_message", handler);
         socket.off("messages_seen", seenHandler);
         socket.off("message_edited", editHandler);
         socket.off("message_deleted", deleteHandler);
       };
     }
-  }, [id, conversations]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
   const customer = useMemo(() => {
     if (!activeConversation) return null;
@@ -241,6 +268,7 @@ export function ChatProvider({ children }) {
       onlineUsers,
       activeConversation,
       messages,
+      messagesLoading,
       setMessages,
       input,
       setInput,

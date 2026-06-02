@@ -11,9 +11,36 @@ export default function MessageInput({
   handleSend,
   handleFileChange,
   isUploading,
-  fileInputRef
+  fileInputRef,
+  className
 }) {
   const textareaRef = useRef(null);
+
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+
+    const updateKeyboardOffset = () => {
+      const keyboardOffset = Math.max(
+        0,
+        window.innerHeight - viewport.height - viewport.offsetTop
+      );
+      document.documentElement.style.setProperty(
+        "--chat-keyboard-offset",
+        `${keyboardOffset}px`
+      );
+    };
+
+    updateKeyboardOffset();
+    viewport.addEventListener("resize", updateKeyboardOffset);
+    viewport.addEventListener("scroll", updateKeyboardOffset);
+
+    return () => {
+      viewport.removeEventListener("resize", updateKeyboardOffset);
+      viewport.removeEventListener("scroll", updateKeyboardOffset);
+      document.documentElement.style.removeProperty("--chat-keyboard-offset");
+    };
+  }, []);
 
   // Auto-resize textarea height as content grows
   useEffect(() => {
@@ -32,7 +59,13 @@ export default function MessageInput({
   };
 
   return (
-    <footer className="p-3 bg-[#f0f2f5] dark:bg-[#202c33] shrink-0 z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+    <footer
+      className={cn(
+        "z-10 shrink-0 bg-[#f0f2f5] p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-4px_10px_rgba(0,0,0,0.02)] transition-[transform] duration-150 dark:bg-[#202c33]",
+        className
+      )}
+      style={{ transform: "translateY(calc(var(--chat-keyboard-offset, 0px) * -1))" }}
+    >
       <div className="max-w-4xl mx-auto flex items-end gap-2">
         <input 
           type="file" 

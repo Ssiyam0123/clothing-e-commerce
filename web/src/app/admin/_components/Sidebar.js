@@ -10,13 +10,14 @@ import { useChatStore } from "@/store/chatStore";
 import { hasPermission } from "@/utils/rbacUtils";
 
 
-export default function Sidebar({ className, onItemClick }) {
+export default function Sidebar({ className, onItemClick, collapsible = true }) {
   const pathname = usePathname();
   const { user } = useAuthStore();
   const { unreadCount } = useChatStore();
   const { settings, isAdminSidebarCollapsed, toggleAdminSidebar } = useAppStore();
   const branding = settings?.branding || {};
   const siteName = branding.siteName || "Store";
+  const isCollapsed = collapsible && isAdminSidebarCollapsed;
 
   const filteredGroups = navGroups.map(group => ({
     ...group,
@@ -29,16 +30,17 @@ export default function Sidebar({ className, onItemClick }) {
   return (
     <aside className={cn(
       "sidebar-vanguard transition-all duration-500 ease-in-out",
-      isAdminSidebarCollapsed ? "w-24" : "w-72",
+      isCollapsed ? "w-24" : "w-72",
       className
     )}>
       {/* 🏷️ Brand Header */}
       <div 
         className={cn(
           "p-8 cursor-pointer hover:opacity-80 transition-opacity",
-          isAdminSidebarCollapsed && "flex justify-center"
+          isCollapsed && "flex justify-center",
+          !collapsible && "cursor-default hover:opacity-100"
         )}
-        onClick={toggleAdminSidebar}
+        onClick={collapsible ? toggleAdminSidebar : undefined}
       >
         <div className="flex items-center gap-4">
           <div className="min-w-10 w-10 h-10 bg-sidebar-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-black/20">
@@ -46,7 +48,7 @@ export default function Sidebar({ className, onItemClick }) {
               {siteName.charAt(0).toUpperCase()}
             </span>
           </div>
-          {!isAdminSidebarCollapsed && (
+          {!isCollapsed && (
             <div className="flex flex-col overflow-hidden whitespace-nowrap animate-in fade-in slide-in-from-left-2 duration-500">
               <h2 className="text-sm font-black tracking-tighter uppercase text-sidebar-foreground leading-none">
                 {siteName}
@@ -63,12 +65,12 @@ export default function Sidebar({ className, onItemClick }) {
       <nav className="flex-1 overflow-y-auto no-scrollbar px-6 py-4 space-y-10 overscroll-y-contain">
         {filteredGroups.map((group, groupIdx) => (
           <div key={groupIdx}>
-            {!isAdminSidebarCollapsed && (
+            {!isCollapsed && (
               <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.5em] mb-6 pl-4 animate-in fade-in duration-700">
                 {group.label}
               </p>
             )}
-            {isAdminSidebarCollapsed && (
+            {isCollapsed && (
               <div className="h-px bg-sidebar-border/10 mb-6" />
             )}
             <ul className="space-y-1.5">
@@ -82,19 +84,19 @@ export default function Sidebar({ className, onItemClick }) {
                       onClick={onItemClick}
                       className={cn(
                         "sidebar-nav-item flex items-center",
-                        isAdminSidebarCollapsed ? "justify-center px-0" : "px-4",
+                        isCollapsed ? "justify-center px-0" : "px-4",
                         isActive ? "sidebar-nav-item-active" : "sidebar-nav-item-inactive"
                       )}
-                      title={isAdminSidebarCollapsed ? item.name : ""}
+                      title={isCollapsed ? item.name : ""}
                     >
                       <span className={cn(
                         "transition-all duration-300", 
                         isActive ? "scale-110" : "opacity-70 group-hover:opacity-100",
-                        isAdminSidebarCollapsed ? "text-xl" : ""
+                        isCollapsed ? "text-xl" : ""
                       )}>
                         {item.icon}
                       </span>
-                      {!isAdminSidebarCollapsed && (
+                      {!isCollapsed && (
                         <div className="flex-1 flex items-center justify-between animate-in fade-in slide-in-from-left-2 duration-500">
                           <span>{item.name}</span>
                           {item.href === "/admin/chat" && unreadCount > 0 && (
@@ -104,7 +106,7 @@ export default function Sidebar({ className, onItemClick }) {
                           )}
                         </div>
                       )}
-                      {isAdminSidebarCollapsed && item.href === "/admin/chat" && unreadCount > 0 && (
+                      {isCollapsed && item.href === "/admin/chat" && unreadCount > 0 && (
                         <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-destructive text-[8px] font-black text-white border-2 border-sidebar shadow-lg">
                           {unreadCount > 9 ? "9+" : unreadCount}
                         </span>
@@ -122,9 +124,9 @@ export default function Sidebar({ className, onItemClick }) {
       <div className="p-8">
         <div className={cn(
           "bg-sidebar-accent/50 rounded-2xl p-4 border border-sidebar-border",
-          isAdminSidebarCollapsed && "flex justify-center"
+          isCollapsed && "flex justify-center"
         )}>
-          {isAdminSidebarCollapsed ? (
+          {isCollapsed ? (
             <span className="text-[10px] font-black text-primary italic">V2</span>
           ) : (
             <p className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.3em] text-center opacity-60 animate-in fade-in duration-700">

@@ -125,16 +125,52 @@ export default function ChatDetailPage() {
     handleEditMessage, 
     handleDeleteMessage 
   } = useChat();
-  const scrollRef = useRef(null);
+  const scrollContainerRef = useRef(null);
+  const stickToBottomRef = useRef(true);
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    const container = scrollContainerRef.current;
+    if (!container || !stickToBottomRef.current) return;
+
+    const frame = requestAnimationFrame(() => {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [messages.length]);
+
+  useEffect(() => {
+    stickToBottomRef.current = true;
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const frame = requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight;
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [activeConversation?._id]);
+
+  const handleScroll = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const distanceFromBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
+    stickToBottomRef.current = distanceFromBottom < 140;
+  };
 
   if (!activeConversation) return null;
 
   return (
-    <main className="w-full h-full overflow-y-auto p-4 md:p-6 no-scrollbar bg-[#efeae2] dark:bg-[#0b141a] relative">
+    <main
+      ref={scrollContainerRef}
+      onScroll={handleScroll}
+      className="relative h-full min-h-0 w-full overflow-y-auto overscroll-contain scroll-smooth bg-[#efeae2] p-4 pb-[calc(1rem+var(--chat-keyboard-offset,0px))] scroll-pb-[calc(1rem+var(--chat-keyboard-offset,0px))] no-scrollbar dark:bg-[#0b141a] md:p-6 md:pb-[calc(1.5rem+var(--chat-keyboard-offset,0px))] md:scroll-pb-[calc(1.5rem+var(--chat-keyboard-offset,0px))]"
+    >
        <div className="absolute inset-0 opacity-[0.06] dark:opacity-[0.03] pointer-events-none bg-[url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-whatsapp-texture.jpg')] bg-repeat" />
        
        <div className="max-w-4xl mx-auto space-y-1 relative z-10">
@@ -154,7 +190,6 @@ export default function ChatDetailPage() {
               />
             );
           })}
-          <div ref={scrollRef} />
        </div>
     </main>
   );

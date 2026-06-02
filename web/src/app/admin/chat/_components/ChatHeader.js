@@ -6,11 +6,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { getImageUrl } from "@/utils/imageUtils";
+import { cn } from "@/lib/utils";
 
-export default function ChatHeader({ customer, onlineUsers }) {
+export default function ChatHeader({ customer, onlineUsers, className }) {
   return (
-    <header className="h-[60px] bg-[#f0f2f5] dark:bg-[#202c33] px-4 flex items-center justify-between border-l border-border/5 shrink-0 z-10 shadow-sm">
-      <div className="flex items-center gap-3">
+    <header className={cn("z-10 flex h-[60px] shrink-0 items-center justify-between border-l border-border/5 bg-[#f0f2f5] px-4 shadow-sm dark:bg-[#202c33]", className)}>
+      <div className="flex min-w-0 items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
@@ -37,7 +38,7 @@ export default function ChatHeader({ customer, onlineUsers }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-foreground/70">
           <Search size={20} />
         </Button>

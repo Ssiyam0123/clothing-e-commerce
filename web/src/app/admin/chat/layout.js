@@ -8,12 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { getImageUrl } from "@/utils/imageUtils";
 import { ChatProvider, useChat } from "./ChatContext";
 import api from "@/lib/api";
-import { useChatStore } from "@/store/chatStore";
 import { ChatListSkeleton } from "@/components/common/Skeletons";
 import { useAuthStore } from "@/store/authStore";
 
@@ -32,9 +30,7 @@ function ChatContent({ children }) {
     loading,
     startConversation,
     onlineUsers,
-    activeConversation,
   } = useChat();
-  const { resetUnread } = useChatStore();
   const { id } = useParams();
   const { user } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState("");
@@ -92,13 +88,15 @@ function ChatContent({ children }) {
   const isMobileSidebarOpen = !id;
 
   return (
-    <div className="flex h-screen bg-[#f0f2f5] dark:bg-[#0b141a] overflow-hidden">
+    <div className="relative flex h-dvh min-h-0 overflow-hidden bg-[#f0f2f5] dark:bg-[#0b141a]">
       {/* Sidebar */}
       <div
         className={cn(
-          "w-full lg:w-[380px] border-r border-[#d1d7db] dark:border-[#222d34] flex flex-col bg-white dark:bg-[#111b21] transition-transform duration-300 ease-in-out z-20",
-          "absolute lg:relative h-full shadow-xl",
-          isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          "fixed inset-y-0 left-0 z-30 flex h-dvh min-h-0 w-full flex-col border-r border-[#d1d7db] bg-white shadow-xl transition-[transform,visibility] duration-300 ease-in-out dark:border-[#222d34] dark:bg-[#111b21]",
+          "lg:relative lg:inset-auto lg:z-auto lg:h-full lg:w-[380px] lg:translate-x-0 lg:shadow-none",
+          isMobileSidebarOpen
+            ? "translate-x-0 visible"
+            : "-translate-x-full invisible pointer-events-none lg:visible lg:pointer-events-auto"
         )}
       >
         {/* Sidebar Header */}
@@ -139,7 +137,7 @@ function ChatContent({ children }) {
         </div>
 
         {/* Conversation List */}
-        <ScrollArea className="flex-1 bg-white dark:bg-[#111b21]">
+        <ScrollArea className="min-h-0 flex-1 bg-white dark:bg-[#111b21]">
           <div className="flex flex-col">
             {loading ? (
               <ChatListSkeleton count={6} />
@@ -243,7 +241,7 @@ function ChatContent({ children }) {
       </div>
 
       {/* Right panel – only renders children, NO header/input */}
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 relative overflow-hidden">
         {children}
       </div>
     </div>
