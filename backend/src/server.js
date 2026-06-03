@@ -4,7 +4,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import { createAdapter } from "@socket.io/redis-adapter";
 import Redis from "ioredis";
-import app from './app.js';
+import app, { isAllowedOrigin } from './app.js';
 import { socketAuth } from './middleware/socketAuth.js'; 
 import { initSocketEvents } from './modules/chat/chat.socket.js'; 
 import redisClient from "./config/redis.js";
@@ -15,11 +15,13 @@ const server = http.createServer(app);
 // 🚀 Socket.io Setup
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:3000",
-      "https://clothing-e-commerce-web.vercel.app",
-      process.env.FRONTEND_URL
-    ].filter(Boolean),
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST"]
   },

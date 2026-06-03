@@ -53,21 +53,33 @@ const allowedOrigins = [
   .filter(Boolean)
   .map(origin => origin.trim().replace(/\/$/, "")); // Trim whitespace and remove trailing slashes
 
+export const isAllowedOrigin = (origin) => {
+  if (!origin || origin === "null") return true;
+  
+  const sanitized = origin.trim().replace(/\/$/, "");
+  
+  // Standard list of allowed domains
+  if (allowedOrigins.includes(sanitized)) return true;
+  
+  // Allow localhost on any port
+  if (/^http:\/\/localhost(:\d+)?$/.test(sanitized)) return true;
+  if (/^http:\/\/127\.0\.0\.1(:\d+)?$/.test(sanitized)) return true;
+  
+  // Allow local network IPs on any port (e.g. 192.168.x.x, 10.x.x.x, 172.16-31.x.x)
+  if (/^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(sanitized)) return true;
+  
+  return false;
+};
+
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || origin === 'null') {
-        return callback(null, true);
-      }
-      
-      const sanitizedOrigin = origin.trim().replace(/\/$/, "");
-      
-      if (allowedOrigins.includes(sanitizedOrigin)) {
+      if (isAllowedOrigin(origin)) {
         callback(null, true);
       } else {
         console.warn(`⚠️ CORS blocked for origin: ${origin}`);
         // Fallback for subdomains or development environments
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === "development") {
           return callback(null, true);
         }
         callback(null, false); // Return false instead of throwing 500 error, letting browser handle CORS rejection cleanly
