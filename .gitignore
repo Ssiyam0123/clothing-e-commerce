@@ -5,6 +5,7 @@
 !/backend/
 !/web/
 !/documentation/
+!/mobile/
 
 # Explicitly allow essential root configuration
 !/.gitignore
@@ -32,6 +33,10 @@
 /web/.env
 /web/.env.local
 /web/.env.*.local
+
+/mobile/.env
+/mobile/.env.local
+/mobile/.env.*.local
 
 # Globally ignore AI/Agent metadata and logs
 **/.agents/
