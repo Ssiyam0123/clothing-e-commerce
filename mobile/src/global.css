@@ -1,124 +1,70 @@
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/preflight.css" layer(base);
-@import "tailwindcss/utilities.css";
-@config "../tailwind.config.js";
-@source "../src/**/*.{js,jsx,ts,tsx}";
+@import "tailwindcss";
 @import "nativewind/theme";
 
 /* ═══════════════════════════════════════════
    🍎 Apple-Style Glass Morphism Design System
    ═══════════════════════════════════════════ */
 
-:root {
-  /* Base theme */
-  --background: #FFFFFF;
-  --foreground: #141414;
-  --primary: #0F0F11;
-  --card: #FFFFFF;
-  --border: #E2E8F0;
+@theme {
+  --color-background: #FFFFFF;
+  --color-foreground: #141414;
+  --color-primary: #0F0F11;
+  --color-card: #FFFFFF;
+  --color-border: #E2E8F0;
 
   /* Glass morphism tokens */
-  --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(255, 255, 255, 0.18);
-  --glass-shadow: rgba(0, 0, 0, 0.04);
-  --glass-highlight: rgba(255, 255, 255, 0.6);
-  --glass-blur: 16px;
+  --color-glass-bg: rgba(255, 255, 255, 0.72);
+  --color-glass-border: rgba(255, 255, 255, 0.18);
+  --color-glass-shadow: rgba(0, 0, 0, 0.04);
+  --color-glass-highlight: rgba(255, 255, 255, 0.6);
+  --color-glass-blur: 16px;
 
   /* Frosted surface */
-  --frost-bg: rgba(255, 255, 255, 0.45);
-  --frost-border: rgba(255, 255, 255, 0.12);
+  --color-frost-bg: rgba(255, 255, 255, 0.45);
+  --color-frost-border: rgba(255, 255, 255, 0.12);
 
   /* Accent colors */
-  --accent-gold: #D4AF37;
-  --accent-crimson: #EF4444;
-  --accent-slate: #64748B;
-  --accent-light: #F1F5F9;
+  --color-accent-gold: #D4AF37;
+  --color-accent-crimson: #EF4444;
+  --color-accent-slate: #64748B;
+  --color-accent-light: #F1F5F9;
 
   /* Surfaces */
-  --surface-primary: #F8FAFC;
-  --surface-secondary: #F1F5F9;
-  --surface-elevated: #FFFFFF;
+  --color-surface-primary: #F8FAFC;
+  --color-surface-secondary: #F1F5F9;
+  --color-surface-elevated: #FFFFFF;
 
   /* Typography */
-  --font-display:
-    Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol, Noto Color Emoji;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+  --font-display: Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
   --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
   --font-serif: Georgia, 'Times New Roman', serif;
 }
 
-.dark {
-  --background: #09090B;
-  --foreground: #F9FAFB;
-  --primary: #FFFFFF;
-  --card: #151518;
-  --border: #27272A;
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-background: #09090B;
+    --color-foreground: #F9FAFB;
+    --color-primary: #FFFFFF;
+    --color-card: #151518;
+    --color-border: #27272A;
 
-  /* Glass morphism - dark mode */
-  --glass-bg: rgba(18, 18, 22, 0.78);
-  --glass-border: rgba(255, 255, 255, 0.06);
-  --glass-shadow: rgba(0, 0, 0, 0.25);
-  --glass-highlight: rgba(255, 255, 255, 0.03);
+    /* Glass morphism - dark mode */
+    --color-glass-bg: rgba(18, 18, 22, 0.78);
+    --color-glass-border: rgba(255, 255, 255, 0.06);
+    --color-glass-shadow: rgba(0, 0, 0, 0.25);
+    --color-glass-highlight: rgba(255, 255, 255, 0.03);
 
-  /* Frosted surface - dark */
-  --frost-bg: rgba(18, 18, 22, 0.55);
-  --frost-border: rgba(255, 255, 255, 0.04);
+    /* Frosted surface - dark */
+    --color-frost-bg: rgba(18, 18, 22, 0.55);
+    --color-frost-border: rgba(255, 255, 255, 0.04);
 
-  /* Surfaces - dark */
-  --surface-primary: #0C0C10;
-  --surface-secondary: #131318;
-  --surface-elevated: #1A1A20;
+    /* Surfaces - dark */
+    --color-surface-primary: #0C0C10;
+    --color-surface-secondary: #131318;
+    --color-surface-elevated: #1A1A20;
+  }
 }
 
-@theme {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-card: var(--card);
-  --color-border: var(--border);
-  --color-surface-primary: var(--surface-primary);
-  --color-surface-secondary: var(--surface-secondary);
-  --color-surface-elevated: var(--surface-elevated);
-  --color-accent-gold: var(--accent-gold);
-  --color-accent-crimson: var(--accent-crimson);
-}
 
-/* Web-specific overrides to solve React Native Web CSS specificity conflicts */
-@supports (background-color: revert) {
-  html, body, #root {
-    overflow: auto !important;
-  }
-  .text-foreground {
-    color: var(--foreground) !important;
-  }
-  .text-white {
-    color: #ffffff !important;
-  }
-  .text-rose-500 {
-    color: #f43f5e !important;
-  }
-  .bg-background {
-    background-color: var(--background) !important;
-  }
-  .bg-white {
-    background-color: #ffffff !important;
-  }
-  .border-border {
-    border-color: var(--border) !important;
-  }
-  
-  .dark .bg-white {
-    background-color: var(--card) !important;
-  }
-  .dark .text-slate-400 {
-    color: #94a3b8 !important;
-  }
-  .dark .text-slate-500 {
-    color: #64748b !important;
-  }
-  .dark .border-slate-100 {
-    border-color: var(--border) !important;
-  }
-}
+

@@ -116,7 +116,7 @@ export default function OrderListScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListEmptyComponent={
-          !myOrdersLoading && (
+          !myOrdersLoading ? (
             <View className="flex-1 items-center justify-center py-20 px-6">
               <Package size={48} className="text-slate-400 dark:text-zinc-500 mb-4" />
               <Text className="text-base font-black text-foreground mb-2">
@@ -134,7 +134,7 @@ export default function OrderListScreen() {
                 </Text>
               </Pressable>
             </View>
-          )
+          ) : null
         }
         ListFooterComponent={
           myOrdersLoading ? (

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from 'expo-router';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, Appearance } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import FlashMessage from 'react-native-flash-message';
 
@@ -43,7 +43,7 @@ export default function RootLayout() {
     }
   }, [isAuthenticated, syncWithServer]);
 
-  // Sync dark class on Web platform
+  // Sync theme with native Appearance API and Web document class
   useEffect(() => {
     if (typeof window !== 'undefined' && window.document) {
       const root = window.document.documentElement;
@@ -73,6 +73,9 @@ export default function RootLayout() {
           overflow: auto !important;
         }
       `;
+    } else {
+      // On native mobile, set native Appearance scheme so NativeWind `dark:` styles apply
+      Appearance.setColorScheme(theme);
     }
   }, [theme]);
 
