@@ -1,4 +1,11 @@
 import 'dotenv/config';
+import dns from 'dns';
+
+// Force Google DNS locally to bypass Cloudflare WARP DNS resolution errors on Windows
+if (process.env.NODE_ENV !== 'production') {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+}
+
 import mongoose from 'mongoose';
 import http from 'http';
 import { Server } from 'socket.io';

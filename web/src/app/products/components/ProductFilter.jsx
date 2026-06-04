@@ -185,13 +185,13 @@ export default function ProductFilter({ initialCategories }) {
             </div>
 
             {/* Scrollable Body */}
-            <div className="flex-1 overflow-y-auto space-y-6 pb-6 pr-1 scrollbar-none">
+            <div className="flex-1 overflow-y-auto space-y-6 pb-6 pr-1 no-scrollbar">
               {/* Sort By Section */}
               <div>
                 <p className="mb-2 text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                   {t.sort || "Sort By"}
                 </p>
-                <div className="-mx-4 overflow-x-auto px-4 pb-1 scrollbar-none">
+                <div className="-mx-4 overflow-x-auto px-4 pb-1 no-scrollbar">
                   <div className="flex w-max gap-2">
                     {[
                       { value: "all", label: t.newest || t.all || "Newest" },
@@ -224,7 +224,7 @@ export default function ProductFilter({ initialCategories }) {
                 <p className="mb-2 text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                   {t.categories || "Category"}
                 </p>
-                <div className="-mx-4 overflow-x-auto px-4 pb-1 scrollbar-none">
+                <div className="-mx-4 overflow-x-auto px-4 pb-1 no-scrollbar">
                   <div className="flex w-max gap-2">
                     <CategoryItem
                       isSelected={filters.category === "all"}
@@ -263,7 +263,7 @@ export default function ProductFilter({ initialCategories }) {
                   <p className="mb-2 text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                     {t.subcategories || "Subcategory"}
                   </p>
-                  <div className="-mx-4 overflow-x-auto px-4 pb-1 scrollbar-none">
+                  <div className="-mx-4 overflow-x-auto px-4 pb-1 no-scrollbar">
                     <div className="flex w-max gap-2">
                       {filteredSubcategories.map((sub) => {
                         const isSelected = filters.subcategory === sub.slug;
@@ -565,7 +565,7 @@ export default function ProductFilter({ initialCategories }) {
                 {t.categories || "Categories"}
               </p>
             </div>
-            <div className="-mx-3 overflow-x-auto px-3 pb-2 scrollbar-none">
+            <div className="-mx-3 overflow-x-auto px-3 pb-2 no-scrollbar">
               <div className="flex w-max gap-2 sm:gap-3">
                 <CategoryItem
                   isSelected={filters.category === "all"}
@@ -606,7 +606,7 @@ export default function ProductFilter({ initialCategories }) {
                   {t.subcategories || "Subcategories"}
                 </p>
               </div>
-              <div className="-mx-3 overflow-x-auto px-3 pb-1 scrollbar-none">
+              <div className="-mx-3 overflow-x-auto px-3 pb-1 no-scrollbar">
                 <div className="flex w-max gap-2">
                   {filteredSubcategories.map((sub) => {
                     const isSelected = filters.subcategory === sub.slug;
