@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from 'expo-router';
 import { View, Text, ActivityIndicator, Appearance } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import FlashMessage from 'react-native-flash-message';
+import { VariableContextProvider } from 'nativewind';
 
 import '../global.css';
 import { AnimatedSplashOverlay } from '../components/animated-icon';
@@ -11,6 +12,9 @@ import { useAppStore } from '../store/appStore';
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
 import { Button } from '../components/ui/Button';
+import { getBrandScheme, getNativeThemeVars } from '../constants/designSystem';
+
+const loaderColor = '#4A3525';
 
 // Setup TanStack Query
 const queryClient = new QueryClient({
@@ -23,7 +27,7 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
-  const { theme, initApp, maintenanceMode, isInitialized } = useAppStore();
+  const { theme, lang, initApp, maintenanceMode, isInitialized } = useAppStore();
   const checkSession = useAuthStore((s) => s.checkSession);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const syncWithServer = useCartStore((s) => s.syncWithServer);
@@ -48,11 +52,9 @@ export default function RootLayout() {
   useEffect(() => {
     if (typeof window !== 'undefined' && window.document) {
       const root = window.document.documentElement;
-      if (theme === 'dark') {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-      }
+      root.lang = lang;
+      root.classList.toggle('dark', theme === 'dark');
+      root.classList.toggle('font-bn', lang === 'bn');
 
       // Inject robust web scrolling style overrides
       let styleEl = window.document.getElementById('web-scroll-override');
@@ -78,15 +80,17 @@ export default function RootLayout() {
       // On native mobile, set native Appearance scheme so NativeWind `dark:` styles apply
       Appearance.setColorScheme(theme);
     }
-  }, [theme]);
+  }, [lang, theme]);
 
   // Determine active color theme
   const activeTheme = theme === 'dark' ? DarkTheme : DefaultTheme;
+  const nativeThemeVars = useMemo(() => getNativeThemeVars(theme), [theme]);
+  const scheme = getBrandScheme(theme);
 
   if (!isInitialized) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator size="large" color="#0F0F11" />
+      <View className="flex-1 items-center justify-center bg-background" style={{ backgroundColor: scheme.background }}>
+        <ActivityIndicator size="large" color={loaderColor} />
       </View>
     );
   }
@@ -95,11 +99,11 @@ export default function RootLayout() {
   if (maintenanceMode) {
     return (
       <ThemeProvider value={activeTheme}>
-        <View className="flex-1 items-center justify-center bg-background px-6">
-          <Text className="text-3xl font-black text-foreground mb-4 text-center italic">
+        <View className="flex-1 items-center justify-center bg-background px-6" style={{ backgroundColor: scheme.background }}>
+          <Text className="mb-4 text-center font-heading text-3xl font-black text-main">
             Maintenance Mode
           </Text>
-          <Text className="text-sm font-semibold text-slate-500 dark:text-zinc-400 text-center mb-8">
+          <Text className="mb-8 text-center text-sm font-semibold text-muted-foreground">
             Our systems are currently undergoing updates. Please try again later.
           </Text>
           <Button title="Retry" onPress={initApp} className="w-1/2" />
@@ -111,23 +115,27 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
-        <ThemeProvider value={activeTheme}>
-          <AnimatedSplashOverlay />
+        <VariableContextProvider value={nativeThemeVars as any}>
+          <ThemeProvider value={activeTheme}>
+            <View className="flex-1 bg-background" style={{ backgroundColor: scheme.background }}>
+              <AnimatedSplashOverlay />
 
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="(auth)/login" />
-            <Stack.Screen name="(auth)/register" />
-            <Stack.Screen name="product/[slug]" />
-            <Stack.Screen name="checkout/index" />
-            <Stack.Screen name="checkout/payment" />
-            <Stack.Screen name="checkout/success" />
-            <Stack.Screen name="order/track" />
-            <Stack.Screen name="support/chat" />
-          </Stack>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="(auth)/login" />
+                <Stack.Screen name="(auth)/register" />
+                <Stack.Screen name="product/[slug]" />
+                <Stack.Screen name="checkout/index" />
+                <Stack.Screen name="checkout/payment" />
+                <Stack.Screen name="checkout/success" />
+                <Stack.Screen name="order/track" />
+                <Stack.Screen name="support/chat" />
+              </Stack>
 
-          <FlashMessage position="top" />
-        </ThemeProvider>
+              <FlashMessage position="top" />
+            </View>
+          </ThemeProvider>
+        </VariableContextProvider>
       </SafeAreaProvider>
     </QueryClientProvider>
   );

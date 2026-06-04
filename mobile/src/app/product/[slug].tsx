@@ -114,10 +114,16 @@ export default function ProductDetailScreen() {
   const [reviewComment, setReviewComment] = useState('');
   const [reviewError, setReviewError] = useState('');
 
-  const [reviewsPage, setReviewsPage] = useState(1);
-  useEffect(() => {
-    setReviewsPage(1);
-  }, [product?._id]);
+  const [reviewsPager, setReviewsPager] = useState({ productId: '', page: 1 });
+  const reviewsPage = reviewsPager.productId === product?._id ? reviewsPager.page : 1;
+  const setReviewsPage = (nextPage: number | ((page: number) => number)) => {
+    setReviewsPager((current) => {
+      const currentProductId = product?._id || '';
+      const currentPage = current.productId === currentProductId ? current.page : 1;
+      const page = typeof nextPage === 'function' ? nextPage(currentPage) : nextPage;
+      return { productId: currentProductId, page };
+    });
+  };
 
   // Fetch product reviews
   const { data: reviewsData } = useQuery({

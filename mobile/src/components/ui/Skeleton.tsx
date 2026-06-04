@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { Animated, Platform, useColorScheme } from 'react-native';
+import { Animated } from 'react-native';
 
 interface SkeletonProps {
   width?: number | string;
@@ -8,8 +8,6 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ width = '100%', height = 20, className = '' }: SkeletonProps) {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
   const shimmerAnim = useMemo(() => new Animated.Value(0), []);
 
   useEffect(() => {
@@ -32,18 +30,11 @@ export function Skeleton({ width = '100%', height = 20, className = '' }: Skelet
   return (
     <Animated.View
       style={{
-        width: typeof width === 'number' ? width : undefined,
-        height: typeof height === 'number' ? height : undefined,
-        backgroundColor: isDark
-          ? 'rgba(39,39,42,0.7)'
-          : Platform.select({
-              ios: 'rgba(226,232,240,0.7)',
-              default: '#E2E8F0',
-            }),
-        borderRadius: 12,
+        width: width as any,
+        height: height as any,
         overflow: 'hidden',
       }}
-      className={className}
+      className={`rounded-field bg-surface-muted ${className}`}
     >
       {/* Shimmer overlay */}
       <Animated.View
@@ -54,13 +45,8 @@ export function Skeleton({ width = '100%', height = 20, className = '' }: Skelet
           bottom: 0,
           width: '100%',
           transform: [{ translateX }],
-          backgroundColor: isDark
-            ? 'rgba(255,255,255,0.06)'
-            : Platform.select({
-                ios: 'rgba(255,255,255,0.45)',
-                default: 'rgba(255,255,255,0.4)',
-              }),
         }}
+        className="bg-card/40"
       />
     </Animated.View>
   );

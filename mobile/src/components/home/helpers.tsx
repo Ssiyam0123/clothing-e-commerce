@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Image, Dimensions, View, Text, Pressable } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { getImageUrl } from '../../lib/api';
+import { useAppStore } from '../../store/appStore';
+import { getBrandScheme } from '../../constants/designSystem';
 
 export const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -140,19 +142,28 @@ export function SectionHeader({
   seeAllLabel?: string;
   accent?: boolean;
 }) {
+  const theme = useAppStore((s) => s.theme);
+  const colors = getBrandScheme(theme);
+
   return (
     <View className="flex-row items-end justify-between mb-3.5 px-1">
       <View className="flex-1">
         <View className="flex-row items-center gap-2 mb-1">
           {accent && (
-            <View className="w-1 h-5 bg-accent-crimson rounded-full" />
+            <View className="h-5 w-1 rounded-full bg-brand-accent" />
           )}
-          <Text className="text-lg font-black text-foreground uppercase tracking-tight">
+          <Text
+            className="text-lg font-black uppercase tracking-tight"
+            style={{ color: colors.text }}
+          >
             {title}
           </Text>
         </View>
         {subtitle ? (
-          <Text className="text-[11px] font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wide">
+          <Text
+            className="text-[11px] font-semibold uppercase tracking-wide"
+            style={{ color: colors.textSecondary }}
+          >
             {subtitle}
           </Text>
         ) : null}
@@ -160,12 +171,12 @@ export function SectionHeader({
       {onSeeAll ? (
         <Pressable
           onPress={onSeeAll}
-          className="flex-row items-center gap-0.5 py-1 px-3 rounded-full bg-slate-100/80 dark:bg-zinc-800/60 active:scale-95"
+          className="flex-row items-center gap-0.5 rounded-full bg-brand-light-surface px-3 py-1 active:scale-95 dark:bg-brand-dark-surface"
         >
-          <Text className="text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+          <Text className="text-[11px] font-bold uppercase tracking-wider text-brand-light-muted dark:text-brand-dark-muted">
             {seeAllLabel}
           </Text>
-          <ChevronRight size={13} className="text-slate-400 dark:text-zinc-500" />
+          <ChevronRight size={13} className="text-brand-light-muted dark:text-brand-dark-muted" />
         </Pressable>
       ) : null}
     </View>

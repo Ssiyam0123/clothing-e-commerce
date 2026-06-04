@@ -5,6 +5,21 @@ import { useAppStore } from '../../store/appStore';
 import { useCartStore } from '../../store/cartStore';
 import { View, Text, Pressable } from 'react-native';
 
+const navTheme = {
+  light: {
+    surface: '#FFFFFF',
+    border: '#E5E5E5',
+    active: '#4A3525',
+    inactive: '#6B6B6B',
+  },
+  dark: {
+    surface: '#2C2C2E',
+    border: '#3A3A3C',
+    active: '#FFFFFF',
+    inactive: '#A1A1A6',
+  },
+};
+
 function CustomCartTabBarButton({ onPress, totalCartItems }: any) {
   return (
     <Pressable
@@ -17,13 +32,12 @@ function CustomCartTabBarButton({ onPress, totalCartItems }: any) {
       className="active:scale-95"
     >
       <View
-        className="w-13 h-13 rounded-full justify-center items-center shadow-lg relative border-4 border-white dark:border-zinc-950"
-        style={{ backgroundColor: '#0F172A' }}
+        className="relative h-13 w-13 items-center justify-center rounded-full border-4 border-card bg-primary shadow-nav"
       >
-        <ShoppingCart size={20} color="#FFFFFF" strokeWidth={2.4} />
+        <ShoppingCart size={20} className="text-primary-foreground" strokeWidth={2.4} />
         {totalCartItems > 0 ? (
-          <View className="absolute -top-1 -right-1 bg-red-500 rounded-full h-4.5 min-w-4.5 px-1 items-center justify-center">
-            <Text className="text-white text-[8px] font-black text-center">
+          <View className="absolute -right-1 -top-1 h-4.5 min-w-4.5 items-center justify-center rounded-full bg-danger px-1">
+            <Text className="text-center text-[8px] font-black text-primary-foreground">
               {totalCartItems}
             </Text>
           </View>
@@ -38,9 +52,7 @@ export default function TabLayout() {
   const totalCartItems = useCartStore((s) => s.totalItems);
 
   const isDark = theme === 'dark';
-  const bgColor = isDark ? '#09090B' : '#FFFFFF';
-  const inactiveColor = isDark ? '#4B5563' : '#9CA3AF';
-  const borderColor = isDark ? '#27272A' : '#E2E8F0';
+  const colors = isDark ? navTheme.dark : navTheme.light;
 
   return (
     <Tabs
@@ -48,14 +60,14 @@ export default function TabLayout() {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: bgColor,
-          borderTopColor: borderColor,
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
           height: 64,
           paddingBottom: 0,
           paddingTop: 0,
         },
-        tabBarActiveTintColor: isDark ? '#FFFFFF' : '#0F0F11',
-        tabBarInactiveTintColor: inactiveColor,
+        tabBarActiveTintColor: colors.active,
+        tabBarInactiveTintColor: colors.inactive,
       }}
     >
       <Tabs.Screen
@@ -65,7 +77,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Home size={24} color={color} />,
         }}
       />
-      
+
       <Tabs.Screen
         name="shop"
         options={{

@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState, useEffect } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { Pressable, Text, View, Modal, ScrollView, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { Heart, Star, ImageOff, ShoppingCart, Zap, Plus, Minus } from 'lucide-react-native';
@@ -71,26 +71,19 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1);
   const [loadingCart, setLoadingCart] = useState(false);
 
-  useEffect(() => {
-    if (isSelectorOpen && product.sizes && product.sizes.length > 0) {
-      const available = product.sizes.find((s: any) => s && s.stock > 0);
-      const sizeId = available ? (available.size?._id || available.size) : '';
-      if (sizeId) {
-        setSelectedSizeId(String(sizeId));
-      }
-      setQuantity(1);
-    }
-  }, [isSelectorOpen, product]);
-
   const handleAddToCart = (event: any) => {
     event?.stopPropagation?.();
     setSelectorAction('cart');
+    setSelectedSizeId(getDefaultSizeId());
+    setQuantity(1);
     setIsSelectorOpen(true);
   };
 
   const handleInstantBuy = (event: any) => {
     event?.stopPropagation?.();
     setSelectorAction('buy');
+    setSelectedSizeId(getDefaultSizeId());
+    setQuantity(1);
     setIsSelectorOpen(true);
   };
 
@@ -134,16 +127,9 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
     <>
       <Pressable
         onPress={handlePress}
-        className={`rounded-[20px] overflow-hidden flex-1 m-1 active:scale-[0.98] bg-white dark:bg-zinc-950 border border-black/[0.06] dark:border-white/[0.08] ${className}`}
-        style={{
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.04,
-          shadowRadius: 6,
-          elevation: 1,
-        }}
+        className={`m-1 flex-1 overflow-hidden rounded-card border border-border bg-card active:scale-[0.98] shadow-card ${className}`}
       >
-        <View className="relative w-full aspect-[1/1.12] bg-slate-100 dark:bg-zinc-900">
+        <View className="relative aspect-[1/1.12] w-full bg-surface-soft">
           {product.images && product.images.length > 0 ? (
             <Image
               source={{ uri: getImageUrl(product.images[0]) }}
@@ -154,25 +140,25 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
             />
           ) : (
             <View className="w-full h-full items-center justify-center">
-              <ImageOff size={38} color="#9ca3af" strokeWidth={1.2} />
+              <ImageOff size={38} className="text-muted-foreground" strokeWidth={1.2} />
             </View>
           )}
 
           {discount > 0 ? (
-            <View className="absolute top-2.5 left-2.5 py-1.5 px-2.5 rounded-full z-10 bg-red-600">
-              <Text className="text-white text-[9px] font-black tracking-wide">
+            <View className="absolute left-2.5 top-2.5 z-10 rounded-full bg-danger px-2.5 py-1.5">
+              <Text className="text-[9px] font-black tracking-wide text-primary-foreground">
                 -{Math.round(discount)}%
               </Text>
             </View>
           ) : product.isNew ? (
-            <View className="absolute top-2.5 left-2.5 py-1.5 px-2.5 rounded-full z-10 bg-emerald-600">
-              <Text className="text-white text-[9px] font-black tracking-wide">NEW</Text>
+            <View className="absolute left-2.5 top-2.5 z-10 rounded-full bg-success px-2.5 py-1.5">
+              <Text className="text-[9px] font-black tracking-wide text-primary-foreground">NEW</Text>
             </View>
           ) : null}
 
           <Pressable
             onPress={handleWishlist}
-            className="absolute top-2.5 right-2.5 w-8 h-8 items-center justify-center rounded-full z-10 active:scale-90 bg-white/90 dark:bg-black/70"
+            className="absolute right-2.5 top-2.5 z-10 h-8 w-8 items-center justify-center rounded-full bg-card/90 active:scale-90"
           >
             <Heart
               size={15}
@@ -185,25 +171,25 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
         <View className="p-3">
           {product.brand || product.category?.name ? (
             <Text
-              className="text-[9px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider mb-1"
+              className="mb-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground"
               numberOfLines={1}
             >
               {product.brand || product.category?.name}
             </Text>
           ) : null}
 
-          <Text numberOfLines={2} className="text-[12px] font-black text-foreground leading-[1.25] min-h-[32px]">
+          <Text numberOfLines={2} className="min-h-[32px] text-[12px] font-black leading-[1.25] text-card-foreground">
             {product.name}
           </Text>
 
           <View className="mt-2 flex-row items-center justify-between gap-1.5">
             <View className="flex-row items-baseline gap-1.5 flex-1">
-              <Text className="text-[15px] font-black text-foreground tracking-tight">
+              <Text className="text-[15px] font-black tracking-tight text-card-foreground">
                 {currency}
                 {Math.round(discountedPrice).toLocaleString()}
               </Text>
               {discount > 0 ? (
-                <Text className="text-[11px] text-slate-400 line-through font-semibold">
+                <Text className="text-[11px] font-semibold text-muted-foreground line-through">
                   {currency}
                   {Math.round(productPrice).toLocaleString()}
                 </Text>
@@ -211,9 +197,9 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
             </View>
 
             {showReviews && reviewCount > 0 ? (
-              <View className="flex-row items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-500/10 px-2 py-1">
+              <View className="flex-row items-center gap-1 rounded-full bg-accent px-2 py-1">
                 <Star size={10} color="#F59E0B" fill="#F59E0B" />
-                <Text className="text-[10px] font-black text-amber-600 dark:text-amber-400">
+                <Text className="text-[10px] font-black text-accent-foreground">
                   {avgRating.toFixed(1)}
                 </Text>
               </View>
@@ -223,17 +209,15 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
           <View className="mt-3 flex-row gap-2">
             <Pressable
               onPress={handleAddToCart}
-              className="h-10 flex-1 items-center justify-center rounded-2xl active:scale-95"
-              style={{ backgroundColor: '#E5E7EB' }}
+              className="h-10 flex-1 items-center justify-center rounded-button bg-accent active:scale-95"
             >
-              <ShoppingCart size={16} color="#0F172A" strokeWidth={2.4} />
+              <ShoppingCart size={16} className="text-accent-foreground" strokeWidth={2.4} />
             </Pressable>
             <Pressable
               onPress={handleInstantBuy}
-              className="h-10 flex-1 items-center justify-center rounded-2xl active:scale-95"
-              style={{ backgroundColor: '#0F172A' }}
+              className="h-10 flex-1 items-center justify-center rounded-button bg-primary active:scale-95"
             >
-              <Zap size={16} color="#FFFFFF" fill="#FFFFFF" strokeWidth={2.4} />
+              <Zap size={16} className="text-primary-foreground" fill="#FFFFFF" strokeWidth={2.4} />
             </Pressable>
           </View>
         </View>
@@ -246,7 +230,7 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
         transparent={true}
         onRequestClose={() => setIsSelectorOpen(false)}
       >
-        <View className="flex-1 justify-end bg-black/40">
+        <View className="flex-1 justify-end bg-overlay">
           {/* Dismiss Backdrop */}
           <Pressable 
             className="absolute inset-0" 
@@ -257,13 +241,13 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
           />
 
           {/* Bottom Sheet Container */}
-          <View className="bg-white dark:bg-zinc-950 rounded-t-[32px] p-5 pb-8 border-t border-slate-100 dark:border-zinc-900 shadow-2xl">
+          <View className="rounded-t-sheet border-t border-border bg-card p-5 pb-8 shadow-sheet">
             {/* Grabber indicator */}
-            <View className="w-12 h-1 bg-slate-200 dark:bg-zinc-800 rounded-full mx-auto mb-5" />
+            <View className="mx-auto mb-5 h-1 w-12 rounded-full bg-surface-muted" />
 
             {/* Header: Product details */}
             <View className="flex-row gap-4 mb-6">
-              <View className="w-20 h-24 rounded-2xl overflow-hidden bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800">
+              <View className="h-24 w-20 overflow-hidden rounded-card border border-border bg-surface-soft">
                 {product.images && product.images.length > 0 ? (
                   <Image
                     source={{ uri: getImageUrl(product.images[0]) }}
@@ -272,32 +256,32 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
                   />
                 ) : (
                   <View className="w-full h-full items-center justify-center">
-                    <Text className="text-[10px] text-slate-400 uppercase">No Image</Text>
+                    <Text className="text-[10px] uppercase text-muted-foreground">No Image</Text>
                   </View>
                 )}
               </View>
 
               <View className="flex-1 justify-center">
                 {product.brand || product.category?.name ? (
-                  <Text className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-1">
+                  <Text className="mb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                     {product.brand || product.category?.name}
                   </Text>
                 ) : null}
-                <Text numberOfLines={2} className="text-base font-black text-foreground mb-2 leading-snug">
+                <Text numberOfLines={2} className="mb-2 text-base font-black leading-snug text-card-foreground">
                   {product.name}
                 </Text>
-                <Text className="text-lg font-black text-foreground italic">
+                <Text className="text-lg font-black italic text-card-foreground">
                   {currency}{Math.round(discountedPrice).toLocaleString()}
                 </Text>
               </View>
             </View>
 
-            <View className="h-px bg-slate-100 dark:bg-zinc-900 mb-5" />
+            <View className="mb-5 h-px bg-border" />
 
             {/* Sizes section */}
             {product.sizes && product.sizes.length > 0 && (
               <View className="mb-5">
-                <Text className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider mb-3">
+                <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Select Size
                 </Text>
                 <ScrollView overScrollMode="never" horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
@@ -316,18 +300,18 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
                           setSelectedSizeId(String(sizeId));
                         }}
                         className={`py-2.5 px-5 rounded-xl border items-center justify-center min-w-[55px] ${isOutOfStock
-                            ? 'border-slate-100 bg-slate-50 opacity-35 dark:border-zinc-900 dark:bg-zinc-950'
+                            ? 'border-border bg-surface-soft opacity-35'
                             : isSelected
-                              ? 'bg-zinc-900 border-zinc-900 dark:bg-white dark:border-white'
-                              : 'bg-transparent border-slate-200 dark:border-zinc-800'
+                              ? 'border-primary bg-primary'
+                              : 'border-border bg-transparent'
                           }`}
                       >
                         <Text
                           className={`text-xs font-bold uppercase ${isOutOfStock
-                              ? 'text-slate-300 line-through dark:text-zinc-700'
+                              ? 'text-muted-foreground line-through'
                               : isSelected
-                                ? 'text-white dark:text-black'
-                                : 'text-foreground'
+                                ? 'text-primary-foreground'
+                                : 'text-card-foreground'
                             }`}
                         >
                           {sObj.name || String(sObj)}
@@ -341,21 +325,21 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
 
             {/* Quantity Selector */}
             <View className="flex-row items-center justify-between mb-6">
-              <Text className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+              <Text className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Quantity
               </Text>
-              <View className="flex-row items-center bg-slate-50 dark:bg-zinc-900 rounded-2xl py-1 px-1.5 border border-slate-100 dark:border-zinc-800 h-10">
+              <View className="h-10 flex-row items-center rounded-card border border-border bg-surface-soft px-1.5 py-1">
                 <Pressable
                   onPress={(event) => {
                     event?.stopPropagation?.();
                     if (quantity > 1) setQuantity(quantity - 1);
                   }}
-                  className="w-7 h-7 items-center justify-center rounded-lg bg-white dark:bg-zinc-950 border border-slate-150 dark:border-zinc-800/60"
+                  className="h-7 w-7 items-center justify-center rounded-button border border-border bg-card"
                 >
-                  <Minus size={12} className="text-foreground" />
+                  <Minus size={12} className="text-card-foreground" />
                 </Pressable>
 
-                <Text className="text-xs font-black text-foreground px-4 text-center min-w-[30px]">
+                <Text className="min-w-[30px] px-4 text-center text-xs font-black text-card-foreground">
                   {quantity}
                 </Text>
 
@@ -364,9 +348,9 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
                     event?.stopPropagation?.();
                     setQuantity(quantity + 1);
                   }}
-                  className="w-7 h-7 items-center justify-center rounded-lg bg-white dark:bg-zinc-950 border border-slate-150 dark:border-zinc-800/60"
+                  className="h-7 w-7 items-center justify-center rounded-button border border-border bg-card"
                 >
-                  <Plus size={12} className="text-foreground" />
+                  <Plus size={12} className="text-card-foreground" />
                 </Pressable>
               </View>
             </View>
@@ -375,12 +359,12 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
             <Pressable
               onPress={handleConfirmAction}
               disabled={loadingCart}
-              className="w-full h-12 rounded-2xl bg-zinc-900 dark:bg-white items-center justify-center active:scale-95 shadow-lg"
+              className="h-12 w-full items-center justify-center rounded-button bg-primary active:scale-95 shadow-card"
             >
               {loadingCart ? (
                 <ActivityIndicator size="small" color={selectorAction === 'buy' ? '#0F172A' : '#FFFFFF'} />
               ) : (
-                <Text className="text-xs font-black uppercase text-white dark:text-zinc-900 tracking-widest">
+                <Text className="text-xs font-black uppercase tracking-widest text-primary-foreground">
                   {selectorAction === 'buy' ? 'Confirm Buy Now' : 'Confirm Add to Cart'}
                 </Text>
               )}

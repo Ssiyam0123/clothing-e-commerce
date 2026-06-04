@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TextInputProps, Pressable } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 
+const placeholderColor = '#8D7B68';
+
 interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
@@ -25,18 +27,18 @@ export function Input({
   return (
     <View className={`w-full mb-4 ${containerClassName}`}>
       {label ? (
-        <Text className="text-xs font-semibold text-slate-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">
+        <Text className="mb-1.5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
           {label}
         </Text>
       ) : null}
       
       <View
-        className={`w-full flex-row items-center border rounded-xl bg-white dark:bg-zinc-900 ${
+        className={`w-full flex-row items-center rounded-field border bg-input ${
           error
-            ? 'border-red-500'
+            ? 'border-danger'
             : isFocused
-            ? 'border-primary dark:border-white'
-            : 'border-slate-200 dark:border-zinc-800'
+            ? 'border-ring'
+            : 'border-border'
         }`}
       >
         <TextInput
@@ -49,8 +51,8 @@ export function Input({
             if (props.onBlur) props.onBlur(e);
           }}
           secureTextEntry={isPassword && !showPassword}
-          className={`flex-1 py-3.5 px-4 text-foreground font-medium text-base ${className}`}
-          placeholderTextColor="#94A3B8"
+          className={`flex-1 px-4 py-3.5 text-sm font-semibold text-main ${className}`}
+          placeholderTextColor={placeholderColor}
           {...props}
         />
         
@@ -60,16 +62,16 @@ export function Input({
             className="px-4 py-3.5"
           >
             {showPassword ? (
-              <EyeOff size={20} className="text-slate-400 dark:text-zinc-500" />
+              <EyeOff size={20} className="text-muted-foreground" />
             ) : (
-              <Eye size={20} className="text-slate-400 dark:text-zinc-500" />
+              <Eye size={20} className="text-muted-foreground" />
             )}
           </Pressable>
         ) : null}
       </View>
       
       {error ? (
-        <Text className="text-xs font-medium text-red-500 mt-1">
+        <Text className="mt-1 text-xs font-semibold text-danger">
           {error}
         </Text>
       ) : null}

@@ -38,34 +38,36 @@ export function Button({
     }).start();
   };
 
-  // Build variant classes
   let variantClass = 'bg-primary border-primary';
-  let textClass = 'text-white';
+  let textClass = 'text-primary-foreground';
+  let indicatorColor = '#FFF8F0';
 
   if (variant === 'secondary') {
-    variantClass = 'bg-slate-200 border-slate-200 dark:bg-zinc-800 dark:border-zinc-800';
-    textClass = 'text-foreground';
+    variantClass = 'bg-accent border-accent';
+    textClass = 'text-accent-foreground';
+    indicatorColor = '#2A1C13';
   } else if (variant === 'danger') {
-    variantClass = 'bg-red-500 border-red-500';
-    textClass = 'text-white';
+    variantClass = 'bg-danger border-danger';
+    textClass = 'text-primary-foreground';
   } else if (variant === 'outline') {
     variantClass = 'bg-transparent border border-border';
-    textClass = 'text-foreground';
+    textClass = 'text-primary';
+    indicatorColor = '#4A3525';
   } else if (variant === 'ghost') {
     variantClass = 'bg-transparent border-transparent';
-    textClass = 'text-foreground';
+    textClass = 'text-primary';
+    indicatorColor = '#4A3525';
   }
 
-  // Size classes
-  let sizeClass = 'py-3 px-6 rounded-xl';
-  let fontClass = 'text-base font-semibold';
+  let sizeClass = 'h-12 px-6 rounded-button';
+  let fontClass = 'text-xs font-black uppercase tracking-wider';
 
   if (size === 'sm') {
-    sizeClass = 'py-2 px-4 rounded-lg';
-    fontClass = 'text-sm font-semibold';
+    sizeClass = 'h-10 px-4 rounded-button';
+    fontClass = 'text-[10px] font-black uppercase tracking-wider';
   } else if (size === 'lg') {
-    sizeClass = 'py-4 px-8 rounded-2xl';
-    fontClass = 'text-lg font-bold';
+    sizeClass = 'h-14 px-8 rounded-card';
+    fontClass = 'text-sm font-black uppercase tracking-widest';
   }
 
   return (
@@ -77,9 +79,7 @@ export function Button({
         disabled={disabled || loading}
         className={`flex-row items-center justify-center border ${variantClass} ${sizeClass} ${disabled ? 'opacity-50' : ''} ${className}`}
       >
-        {loading ? (
-          <ActivityIndicator color={variant === 'outline' || variant === 'ghost' ? '#141414' : '#FFFFFF'} className="mr-2" />
-        ) : null}
+        {loading ? <ActivityIndicator color={indicatorColor} className="mr-2" /> : null}
         <Text className={`${textClass} ${fontClass} text-center ${textClassName}`}>
           {title}
         </Text>

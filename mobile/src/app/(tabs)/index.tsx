@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Search, Bell } from 'lucide-react-native';
+import { Search, Bell, Languages, Moon, Sun } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/api';
@@ -30,7 +30,11 @@ import {
 export default function HomeScreen() {
   const router = useRouter();
   const theme = useAppStore((s) => s.theme);
+  const lang = useAppStore((s) => s.lang);
+  const setLang = useAppStore((s) => s.setLang);
+  const toggleTheme = useAppStore((s) => s.toggleTheme);
   const siteName = useAppStore((s) => s.settings?.branding?.siteName) || 'VANGUARD';
+  const isDark = theme === 'dark';
 
   // Fetch dynamic home layout configuration from backend
   const {
@@ -135,39 +139,50 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-brand-light-bg dark:bg-brand-dark-bg">
       {/* 🍎 Premium Glass Header Bar */}
-      <View
-        className="flex-row items-center justify-between px-4 py-2.5 h-14"
-        style={{
-          backgroundColor: '#0F0F11',
-          borderBottomWidth: 1,
-          borderBottomColor: 'rgba(255,255,255,0.08)',
-        }}
-      >
+      <View className="h-14 flex-row items-center justify-between bg-brand-light-surface px-4 py-2.5 dark:bg-brand-dark-surface">
         {/* Brand / Menu */}
-        <View className="flex-row items-center gap-2">
-          <Text className="text-base font-black text-white uppercase tracking-[0.15em] italic">
+        <View className="min-w-0 flex-1 flex-row items-center gap-2">
+          <Text className="text-base font-black uppercase tracking-[0.15em] text-brand-light-text dark:text-brand-dark-text" numberOfLines={1}>
             {siteName}
           </Text>
         </View>
 
         {/* Right actions */}
         <View className="flex-row items-center gap-1">
+          <Pressable
+            onPress={toggleTheme}
+            className="h-9 w-9 items-center justify-center rounded-full bg-brand-light-bg active:scale-90 dark:bg-brand-dark-bg"
+          >
+            {isDark ? (
+              <Moon size={18} color="#FFFFFF" />
+            ) : (
+              <Sun size={18} color="#4A3525" />
+            )}
+          </Pressable>
+
+          <Pressable
+            onPress={() => setLang(lang === 'en' ? 'bn' : 'en')}
+            className="h-9 flex-row items-center justify-center gap-0.5 rounded-full bg-brand-light-bg px-2 active:scale-90 dark:bg-brand-dark-bg"
+          >
+            <Languages size={14} color={isDark ? '#FFFFFF' : '#4A3525'} />
+            <Text className="text-[9px] font-black uppercase text-brand-light-text dark:text-brand-dark-text">
+              {lang === 'en' ? 'BN' : 'EN'}
+            </Text>
+          </Pressable>
+
           {/* Search */}
           <Pressable
             onPress={() => router.push('/(tabs)/shop')}
-            className="w-9 h-9 items-center justify-center rounded-full active:scale-90"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.10)',
-            }}
+            className="h-9 w-9 items-center justify-center rounded-full bg-brand-light-bg active:scale-90 dark:bg-brand-dark-bg"
           >
-            <Search size={20} color="white" />
+            <Search size={20} color={isDark ? '#FFFFFF' : '#4A3525'} />
           </Pressable>
 
           {/* Notifications */}
-          <Pressable className="w-9 h-9 items-center justify-center rounded-full active:scale-90 relative">
-            <Bell size={20} color="white" />
+          <Pressable className="relative h-9 w-9 items-center justify-center rounded-full active:scale-90">
+            <Bell size={20} color={isDark ? '#FFFFFF' : '#4A3525'} />
             <View className="absolute top-1.5 right-1.5 bg-accent-crimson rounded-full h-4 min-w-4 px-1 items-center justify-center">
               <Text className="text-white text-[8px] font-black text-center">
                 3
@@ -179,8 +194,8 @@ export default function HomeScreen() {
 
       {/* Main Content */}
       {isLoading ? (
-        <View className="flex-1 items-center justify-center bg-background">
-          <ActivityIndicator size="large" color="#0F0F11" />
+        <View className="flex-1 items-center justify-center bg-brand-light-bg dark:bg-brand-dark-bg">
+          <ActivityIndicator size="large" color={isDark ? '#FFFFFF' : '#4A3525'} />
         </View>
       ) : (
         <FlatList overScrollMode="never"
@@ -201,8 +216,8 @@ export default function HomeScreen() {
             <RefreshControl
               refreshing={isFetching}
               onRefresh={refetch}
-              tintColor={theme === 'dark' ? '#FFFFFF' : '#0F0F11'}
-              colors={['#0F0F11']}
+              tintColor={isDark ? '#FFFFFF' : '#4A3525'}
+              colors={['#4A3525']}
             />
           }
           removeClippedSubviews={true}

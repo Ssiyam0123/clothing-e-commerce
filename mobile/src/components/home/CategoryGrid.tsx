@@ -5,12 +5,15 @@ import { useQuery } from '@tanstack/react-query';
 import { useAppStore } from '../../store/appStore';
 import { getTranslation } from '../../utils/i18n';
 import { api, getImageUrl } from '../../lib/api';
+import { getBrandScheme } from '../../constants/designSystem';
 
 export function MobileCategoryGrid({ config }: { config: any }) {
   const router = useRouter();
   const lang = useAppStore((s) => s.lang);
+  const theme = useAppStore((s) => s.theme);
   const t = getTranslation('home', lang);
   const [selected, setSelected] = useState('men');
+  const colors = getBrandScheme(theme);
 
   // Fetch actual categories
   const { data: categories } = useQuery({
@@ -61,8 +64,8 @@ export function MobileCategoryGrid({ config }: { config: any }) {
               className="w-[78px] items-center active:scale-95"
             >
               <View
-                className={`h-[68px] w-[68px] items-center justify-center overflow-hidden rounded-full border-2 bg-slate-100 dark:bg-zinc-900 ${
-                  isSelected ? 'border-white' : 'border-zinc-800 dark:border-zinc-700'
+                className={`h-[68px] w-[68px] items-center justify-center overflow-hidden rounded-full border-2 bg-brand-light-surface dark:bg-brand-dark-surface ${
+                  isSelected ? 'border-brand-accent' : 'border-brand-light-border dark:border-brand-dark-border'
                 }`}
                 style={{
                   shadowColor: '#000',
@@ -80,15 +83,15 @@ export function MobileCategoryGrid({ config }: { config: any }) {
                 {isSelected ? <View className="absolute inset-0 bg-black/10" /> : null}
               </View>
               <Text
-                className="mt-2 min-h-[28px] text-center text-[10px] font-black uppercase leading-[14px] text-foreground"
+                className="mt-2 min-h-[28px] text-center text-[10px] font-black uppercase leading-[14px]"
+                style={{ color: colors.text }}
                 numberOfLines={2}
               >
                 {cat.name}
               </Text>
               {isSelected ? (
                 <View
-                  className="mt-1 h-1 w-6 rounded-full"
-                  style={{ backgroundColor: '#FFFFFF' }}
+                  className="mt-1 h-1 w-6 rounded-full bg-brand-accent"
                 />
               ) : null}
             </Pressable>

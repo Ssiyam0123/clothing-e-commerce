@@ -58,6 +58,8 @@ interface AppState {
   settings: AppSettings | null;
   maintenanceMode: boolean;
   isInitialized: boolean;
+  hasUserThemePreference: boolean;
+  hasUserLangPreference: boolean;
 
   setTheme: (theme: 'light' | 'dark') => void;
   setLang: (lang: 'en' | 'bn') => void;
@@ -74,13 +76,15 @@ export const useAppStore = create<AppState>()(
       settings: null,
       maintenanceMode: false,
       isInitialized: false,
+      hasUserThemePreference: false,
+      hasUserLangPreference: false,
 
-      setTheme: (theme) => set({ theme }),
-      setLang: (lang) => set({ lang }),
+      setTheme: (theme) => set({ theme, hasUserThemePreference: true }),
+      setLang: (lang) => set({ lang, hasUserLangPreference: true }),
       
       toggleTheme: () => {
         const nextTheme = get().theme === 'dark' ? 'light' : 'dark';
-        set({ theme: nextTheme });
+        set({ theme: nextTheme, hasUserThemePreference: true });
       },
 
       refreshSettings: async () => {
@@ -92,8 +96,16 @@ export const useAppStore = create<AppState>()(
           set({
             settings: data,
             maintenanceMode: isMaintenance,
-            theme: branding.defaultTheme === 'light' ? 'light' : 'dark',
-            lang: branding.defaultLanguage === 'bn' ? 'bn' : 'en',
+            theme: get().hasUserThemePreference
+              ? get().theme
+              : branding.defaultTheme === 'light'
+                ? 'light'
+                : 'dark',
+            lang: get().hasUserLangPreference
+              ? get().lang
+              : branding.defaultLanguage === 'bn'
+                ? 'bn'
+                : 'en',
             isInitialized: true,
           });
         } catch (error) {
@@ -112,6 +124,8 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         theme: state.theme,
         lang: state.lang,
+        hasUserThemePreference: state.hasUserThemePreference,
+        hasUserLangPreference: state.hasUserLangPreference,
         settings: state.settings,
         maintenanceMode: state.maintenanceMode,
       }),
