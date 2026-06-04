@@ -1,0 +1,15 @@
+env: load .env
+env: export EXPO_PUBLIC_API_URL EXPO_PUBLIC_IMAGE_URL
+Starting project at D:\pg\clothing-e-commerce-main\clothing-e-commerce-main\mobile
+Using src/app as the root directory for Expo Router.
+React Compiler enabled
+Starting Metro Bundler
+
+warning: Bundler cache is empty, rebuilding (this may take a minute)
+Waiting on http://localhost:8081
+1 package may need updating. Run npx expo install --check for details.
+Logs for your project will appear below.
+λ Bundled 14082ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (3319 modules)
+Web Bundled 14658ms node_modules\expo-router\entry.js (3172 modules)
+λ Bundled 94ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 2476ms node_modules\expo-router\entry.js (1 module)

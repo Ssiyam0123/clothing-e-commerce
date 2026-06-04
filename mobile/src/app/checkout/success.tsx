@@ -1,17 +1,29 @@
-import React from 'react';
-import { View, Text, SafeAreaView, Pressable } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { CheckCircle2, XCircle, ShoppingBag, Truck } from 'lucide-react-native';
+import { CheckCircle2, XCircle } from 'lucide-react-native';
 import { Button } from '../../components/ui/Button';
+import { useCartStore } from '../../store/cartStore';
 
 export default function OrderSuccessScreen() {
   const router = useRouter();
   const { orderId, status, reason } = useLocalSearchParams();
 
+  const clearCart = useCartStore((s) => s.clearCart);
+  const clearBuyNowItem = useCartStore((s) => s.clearBuyNowItem);
+
   const isFailed = status === 'failed';
 
+  useEffect(() => {
+    if (!isFailed) {
+      clearCart();
+      clearBuyNowItem();
+    }
+  }, [clearBuyNowItem, clearCart, isFailed]);
+
   return (
-    <SafeAreaView className="flex-1 bg-background justify-center px-6">
+    <SafeAreaView className="flex-1 bg-background justify-center px-6" style={{ flex: 1 }}>
       <View className="items-center text-center">
         {isFailed ? (
           <>

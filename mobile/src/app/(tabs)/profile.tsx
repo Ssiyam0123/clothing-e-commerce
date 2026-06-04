@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Pressable, SafeAreaView, ActivityIndicator, Alert, Platform } from 'react-native';
+import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { LogOut, Package, Languages, MessageSquare, ChevronRight, MapPin, BookOpen } from 'lucide-react-native';
@@ -73,7 +74,7 @@ export default function ProfileScreen() {
   const roleLabel = typeof user?.role === 'object' ? user.role?.name : user?.role;
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1 }}>
       {/* Header bar */}
       <View className="px-4 py-4 border-b border-slate-100 dark:border-zinc-900 bg-white dark:bg-zinc-950">
         <Text className="text-lg font-black text-foreground italic uppercase tracking-wider">
@@ -81,7 +82,7 @@ export default function ProfileScreen() {
         </Text>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} className="flex-1 px-5 py-4">
+      <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false} className="flex-1 px-5 py-4">
         {/* User Card Area */}
         {isAuthenticated && user ? (
           <View className="bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800/40 p-5 rounded-3xl flex-row items-center mb-6">
@@ -136,14 +137,12 @@ export default function ProfileScreen() {
             <View className="flex-row bg-slate-50 dark:bg-zinc-950 rounded-xl p-1 border border-slate-100 dark:border-zinc-900 mb-4">
               <Pressable
                 onPress={() => setActiveTab('active')}
-                className={`flex-1 py-2.5 rounded-lg items-center ${
-                  activeTab === 'active' ? 'bg-white dark:bg-zinc-900 shadow-sm' : ''
-                }`}
+                className={`flex-1 py-2.5 rounded-lg items-center ${activeTab === 'active' ? 'bg-white dark:bg-zinc-900 shadow-sm' : ''
+                  }`}
               >
                 <Text
-                  className={`text-xs font-bold uppercase tracking-wider ${
-                    activeTab === 'active' ? 'text-foreground' : 'text-slate-500 dark:text-zinc-400'
-                  }`}
+                  className={`text-xs font-bold uppercase tracking-wider ${activeTab === 'active' ? 'text-foreground' : 'text-slate-500 dark:text-zinc-400'
+                    }`}
                 >
                   {t.activeOrders || 'Active'} ({activeOrders.length})
                 </Text>
@@ -151,14 +150,12 @@ export default function ProfileScreen() {
 
               <Pressable
                 onPress={() => setActiveTab('completed')}
-                className={`flex-1 py-2.5 rounded-lg items-center ${
-                  activeTab === 'completed' ? 'bg-white dark:bg-zinc-900 shadow-sm' : ''
-                }`}
+                className={`flex-1 py-2.5 rounded-lg items-center ${activeTab === 'completed' ? 'bg-white dark:bg-zinc-900 shadow-sm' : ''
+                  }`}
               >
                 <Text
-                  className={`text-xs font-bold uppercase tracking-wider ${
-                    activeTab === 'completed' ? 'text-foreground' : 'text-slate-500 dark:text-zinc-400'
-                  }`}
+                  className={`text-xs font-bold uppercase tracking-wider ${activeTab === 'completed' ? 'text-foreground' : 'text-slate-500 dark:text-zinc-400'
+                    }`}
                 >
                   {t.completedOrders || 'Completed'} ({completedOrders.length})
                 </Text>
@@ -183,22 +180,20 @@ export default function ProfileScreen() {
                       ID: {order._id.slice(-10).toUpperCase()}
                     </Text>
                     <View
-                      className={`py-1 px-2.5 rounded-md ${
-                        order.orderStatus === 'Delivered'
+                      className={`py-1 px-2.5 rounded-md ${order.orderStatus === 'Delivered'
                           ? 'bg-emerald-50 dark:bg-emerald-950/20'
                           : order.orderStatus === 'Cancelled'
-                          ? 'bg-red-50 dark:bg-red-950/20'
-                          : 'bg-amber-50 dark:bg-amber-950/20'
-                      }`}
+                            ? 'bg-red-50 dark:bg-red-950/20'
+                            : 'bg-amber-50 dark:bg-amber-950/20'
+                        }`}
                     >
                       <Text
-                        className={`text-[9px] font-black uppercase ${
-                          order.orderStatus === 'Delivered'
+                        className={`text-[9px] font-black uppercase ${order.orderStatus === 'Delivered'
                             ? 'text-emerald-600'
                             : order.orderStatus === 'Cancelled'
-                            ? 'text-red-500'
-                            : 'text-amber-600'
-                        }`}
+                              ? 'text-red-500'
+                              : 'text-amber-600'
+                          }`}
                       >
                         {order.orderStatus}
                       </Text>
@@ -213,7 +208,7 @@ export default function ProfileScreen() {
                     <Text className="text-base font-black text-foreground italic">
                       ৳{Math.round(order.totalPrice).toLocaleString()}
                     </Text>
-                    
+
                     {order.orderStatus !== 'Cancelled' ? (
                       <Pressable
                         onPress={() =>

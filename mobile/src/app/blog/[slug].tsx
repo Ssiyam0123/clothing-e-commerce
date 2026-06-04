@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, ScrollView, Image, Pressable, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Image, Pressable, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Calendar, User } from 'lucide-react-native';
@@ -69,7 +70,7 @@ export default function BlogDetailScreen() {
         <View className="w-9 h-9" />
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+      <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false} className="flex-1">
         {/* Banner image */}
         <View className="w-full h-56 bg-slate-50">
           <Image

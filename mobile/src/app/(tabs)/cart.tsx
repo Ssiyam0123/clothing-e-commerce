@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, FlatList, Image, Pressable, TextInput, SafeAreaView, Alert } from 'react-native';
+import { View, Text, FlatList, Image, Pressable, TextInput, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus, Minus, Trash2, Tag, ShoppingCart, ArrowLeft, User, Mail, Phone, MapPin, Truck, CreditCard, Banknote } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useCartStore } from '../../store/cartStore';
@@ -17,16 +18,15 @@ export default function CartScreen() {
   const settings = useAppStore((s) => s.settings);
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  
+
   const itemsMap = useCartStore((s) => s.itemsMap);
   const updateCartItem = useCartStore((s) => s.updateCartItem);
   const removeFromCart = useCartStore((s) => s.removeFromCart);
-  const clearCart = useCartStore((s) => s.clearCart);
   const totalCartItems = useCartStore((s) => s.totalItems);
   const totalCartPrice = useCartStore((s) => s.totalPrice);
   const buyNowItem = useCartStore((s) => s.buyNowItem);
   const clearBuyNowItem = useCartStore((s) => s.clearBuyNowItem);
-  
+
   const t = getTranslation('cart', lang);
 
   // Promo coupon states
@@ -93,7 +93,7 @@ export default function CartScreen() {
     enabledPaymentMethods[paymentMethod]
       ? paymentMethod
       : ((Object.keys(enabledPaymentMethods) as (keyof typeof enabledPaymentMethods)[])
-          .find((method) => enabledPaymentMethods[method]) || 'cod');
+        .find((method) => enabledPaymentMethods[method]) || 'cod');
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
@@ -140,10 +140,19 @@ export default function CartScreen() {
     setOrderError('');
 
     const orderItems = cartList.map((item) => ({
-      product: item.product._id,
-      size: item.size._id,
+      product: item.product?._id,
+      size: item.size?._id,
       quantity: item.quantity,
     }));
+    const hasInvalidOrderItem = orderItems.some(
+      (item) => !item.product || !item.size || !Number.isFinite(Number(item.quantity)) || Number(item.quantity) < 1,
+    );
+
+    if (orderItems.length === 0 || hasInvalidOrderItem) {
+      setOrderError('Some cart items are missing product or size. Please remove and add them again.');
+      setOrderLoading(false);
+      return;
+    }
 
     trackEvent('InitiateCheckout', {
       content_ids: orderItems.map((item) => item.product),
@@ -166,11 +175,6 @@ export default function CartScreen() {
       });
 
       if (effectivePaymentMethod === 'cod') {
-        if (isBuyNow) {
-          clearBuyNowItem();
-        } else {
-          clearCart();
-        }
         trackEvent('Purchase', {
           content_ids: orderItems.map((item) => item.product),
           value: grandTotal,
@@ -210,7 +214,7 @@ export default function CartScreen() {
 
   if (cartList.length === 0) {
     return (
-      <SafeAreaView className="flex-1 bg-background justify-center items-center p-6" style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+      <SafeAreaView className="flex-1 bg-background justify-center items-center p-6" style={{ flex: 1, width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
         <View className="items-center justify-center p-8 bg-slate-50 dark:bg-zinc-900 rounded-3xl mb-6">
           <ShoppingCart size={48} className="text-slate-300 dark:text-zinc-700 mb-4" />
           <Text className="text-lg font-black text-foreground italic mb-2">
@@ -230,7 +234,7 @@ export default function CartScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background" style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
       {/* Header bar */}
       <View className="flex-row items-center justify-between px-4 py-2 bg-white dark:bg-zinc-950 border-b border-slate-100 dark:border-zinc-900 h-14 z-10">
         <Pressable
@@ -257,7 +261,7 @@ export default function CartScreen() {
         </View>
       </View>
 
-      <FlatList
+      <FlatList overScrollMode="never"
         data={cartList}
         keyExtractor={(item) => `${item.product._id}_${item.size._id}`}
         contentContainerStyle={{ padding: 16 }}
@@ -272,13 +276,13 @@ export default function CartScreen() {
                 className="w-20 h-20 rounded-xl bg-slate-50"
                 resizeMode="cover"
               />
-              
+
               {/* Middle details */}
               <View className="flex-1 ml-4 pr-1 justify-center" style={{ minWidth: 0 }}>
                 <Text className="text-sm font-bold text-foreground mb-1 leading-5">
                   {item.product.name}
                 </Text>
-                
+
                 <Text className="text-sm font-black text-foreground italic mb-2">
                   ৳{Math.round(item.discountedPrice * item.quantity).toLocaleString()}
                 </Text>

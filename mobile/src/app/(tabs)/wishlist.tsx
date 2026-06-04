@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, FlatList, SafeAreaView, Pressable, Image, Share } from 'react-native';
+import { View, Text, FlatList, Pressable, Image, Share } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Heart, ArrowLeft, Share2 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useCartStore } from '../../store/cartStore';
@@ -28,7 +29,7 @@ export default function WishlistScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1 }}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-2 bg-white dark:bg-zinc-950 border-b border-slate-100 dark:border-zinc-900 h-14 z-10">
         <Pressable
@@ -66,7 +67,7 @@ export default function WishlistScreen() {
           />
         </View>
       ) : (
-        <FlatList
+        <FlatList overScrollMode="never"
           data={wishlistItems}
           keyExtractor={(item) => item._id}
           contentContainerStyle={{ padding: 16 }}

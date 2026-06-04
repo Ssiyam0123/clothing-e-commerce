@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { safeStorage } from '../utils/storage';
 import * as SecureStore from '../utils/secureStore';
 import { api } from '../lib/api';
 
@@ -126,7 +126,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'vanguard-auth-storage',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => safeStorage),
       partialize: (state) => ({
         user: state.user,
         token: state.token,

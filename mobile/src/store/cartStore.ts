@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { safeStorage } from '../utils/storage';
 import { api } from '../lib/api';
 
 const getKey = (pId: string, sId: string) => `${String(pId)}_${String(sId)}`;
@@ -349,7 +349,7 @@ export const useCartStore = create<CartState>()(
       name: 'vanguard-cart-storage',
       storage: {
         getItem: async (name) => {
-          const str = await AsyncStorage.getItem(name);
+          const str = await safeStorage.getItem(name);
           if (!str) return null;
           const data = JSON.parse(str);
           if (data.state && data.state.wishlistItems) {
@@ -365,10 +365,10 @@ export const useCartStore = create<CartState>()(
               wishlistSet: undefined, // Don't serialize set directly
             },
           };
-          await AsyncStorage.setItem(name, JSON.stringify(dataToStore));
+          await safeStorage.setItem(name, JSON.stringify(dataToStore));
         },
         removeItem: async (name) => {
-          await AsyncStorage.removeItem(name);
+          await safeStorage.removeItem(name);
         },
       },
     }

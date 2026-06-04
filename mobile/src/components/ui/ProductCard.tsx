@@ -1,5 +1,6 @@
-import React from 'react';
-import { Pressable, Text, View, Image } from 'react-native';
+import React, { memo, useCallback } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import { Image } from 'expo-image';
 import { Heart, Star, ImageOff, ShoppingCart, Zap } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { showMessage } from 'react-native-flash-message';
@@ -29,15 +30,16 @@ interface ProductCardProps {
   className?: string;
 }
 
-export function ProductCard({ product, className = '' }: ProductCardProps) {
+function ProductCardBase({ product, className = '' }: ProductCardProps) {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const wishlistSet = useCartStore((s) => s.wishlistSet);
+  const isFavorited = useCartStore(
+    useCallback((s) => s.wishlistSet.has(product._id), [product._id]),
+  );
   const toggleWishlist = useCartStore((s) => s.toggleWishlist);
   const addToCart = useCartStore((s) => s.addToCart);
   const setBuyNowItem = useCartStore((s) => s.setBuyNowItem);
 
-  const isFavorited = wishlistSet.has(product._id);
   const productPrice = Number(product.price || 0);
   const discount = Number(product.discount || 0);
   const discountedPrice =
@@ -92,18 +94,20 @@ export function ProductCard({ product, className = '' }: ProductCardProps) {
       className={`rounded-[20px] overflow-hidden flex-1 m-1 active:scale-[0.98] bg-white dark:bg-zinc-950 border border-black/[0.06] dark:border-white/[0.08] ${className}`}
       style={{
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.06,
-        shadowRadius: 18,
-        elevation: 4,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 6,
+        elevation: 1,
       }}
     >
       <View className="relative w-full aspect-[1/1.12] bg-slate-100 dark:bg-zinc-900">
         {product.images && product.images.length > 0 ? (
           <Image
             source={{ uri: getImageUrl(product.images[0]) }}
-            resizeMode="cover"
-            className="w-full h-full"
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            transition={0}
+            style={{ width: '100%', height: '100%' }}
           />
         ) : (
           <View className="w-full h-full items-center justify-center">
@@ -126,13 +130,6 @@ export function ProductCard({ product, className = '' }: ProductCardProps) {
         <Pressable
           onPress={handleWishlist}
           className="absolute top-2.5 right-2.5 w-8 h-8 items-center justify-center rounded-full z-10 active:scale-90 bg-white/90 dark:bg-black/70"
-          style={{
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.12,
-            shadowRadius: 8,
-            elevation: 2,
-          }}
         >
           <Heart
             size={15}
@@ -200,3 +197,19 @@ export function ProductCard({ product, className = '' }: ProductCardProps) {
     </Pressable>
   );
 }
+
+export const ProductCard = memo(ProductCardBase, (prev, next) => {
+  const prevProduct = prev.product;
+  const nextProduct = next.product;
+
+  return (
+    prev.className === next.className &&
+    prevProduct._id === nextProduct._id &&
+    prevProduct.name === nextProduct.name &&
+    prevProduct.price === nextProduct.price &&
+    prevProduct.discount === nextProduct.discount &&
+    prevProduct.images?.[0] === nextProduct.images?.[0] &&
+    prevProduct.averageRating === nextProduct.averageRating &&
+    prevProduct.totalReviews === nextProduct.totalReviews
+  );
+});

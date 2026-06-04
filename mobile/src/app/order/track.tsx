@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, CheckCircle2, Circle, Clock } from 'lucide-react-native';
@@ -31,7 +32,7 @@ export default function OrderTrackingScreen() {
 
   if (error || !order) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-background p-6">
+      <SafeAreaView className="flex-1 items-center justify-center bg-background p-6" style={{ flex: 1 }}>
         <Text className="text-lg font-black text-foreground italic mb-4">Order Record Not Found</Text>
         <Button title="Go Back" onPress={safeBack} className="w-1/2" />
       </SafeAreaView>
@@ -88,7 +89,7 @@ export default function OrderTrackingScreen() {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1 }}>
       {/* Header bar */}
       <View className="flex-row items-center justify-between px-4 py-3 bg-white dark:bg-zinc-950 border-b border-slate-50 dark:border-zinc-900">
         <Pressable
@@ -103,7 +104,7 @@ export default function OrderTrackingScreen() {
         <View className="w-9 h-9" />
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} className="flex-1 px-5 py-4">
+      <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false} className="flex-1 px-5 py-4">
         {/* Order Details Banner */}
         <View className="bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800/40 p-5 rounded-3xl mb-6 shadow-sm">
           <Text className="text-xs font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">

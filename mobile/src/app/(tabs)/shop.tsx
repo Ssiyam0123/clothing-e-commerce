@@ -1,17 +1,17 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
   Image,
   Modal,
   Pressable,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ArrowUpDown,
   BadgePercent,
@@ -188,7 +188,7 @@ export default function ShopScreen() {
   ].filter(Boolean).length;
 
   const fetchProducts = async ({ pageParam = 1 }) => {
-    let url = `/products?page=${pageParam}&limit=8`;
+    let url = `/products?page=${pageParam}&limit=20`;
     if (debouncedSearch) url += `&search=${encodeURIComponent(debouncedSearch)}`;
     if (selectedCategory === 'isFeatured') {
       url += '&isFeatured=true';
@@ -224,14 +224,31 @@ export default function ShopScreen() {
     ],
     queryFn: fetchProducts,
     getNextPageParam: (lastPage) => {
-      const currentPage = lastPage.currentPage;
-      const totalPages = lastPage.pages;
+      const currentPage = Number(lastPage.currentPage || 1);
+      const totalPages = Number(lastPage.pages || 1);
       return currentPage < totalPages ? currentPage + 1 : undefined;
     },
     initialPageParam: 1,
+    staleTime: 1000 * 30,
   });
 
-  const productsList = data?.pages.flatMap((page) => page.products) || [];
+  const productsList = useMemo(() => {
+    const seen = new Set<string>();
+    const products: any[] = [];
+
+    data?.pages.forEach((page) => {
+      (page.products || []).forEach((product: any) => {
+        const key = String(product?._id || product?.slug || '');
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        products.push(product);
+      });
+    });
+
+    return products;
+  }, [data]);
+
+  const endReachedLockedRef = useRef(false);
 
   const handleCategoryChange = (slug: string) => {
     setSelectedCategory(slug);
@@ -247,6 +264,19 @@ export default function ShopScreen() {
     setSearchTerm('');
     setDebouncedSearch('');
   };
+
+  const handleEndReached = useCallback(() => {
+    if (endReachedLockedRef.current || !hasNextPage || isFetchingNextPage) return;
+    endReachedLockedRef.current = true;
+    fetchNextPage().finally(() => {
+      endReachedLockedRef.current = false;
+    });
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  const renderProduct = useCallback(
+    ({ item }: { item: any }) => <ProductCard product={item} />,
+    [],
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -323,12 +353,12 @@ export default function ShopScreen() {
               </View>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false}>
               <View className="mb-5">
                 <Text className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">
                   Sort By
                 </Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <ScrollView overScrollMode="never" horizontal showsHorizontalScrollIndicator={false}>
                   {sortOptions.map((option) => {
                     const isSelected = sortBy === option.value;
                     return (
@@ -363,7 +393,7 @@ export default function ShopScreen() {
                 <Text className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">
                   Category
                 </Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <ScrollView overScrollMode="never" horizontal showsHorizontalScrollIndicator={false}>
                   <CategoryCard
                     category={{ name: 'All', slug: '', icon: <Grid2X2 size={18} color="#64748B" /> }}
                     active={selectedCategory === ''}
@@ -405,7 +435,7 @@ export default function ShopScreen() {
                   <Text className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">
                     Subcategory
                   </Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <ScrollView overScrollMode="never" horizontal showsHorizontalScrollIndicator={false}>
                     {visibleSubcategories.map((sub) => (
                       <FilterChip
                         key={sub._id}
@@ -496,22 +526,24 @@ export default function ShopScreen() {
           <Button title="Reset Filters" onPress={handleClearFilters} className="w-1/2" />
         </View>
       ) : (
-        <FlatList
+        <FlatList overScrollMode="never"
           data={productsList}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item, index) => `${item._id || item.slug || 'product'}-${index}`}
           numColumns={2}
           contentContainerStyle={{ padding: 6, paddingBottom: 28 }}
-          renderItem={({ item }) => (
-            <View className="w-[50%]">
-              <ProductCard product={item} />
-            </View>
-          )}
+          renderItem={renderProduct}
           refreshing={isRefetching}
           onRefresh={refetch}
-          onEndReached={() => {
-            if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+          onEndReached={handleEndReached}
+          onEndReachedThreshold={0.2}
+          onMomentumScrollBegin={() => {
+            endReachedLockedRef.current = false;
           }}
-          onEndReachedThreshold={0.4}
+          initialNumToRender={8}
+          maxToRenderPerBatch={8}
+          updateCellsBatchingPeriod={50}
+          windowSize={7}
+          removeClippedSubviews
           ListFooterComponent={
             isFetchingNextPage ? (
               <View className="items-center py-4">

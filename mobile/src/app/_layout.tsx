@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from 'expo-router';
 import { View, Text, ActivityIndicator, Appearance } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import FlashMessage from 'react-native-flash-message';
 
 import '../global.css';
@@ -109,23 +110,25 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={activeTheme}>
-        <AnimatedSplashOverlay />
+      <SafeAreaProvider>
+        <ThemeProvider value={activeTheme}>
+          <AnimatedSplashOverlay />
 
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="(auth)/login" />
-          <Stack.Screen name="(auth)/register" />
-          <Stack.Screen name="product/[slug]" />
-          <Stack.Screen name="checkout/index" />
-          <Stack.Screen name="checkout/payment" />
-          <Stack.Screen name="checkout/success" />
-          <Stack.Screen name="order/track" />
-          <Stack.Screen name="support/chat" />
-        </Stack>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="(auth)/login" />
+            <Stack.Screen name="(auth)/register" />
+            <Stack.Screen name="product/[slug]" />
+            <Stack.Screen name="checkout/index" />
+            <Stack.Screen name="checkout/payment" />
+            <Stack.Screen name="checkout/success" />
+            <Stack.Screen name="order/track" />
+            <Stack.Screen name="support/chat" />
+          </Stack>
 
-        <FlashMessage position="top" />
-      </ThemeProvider>
+          <FlashMessage position="top" />
+        </ThemeProvider>
+      </SafeAreaProvider>
     </QueryClientProvider>
   );
 }

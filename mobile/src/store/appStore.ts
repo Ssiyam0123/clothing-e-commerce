@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { safeStorage } from '../utils/storage';
 import { api } from '../lib/api';
 
 interface BrandingSettings {
@@ -108,7 +108,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'vanguard-app-storage',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => safeStorage),
       partialize: (state) => ({
         theme: state.theme,
         lang: state.lang,

@@ -2,6 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+// Ensure correct JDK and Android SDK paths are set on Windows
+process.env.JAVA_HOME = process.env.JAVA_HOME || 'C:\\Program Files\\Android\\Android Studio\\jbr';
+process.env.ANDROID_HOME = process.env.ANDROID_HOME || 'C:\\Users\\ssiya\\AppData\\Local\\Android\\Sdk';
+
 const sourceDir = path.resolve(__dirname, '..');
 const targetDir = 'D:\\clothing-mobile';
 
@@ -80,6 +84,27 @@ if (!fs.existsSync(buildDir)) {
     process.exit(1);
   }
 }
+
+function copyIfExists(src, dest) {
+  if (!fs.existsSync(src)) return;
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  fs.copyFileSync(src, dest);
+}
+
+// The full android/ folder is intentionally excluded from source sync because it
+// contains generated build output, but release signing config must stay current.
+copyIfExists(
+  path.join(sourceDir, 'android/app/build.gradle'),
+  path.join(buildDir, 'app/build.gradle')
+);
+copyIfExists(
+  path.join(sourceDir, 'android/keystore.properties'),
+  path.join(buildDir, 'keystore.properties')
+);
+copyIfExists(
+  path.join(sourceDir, 'android/app/upload-keystore.jks'),
+  path.join(buildDir, 'app/upload-keystore.jks')
+);
 
 // Compile
 try {

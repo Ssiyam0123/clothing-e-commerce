@@ -2,12 +2,12 @@ import React from 'react';
 import {
   View,
   Text,
-  ScrollView,
+  FlatList,
   Pressable,
   RefreshControl,
-  SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, Bell } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
@@ -183,9 +183,20 @@ export default function HomeScreen() {
           <ActivityIndicator size="large" color="#0F0F11" />
         </View>
       ) : (
-        <ScrollView
+        <FlatList overScrollMode="never"
+          data={sections.length > 0 ? renderedSections : [
+            <MobileHeroSlider key="hero" config={{ slides: [] }} />,
+            <MobileUspCards key="usp" config={{}} />,
+            <MobileCategoryGrid key="categories" config={{}} />,
+            <MobileFlashSale key="flash" config={{}} />,
+            <MobileProductGrid key="feat" type="featured" />,
+            <MobileProductGrid key="new" type="new" />,
+            <MobileSaleProducts key="sale" config={{}} />,
+          ]}
+          renderItem={({ item }) => item}
+          keyExtractor={(_, index) => String(index)}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingTop: 8 }}
+          contentContainerStyle={{ paddingTop: 8, paddingBottom: 48 }}
           refreshControl={
             <RefreshControl
               refreshing={isFetching}
@@ -194,24 +205,11 @@ export default function HomeScreen() {
               colors={['#0F0F11']}
             />
           }
-        >
-          {sections.length > 0 ? (
-            renderedSections
-          ) : (
-            // Default fallback if no layout configured
-            <View className="flex-1">
-              <MobileHeroSlider config={{ slides: [] }} />
-              <MobileUspCards config={{}} />
-              <MobileCategoryGrid config={{}} />
-              <MobileFlashSale config={{}} />
-              <MobileProductGrid type="featured" />
-              <MobileProductGrid type="new" />
-              <MobileSaleProducts config={{}} />
-            </View>
-          )}
-          {/* Bottom safe padding */}
-          <View className="h-12" />
-        </ScrollView>
+          removeClippedSubviews={true}
+          initialNumToRender={4}
+          maxToRenderPerBatch={4}
+          windowSize={5}
+        />
       )}
     </SafeAreaView>
   );

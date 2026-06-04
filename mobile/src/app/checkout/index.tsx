@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, ScrollView, Pressable, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, ScrollView, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, CreditCard, Banknote } from 'lucide-react-native';
 import { useCartStore } from '../../store/cartStore';
@@ -30,8 +31,7 @@ export default function CheckoutScreen() {
   
   const itemsMap = useCartStore((s) => s.itemsMap);
   const totalCartPrice = useCartStore((s) => s.totalPrice);
-  const clearCart = useCartStore((s) => s.clearCart);
-  
+
   const t = getTranslation('checkout', lang);
 
   // Form states
@@ -88,10 +88,19 @@ export default function CheckoutScreen() {
     setOrderError('');
 
     const orderItems = cartList.map((item) => ({
-      product: item.product._id,
-      size: item.size._id,
+      product: item.product?._id,
+      size: item.size?._id,
       quantity: item.quantity,
     }));
+    const hasInvalidOrderItem = orderItems.some(
+      (item) => !item.product || !item.size || !Number.isFinite(Number(item.quantity)) || Number(item.quantity) < 1,
+    );
+
+    if (orderItems.length === 0 || hasInvalidOrderItem) {
+      setOrderError('Some cart items are missing product or size. Please remove and add them again.');
+      setLoading(false);
+      return;
+    }
 
     const shippingAddress = {
       name,
@@ -119,9 +128,6 @@ export default function CheckoutScreen() {
       });
 
       if (effectivePaymentMethod === 'cod') {
-        // Clear local cart
-        clearCart();
-        
         // Track Purchase
         trackEvent('Purchase', {
           content_ids: orderItems.map(i => i.product),
@@ -162,7 +168,7 @@ export default function CheckoutScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1 }}>
       {/* Header bar */}
       <View className="flex-row items-center justify-between px-4 py-3 bg-white dark:bg-zinc-950 border-b border-slate-50 dark:border-zinc-900">
         <Pressable
@@ -181,7 +187,7 @@ export default function CheckoutScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
       >
-        <ScrollView showsVerticalScrollIndicator={false} className="flex-1 px-5 py-4">
+        <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false} className="flex-1 px-5 py-4">
           {hasCartShippingInfo ? (
             <View className="mb-6 rounded-3xl border border-slate-100 bg-slate-50 p-5 dark:border-zinc-800 dark:bg-zinc-900/30">
               <Text className="mb-4 text-xs font-black uppercase tracking-widest text-foreground italic">

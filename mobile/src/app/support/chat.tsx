@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, TextInput, Pressable, SafeAreaView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, ScrollView, TextInput, Pressable, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { io, Socket } from 'socket.io-client';
 import { ArrowLeft, Send } from 'lucide-react-native';
@@ -164,7 +165,7 @@ export default function LiveSupportChatScreen() {
         className="flex-1"
       >
         {/* Messages List */}
-        <ScrollView
+        <ScrollView overScrollMode="never"
           ref={scrollViewRef}
           onContentSizeChange={scrollToBottom}
           className="flex-1 px-4 py-3 bg-slate-50/50 dark:bg-zinc-950/20"

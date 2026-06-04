@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable, SafeAreaView, ActivityIndicator, Image } from 'react-native';
+import { View, Text, ScrollView, Pressable, ActivityIndicator, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, BookOpen, Calendar } from 'lucide-react-native';
@@ -54,7 +55,7 @@ export default function BlogListingScreen() {
           <Button title="Go Back" onPress={() => router.back()} className="w-1/2" />
         </View>
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false} className="flex-1 px-5 py-4">
+        <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false} className="flex-1 px-5 py-4">
           {blogsList.map((post: any) => {
             const dateStr = post.createdAt ? new Date(post.createdAt).toLocaleDateString() : '';
             const imageUrl = getImageUrl(post.featuredImage || post.image || post.thumbnail);

@@ -1,17 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  Image,
-  Pressable,
-  SafeAreaView,
-  ActivityIndicator,
-  TextInput,
-  Alert,
-  Share,
-  Button,
-} from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, ScrollView, Image, Pressable, ActivityIndicator, TextInput, Alert, Share, Button, Dimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -57,6 +46,10 @@ export default function ProductDetailScreen() {
 
   const t = getTranslation('product', lang);
 
+  const { width: SCREEN_WIDTH } = Dimensions.get('window');
+  const containerWidth = SCREEN_WIDTH - 32;
+  const imageScrollRef = useRef<ScrollView>(null);
+
   // Fetch product data by slug
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['productDetails', slug],
@@ -94,6 +87,23 @@ export default function ProductDetailScreen() {
     }
   }, [product]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  const handleThumbnailPress = (idx: number) => {
+    setActiveImageIndex(idx);
+    imageScrollRef.current?.scrollTo({
+      x: idx * containerWidth,
+      animated: true,
+    });
+  };
+
+  const handleImageScrollEnd = (e: any) => {
+    const offset = e.nativeEvent.contentOffset.x;
+    const idx = Math.round(offset / containerWidth);
+    if (idx >= 0 && idx < (product?.images?.length || 0)) {
+      setActiveImageIndex(idx);
+    }
+  };
+
   const [isDescExpanded, setIsDescExpanded] = useState(true);
   const [isSpecExpanded, setIsSpecExpanded] = useState(false);
   const [loadingCart, setLoadingCart] = useState(false);
@@ -383,7 +393,7 @@ export default function ProductDetailScreen() {
     ];
 
   return (
-    <SafeAreaView className="flex-1 bg-background" style={{ overflow: 'hidden', maxWidth: '100%' }}>
+    <SafeAreaView style={{ flex: 1 }} className="bg-background">
       {/* Top Header Bar */}
       <View className="flex-row items-center justify-between px-4 py-2 bg-white dark:bg-zinc-950 border-b border-slate-100 dark:border-zinc-900 h-14 z-10">
         <Pressable
@@ -410,18 +420,34 @@ export default function ProductDetailScreen() {
         </Pressable>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} className="flex-1" style={{ overflow: 'hidden' }}>
+      <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
         {/* ENLARGED Image Gallery Section */}
         <View className="w-full bg-gradient-to-b from-slate-50 to-white dark:from-zinc-900 dark:to-zinc-950">
           {/* Main Large Display */}
           <View className="px-4 pt-6 pb-4">
-            <View className="w-full aspect-[3/4] rounded-3xl overflow-hidden border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl">
+            <View className="w-full aspect-[3/4] rounded-3xl overflow-hidden border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl relative">
               {images.length > 0 ? (
-                <Image
-                  source={{ uri: getImageUrl(images[activeImageIndex]) }}
-                  className="w-full h-full"
-                  resizeMode="cover"
-                />
+                <ScrollView overScrollMode="never"
+                  ref={imageScrollRef}
+                  horizontal
+                  decelerationRate="fast"
+                  snapToInterval={containerWidth}
+                  snapToAlignment="center"
+                  showsHorizontalScrollIndicator={false}
+                  onMomentumScrollEnd={handleImageScrollEnd}
+                  scrollEventThrottle={16}
+                  style={{ width: '100%', height: '100%' }}
+                >
+                  {images.map((img, idx) => (
+                    <View key={idx} style={{ width: containerWidth }} className="h-full">
+                      <Image
+                        source={{ uri: getImageUrl(img) }}
+                        className="w-full h-full"
+                        resizeMode="cover"
+                      />
+                    </View>
+                  ))}
+                </ScrollView>
               ) : (
                 <View className="w-full h-full items-center justify-center bg-slate-100 dark:bg-zinc-800">
                   <Text className="text-slate-400 text-xs font-bold uppercase">No Image Available</Text>
@@ -430,7 +456,7 @@ export default function ProductDetailScreen() {
 
               {/* Discount Badge */}
               {discount > 0 && (
-                <View className="absolute top-4 right-4 bg-red-500 rounded-full px-4 py-2 shadow-lg">
+                <View className="absolute top-4 right-4 bg-red-500 rounded-full px-4 py-2 shadow-lg z-20">
                   <Text className="text-white text-[11px] font-black uppercase tracking-wider">
                     {discount}% OFF
                   </Text>
@@ -444,7 +470,7 @@ export default function ProductDetailScreen() {
                 {images.map((_, idx) => (
                   <Pressable
                     key={idx}
-                    onPress={() => setActiveImageIndex(idx)}
+                    onPress={() => handleThumbnailPress(idx)}
                     className={`h-2 rounded-full transition-all ${activeImageIndex === idx
                         ? 'w-6 bg-zinc-900 dark:bg-white'
                         : 'w-2 bg-slate-300 dark:bg-zinc-600'
@@ -458,7 +484,7 @@ export default function ProductDetailScreen() {
           {/* Horizontal Thumbnail Scroll */}
           {images.length > 1 && (
             <View className="px-4 pb-4">
-              <ScrollView
+              <ScrollView overScrollMode="never"
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 scrollEventThrottle={16}
@@ -467,7 +493,7 @@ export default function ProductDetailScreen() {
                 {images.map((img, idx) => (
                   <Pressable
                     key={idx}
-                    onPress={() => setActiveImageIndex(idx)}
+                    onPress={() => handleThumbnailPress(idx)}
                     className={`h-20 w-16 rounded-xl overflow-hidden border-2 active:scale-95 shadow-md flex-shrink-0 ${activeImageIndex === idx
                         ? 'border-zinc-900 dark:border-white ring-2 ring-zinc-900 dark:ring-white ring-offset-2 dark:ring-offset-zinc-950'
                         : 'border-slate-200 dark:border-zinc-800 opacity-60'
@@ -554,7 +580,7 @@ export default function ProductDetailScreen() {
             <Text className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider mb-3">
               {t.selectSize || 'Select Size'}
             </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+            <ScrollView overScrollMode="never" horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
               {product.sizes?.map((sizeObj: any) => {
                 const sObj = sizeObj.size || sizeObj;
                 const sizeId = sObj._id;
@@ -900,7 +926,12 @@ export default function ProductDetailScreen() {
             {loadingCart ? (
               <ActivityIndicator size="small" color="#0F172A" />
             ) : (
-              <Text className="text-xs font-black uppercase text-foreground tracking-wider">
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.7}
+                className="text-[10px] font-black uppercase text-foreground tracking-wider px-1 text-center"
+              >
                 {t.addToCart || 'Add to Cart'}
               </Text>
             )}
@@ -909,9 +940,14 @@ export default function ProductDetailScreen() {
           {/* Buy Now */}
           <Pressable
             onPress={handleBuyNow}
-            className="flex-1 h-12 rounded-2xl bg-zinc-900 dark:bg-white items-center justify-center active:scale-95"
+            className="flex-1 h-12 rounded-2xl bg-zinc-900 dark:bg-white items-center justify-center active:scale-95 px-1"
           >
-            <Text className="text-xs font-black uppercase text-white dark:text-zinc-900 tracking-wider">
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.7}
+              className="text-[10px] font-black uppercase text-white dark:text-zinc-900 tracking-wider text-center"
+            >
               Buy Now
             </Text>
           </Pressable>

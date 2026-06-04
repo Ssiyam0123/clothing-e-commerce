@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  ScrollView, 
-  Pressable, 
-  SafeAreaView, 
-  ActivityIndicator,
-  RefreshControl,
-  FlatList,
-  Alert
-} from 'react-native';
+import { View, Text, ScrollView, Pressable, ActivityIndicator, RefreshControl, FlatList, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Calendar, Clock, Package } from 'lucide-react-native';
 import { useOrders } from '../../hooks/useOrders';
@@ -20,15 +11,15 @@ import { getTranslation } from '../../utils/i18n';
 const formatDateTime = (dateString: string) => {
   if (!dateString) return { date: 'N/A', time: 'N/A' };
   const date = new Date(dateString);
-  const formattedDate = date.toLocaleDateString('en-GB', { 
-    day: '2-digit', 
-    month: 'short', 
-    year: 'numeric' 
+  const formattedDate = date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
   });
-  const formattedTime = date.toLocaleTimeString('en-US', { 
-    hour: '2-digit', 
-    minute: '2-digit', 
-    hour12: true 
+  const formattedTime = date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
   });
   return { date: formattedDate, time: formattedTime };
 };
@@ -40,13 +31,13 @@ export default function OrderListScreen() {
   const [page, setPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
 
-  const { 
-    orders, 
-    total, 
+  const {
+    orders,
+    total,
     totalPages,
-    myOrdersLoading, 
+    myOrdersLoading,
     myOrdersError,
-    refetch 
+    refetch
   } = useOrders(page, 5);
 
   const t = getTranslation('orders', lang);
@@ -78,7 +69,7 @@ export default function OrderListScreen() {
           <Text className="text-sm text-slate-500 dark:text-zinc-400 text-center mb-6">
             {myOrdersError?.message || 'Unable to fetch your orders'}
           </Text>
-          <Pressable 
+          <Pressable
             onPress={() => refetch()}
             className="px-8 py-3 bg-red-500 dark:bg-red-600 rounded-full active:scale-95"
           >
@@ -95,7 +86,7 @@ export default function OrderListScreen() {
     <SafeAreaView className="flex-1 bg-white dark:bg-black">
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-4 border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-        <Pressable 
+        <Pressable
           onPress={() => router.back()}
           className="p-2"
         >
@@ -108,7 +99,7 @@ export default function OrderListScreen() {
       </View>
 
       {/* Orders List */}
-      <FlatList
+      <FlatList overScrollMode="never"
         data={orders}
         keyExtractor={(item) => item._id}
         scrollEnabled={false}
@@ -125,7 +116,7 @@ export default function OrderListScreen() {
               <Text className="text-xs text-slate-500 dark:text-zinc-400 text-center mb-6">
                 {t?.noOrdersDesc || 'Start shopping to see your orders here'}
               </Text>
-              <Pressable 
+              <Pressable
                 onPress={() => router.push('/(tabs)/shop')}
                 className="px-8 py-3 bg-blue-600 dark:bg-blue-500 rounded-full active:scale-95"
               >
@@ -159,7 +150,7 @@ export default function OrderListScreen() {
           };
 
           return (
-            <Pressable 
+            <Pressable
               onPress={() => router.push(`/order/track?orderId=${order._id}`)}
               className="mx-4 mb-3 p-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl active:opacity-70"
             >
@@ -223,7 +214,7 @@ export default function OrderListScreen() {
       {/* Pagination Info */}
       {totalPages > 1 && (
         <View className="flex-row justify-between items-center px-4 py-4 border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-          <Pressable 
+          <Pressable
             disabled={page === 1}
             onPress={() => setPage(page - 1)}
             className={`px-4 py-2 rounded-lg ${page === 1 ? 'bg-slate-100 dark:bg-zinc-800' : 'bg-blue-600 dark:bg-blue-500'}`}
@@ -235,7 +226,7 @@ export default function OrderListScreen() {
           <Text className="text-xs font-bold text-slate-600 dark:text-zinc-400">
             {t?.page || 'Page'} {page} / {totalPages}
           </Text>
-          <Pressable 
+          <Pressable
             disabled={page >= totalPages}
             onPress={() => setPage(page + 1)}
             className={`px-4 py-2 rounded-lg ${page >= totalPages ? 'bg-slate-100 dark:bg-zinc-800' : 'bg-blue-600 dark:bg-blue-500'}`}
