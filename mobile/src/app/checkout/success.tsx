@@ -3,12 +3,16 @@ import { View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { CheckCircle2, XCircle } from 'lucide-react-native';
+import { useAppStore } from '../../store/appStore';
 import { Button } from '../../components/ui/Button';
 import { useCartStore } from '../../store/cartStore';
 
 export default function OrderSuccessScreen() {
   const router = useRouter();
   const { orderId, status, reason } = useLocalSearchParams();
+  const theme = useAppStore((s) => s.theme);
+  const dangerColor = theme === 'dark' ? '#E86B6B' : '#B52323';
+  const successColor = theme === 'dark' ? '#51B582' : '#217A52';
 
   const clearCart = useCartStore((s) => s.clearCart);
   const clearBuyNowItem = useCartStore((s) => s.clearBuyNowItem);
@@ -29,7 +33,7 @@ export default function OrderSuccessScreen() {
           <>
             {/* Failure Card */}
             <View className="mb-6 bg-red-50 dark:bg-red-950/20 p-5 rounded-full">
-              <XCircle size={64} color="#EF4444" />
+              <XCircle size={64} color={dangerColor} />
             </View>
 
             <Text className="text-2xl font-black text-foreground italic mb-2 uppercase text-center">
@@ -50,7 +54,7 @@ export default function OrderSuccessScreen() {
           <>
             {/* Success Card */}
             <View className="mb-6 bg-emerald-50 dark:bg-emerald-950/20 p-5 rounded-full">
-              <CheckCircle2 size={64} color="#10B981" />
+              <CheckCircle2 size={64} color={successColor} />
             </View>
 
             <Text className="text-2xl font-black text-foreground italic mb-2 uppercase text-center">

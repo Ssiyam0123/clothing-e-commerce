@@ -31,6 +31,8 @@ import { api, getImageUrl } from '../../lib/api';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { Button } from '../../components/ui/Button';
+import { useAppStore } from '../../store/appStore';
+import { getBrandTokens, withAlpha } from '../../constants/designSystem';
 
 type Category = {
   _id: string;
@@ -66,20 +68,22 @@ function FilterChip({
   onPress: () => void;
   icon?: React.ReactNode;
 }) {
+  const theme = useAppStore((s) => s.theme);
+  const palette = getBrandTokens(theme);
+
   return (
     <Pressable
       onPress={onPress}
-      className={`mr-2 h-10 flex-row items-center gap-1.5 rounded-2xl border px-4 active:scale-95 ${
-        active
-          ? 'border-zinc-950 bg-zinc-950'
-          : 'border-slate-200 bg-white dark:border-zinc-800 dark:bg-zinc-950'
-      }`}
+      className="mr-2 h-10 flex-row items-center gap-1.5 rounded-2xl border px-4 active:scale-95"
+      style={{
+        backgroundColor: active ? palette.primary : palette.surface,
+        borderColor: active ? palette.primary : palette.border,
+      }}
     >
       {icon}
       <Text
-        className={`text-[11px] font-black uppercase tracking-wider ${
-          active ? 'text-white' : 'text-slate-600 dark:text-zinc-400'
-        }`}
+        className="text-[11px] font-black uppercase tracking-wider"
+        style={{ color: active ? palette.onPrimary : palette.textSecondary }}
         numberOfLines={1}
       >
         {label}
@@ -97,19 +101,21 @@ function CategoryCard({
   active: boolean;
   onPress: () => void;
 }) {
+  const theme = useAppStore((s) => s.theme);
+  const palette = getBrandTokens(theme);
+
   return (
     <Pressable
       onPress={onPress}
-      className={`mr-2 h-14 min-w-[124px] flex-row items-center gap-2 rounded-2xl border px-2 pr-4 active:scale-95 ${
-        active
-          ? 'border-zinc-950 bg-zinc-950'
-          : 'border-slate-200 bg-white dark:border-zinc-800 dark:bg-zinc-950'
-      }`}
+      className="mr-2 h-14 min-w-[124px] flex-row items-center gap-2 rounded-2xl border px-2 pr-4 active:scale-95"
+      style={{
+        backgroundColor: active ? palette.primary : palette.surface,
+        borderColor: active ? palette.primary : palette.border,
+      }}
     >
       <View
-        className={`h-10 w-10 items-center justify-center overflow-hidden rounded-xl ${
-          active ? 'bg-white/15' : 'bg-slate-100 dark:bg-zinc-900'
-        }`}
+        className="h-10 w-10 items-center justify-center overflow-hidden rounded-xl"
+        style={{ backgroundColor: active ? withAlpha(palette.onPrimary, 0.15) : palette.surfaceSoft }}
       >
         {category.image ? (
           <Image source={{ uri: getImageUrl(category.image) }} className="h-full w-full" resizeMode="cover" />
@@ -118,9 +124,8 @@ function CategoryCard({
         )}
       </View>
       <Text
-        className={`max-w-[76px] text-[10px] font-black uppercase tracking-wider ${
-          active ? 'text-white' : 'text-slate-700 dark:text-zinc-300'
-        }`}
+        className="max-w-[76px] text-[10px] font-black uppercase tracking-wider"
+        style={{ color: active ? palette.onPrimary : palette.text }}
         numberOfLines={2}
       >
         {category.name}
@@ -131,6 +136,11 @@ function CategoryCard({
 
 export default function ShopScreen() {
   const params = useLocalSearchParams();
+  const theme = useAppStore((s) => s.theme);
+  const palette = getBrandTokens(theme);
+  const mutedIconColor = palette.iconMuted;
+  const placeholderColor = palette.iconMuted;
+  const overlayBg = withAlpha(palette.background, 0.7);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -279,15 +289,16 @@ export default function ShopScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <View className="border-b border-slate-100 bg-white px-4 py-3 dark:border-zinc-900 dark:bg-zinc-950">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: palette.background }}>
+      <View className="border-b px-4 py-3" style={{ backgroundColor: palette.nav, borderColor: palette.border }}>
         <View className="flex-row items-center gap-2">
-          <View className="h-12 flex-1 flex-row items-center rounded-2xl border border-slate-100 bg-slate-50 px-3 dark:border-zinc-800 dark:bg-zinc-900">
-            <Search size={18} className="mr-2 text-slate-400" />
+          <View className="h-12 flex-1 flex-row items-center rounded-2xl border px-3" style={{ backgroundColor: palette.surface, borderColor: palette.border }}>
+            <Search size={18} color={palette.iconMuted} />
             <TextInput
               placeholder="Search products"
-              placeholderTextColor="#94A3B8"
-              className="flex-1 py-2 text-sm font-bold text-foreground"
+              placeholderTextColor={placeholderColor}
+              className="ml-2 flex-1 py-2 text-sm font-bold"
+              style={{ color: palette.text }}
               value={searchTerm}
               onChangeText={setSearchTerm}
               autoCapitalize="none"
@@ -295,7 +306,7 @@ export default function ShopScreen() {
             />
             {searchTerm ? (
               <Pressable onPress={() => setSearchTerm('')} className="h-8 w-8 items-center justify-center">
-                <X size={16} className="text-slate-400" />
+                <X size={16} color={palette.iconMuted} />
               </Pressable>
             ) : null}
           </View>
@@ -303,12 +314,12 @@ export default function ShopScreen() {
           <Pressable
             onPress={() => setIsFilterPanelOpen(true)}
             className="h-12 w-12 items-center justify-center rounded-2xl active:scale-95"
-            style={{ backgroundColor: '#0F172A' }}
+            style={{ backgroundColor: palette.primary }}
           >
-            <SlidersHorizontal size={18} color="#FFFFFF" strokeWidth={2.3} />
+            <SlidersHorizontal size={18} color={palette.onPrimary} strokeWidth={2.3} />
             {activeFilterCount ? (
-              <View className="absolute -right-1 -top-1 h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1">
-                <Text className="text-[9px] font-black text-white">{activeFilterCount}</Text>
+              <View className="absolute -right-1 -top-1 h-5 min-w-5 items-center justify-center rounded-full px-1" style={{ backgroundColor: palette.danger }}>
+                <Text className="text-[9px] font-black" style={{ color: palette.onPrimary }}>{activeFilterCount}</Text>
               </View>
             ) : null}
           </Pressable>
@@ -321,41 +332,42 @@ export default function ShopScreen() {
         animationType="slide"
         onRequestClose={() => setIsFilterPanelOpen(false)}
       >
-        <View className="flex-1 justify-end bg-black/40">
+        <View className="flex-1 justify-end" style={{ backgroundColor: overlayBg }}>
           <Pressable className="flex-1" onPress={() => setIsFilterPanelOpen(false)} />
-          <View className="max-h-[82%] rounded-t-[30px] bg-white px-4 pb-5 pt-3 dark:bg-zinc-950">
+          <View className="max-h-[82%] rounded-t-[30px] px-4 pb-5 pt-3" style={{ backgroundColor: palette.surface }}>
             <View className="mb-4 flex-row items-center justify-between">
               <View>
-                <Text className="text-lg font-black uppercase tracking-tight text-foreground">
+                <Text className="text-lg font-black uppercase tracking-tight" style={{ color: palette.text }}>
                   Filters
                 </Text>
-                <Text className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">
+                <Text className="text-[11px] font-bold" style={{ color: palette.textSecondary }}>
                   Sort, category, subcategory, price
                 </Text>
               </View>
               <View className="flex-row items-center gap-2">
                 <Pressable
                   onPress={handleClearFilters}
-                  className="h-10 flex-row items-center gap-1.5 rounded-2xl bg-slate-100 px-3 active:scale-95 dark:bg-zinc-900"
+                  className="h-10 flex-row items-center gap-1.5 rounded-2xl px-3 active:scale-95"
+                  style={{ backgroundColor: palette.surfaceSoft }}
                 >
-                  <RotateCcw size={13} className="text-slate-500 dark:text-zinc-400" />
-                  <Text className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+                  <RotateCcw size={13} color={palette.iconMuted} />
+                  <Text className="text-[10px] font-black uppercase tracking-wider" style={{ color: palette.textSecondary }}>
                     Reset
                   </Text>
                 </Pressable>
                 <Pressable
                   onPress={() => setIsFilterPanelOpen(false)}
                   className="h-10 w-10 items-center justify-center rounded-2xl active:scale-95"
-                  style={{ backgroundColor: '#0F172A' }}
+                  style={{ backgroundColor: palette.primary }}
                 >
-                  <ChevronDown size={17} color="#FFFFFF" strokeWidth={2.3} />
+                  <ChevronDown size={17} color={palette.onPrimary} strokeWidth={2.3} />
                 </Pressable>
               </View>
             </View>
 
             <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false}>
               <View className="mb-5">
-                <Text className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">
+                <Text className="mb-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: palette.textSecondary }}>
                   Sort By
                 </Text>
                 <ScrollView overScrollMode="never" horizontal showsHorizontalScrollIndicator={false}>
@@ -365,24 +377,23 @@ export default function ShopScreen() {
                       <Pressable
                         key={option.label}
                         onPress={() => setSortBy(option.value)}
-                        className={`mr-2 h-11 flex-row items-center gap-2 rounded-2xl border px-4 active:scale-95 ${
-                          isSelected
-                            ? 'border-zinc-950 bg-zinc-950'
-                            : 'border-slate-200 bg-slate-50 dark:border-zinc-800 dark:bg-zinc-900'
-                        }`}
+                        className="mr-2 h-11 flex-row items-center gap-2 rounded-2xl border px-4 active:scale-95"
+                        style={{
+                          backgroundColor: isSelected ? palette.primary : palette.surfaceSoft,
+                          borderColor: isSelected ? palette.primary : palette.border,
+                        }}
                       >
                         <ArrowUpDown
                           size={13}
-                          color={isSelected ? '#FFFFFF' : '#64748B'}
+                          color={isSelected ? palette.onPrimary : mutedIconColor}
                         />
                         <Text
-                          className={`text-[10px] font-black uppercase tracking-wider ${
-                            isSelected ? 'text-white' : 'text-slate-600 dark:text-zinc-400'
-                          }`}
+                          className="text-[10px] font-black uppercase tracking-wider"
+                          style={{ color: isSelected ? palette.onPrimary : palette.textSecondary }}
                         >
                           {option.label}
                         </Text>
-                        {isSelected ? <Check size={13} color="#FFFFFF" /> : null}
+                        {isSelected ? <Check size={13} color={palette.onPrimary} /> : null}
                       </Pressable>
                     );
                   })}
@@ -390,12 +401,12 @@ export default function ShopScreen() {
               </View>
 
               <View className="mb-5">
-                <Text className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">
+                <Text className="mb-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: palette.textSecondary }}>
                   Category
                 </Text>
                 <ScrollView overScrollMode="never" horizontal showsHorizontalScrollIndicator={false}>
                   <CategoryCard
-                    category={{ name: 'All', slug: '', icon: <Grid2X2 size={18} color="#64748B" /> }}
+                    category={{ name: 'All', slug: '', icon: <Grid2X2 size={18} color={mutedIconColor} /> }}
                     active={selectedCategory === ''}
                     onPress={() => handleCategoryChange('')}
                   />
@@ -403,7 +414,7 @@ export default function ShopScreen() {
                     category={{
                       name: 'Featured',
                       slug: 'isFeatured',
-                      icon: <Sparkles size={18} color="#F59E0B" />,
+                      icon: <Sparkles size={18} color={palette.warning} />,
                     }}
                     active={selectedCategory === 'isFeatured'}
                     onPress={() => handleCategoryChange('isFeatured')}
@@ -412,7 +423,7 @@ export default function ShopScreen() {
                     category={{
                       name: 'On Sale',
                       slug: 'on-sale',
-                      icon: <BadgePercent size={18} color="#EF4444" />,
+                      icon: <BadgePercent size={18} color={palette.danger} />,
                     }}
                     active={selectedCategory === 'on-sale'}
                     onPress={() => handleCategoryChange('on-sale')}
@@ -432,7 +443,7 @@ export default function ShopScreen() {
 
               {visibleSubcategories.length > 0 ? (
                 <View className="mb-5">
-                  <Text className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">
+                  <Text className="mb-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: palette.textSecondary }}>
                     Subcategory
                   </Text>
                   <ScrollView overScrollMode="never" horizontal showsHorizontalScrollIndicator={false}>
@@ -445,7 +456,7 @@ export default function ShopScreen() {
                         icon={
                           <Tag
                             size={12}
-                            color={selectedSubcategory === sub.slug ? '#FFFFFF' : '#64748B'}
+                            color={selectedSubcategory === sub.slug ? palette.onPrimary : mutedIconColor}
                           />
                         }
                       />
@@ -455,20 +466,21 @@ export default function ShopScreen() {
               ) : null}
 
               <View className="mb-5">
-                <Text className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">
+                <Text className="mb-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: palette.textSecondary }}>
                   Price Range
                 </Text>
                 <View className="flex-row items-center gap-3">
-                  <View className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
-                    <Text className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                  <View className="flex-1 rounded-2xl border px-3 py-2" style={{ backgroundColor: palette.surfaceSoft, borderColor: palette.border }}>
+                    <Text className="text-[9px] font-black uppercase tracking-widest" style={{ color: palette.textSecondary }}>
                       Min
                     </Text>
                     <View className="flex-row items-center">
-                      <Text className="mr-1 text-sm font-black text-slate-400">{currency}</Text>
+                      <Text className="mr-1 text-sm font-black" style={{ color: palette.textSecondary }}>{currency}</Text>
                       <TextInput
                         placeholder="0"
-                        placeholderTextColor="#94A3B8"
-                        className="flex-1 py-1 text-base font-black text-foreground"
+                        placeholderTextColor={placeholderColor}
+                        className="flex-1 py-1 text-base font-black"
+                        style={{ color: palette.text }}
                         keyboardType="numeric"
                         value={minPrice}
                         onChangeText={setMinPrice}
@@ -476,18 +488,19 @@ export default function ShopScreen() {
                     </View>
                   </View>
 
-                  <View className="h-0.5 w-4 bg-slate-300 dark:bg-zinc-700" />
+                  <View className="h-0.5 w-4" style={{ backgroundColor: palette.border }} />
 
-                  <View className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
-                    <Text className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                  <View className="flex-1 rounded-2xl border px-3 py-2" style={{ backgroundColor: palette.surfaceSoft, borderColor: palette.border }}>
+                    <Text className="text-[9px] font-black uppercase tracking-widest" style={{ color: palette.textSecondary }}>
                       Max
                     </Text>
                     <View className="flex-row items-center">
-                      <Text className="mr-1 text-sm font-black text-slate-400">{currency}</Text>
+                      <Text className="mr-1 text-sm font-black" style={{ color: palette.textSecondary }}>{currency}</Text>
                       <TextInput
                         placeholder="99999"
-                        placeholderTextColor="#94A3B8"
-                        className="flex-1 py-1 text-base font-black text-foreground"
+                        placeholderTextColor={placeholderColor}
+                        className="flex-1 py-1 text-base font-black"
+                        style={{ color: palette.text }}
                         keyboardType="numeric"
                         value={maxPrice}
                         onChangeText={setMaxPrice}
@@ -508,7 +521,7 @@ export default function ShopScreen() {
       </Modal>
 
       {isLoading ? (
-        <View className="flex-row flex-wrap p-2.5">
+        <View className="flex-row flex-wrap p-2.5" style={{ backgroundColor: palette.background }}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <View key={i} className="w-[50%] p-1.5">
               <Skeleton width="100%" height={220} className="rounded-[22px]" />
@@ -516,11 +529,11 @@ export default function ShopScreen() {
           ))}
         </View>
       ) : productsList.length === 0 ? (
-        <View className="flex-1 items-center justify-center bg-background p-8">
-          <Text className="mb-2 text-lg font-black italic text-foreground">
+        <View className="flex-1 items-center justify-center p-8" style={{ backgroundColor: palette.background }}>
+          <Text className="mb-2 text-lg font-black italic" style={{ color: palette.text }}>
             No Products Found
           </Text>
-          <Text className="mb-6 text-center text-xs text-slate-500">
+          <Text className="mb-6 text-center text-xs" style={{ color: palette.textSecondary }}>
             Try adjusting your search keywords or filter values.
           </Text>
           <Button title="Reset Filters" onPress={handleClearFilters} className="w-1/2" />
@@ -547,7 +560,7 @@ export default function ShopScreen() {
           ListFooterComponent={
             isFetchingNextPage ? (
               <View className="items-center py-4">
-                <ActivityIndicator size="small" color="#0F0F11" />
+                <ActivityIndicator size="small" color={theme === 'dark' ? palette.onPrimary : palette.primary} />
               </View>
             ) : null
           }

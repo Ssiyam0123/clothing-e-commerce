@@ -5,12 +5,18 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, CheckCircle2, Circle, Clock } from 'lucide-react-native';
 import { api } from '../../lib/api';
+import { getBrandTokens } from '../../constants/designSystem';
+import { useAppStore } from '../../store/appStore';
 import { Button } from '../../components/ui/Button';
 import { safeBack } from '../../utils/navigation';
 
 export default function OrderTrackingScreen() {
   const router = useRouter();
   const { orderId } = useLocalSearchParams();
+  const theme = useAppStore((s) => s.theme);
+  const palette = getBrandTokens(theme);
+  const successColor = palette.success;
+  const mutedColor = palette.iconMuted;
 
   // Fetch specific order details
   const { data: order, isLoading, error } = useQuery({
@@ -24,16 +30,16 @@ export default function OrderTrackingScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator size="large" color="#0F0F11" />
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: palette.background }}>
+        <ActivityIndicator size="large" color={palette.primary} />
       </View>
     );
   }
 
   if (error || !order) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-background p-6" style={{ flex: 1 }}>
-        <Text className="text-lg font-black text-foreground italic mb-4">Order Record Not Found</Text>
+      <SafeAreaView className="flex-1 items-center justify-center p-6" style={{ flex: 1, backgroundColor: palette.background }}>
+        <Text className="text-lg font-black italic mb-4" style={{ color: palette.text }}>Order Record Not Found</Text>
         <Button title="Go Back" onPress={safeBack} className="w-1/2" />
       </SafeAreaView>
     );
@@ -89,16 +95,17 @@ export default function OrderTrackingScreen() {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1 }}>
+    <SafeAreaView className="flex-1" style={{ flex: 1, backgroundColor: palette.background }}>
       {/* Header bar */}
-      <View className="flex-row items-center justify-between px-4 py-3 bg-white dark:bg-zinc-950 border-b border-slate-50 dark:border-zinc-900">
+      <View className="flex-row items-center justify-between px-4 py-3 border-b" style={{ backgroundColor: palette.nav, borderColor: palette.border }}>
         <Pressable
           onPress={safeBack}
-          className="w-9 h-9 items-center justify-center bg-slate-50 dark:bg-zinc-900 rounded-full active:scale-95"
+          className="w-9 h-9 items-center justify-center rounded-full active:scale-95"
+          style={{ backgroundColor: palette.surfaceSoft }}
         >
-          <ArrowLeft size={18} className="text-foreground" />
+          <ArrowLeft size={18} color={palette.text} />
         </Pressable>
-        <Text className="text-base font-black text-foreground italic uppercase tracking-wider">
+        <Text className="text-base font-black italic uppercase tracking-wider" style={{ color: palette.navText }}>
           Order Tracking
         </Text>
         <View className="w-9 h-9" />
@@ -152,9 +159,9 @@ export default function OrderTrackingScreen() {
                   <View className="items-center mr-4">
                     <View className="z-10 bg-white dark:bg-zinc-900 rounded-full">
                       {isCompleted ? (
-                        <CheckCircle2 size={22} color="#10B981" fill="#10B981" />
+                        <CheckCircle2 size={22} color={successColor} fill={successColor} />
                       ) : (
-                        <Circle size={22} color="#94A3B8" />
+                        <Circle size={22} color={mutedColor} />
                       )}
                     </View>
                     

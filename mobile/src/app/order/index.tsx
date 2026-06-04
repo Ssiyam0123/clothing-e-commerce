@@ -7,6 +7,7 @@ import { useOrders } from '../../hooks/useOrders';
 import { useAppStore } from '../../store/appStore';
 import { useAuthStore } from '../../store/authStore';
 import { getTranslation } from '../../utils/i18n';
+import { getBrandTokens } from '../../constants/designSystem';
 
 const formatDateTime = (dateString: string) => {
   if (!dateString) return { date: 'N/A', time: 'N/A' };
@@ -27,6 +28,8 @@ const formatDateTime = (dateString: string) => {
 export default function OrderListScreen() {
   const router = useRouter();
   const lang = useAppStore((s) => s.lang);
+  const theme = useAppStore((s) => s.theme);
+  const palette = getBrandTokens(theme);
   const { user, isAuthenticated } = useAuthStore();
   const [page, setPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
@@ -50,7 +53,7 @@ export default function OrderListScreen() {
 
   React.useEffect(() => {
     if (!isAuthenticated) {
-      router.push('/(auth)/login');
+      router.push('/login');
     }
   }, [isAuthenticated]);
 
@@ -60,20 +63,21 @@ export default function OrderListScreen() {
 
   if (myOrdersError) {
     return (
-      <SafeAreaView className="flex-1 bg-white dark:bg-black">
+      <SafeAreaView className="flex-1" style={{ backgroundColor: palette.background }}>
         <View className="flex-1 items-center justify-center px-6">
-          <Package size={48} className="text-red-400 mb-4" />
-          <Text className="text-lg font-black text-foreground mb-2">
+          <Package size={48} color={palette.danger} />
+          <Text className="text-lg font-black mb-2 mt-4" style={{ color: palette.text }}>
             {t?.errorTitle || 'Failed to Load Orders'}
           </Text>
-          <Text className="text-sm text-slate-500 dark:text-zinc-400 text-center mb-6">
+          <Text className="text-sm text-center mb-6" style={{ color: palette.textSecondary }}>
             {myOrdersError?.message || 'Unable to fetch your orders'}
           </Text>
           <Pressable
             onPress={() => refetch()}
-            className="px-8 py-3 bg-red-500 dark:bg-red-600 rounded-full active:scale-95"
+            className="px-8 py-3 rounded-full active:scale-95"
+            style={{ backgroundColor: palette.danger }}
           >
-            <Text className="text-white font-black text-sm uppercase tracking-widest">
+            <Text className="font-black text-sm uppercase tracking-widest" style={{ color: palette.onPrimary }}>
               {t?.retry || 'Retry'}
             </Text>
           </Pressable>
@@ -83,16 +87,16 @@ export default function OrderListScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-black">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: palette.background }}>
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-4 border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+      <View className="flex-row items-center justify-between px-4 py-4 border-b" style={{ backgroundColor: palette.nav, borderColor: palette.border }}>
         <Pressable
           onPress={() => router.back()}
           className="p-2"
         >
-          <ChevronLeft size={24} className="text-foreground" />
+          <ChevronLeft size={24} color={palette.navText} />
         </Pressable>
-        <Text className="text-base font-black text-foreground uppercase tracking-wider">
+        <Text className="text-base font-black uppercase tracking-wider" style={{ color: palette.navText }}>
           {t?.title || 'My Orders'}
         </Text>
         <View className="w-8" />
@@ -130,7 +134,7 @@ export default function OrderListScreen() {
         ListFooterComponent={
           myOrdersLoading ? (
             <View className="flex-1 items-center justify-center py-6">
-              <ActivityIndicator size="large" color="#2563EB" />
+              <ActivityIndicator size="large" color={palette.primary} />
             </View>
           ) : null
         }

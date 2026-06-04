@@ -347,29 +347,26 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'vanguard-cart-storage',
-      storage: {
-        getItem: async (name) => {
-          const str = await safeStorage.getItem(name);
-          if (!str) return null;
-          const data = JSON.parse(str);
-          if (data.state && data.state.wishlistItems) {
-            data.state.wishlistSet = new Set(data.state.wishlistItems.map((p: any) => getSafeId(p)));
-          }
-          return data;
-        },
-        setItem: async (name, value) => {
-          const dataToStore = {
-            ...value,
-            state: {
-              ...value.state,
-              wishlistSet: undefined, // Don't serialize set directly
-            },
-          };
-          await safeStorage.setItem(name, JSON.stringify(dataToStore));
-        },
-        removeItem: async (name) => {
-          await safeStorage.removeItem(name);
-        },
+      storage: createJSONStorage(() => safeStorage),
+      partialize: (state) => ({
+        itemsMap: state.itemsMap,
+        totalItems: state.totalItems,
+        totalPrice: state.totalPrice,
+        wishlistItems: state.wishlistItems,
+        buyNowItem: state.buyNowItem,
+      }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<CartState> | undefined;
+        const wishlistItems = Array.isArray(persisted?.wishlistItems)
+          ? persisted.wishlistItems
+          : [];
+
+        return {
+          ...currentState,
+          ...persisted,
+          wishlistItems,
+          wishlistSet: new Set<string>(wishlistItems.map((p: any) => getSafeId(p))),
+        };
       },
     }
   )

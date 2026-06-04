@@ -8,6 +8,7 @@ import { ArrowLeft, Send } from 'lucide-react-native';
 import { useAuthStore } from '../../store/authStore';
 import { useAppStore } from '../../store/appStore';
 import { api, API_URL } from '../../lib/api';
+import { getBrandTokens } from '../../constants/designSystem';
 import { safeBack } from '../../utils/navigation';
 
 interface Message {
@@ -26,6 +27,8 @@ export default function LiveSupportChatScreen() {
   const user = useAuthStore((s) => s.user);
   const token = useAuthStore((s) => s.token);
   const lang = useAppStore((s) => s.lang);
+  const theme = useAppStore((s) => s.theme);
+  const palette = getBrandTokens(theme);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
@@ -130,29 +133,30 @@ export default function LiveSupportChatScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator size="large" color="#0F0F11" />
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: palette.background }}>
+        <ActivityIndicator size="large" color={palette.primary} />
       </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: palette.background }}>
       {/* Header bar */}
-      <View className="flex-row items-center justify-between px-4 py-3 bg-white dark:bg-zinc-950 border-b border-slate-50 dark:border-zinc-900">
+      <View className="flex-row items-center justify-between px-4 py-3 border-b" style={{ backgroundColor: palette.nav, borderColor: palette.border }}>
         <Pressable
           onPress={safeBack}
-          className="w-9 h-9 items-center justify-center bg-slate-50 dark:bg-zinc-900 rounded-full active:scale-95"
+          className="w-9 h-9 items-center justify-center rounded-full active:scale-95"
+          style={{ backgroundColor: palette.surfaceSoft }}
         >
-          <ArrowLeft size={18} className="text-foreground" />
+          <ArrowLeft size={18} color={palette.text} />
         </Pressable>
         <View className="items-center">
-          <Text className="text-sm font-black text-foreground italic uppercase tracking-wider">
+          <Text className="text-sm font-black italic uppercase tracking-wider" style={{ color: palette.navText }}>
             Vanguard Support
           </Text>
           <View className="flex-row items-center gap-1 mt-0.5">
             <View className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-emerald-500' : 'bg-red-400'}`} />
-            <Text className="text-[8px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest">
+            <Text className="text-[8px] font-black uppercase tracking-widest" style={{ color: palette.navText }}>
               {connected ? 'Online' : 'Offline'}
             </Text>
           </View>
@@ -224,7 +228,7 @@ export default function LiveSupportChatScreen() {
         <View className="p-3 border-t border-slate-100 dark:border-zinc-900 bg-white dark:bg-zinc-950 flex-row gap-3 items-center">
           <TextInput
             placeholder="Type a message..."
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={theme === 'dark' ? '#A1A1A6' : '#6B6B6B'}
             className="flex-1 bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 py-3.5 px-4 rounded-xl text-foreground font-semibold text-sm"
             value={inputText}
             onChangeText={setInputText}
@@ -235,7 +239,7 @@ export default function LiveSupportChatScreen() {
             onPress={handleSendMessage}
             className="w-12 h-12 bg-primary dark:bg-white rounded-xl items-center justify-center active:scale-95"
           >
-            <Send size={18} color={Platform.OS === 'web' ? undefined : (useAppStore.getState().theme === 'dark' ? '#000000' : '#FFFFFF')} />
+            <Send size={18} color={Platform.OS === 'web' ? undefined : (theme === 'dark' ? '#000000' : '#FFFFFF')} />
           </Pressable>
         </View>
       </KeyboardAvoidingView>

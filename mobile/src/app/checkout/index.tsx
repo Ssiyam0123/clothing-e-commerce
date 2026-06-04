@@ -12,6 +12,7 @@ import { getTranslation } from '../../utils/i18n';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { safeBack } from '../../utils/navigation';
+import { getBrandTokens } from '../../constants/designSystem';
 
 export default function CheckoutScreen() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function CheckoutScreen() {
     shippingPrice: shippingPriceParam,
   } = useLocalSearchParams();
   const lang = useAppStore((s) => s.lang);
+  const theme = useAppStore((s) => s.theme);
   const settings = useAppStore((s) => s.settings);
   const user = useAuthStore((s) => s.user);
   
@@ -33,6 +35,7 @@ export default function CheckoutScreen() {
   const totalCartPrice = useCartStore((s) => s.totalPrice);
 
   const t = getTranslation('checkout', lang);
+  const palette = getBrandTokens(theme);
 
   // Form states
   const [name, setName] = useState(String(nameParam || user?.name || ''));
@@ -168,16 +171,17 @@ export default function CheckoutScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1 }}>
+    <SafeAreaView className="flex-1" style={{ flex: 1, backgroundColor: palette.background }}>
       {/* Header bar */}
-      <View className="flex-row items-center justify-between px-4 py-3 bg-white dark:bg-zinc-950 border-b border-slate-50 dark:border-zinc-900">
+      <View className="flex-row items-center justify-between px-4 py-3 border-b" style={{ backgroundColor: palette.nav, borderColor: palette.border }}>
         <Pressable
           onPress={safeBack}
-          className="w-9 h-9 items-center justify-center bg-slate-50 dark:bg-zinc-900 rounded-full active:scale-95"
+          className="w-9 h-9 items-center justify-center rounded-full active:scale-95"
+          style={{ backgroundColor: palette.surfaceSoft }}
         >
-          <ArrowLeft size={18} className="text-foreground" />
+          <ArrowLeft size={18} color={palette.text} />
         </Pressable>
-        <Text className="text-base font-black text-foreground italic uppercase tracking-wider">
+        <Text className="text-base font-black italic uppercase tracking-wider" style={{ color: palette.navText }}>
           {t.shippingTitle || 'Checkout'}
         </Text>
         <View className="w-9 h-9" />

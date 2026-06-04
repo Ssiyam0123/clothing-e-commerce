@@ -98,6 +98,10 @@ copyIfExists(
   path.join(buildDir, 'app/build.gradle')
 );
 copyIfExists(
+  path.join(sourceDir, 'android/gradle.properties'),
+  path.join(buildDir, 'gradle.properties')
+);
+copyIfExists(
   path.join(sourceDir, 'android/keystore.properties'),
   path.join(buildDir, 'keystore.properties')
 );

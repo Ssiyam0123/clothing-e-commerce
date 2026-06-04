@@ -11,10 +11,12 @@ import { trackEvent } from '../../lib/tracker';
 import { getTranslation } from '../../utils/i18n';
 import { Button } from '../../components/ui/Button';
 import { safeBack } from '../../utils/navigation';
+import { getBrandTokens, withAlpha } from '../../constants/designSystem';
 
 export default function CartScreen() {
   const router = useRouter();
   const lang = useAppStore((s) => s.lang);
+  const theme = useAppStore((s) => s.theme);
   const settings = useAppStore((s) => s.settings);
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -28,6 +30,10 @@ export default function CartScreen() {
   const clearBuyNowItem = useCartStore((s) => s.clearBuyNowItem);
 
   const t = getTranslation('cart', lang);
+  const palette = getBrandTokens(theme);
+  const selectedSurface = withAlpha(palette.primary, 0.08);
+  const mutedSurface = withAlpha(palette.textSecondary, 0.14);
+  const dangerSurface = withAlpha(palette.danger, 0.12);
 
   // Promo coupon states
   const [couponCode, setCouponCode] = useState('');
@@ -189,7 +195,7 @@ export default function CartScreen() {
           }
         }
 
-        router.replace({
+        router.push({
           pathname: '/checkout/success',
           params: { orderId },
         });
@@ -197,7 +203,7 @@ export default function CartScreen() {
       }
 
       if (data.url) {
-        router.replace({
+        router.push({
           pathname: '/checkout/payment',
           params: { url: data.url },
         });
@@ -214,13 +220,13 @@ export default function CartScreen() {
 
   if (cartList.length === 0) {
     return (
-      <SafeAreaView className="flex-1 bg-background justify-center items-center p-6" style={{ flex: 1, width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
-        <View className="items-center justify-center p-8 bg-slate-50 dark:bg-zinc-900 rounded-3xl mb-6">
-          <ShoppingCart size={48} className="text-slate-300 dark:text-zinc-700 mb-4" />
-          <Text className="text-lg font-black text-foreground italic mb-2">
+      <SafeAreaView className="flex-1 justify-center items-center p-6" style={{ flex: 1, width: '100%', maxWidth: '100%', overflow: 'hidden', backgroundColor: palette.background }}>
+        <View className="items-center justify-center p-8 rounded-3xl mb-6" style={{ backgroundColor: palette.surfaceSoft }}>
+          <ShoppingCart size={48} color={palette.iconMuted} />
+          <Text className="text-lg font-black italic mb-2 mt-4" style={{ color: palette.text }}>
             {t.emptyCart || 'Your Cart is Empty'}
           </Text>
-          <Text className="text-xs text-slate-500 dark:text-zinc-400 text-center">
+          <Text className="text-xs text-center" style={{ color: palette.textSecondary }}>
             {"Looks like you haven't added anything to your cart yet."}
           </Text>
         </View>
@@ -234,9 +240,9 @@ export default function CartScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+    <SafeAreaView className="flex-1" style={{ flex: 1, width: '100%', maxWidth: '100%', overflow: 'hidden', backgroundColor: palette.background }}>
       {/* Header bar */}
-      <View className="flex-row items-center justify-between px-4 py-2 bg-white dark:bg-zinc-950 border-b border-slate-100 dark:border-zinc-900 h-14 z-10">
+      <View className="flex-row items-center justify-between px-4 py-2 border-b h-14 z-10" style={{ backgroundColor: palette.nav, borderColor: palette.border }}>
         <Pressable
           onPress={() => {
             if (isBuyNow) clearBuyNowItem();
@@ -244,18 +250,18 @@ export default function CartScreen() {
           }}
           className="w-9 h-9 items-center justify-center rounded-full active:scale-95"
         >
-          <ArrowLeft size={22} className="text-foreground" />
+          <ArrowLeft size={22} color={palette.navText} />
         </Pressable>
 
-        <Text className="text-base font-black text-foreground uppercase tracking-widest">
+        <Text className="text-base font-black uppercase tracking-widest" style={{ color: palette.navText }}>
           {isBuyNow ? 'Buy Now' : (t.title || 'Cart')}
         </Text>
 
         <View className="w-9 h-9 items-center justify-center relative">
-          <ShoppingCart size={22} className="text-foreground" />
+          <ShoppingCart size={22} color={palette.navText} />
           {!isBuyNow && totalCartItems > 0 ? (
-            <View className="absolute top-1 right-1 bg-red-500 rounded-full h-4 min-w-4 px-1 items-center justify-center">
-              <Text className="text-white text-[8px] font-black text-center">{totalCartItems}</Text>
+            <View className="absolute top-1 right-1 rounded-full h-4 min-w-4 px-1 items-center justify-center" style={{ backgroundColor: palette.danger }}>
+              <Text className="text-[8px] font-black text-center" style={{ color: palette.onPrimary }}>{totalCartItems}</Text>
             </View>
           ) : null}
         </View>
@@ -269,25 +275,26 @@ export default function CartScreen() {
         renderItem={({ item }) => {
           const imageUrl = getImageUrl(item.product.images?.[0]);
           return (
-            <View className="flex-row bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800/40 p-3 rounded-2xl mb-3 items-center" style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+            <View className="flex-row border p-3 rounded-2xl mb-3 items-center" style={{ width: '100%', maxWidth: '100%', overflow: 'hidden', backgroundColor: palette.surface, borderColor: palette.border }}>
               {/* Left Product Image */}
               <Image
                 source={{ uri: imageUrl }}
-                className="w-20 h-20 rounded-xl bg-slate-50"
+                className="w-20 h-20 rounded-xl"
+                style={{ backgroundColor: palette.surfaceSoft }}
                 resizeMode="cover"
               />
 
               {/* Middle details */}
               <View className="flex-1 ml-4 pr-1 justify-center" style={{ minWidth: 0 }}>
-                <Text className="text-sm font-bold text-foreground mb-1 leading-5">
+                <Text className="text-sm font-bold mb-1 leading-5" style={{ color: palette.text }}>
                   {item.product.name}
                 </Text>
 
-                <Text className="text-sm font-black text-foreground italic mb-2">
+                <Text className="text-sm font-black italic mb-2" style={{ color: palette.text }}>
                   ৳{Math.round(item.discountedPrice * item.quantity).toLocaleString()}
                 </Text>
 
-                <Text className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest">
+                <Text className="text-[10px] font-black uppercase tracking-widest" style={{ color: palette.textSecondary }}>
                   Size: {item.size.name}
                 </Text>
               </View>
@@ -297,25 +304,27 @@ export default function CartScreen() {
                 {/* Trash button */}
                 <Pressable
                   onPress={() => removeFromCart(item.product._id, item.size._id, isAuthenticated)}
-                  className="p-1.5 bg-slate-55 dark:bg-zinc-950 border border-slate-100 dark:border-zinc-900 rounded-xl active:scale-90"
+                  className="p-1.5 border rounded-xl active:scale-90"
+                  style={{ backgroundColor: palette.surfaceSoft, borderColor: palette.border }}
                 >
-                  <Trash2 size={16} color="#EF4444" />
+                  <Trash2 size={16} color={palette.danger} />
                 </Pressable>
 
                 {/* Quantity selector */}
-                <View className="flex-row items-center bg-slate-50 dark:bg-zinc-950 rounded-xl py-0.5 px-1 border border-slate-150 dark:border-zinc-900">
+                <View className="flex-row items-center rounded-xl py-0.5 px-1 border" style={{ backgroundColor: palette.surfaceSoft, borderColor: palette.border }}>
                   <Pressable
                     onPress={() => {
                       if (item.quantity > 1) {
                         updateCartItem(item.product._id, item.size._id, item.quantity - 1, isAuthenticated);
                       }
                     }}
-                    className="w-6 h-6 items-center justify-center rounded-lg bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800/60"
+                    className="w-6 h-6 items-center justify-center rounded-lg border"
+                    style={{ backgroundColor: palette.surface, borderColor: palette.border }}
                   >
-                    <Minus size={12} className="text-foreground" />
+                    <Minus size={12} color={palette.text} />
                   </Pressable>
 
-                  <Text className="text-xs font-black text-foreground px-2 text-center min-w-[20px]">
+                  <Text className="text-xs font-black px-2 text-center min-w-[20px]" style={{ color: palette.text }}>
                     {item.quantity}
                   </Text>
 
@@ -323,9 +332,10 @@ export default function CartScreen() {
                     onPress={() => {
                       updateCartItem(item.product._id, item.size._id, item.quantity + 1, isAuthenticated);
                     }}
-                    className="w-6 h-6 items-center justify-center rounded-lg bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800/60"
+                    className="w-6 h-6 items-center justify-center rounded-lg border"
+                    style={{ backgroundColor: palette.surface, borderColor: palette.border }}
                   >
-                    <Plus size={12} className="text-foreground" />
+                    <Plus size={12} color={palette.text} />
                   </Pressable>
                 </View>
               </View>
@@ -334,23 +344,23 @@ export default function CartScreen() {
         }}
         ListFooterComponent={
           <View className="mt-4 mb-6">
-            <View className="mb-6 border-b border-slate-100 pb-6 dark:border-zinc-900">
+            <View className="mb-6 border-b pb-6" style={{ borderColor: palette.border }}>
               <View className="mb-4">
-                <Text className="text-[10px] font-black uppercase tracking-[0.35em] text-red-500">
+                <Text className="text-[10px] font-black uppercase tracking-[0.35em]" style={{ color: palette.accent }}>
                   02. Destination
                 </Text>
-                <Text className="mt-1 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-zinc-400">
+                <Text className="mt-1 text-[10px] font-bold uppercase tracking-widest" style={{ color: palette.textSecondary }}>
                   Deployment Logistics
                 </Text>
               </View>
 
               <View className="gap-4">
                 <View>
-                  <Text className="ml-2 mb-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
+                  <Text className="ml-2 mb-2 text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: palette.textSecondary }}>
                     Full Identity
                   </Text>
-                  <View className="h-14 flex-row items-center rounded-2xl bg-slate-100 px-4 dark:bg-zinc-900">
-                    <User size={16} color="#94A3B8" />
+                  <View className="h-14 flex-row items-center rounded-2xl px-4" style={{ backgroundColor: palette.surfaceSoft }}>
+                    <User size={16} color={palette.iconMuted} />
                     <TextInput
                       value={shippingInfo.name}
                       onChangeText={(value) => {
@@ -358,37 +368,39 @@ export default function CartScreen() {
                         if (formErrors.name) setFormErrors((prev) => ({ ...prev, name: undefined }));
                       }}
                       placeholder="Enter your full name"
-                      placeholderTextColor="#94A3B8"
-                      className="ml-3 flex-1 text-xs font-black uppercase tracking-wider text-foreground"
+                      placeholderTextColor={palette.iconMuted}
+                      className="ml-3 flex-1 text-xs font-black uppercase tracking-wider"
+                      style={{ color: palette.text }}
                     />
                   </View>
-                  {formErrors.name ? <Text className="mt-1 ml-2 text-[10px] font-bold text-red-500">{formErrors.name}</Text> : null}
+                  {formErrors.name ? <Text className="mt-1 ml-2 text-[10px] font-bold" style={{ color: palette.danger }}>{formErrors.name}</Text> : null}
                 </View>
 
                 <View>
-                  <Text className="ml-2 mb-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
+                  <Text className="ml-2 mb-2 text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: palette.textSecondary }}>
                     Email Address
                   </Text>
-                  <View className="h-14 flex-row items-center rounded-2xl bg-slate-100 px-4 dark:bg-zinc-900">
-                    <Mail size={16} color="#94A3B8" />
+                  <View className="h-14 flex-row items-center rounded-2xl px-4" style={{ backgroundColor: palette.surfaceSoft }}>
+                    <Mail size={16} color={palette.iconMuted} />
                     <TextInput
                       value={shippingInfo.email}
                       onChangeText={(value) => setShippingInfoEdits((prev) => ({ ...prev, email: value }))}
                       placeholder="Enter your email"
-                      placeholderTextColor="#94A3B8"
+                      placeholderTextColor={palette.iconMuted}
                       keyboardType="email-address"
                       autoCapitalize="none"
-                      className="ml-3 flex-1 text-xs font-black uppercase tracking-wider text-foreground"
+                      className="ml-3 flex-1 text-xs font-black uppercase tracking-wider"
+                      style={{ color: palette.text }}
                     />
                   </View>
                 </View>
 
                 <View>
-                  <Text className="ml-2 mb-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
+                  <Text className="ml-2 mb-2 text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: palette.textSecondary }}>
                     Contact Protocol
                   </Text>
-                  <View className="h-14 flex-row items-center rounded-2xl bg-slate-100 px-4 dark:bg-zinc-900">
-                    <Phone size={16} color="#94A3B8" />
+                  <View className="h-14 flex-row items-center rounded-2xl px-4" style={{ backgroundColor: palette.surfaceSoft }}>
+                    <Phone size={16} color={palette.iconMuted} />
                     <TextInput
                       value={shippingInfo.phone}
                       onChangeText={(value) => {
@@ -396,16 +408,17 @@ export default function CartScreen() {
                         if (formErrors.phone) setFormErrors((prev) => ({ ...prev, phone: undefined }));
                       }}
                       placeholder="Enter phone number"
-                      placeholderTextColor="#94A3B8"
+                      placeholderTextColor={palette.iconMuted}
                       keyboardType="phone-pad"
-                      className="ml-3 flex-1 text-xs font-black uppercase tracking-wider text-foreground"
+                      className="ml-3 flex-1 text-xs font-black uppercase tracking-wider"
+                      style={{ color: palette.text }}
                     />
                   </View>
-                  {formErrors.phone ? <Text className="mt-1 ml-2 text-[10px] font-bold text-red-500">{formErrors.phone}</Text> : null}
+                  {formErrors.phone ? <Text className="mt-1 ml-2 text-[10px] font-bold" style={{ color: palette.danger }}>{formErrors.phone}</Text> : null}
                 </View>
 
                 <View>
-                  <Text className="ml-2 mb-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
+                  <Text className="ml-2 mb-2 text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: palette.textSecondary }}>
                     Transit Zone / Courier
                   </Text>
                   <View className="gap-2">
@@ -417,17 +430,17 @@ export default function CartScreen() {
                           onPress={() => setDeliveryZone(courier.name)}
                           className="min-h-14 rounded-2xl border-2 px-4 py-3 active:scale-95"
                           style={{
-                            borderColor: isSelected ? '#EF4444' : 'transparent',
-                            backgroundColor: isSelected ? 'rgba(239,68,68,0.08)' : 'rgba(148,163,184,0.14)',
+                            borderColor: isSelected ? palette.accent : palette.border,
+                            backgroundColor: isSelected ? selectedSurface : mutedSurface,
                           }}
                         >
                           <View className="flex-row items-center gap-2">
-                            <Truck size={15} color={isSelected ? '#EF4444' : '#64748B'} />
-                            <Text className="flex-1 text-[11px] font-black uppercase tracking-wider text-foreground">
+                            <Truck size={15} color={isSelected ? palette.accent : palette.iconMuted} />
+                            <Text className="flex-1 text-[11px] font-black uppercase tracking-wider" style={{ color: palette.text }}>
                               {courier.name}
                             </Text>
                           </View>
-                          <Text className="mt-1 ml-6 text-[9px] font-mono font-medium text-slate-500">
+                          <Text className="mt-1 ml-6 text-[9px] font-mono font-medium" style={{ color: palette.textSecondary }}>
                             BDT {courier.charge} • {courier.estimatedDays || 'Standard'}
                           </Text>
                         </Pressable>
@@ -437,11 +450,11 @@ export default function CartScreen() {
                 </View>
 
                 <View>
-                  <Text className="ml-2 mb-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
+                  <Text className="ml-2 mb-2 text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: palette.textSecondary }}>
                     Full Address
                   </Text>
-                  <View className="min-h-14 flex-row items-start rounded-2xl bg-slate-100 px-4 py-3 dark:bg-zinc-900">
-                    <MapPin size={16} color="#94A3B8" style={{ marginTop: 2 }} />
+                  <View className="min-h-14 flex-row items-start rounded-2xl px-4 py-3" style={{ backgroundColor: palette.surfaceSoft }}>
+                    <MapPin size={16} color={palette.iconMuted} style={{ marginTop: 2 }} />
                     <TextInput
                       value={shippingInfo.address}
                       onChangeText={(value) => {
@@ -449,25 +462,25 @@ export default function CartScreen() {
                         if (formErrors.address) setFormErrors((prev) => ({ ...prev, address: undefined }));
                       }}
                       placeholder="Enter your full address"
-                      placeholderTextColor="#94A3B8"
+                      placeholderTextColor={palette.iconMuted}
                       multiline
-                      className="ml-3 flex-1 text-xs font-black uppercase tracking-wider text-foreground"
-                      style={{ minHeight: 44, textAlignVertical: 'top' }}
+                      className="ml-3 flex-1 text-xs font-black uppercase tracking-wider"
+                      style={{ minHeight: 44, textAlignVertical: 'top', color: palette.text }}
                     />
                   </View>
-                  {formErrors.address ? <Text className="mt-1 ml-2 text-[10px] font-bold text-red-500">{formErrors.address}</Text> : null}
+                  {formErrors.address ? <Text className="mt-1 ml-2 text-[10px] font-bold" style={{ color: palette.danger }}>{formErrors.address}</Text> : null}
                 </View>
               </View>
             </View>
 
             {/* Promo Coupon Form */}
-            <View className="flex-row bg-slate-55 dark:bg-zinc-900/40 border border-slate-200/50 dark:border-zinc-800 p-2.5 rounded-2xl items-center mb-6" style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
-              <Tag size={16} color="#94A3B8" style={{ marginLeft: 8, marginRight: 8 }} />
+            <View className="flex-row border p-2.5 rounded-2xl items-center mb-6" style={{ width: '100%', maxWidth: '100%', overflow: 'hidden', backgroundColor: palette.surfaceSoft, borderColor: palette.border }}>
+              <Tag size={16} color={palette.iconMuted} style={{ marginLeft: 8, marginRight: 8 }} />
               <TextInput
                 placeholder={t.couponPlaceholder || 'Enter Promo Code'}
-                placeholderTextColor="#94A3B8"
-                className="flex-1 text-foreground font-semibold text-sm py-1"
-                style={{ minWidth: 0 }}
+                placeholderTextColor={palette.iconMuted}
+                className="flex-1 font-semibold text-sm py-1"
+                style={{ minWidth: 0, color: palette.text }}
                 value={couponCode}
                 onChangeText={(value) => setCouponCode(value.toUpperCase())}
                 autoCapitalize="characters"
@@ -476,21 +489,21 @@ export default function CartScreen() {
                 onPress={handleApplyCoupon}
                 disabled={couponLoading}
                 className="h-10 w-20 items-center justify-center rounded-xl active:scale-95"
-                style={{ backgroundColor: '#0F172A', opacity: couponLoading ? 0.6 : 1 }}
+                style={{ backgroundColor: palette.primary, opacity: couponLoading ? 0.6 : 1 }}
               >
-                <Text className="text-[11px] font-black uppercase tracking-wider text-white">
+                <Text className="text-[11px] font-black uppercase tracking-wider" style={{ color: palette.onPrimary }}>
                   {couponLoading ? '...' : t.apply || 'Apply'}
                 </Text>
               </Pressable>
             </View>
             {couponError ? (
-              <Text className="-mt-4 mb-5 ml-2 text-[10px] font-bold text-red-500">
+              <Text className="-mt-4 mb-5 ml-2 text-[10px] font-bold" style={{ color: palette.danger }}>
                 {couponError}
               </Text>
             ) : null}
 
             <View className="mb-6">
-              <Text className="mb-3 text-[10px] font-black uppercase tracking-[0.35em] text-red-500">
+              <Text className="mb-3 text-[10px] font-black uppercase tracking-[0.35em]" style={{ color: palette.accent }}>
                 03. Payment
               </Text>
               <View className="gap-3">
@@ -499,16 +512,16 @@ export default function CartScreen() {
                     onPress={() => setPaymentMethod('cod')}
                     className="flex-row items-center justify-between rounded-2xl border p-4 active:scale-95"
                     style={{
-                      borderColor: effectivePaymentMethod === 'cod' ? '#0F172A' : '#E5E7EB',
-                      backgroundColor: effectivePaymentMethod === 'cod' ? 'rgba(15,23,42,0.06)' : 'transparent',
+                      borderColor: effectivePaymentMethod === 'cod' ? palette.primary : palette.border,
+                      backgroundColor: effectivePaymentMethod === 'cod' ? selectedSurface : palette.surface,
                     }}
                   >
                     <View className="flex-row items-center gap-3">
-                      <Banknote size={20} color="#0F172A" />
-                      <Text className="text-sm font-bold text-foreground">Cash on Delivery (COD)</Text>
+                      <Banknote size={20} color={palette.primary} />
+                      <Text className="text-sm font-bold" style={{ color: palette.text }}>Cash on Delivery (COD)</Text>
                     </View>
-                    <View className="h-5 w-5 items-center justify-center rounded-full border" style={{ borderColor: effectivePaymentMethod === 'cod' ? '#0F172A' : '#CBD5E1' }}>
-                      {effectivePaymentMethod === 'cod' ? <View className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#0F172A' }} /> : null}
+                    <View className="h-5 w-5 items-center justify-center rounded-full border" style={{ borderColor: effectivePaymentMethod === 'cod' ? palette.primary : palette.border }}>
+                      {effectivePaymentMethod === 'cod' ? <View className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: palette.primary }} /> : null}
                     </View>
                   </Pressable>
                 ) : null}
@@ -518,16 +531,16 @@ export default function CartScreen() {
                     onPress={() => setPaymentMethod('bkash')}
                     className="flex-row items-center justify-between rounded-2xl border p-4 active:scale-95"
                     style={{
-                      borderColor: effectivePaymentMethod === 'bkash' ? '#0F172A' : '#E5E7EB',
-                      backgroundColor: effectivePaymentMethod === 'bkash' ? 'rgba(15,23,42,0.06)' : 'transparent',
+                      borderColor: effectivePaymentMethod === 'bkash' ? palette.primary : palette.border,
+                      backgroundColor: effectivePaymentMethod === 'bkash' ? selectedSurface : palette.surface,
                     }}
                   >
                     <View className="flex-row items-center gap-3">
-                      <CreditCard size={20} color="#0F172A" />
-                      <Text className="text-sm font-bold text-foreground">bKash Wallet / MFS</Text>
+                      <CreditCard size={20} color={palette.primary} />
+                      <Text className="text-sm font-bold" style={{ color: palette.text }}>bKash Wallet / MFS</Text>
                     </View>
-                    <View className="h-5 w-5 items-center justify-center rounded-full border" style={{ borderColor: effectivePaymentMethod === 'bkash' ? '#0F172A' : '#CBD5E1' }}>
-                      {effectivePaymentMethod === 'bkash' ? <View className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#0F172A' }} /> : null}
+                    <View className="h-5 w-5 items-center justify-center rounded-full border" style={{ borderColor: effectivePaymentMethod === 'bkash' ? palette.primary : palette.border }}>
+                      {effectivePaymentMethod === 'bkash' ? <View className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: palette.primary }} /> : null}
                     </View>
                   </Pressable>
                 ) : null}
@@ -537,16 +550,16 @@ export default function CartScreen() {
                     onPress={() => setPaymentMethod('ssl')}
                     className="flex-row items-center justify-between rounded-2xl border p-4 active:scale-95"
                     style={{
-                      borderColor: effectivePaymentMethod === 'ssl' ? '#0F172A' : '#E5E7EB',
-                      backgroundColor: effectivePaymentMethod === 'ssl' ? 'rgba(15,23,42,0.06)' : 'transparent',
+                      borderColor: effectivePaymentMethod === 'ssl' ? palette.primary : palette.border,
+                      backgroundColor: effectivePaymentMethod === 'ssl' ? selectedSurface : palette.surface,
                     }}
                   >
                     <View className="flex-row items-center gap-3">
-                      <CreditCard size={20} color="#0F172A" />
-                      <Text className="text-sm font-bold text-foreground">SSLCommerz (Cards/NetBanking)</Text>
+                      <CreditCard size={20} color={palette.primary} />
+                      <Text className="text-sm font-bold" style={{ color: palette.text }}>SSLCommerz (Cards/NetBanking)</Text>
                     </View>
-                    <View className="h-5 w-5 items-center justify-center rounded-full border" style={{ borderColor: effectivePaymentMethod === 'ssl' ? '#0F172A' : '#CBD5E1' }}>
-                      {effectivePaymentMethod === 'ssl' ? <View className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#0F172A' }} /> : null}
+                    <View className="h-5 w-5 items-center justify-center rounded-full border" style={{ borderColor: effectivePaymentMethod === 'ssl' ? palette.primary : palette.border }}>
+                      {effectivePaymentMethod === 'ssl' ? <View className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: palette.primary }} /> : null}
                     </View>
                   </Pressable>
                 ) : null}
@@ -554,43 +567,43 @@ export default function CartScreen() {
             </View>
 
             {/* Price Calculations Card */}
-            <View className="bg-slate-50 dark:bg-zinc-900/20 border border-slate-100 dark:border-zinc-800/40 p-5 rounded-3xl">
+            <View className="border p-5 rounded-3xl" style={{ backgroundColor: palette.surface, borderColor: palette.border }}>
               <View className="flex-row justify-between mb-3.5">
-                <Text className="text-xs font-semibold text-slate-500 dark:text-zinc-400">
+                <Text className="text-xs font-semibold" style={{ color: palette.textSecondary }}>
                   {t.subtotal || 'Subtotal'}
                 </Text>
-                <Text className="text-sm font-bold text-foreground">
+                <Text className="text-sm font-bold" style={{ color: palette.text }}>
                   ৳{Math.round(subtotal).toLocaleString()}
                 </Text>
               </View>
 
               <View className="flex-row justify-between mb-3.5">
-                <Text className="text-xs font-semibold text-slate-500 dark:text-zinc-400">
+                <Text className="text-xs font-semibold" style={{ color: palette.textSecondary }}>
                   {t.shipping || 'Shipping'}
                 </Text>
-                <Text className="text-sm font-bold text-foreground">
+                <Text className="text-sm font-bold" style={{ color: palette.text }}>
                   {shippingFee > 0 ? `৳${shippingFee}` : 'Free'}
                 </Text>
               </View>
 
               {discountAmount > 0 ? (
                 <View className="flex-row justify-between mb-3.5">
-                  <Text className="text-xs font-semibold text-emerald-500">
+                  <Text className="text-xs font-semibold" style={{ color: palette.success }}>
                     {t.discount || 'Discount'} {discountCodeApplied ? `(${discountCodeApplied})` : ''}
                   </Text>
-                  <Text className="text-sm font-bold text-emerald-500">
+                  <Text className="text-sm font-bold" style={{ color: palette.success }}>
                     -৳{Math.round(discountAmount).toLocaleString()}
                   </Text>
                 </View>
               ) : null}
 
-              <View className="h-px bg-slate-200 dark:bg-zinc-800 my-4" />
+              <View className="h-px my-4" style={{ backgroundColor: palette.border }} />
 
               <View className="flex-row justify-between items-baseline">
-                <Text className="text-sm font-bold text-foreground">
+                <Text className="text-sm font-bold" style={{ color: palette.text }}>
                   {t.total || 'Grand Total'}
                 </Text>
-                <Text className="text-xl font-black text-foreground italic">
+                <Text className="text-xl font-black italic" style={{ color: palette.text }}>
                   ৳{Math.round(grandTotal).toLocaleString()}
                 </Text>
               </View>
@@ -600,17 +613,17 @@ export default function CartScreen() {
       />
 
       {/* Checkout Bar */}
-      <View className="px-5 py-4 border-t border-slate-100 dark:border-zinc-900 bg-white dark:bg-zinc-950 flex-col gap-3">
+      <View className="px-5 py-4 border-t flex-col gap-3" style={{ backgroundColor: palette.nav, borderColor: palette.border }}>
         {orderError ? (
-          <Text className="rounded-2xl bg-red-50 px-4 py-3 text-xs font-bold text-red-500 dark:bg-red-950/20">
+          <Text className="rounded-2xl px-4 py-3 text-xs font-bold" style={{ backgroundColor: dangerSurface, color: palette.danger }}>
             {orderError}
           </Text>
         ) : null}
         <View className="flex-row justify-between items-center mb-1">
-          <Text className="text-sm font-bold text-slate-500 dark:text-zinc-400">
+          <Text className="text-sm font-bold" style={{ color: palette.navText }}>
             Grand Total
           </Text>
-          <Text className="text-lg font-black text-foreground italic">
+          <Text className="text-lg font-black italic" style={{ color: palette.navText }}>
             ৳{Math.round(grandTotal).toLocaleString()}
           </Text>
         </View>
@@ -618,9 +631,9 @@ export default function CartScreen() {
           onPress={handlePlaceOrder}
           disabled={orderLoading}
           className="w-full h-12 items-center justify-center rounded-2xl active:scale-95"
-          style={{ backgroundColor: '#0F172A', opacity: orderLoading ? 0.65 : 1 }}
+          style={{ backgroundColor: palette.primary, opacity: orderLoading ? 0.65 : 1 }}
         >
-          <Text className="text-sm font-black uppercase tracking-wider text-white">
+          <Text className="text-sm font-black uppercase tracking-wider" style={{ color: palette.onPrimary }}>
             {orderLoading ? 'Processing Order...' : 'Place Order'}
           </Text>
         </Pressable>

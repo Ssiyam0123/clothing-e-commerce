@@ -11,9 +11,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, Bell, Languages, Moon, Sun } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { api } from '../../lib/api';
 import { useAppStore } from '../../store/appStore';
-import { getBrandScheme } from '../../constants/designSystem';
+import { getBrandScheme, brandColors } from '../../constants/designSystem';
 import {
   MobileHeroSlider,
   MobileUspCards,
@@ -27,6 +28,39 @@ import {
   MobileSectionHeader,
   MobileFeaturedCategorySection,
 } from '../../components/home/HomeSections';
+
+function AnimatedThemeToggle({ isDark, onPress, colors }: { isDark: boolean; onPress: () => void; colors: any }) {
+  const rotation = useSharedValue(isDark ? 360 : 0);
+
+  React.useEffect(() => {
+    rotation.value = withSpring(isDark ? 360 : 0, { damping: 15, stiffness: 120 });
+  }, [isDark, rotation]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { rotate: `${rotation.value}deg` },
+      ]
+    };
+  });
+
+  return (
+    <Pressable
+      onPress={() => {
+        onPress();
+      }}
+      className="h-9 w-9 items-center justify-center rounded-full bg-brand-light-bg dark:bg-brand-dark-bg active:scale-95"
+    >
+      <Animated.View style={animatedStyle}>
+        {isDark ? (
+          <Moon size={18} color={colors.text} />
+        ) : (
+          <Sun size={18} color={brandColors.primary} />
+        )}
+      </Animated.View>
+    </Pressable>
+  );
+}
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -160,22 +194,21 @@ export default function HomeScreen() {
 
         {/* Right actions */}
         <View className="flex-row items-center gap-1">
-          <Pressable
+          <AnimatedThemeToggle
+            isDark={isDark}
             onPress={toggleTheme}
-            className="h-9 w-9 items-center justify-center rounded-full bg-brand-light-bg active:scale-90 dark:bg-brand-dark-bg"
-          >
-            {isDark ? (
-              <Moon size={18} color="#FFFFFF" />
-            ) : (
-              <Sun size={18} color="#4A3525" />
-            )}
-          </Pressable>
+            colors={colors}
+          />
 
           <Pressable
-            onPress={() => setLang(lang === 'en' ? 'bn' : 'en')}
+            onPress={() => {
+              requestAnimationFrame(() => {
+                setLang(lang === 'en' ? 'bn' : 'en');
+              });
+            }}
             className="h-9 flex-row items-center justify-center gap-0.5 rounded-full bg-brand-light-bg px-2 active:scale-90 dark:bg-brand-dark-bg"
           >
-            <Languages size={14} color={isDark ? '#FFFFFF' : '#4A3525'} />
+            <Languages size={14} color={isDark ? colors.text : brandColors.primary} />
             <Text className="text-[9px] font-black uppercase text-brand-light-text dark:text-brand-dark-text">
               {lang === 'en' ? 'BN' : 'EN'}
             </Text>
@@ -186,12 +219,12 @@ export default function HomeScreen() {
             onPress={() => router.push('/(tabs)/shop')}
             className="h-9 w-9 items-center justify-center rounded-full bg-brand-light-bg active:scale-90 dark:bg-brand-dark-bg"
           >
-            <Search size={20} color={isDark ? '#FFFFFF' : '#4A3525'} />
+            <Search size={20} color={isDark ? colors.text : brandColors.primary} />
           </Pressable>
 
           {/* Notifications */}
           <Pressable className="relative h-9 w-9 items-center justify-center rounded-full active:scale-90">
-            <Bell size={20} color={isDark ? '#FFFFFF' : '#4A3525'} />
+            <Bell size={20} color={isDark ? colors.text : brandColors.primary} />
             <View className="absolute top-1.5 right-1.5 bg-accent-crimson rounded-full h-4 min-w-4 px-1 items-center justify-center">
               <Text className="text-white text-[8px] font-black text-center">
                 3
@@ -204,7 +237,7 @@ export default function HomeScreen() {
       {/* Main Content */}
       {isLoading ? (
         <View className="flex-1 items-center justify-center bg-brand-light-bg dark:bg-brand-dark-bg">
-          <ActivityIndicator size="large" color={isDark ? '#FFFFFF' : '#4A3525'} />
+          <ActivityIndicator size="large" color={isDark ? colors.text : brandColors.primary} />
         </View>
       ) : (
         <FlatList overScrollMode="never"
@@ -225,8 +258,8 @@ export default function HomeScreen() {
             <RefreshControl
               refreshing={isFetching}
               onRefresh={refetch}
-              tintColor={isDark ? '#FFFFFF' : '#4A3525'}
-              colors={['#4A3525']}
+              tintColor={isDark ? colors.text : brandColors.primary}
+              colors={[brandColors.primary]}
             />
           }
           removeClippedSubviews={true}

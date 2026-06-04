@@ -30,14 +30,16 @@ import { useAppStore } from '../../store/appStore';
 import { getTranslation } from '../../utils/i18n';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { safeBack } from '../../utils/navigation';
-import { brandColors, getBrandScheme } from '../../constants/designSystem';
+import { getBrandTokens, withAlpha } from '../../constants/designSystem';
 
 export default function ProductDetailScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { slug } = useLocalSearchParams();
+  const productSlug = Array.isArray(slug) ? slug[0] : slug;
   const lang = useAppStore((s) => s.lang);
   const theme = useAppStore((s) => s.theme);
+  const tokens = getBrandTokens(theme);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const addToCart = useCartStore((s) => s.addToCart);
@@ -54,9 +56,9 @@ export default function ProductDetailScreen() {
 
   // Fetch product data by slug
   const { data: product, isLoading, error } = useQuery({
-    queryKey: ['productDetails', slug],
+    queryKey: ['productDetails', productSlug],
     queryFn: async () => {
-      const { data } = await api.get(`/products/details/${slug}`);
+      const { data } = await api.get(`/products/details/${productSlug}`);
 
       // Dispatch server-side analytics event for ViewContent on detail load
       if (data) {
@@ -70,7 +72,9 @@ export default function ProductDetailScreen() {
 
       return data;
     },
-    enabled: !!slug,
+    enabled: !!productSlug,
+    placeholderData: () => queryClient.getQueryData(['productPreview', productSlug]),
+    staleTime: 30 * 1000,
   });
 
   // Component UI States
@@ -183,7 +187,7 @@ export default function ProductDetailScreen() {
       resetReviewForm();
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['productReviews', product?._id] }),
-        queryClient.invalidateQueries({ queryKey: ['productDetails', slug] }),
+        queryClient.invalidateQueries({ queryKey: ['productDetails', productSlug] }),
       ]);
       showMessage({
         message: isEditingReview ? 'Review updated' : 'Review published',
@@ -201,7 +205,7 @@ export default function ProductDetailScreen() {
       resetReviewForm();
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['productReviews', product?._id] }),
-        queryClient.invalidateQueries({ queryKey: ['productDetails', slug] }),
+        queryClient.invalidateQueries({ queryKey: ['productDetails', productSlug] }),
       ]);
       showMessage({ message: 'Review removed', type: 'success' });
     },
@@ -350,16 +354,16 @@ export default function ProductDetailScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator size="large" color="#0F0F11" />
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: tokens.background }}>
+        <ActivityIndicator size="large" color={tokens.primary} />
       </View>
     );
   }
 
   if (error || !product) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-background p-6">
-        <Text className="text-lg font-black text-foreground italic mb-4">Product Not Found</Text>
+      <SafeAreaView className="flex-1 items-center justify-center p-6" style={{ backgroundColor: tokens.background }}>
+        <Text className="text-lg font-black italic mb-4" style={{ color: tokens.text }}>Product Not Found</Text>
         <Button title="Go Back" onPress={safeBack} className="w-1/2" />
       </SafeAreaView>
     );
@@ -371,16 +375,17 @@ export default function ProductDetailScreen() {
   const currency = '\u09F3';
   const showReviews = product.showReviews !== false && product.showReviews !== 'false';
   const isFavorited = wishlistSet.has(product._id);
-  const colors = getBrandScheme(theme);
-  const isDark = theme === 'dark';
-  const detailBg = colors.background;
-  const detailSurface = colors.surface;
-  const detailSoft = isDark ? '#241E1A' : '#F1ECE7';
-  const detailText = colors.text;
-  const detailMuted = colors.textSecondary;
-  const detailBorder = colors.border;
-  const detailPrimary = brandColors.primary;
-  const detailAccent = brandColors.accent;
+  const detailBg = tokens.background;
+  const detailSurface = tokens.surface;
+  const detailSoft = tokens.surfaceSoft;
+  const dangerColor = tokens.danger;
+  const goldColor = tokens.warning;
+  const detailText = tokens.text;
+  const detailMuted = tokens.textSecondary;
+  const detailBorder = tokens.border;
+  const detailPrimary = tokens.primary;
+  const onPrimary = tokens.onPrimary;
+  const selectedSoft = withAlpha(tokens.primary, 0.1);
 
   // Average Rating calculation
   const reviewsList = reviewsData?.reviews || [];
@@ -416,20 +421,20 @@ export default function ProductDetailScreen() {
     ];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: detailBg }} className="bg-background">
+    <SafeAreaView style={{ flex: 1, backgroundColor: detailBg }}>
       {/* Top Header Bar */}
       <View
         className="z-10 h-14 flex-row items-center justify-between border-b px-4 py-2"
-        style={{ backgroundColor: detailSurface, borderBottomColor: detailBorder }}
+        style={{ backgroundColor: tokens.nav, borderBottomColor: detailBorder }}
       >
         <Pressable
           onPress={safeBack}
           className="w-9 h-9 items-center justify-center rounded-full active:scale-95"
         >
-          <ArrowLeft size={22} color={detailText} />
+          <ArrowLeft size={22} color={tokens.navText} />
         </Pressable>
 
-        <Text className="text-base font-black uppercase tracking-widest" style={{ color: detailText }}>
+        <Text className="text-base font-black uppercase tracking-widest" style={{ color: tokens.navText }}>
           Product Details
         </Text>
 
@@ -437,10 +442,10 @@ export default function ProductDetailScreen() {
           onPress={() => router.push('/(tabs)/cart')}
           className="w-9 h-9 items-center justify-center rounded-full active:scale-95 relative"
         >
-          <ShoppingCart size={22} color={detailText} />
+          <ShoppingCart size={22} color={tokens.navText} />
           {totalCartItems > 0 ? (
-            <View className="absolute top-1 right-1 bg-red-500 rounded-full h-4 min-w-4 px-1 items-center justify-center">
-              <Text className="text-white text-[8px] font-black text-center">{totalCartItems}</Text>
+            <View className="absolute top-1 right-1 rounded-full h-4 min-w-4 px-1 items-center justify-center" style={{ backgroundColor: dangerColor }}>
+              <Text className="text-[8px] font-black text-center" style={{ color: onPrimary }}>{totalCartItems}</Text>
             </View>
           ) : null}
         </Pressable>
@@ -485,8 +490,8 @@ export default function ProductDetailScreen() {
 
               {/* Discount Badge */}
               {discount > 0 && (
-                <View className="absolute top-4 right-4 bg-red-500 rounded-full px-4 py-2 shadow-lg z-20">
-                  <Text className="text-white text-[11px] font-black uppercase tracking-wider">
+                <View className="absolute top-4 right-4 rounded-full px-4 py-2 shadow-lg z-20" style={{ backgroundColor: dangerColor }}>
+                  <Text className="text-[11px] font-black uppercase tracking-wider" style={{ color: onPrimary }}>
                     {discount}% OFF
                   </Text>
                 </View>
@@ -500,10 +505,8 @@ export default function ProductDetailScreen() {
                   <Pressable
                     key={idx}
                     onPress={() => handleThumbnailPress(idx)}
-                    className={`h-2 rounded-full transition-all ${activeImageIndex === idx
-                        ? 'w-6 bg-zinc-900 dark:bg-white'
-                        : 'w-2 bg-slate-300 dark:bg-zinc-600'
-                      }`}
+                    className={`h-2 rounded-full transition-all ${activeImageIndex === idx ? 'w-6' : 'w-2'}`}
+                    style={{ backgroundColor: activeImageIndex === idx ? detailPrimary : detailBorder }}
                   />
                 ))}
               </View>
@@ -523,10 +526,8 @@ export default function ProductDetailScreen() {
                   <Pressable
                     key={idx}
                     onPress={() => handleThumbnailPress(idx)}
-                    className={`h-20 w-16 rounded-xl overflow-hidden border-2 active:scale-95 shadow-md flex-shrink-0 ${activeImageIndex === idx
-                        ? 'border-zinc-900 dark:border-white ring-2 ring-zinc-900 dark:ring-white ring-offset-2 dark:ring-offset-zinc-950'
-                        : 'border-slate-200 dark:border-zinc-800 opacity-60'
-                      }`}
+                    className={`h-20 w-16 rounded-xl overflow-hidden border-2 active:scale-95 shadow-md flex-shrink-0 ${activeImageIndex === idx ? '' : 'opacity-60'}`}
+                    style={{ borderColor: activeImageIndex === idx ? detailPrimary : detailBorder }}
                   >
                     <Image
                       source={{ uri: getImageUrl(img) }}
@@ -555,36 +556,38 @@ export default function ProductDetailScreen() {
           <View className="flex-row gap-2 mb-4">
             <Pressable
               onPress={handleToggleWishlist}
-              className="h-11 px-4 rounded-2xl border border-slate-200 bg-white flex-row items-center justify-center gap-2 active:scale-95"
+              className="h-11 flex-row items-center justify-center gap-2 rounded-2xl border px-4 active:scale-95"
+              style={{ backgroundColor: detailSurface, borderColor: detailBorder }}
             >
               <Heart
                 size={16}
-                color={isFavorited ? '#EF4444' : '#0F172A'}
-                fill={isFavorited ? '#EF4444' : 'transparent'}
+                color={isFavorited ? dangerColor : detailText}
+                fill={isFavorited ? dangerColor : 'transparent'}
               />
-              <Text className="text-[11px] font-black uppercase" style={{ color: '#0F172A' }}>Wishlist</Text>
+              <Text className="text-[11px] font-black uppercase" style={{ color: detailText }}>Wishlist</Text>
             </Pressable>
             <Pressable
               onPress={handleShareProduct}
-              className="h-11 px-4 rounded-2xl border border-slate-200 bg-white flex-row items-center justify-center gap-2 active:scale-95"
+              className="h-11 flex-row items-center justify-center gap-2 rounded-2xl border px-4 active:scale-95"
+              style={{ backgroundColor: detailSurface, borderColor: detailBorder }}
             >
-              <Share2 size={16} color="#0F172A" />
-              <Text className="text-[11px] font-black uppercase" style={{ color: '#0F172A' }}>Share</Text>
+              <Share2 size={16} color={detailText} />
+              <Text className="text-[11px] font-black uppercase" style={{ color: detailText }}>Share</Text>
             </Pressable>
           </View>
 
           {/* Pricing Row */}
           <View className="flex-row items-baseline gap-2 mb-4">
-            <Text className="text-2xl font-black text-foreground italic">
+            <Text className="text-2xl font-black italic" style={{ color: detailText }}>
               {currency}{Math.round(discountedPrice).toLocaleString()}
             </Text>
             {discount > 0 ? (
               <>
-                <Text className="text-sm font-semibold text-slate-400 line-through">
+                <Text className="text-sm font-semibold line-through" style={{ color: detailMuted }}>
                   {currency}{Math.round(product.price).toLocaleString()}
                 </Text>
-                <View className="bg-red-500 py-0.5 px-2 rounded-md">
-                  <Text className="text-white text-[9px] font-black uppercase">
+                <View className="py-0.5 px-2 rounded-md" style={{ backgroundColor: dangerColor }}>
+                  <Text className="text-[9px] font-black uppercase" style={{ color: onPrimary }}>
                     {discount}% OFF
                   </Text>
                 </View>
@@ -594,19 +597,19 @@ export default function ProductDetailScreen() {
 
           {/* Rating summary */}
           <View className="flex-row items-center gap-1 mb-5">
-            <Star size={16} color="#D4AF37" fill="#D4AF37" />
-            <Text className="text-sm font-bold text-foreground">{avgRating}</Text>
-            <Text className="text-xs font-semibold text-slate-400 dark:text-zinc-500">
+            <Star size={16} color={goldColor} fill={goldColor} />
+            <Text className="text-sm font-bold" style={{ color: detailText }}>{avgRating}</Text>
+            <Text className="text-xs font-semibold" style={{ color: detailMuted }}>
               ({totalReviews} {totalReviews === 1 ? 'Review' : 'Reviews'})
             </Text>
           </View>
 
           {/* Divider */}
-          <View className="h-px bg-slate-100 dark:bg-zinc-900 my-2" />
+          <View className="my-2 h-px" style={{ backgroundColor: detailBorder }} />
 
           {/* Size Pills */}
           <View className="py-4">
-            <Text className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider mb-3">
+            <Text className="mb-3 text-xs font-bold uppercase tracking-wider" style={{ color: detailMuted }}>
               {t.selectSize || 'Select Size'}
             </Text>
             <ScrollView overScrollMode="never" horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
@@ -621,20 +624,16 @@ export default function ProductDetailScreen() {
                     key={sizeId}
                     disabled={isOutOfStock}
                     onPress={() => setSelectedSizeId(sizeId)}
-                    className={`py-2.5 px-5 rounded-xl border items-center justify-center min-w-[55px] ${isOutOfStock
-                        ? 'border-slate-100 bg-slate-50 opacity-35 dark:border-zinc-900 dark:bg-zinc-950'
-                        : isSelected
-                          ? 'bg-primary border-primary dark:bg-white dark:border-white'
-                          : 'bg-transparent border-slate-200 dark:border-zinc-800'
-                      }`}
+                    className="min-w-[55px] items-center justify-center rounded-xl border px-5 py-2.5"
+                    style={{
+                      backgroundColor: isOutOfStock ? detailSoft : isSelected ? detailPrimary : selectedSoft,
+                      borderColor: isSelected ? detailPrimary : detailBorder,
+                      opacity: isOutOfStock ? 0.35 : 1,
+                    }}
                   >
                     <Text
-                      className={`text-xs font-bold uppercase ${isOutOfStock
-                          ? 'text-slate-300 line-through dark:text-zinc-700'
-                          : isSelected
-                            ? 'text-white dark:text-black'
-                            : 'text-foreground'
-                        }`}
+                      className={`text-xs font-bold uppercase ${isOutOfStock ? 'line-through' : ''}`}
+                      style={{ color: isSelected ? onPrimary : isOutOfStock ? detailMuted : detailText }}
                     >
                       {sObj.name}
                     </Text>
@@ -645,22 +644,22 @@ export default function ProductDetailScreen() {
           </View>
 
           {/* Description Accordion */}
-          <View className="border-t border-slate-100 dark:border-zinc-900 py-3.5">
+          <View className="border-t py-3.5" style={{ borderTopColor: detailBorder }}>
             <Pressable
               onPress={() => setIsDescExpanded(!isDescExpanded)}
               className="flex-row justify-between items-center"
             >
-              <Text className="text-xs font-black text-foreground uppercase tracking-widest italic">
+              <Text className="text-xs font-black uppercase tracking-widest italic" style={{ color: detailText }}>
                 {t.description || 'Description'}
               </Text>
               {isDescExpanded ? (
-                <ChevronUp size={16} className="text-slate-400" />
+                <ChevronUp size={16} color={detailMuted} />
               ) : (
-                <ChevronDown size={16} className="text-slate-400" />
+                <ChevronDown size={16} color={detailMuted} />
               )}
             </Pressable>
             {isDescExpanded ? (
-              <Text className="text-sm font-medium text-slate-600 dark:text-zinc-400 mt-2.5 leading-relaxed">
+              <Text className="mt-2.5 text-sm font-medium leading-relaxed" style={{ color: detailMuted }}>
                 {product.description || 'No description provided.'}
               </Text>
             ) : null}
@@ -668,29 +667,29 @@ export default function ProductDetailScreen() {
 
           {/* Spec details accordion */}
           {specificationItems.length > 0 ? (
-            <View className="border-t border-slate-100 dark:border-zinc-900 py-3.5">
+            <View className="border-t py-3.5" style={{ borderTopColor: detailBorder }}>
               <Pressable
                 onPress={() => setIsSpecExpanded(!isSpecExpanded)}
                 className="flex-row justify-between items-center"
               >
-                <Text className="text-xs font-black text-foreground uppercase tracking-widest italic">
+                <Text className="text-xs font-black uppercase tracking-widest italic" style={{ color: detailText }}>
                   Specifications
                 </Text>
                 {isSpecExpanded ? (
-                  <ChevronUp size={16} className="text-slate-400" />
+                  <ChevronUp size={16} color={detailMuted} />
                 ) : (
-                  <ChevronDown size={16} className="text-slate-400" />
+                  <ChevronDown size={16} color={detailMuted} />
                 )}
               </Pressable>
               {isSpecExpanded ? (
                 <View className="mt-3 flex-row flex-wrap" style={{ gap: 8 }}>
                   {specificationItems.map(([label, value]) => (
                     <View key={label} style={{ width: '48%' }}>
-                      <View className="rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 p-3 min-h-[66px]">
-                        <Text className="text-[8px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500 mb-1">
+                      <View className="rounded-2xl border p-3 min-h-[66px]" style={{ backgroundColor: detailSoft, borderColor: detailBorder }}>
+                        <Text className="text-[8px] font-black uppercase tracking-widest mb-1" style={{ color: detailMuted }}>
                           {label}
                         </Text>
-                        <Text className="text-xs font-black text-foreground" numberOfLines={2}>
+                        <Text className="text-xs font-black" style={{ color: detailText }} numberOfLines={2}>
                           {String(value)}
                         </Text>
                       </View>
@@ -701,7 +700,7 @@ export default function ProductDetailScreen() {
             </View>
           ) : null}
 
-          <View className="border-t border-slate-100 dark:border-zinc-900 py-4">
+          <View className="border-t py-4" style={{ borderTopColor: detailBorder }}>
             <View className="flex-row flex-wrap" style={{ gap: 8 }}>
               {[
                 { icon: ShieldCheck, title: 'Authentic', desc: 'Verified quality' },
@@ -712,14 +711,14 @@ export default function ProductDetailScreen() {
                 const Icon = item.icon;
                 return (
                   <View key={item.title} style={{ width: '48%' }}>
-                    <View className="rounded-2xl border border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900 p-3">
-                      <View className="w-9 h-9 rounded-xl bg-white dark:bg-zinc-950 items-center justify-center mb-2">
-                        <Icon size={16} color="#0F172A" />
+                    <View className="rounded-2xl border p-3" style={{ backgroundColor: detailSoft, borderColor: detailBorder }}>
+                      <View className="w-9 h-9 rounded-xl items-center justify-center mb-2" style={{ backgroundColor: detailSurface }}>
+                        <Icon size={16} color={detailPrimary} />
                       </View>
-                      <Text className="text-[10px] font-black uppercase text-foreground">
+                      <Text className="text-[10px] font-black uppercase" style={{ color: detailText }}>
                         {item.title}
                       </Text>
-                      <Text className="text-[9px] font-semibold text-slate-400 dark:text-zinc-500 mt-0.5">
+                      <Text className="text-[9px] font-semibold mt-0.5" style={{ color: detailMuted }}>
                         {item.desc}
                       </Text>
                     </View>
@@ -730,19 +729,20 @@ export default function ProductDetailScreen() {
           </View>
 
           {faqItems.length > 0 ? (
-            <View className="border-t border-slate-100 dark:border-zinc-900 py-4">
-              <Text className="text-xs font-black text-foreground uppercase tracking-widest italic mb-3">
+            <View className="border-t py-4" style={{ borderTopColor: detailBorder }}>
+              <Text className="text-xs font-black uppercase tracking-widest italic mb-3" style={{ color: detailText }}>
                 Product Notes
               </Text>
               {faqItems.map((faq: any, idx: number) => (
                 <View
                   key={`${faq.question || 'faq'}-${idx}`}
-                  className="rounded-2xl bg-slate-50 dark:bg-zinc-900/70 border border-slate-100 dark:border-zinc-800 p-3.5 mb-2"
+                  className="rounded-2xl border p-3.5 mb-2"
+                  style={{ backgroundColor: detailSoft, borderColor: detailBorder }}
                 >
-                  <Text className="text-[10px] font-black uppercase tracking-wider text-foreground mb-1.5">
+                  <Text className="text-[10px] font-black uppercase tracking-wider mb-1.5" style={{ color: detailText }}>
                     {faq.question}
                   </Text>
-                  <Text className="text-xs font-semibold text-slate-500 dark:text-zinc-400 leading-normal">
+                  <Text className="text-xs font-semibold leading-normal" style={{ color: detailMuted }}>
                     {faq.answer}
                   </Text>
                 </View>
@@ -751,16 +751,16 @@ export default function ProductDetailScreen() {
           ) : null}
 
           {showReviews ? (
-            <View className="border-t border-slate-100 dark:border-zinc-900 py-4 mb-4">
+            <View className="border-t py-4 mb-4" style={{ borderTopColor: detailBorder }}>
               <View className="flex-row items-center justify-between mb-4">
                 <View>
-                  <Text className="text-xs font-black text-foreground uppercase tracking-widest italic">
+                  <Text className="text-xs font-black uppercase tracking-widest italic" style={{ color: detailText }}>
                     {t.reviews || 'Customer Reviews'}
                   </Text>
                   <View className="flex-row items-center gap-1 mt-1">
-                    <Star size={13} color="#D4AF37" fill="#D4AF37" />
-                    <Text className="text-xs font-black text-foreground">{avgRating}</Text>
-                    <Text className="text-[10px] font-bold text-slate-400">
+                    <Star size={13} color={goldColor} fill={goldColor} />
+                    <Text className="text-xs font-black" style={{ color: detailText }}>{avgRating}</Text>
+                    <Text className="text-[10px] font-bold" style={{ color: detailMuted }}>
                       {totalReviews} reports
                     </Text>
                   </View>
@@ -769,26 +769,27 @@ export default function ProductDetailScreen() {
                 {!userReview && !showReviewForm ? (
                   <Pressable
                     onPress={handleStartReview}
-                    className="h-10 px-3 rounded-2xl bg-zinc-900 flex-row items-center gap-2 active:scale-95"
+                    className="h-10 px-3 rounded-2xl flex-row items-center gap-2 active:scale-95"
+                    style={{ backgroundColor: detailPrimary }}
                   >
-                    <MessageSquare size={14} color="#FFFFFF" />
-                    <Text className="text-[10px] font-black text-white uppercase">Review</Text>
+                    <MessageSquare size={14} color={onPrimary} />
+                    <Text className="text-[10px] font-black uppercase" style={{ color: onPrimary }}>Review</Text>
                   </Pressable>
                 ) : null}
               </View>
 
               {userReview && !showReviewForm ? (
-                <View className="rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 p-3.5 mb-4">
+                <View className="rounded-2xl border p-3.5 mb-4" style={{ backgroundColor: withAlpha(tokens.accent, 0.12), borderColor: withAlpha(tokens.accent, 0.28) }}>
                   <View className="flex-row items-center justify-between mb-2">
-                    <Text className="text-[10px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-300">
+                    <Text className="text-[10px] font-black uppercase tracking-wider" style={{ color: detailPrimary }}>
                       Your Review
                     </Text>
                     <View className="flex-row gap-2">
-                      <Pressable onPress={handleEditReview} className="w-8 h-8 rounded-full bg-white dark:bg-zinc-950 items-center justify-center">
-                        <Edit3 size={13} color="#0F172A" />
+                      <Pressable onPress={handleEditReview} className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: detailSurface }}>
+                        <Edit3 size={13} color={detailPrimary} />
                       </Pressable>
-                      <Pressable onPress={handleDeleteReview} className="w-8 h-8 rounded-full bg-white dark:bg-zinc-950 items-center justify-center">
-                        <Trash2 size={13} color="#EF4444" />
+                      <Pressable onPress={handleDeleteReview} className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: detailSurface }}>
+                        <Trash2 size={13} color={dangerColor} />
                       </Pressable>
                     </View>
                   </View>
@@ -796,21 +797,20 @@ export default function ProductDetailScreen() {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
-                        size={13}
-                        color="#D4AF37"
-                        fill={star <= Number(userReview.rating || 0) ? '#D4AF37' : 'transparent'}
+                        size={13}                          color={goldColor}
+                          fill={star <= Number(userReview.rating || 0) ? goldColor : 'transparent'}
                       />
                     ))}
                   </View>
-                  <Text className="text-xs font-semibold text-slate-600 dark:text-zinc-300 leading-normal">
+                  <Text className="text-xs font-semibold leading-normal" style={{ color: detailMuted }}>
                     {userReview.comment}
                   </Text>
                 </View>
               ) : null}
 
               {showReviewForm ? (
-                <View className="rounded-3xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 p-4 mb-4">
-                  <Text className="text-xs font-black text-foreground uppercase tracking-widest mb-3">
+                <View className="rounded-3xl border p-4 mb-4" style={{ backgroundColor: detailSoft, borderColor: detailBorder }}>
+                  <Text className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: detailText }}>
                     {isEditingReview ? 'Update Review' : 'Share Your Experience'}
                   </Text>
                   <View className="flex-row gap-2 mb-4">
@@ -818,8 +818,8 @@ export default function ProductDetailScreen() {
                       <Pressable key={star} onPress={() => setReviewRating(star)} className="active:scale-90">
                         <Star
                           size={26}
-                          color="#D4AF37"
-                          fill={star <= reviewRating ? '#D4AF37' : 'transparent'}
+                          color={goldColor}
+                          fill={star <= reviewRating ? goldColor : 'transparent'}
                         />
                       </Pressable>
                     ))}
@@ -828,28 +828,31 @@ export default function ProductDetailScreen() {
                     value={reviewComment}
                     onChangeText={setReviewComment}
                     placeholder="Write your product experience..."
-                    placeholderTextColor="#94A3B8"
+                    placeholderTextColor={detailMuted}
                     multiline
                     textAlignVertical="top"
-                    className="min-h-[112px] rounded-2xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 p-3 text-sm font-semibold text-foreground"
+                    className="min-h-[112px] rounded-2xl border p-3 text-sm font-semibold"
+                    style={{ backgroundColor: detailSurface, borderColor: detailBorder, color: detailText }}
                   />
                   {reviewError ? (
-                    <Text className="text-xs font-bold text-red-500 mt-2">{reviewError}</Text>
+                    <Text className="text-xs font-bold mt-2" style={{ color: dangerColor }}>{reviewError}</Text>
                   ) : null}
                   <View className="flex-row gap-2 mt-4">
                     <Pressable
                       onPress={resetReviewForm}
-                      className="h-11 px-4 rounded-2xl border border-slate-200 dark:border-zinc-800 items-center justify-center"
+                      className="h-11 px-4 rounded-2xl border items-center justify-center"
+                      style={{ borderColor: detailBorder }}
                     >
-                      <Text className="text-[10px] font-black uppercase text-foreground">Cancel</Text>
+                      <Text className="text-[10px] font-black uppercase" style={{ color: detailText }}>Cancel</Text>
                     </Pressable>
                     <Pressable
                       onPress={handleSubmitReview}
                       disabled={reviewMutation.isPending}
-                      className="h-11 flex-1 rounded-2xl bg-zinc-900 flex-row items-center justify-center gap-2 disabled:opacity-50"
+                      className="h-11 flex-1 rounded-2xl flex-row items-center justify-center gap-2 disabled:opacity-50"
+                      style={{ backgroundColor: detailPrimary }}
                     >
-                      <Send size={14} color="#FFFFFF" />
-                      <Text className="text-[10px] font-black uppercase text-white">
+                      <Send size={14} color={onPrimary} />
+                      <Text className="text-[10px] font-black uppercase" style={{ color: onPrimary }}>
                         {reviewMutation.isPending ? 'Publishing...' : 'Publish'}
                       </Text>
                     </Pressable>
@@ -858,25 +861,25 @@ export default function ProductDetailScreen() {
               ) : null}
 
               {reviewsList.length === 0 ? (
-                <Text className="text-xs font-semibold text-slate-400 dark:text-zinc-500 italic">
+                <Text className="text-xs font-semibold italic" style={{ color: detailMuted }}>
                   {t.noReviews || 'No reviews yet for this product.'}
                 </Text>
               ) : (
                 <>
                   {reviewsList.map((rev: any) => (
-                    <View key={rev._id} className="mb-3 bg-slate-50 dark:bg-zinc-900/40 p-3.5 rounded-2xl">
+                    <View key={rev._id} className="mb-3 p-3.5 rounded-2xl" style={{ backgroundColor: detailSoft }}>
                       <View className="flex-row justify-between items-center mb-1.5">
-                        <Text className="text-xs font-bold text-foreground">
+                        <Text className="text-xs font-bold" style={{ color: detailText }}>
                           {rev.user?.name || 'Customer'}
                         </Text>
                         <View className="flex-row items-center">
-                          <Star size={10} color="#D4AF37" fill="#D4AF37" />
-                          <Text className="text-[10px] font-bold text-foreground ml-1">
+                          <Star size={10} color={goldColor} fill={goldColor} />
+                          <Text className="text-[10px] font-bold ml-1" style={{ color: detailText }}>
                             {rev.rating || 5}
                           </Text>
                         </View>
                       </View>
-                      <Text className="text-xs font-semibold text-slate-500 dark:text-zinc-400 leading-normal">
+                      <Text className="text-xs font-semibold leading-normal" style={{ color: detailMuted }}>
                         {rev.comment}
                       </Text>
                     </View>
@@ -888,35 +891,25 @@ export default function ProductDetailScreen() {
                       <Pressable
                         onPress={() => setReviewsPage(prev => Math.max(prev - 1, 1))}
                         disabled={reviewsPage === 1}
-                        className={`h-9 px-4 rounded-xl items-center justify-center border ${
-                          reviewsPage === 1
-                            ? 'border-slate-100 dark:border-zinc-900 bg-slate-50 dark:bg-zinc-950 opacity-40'
-                            : 'border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 active:scale-95'
-                        }`}
+                        className={`h-9 px-4 rounded-xl items-center justify-center border ${reviewsPage === 1 ? 'opacity-40' : 'active:scale-95'}`}
+                        style={{ backgroundColor: reviewsPage === 1 ? detailSoft : detailSurface, borderColor: detailBorder }}
                       >
-                        <Text className={`text-[10px] font-black uppercase ${
-                          reviewsPage === 1 ? 'text-slate-300 dark:text-zinc-700' : 'text-foreground'
-                        }`}>
+                        <Text className="text-[10px] font-black uppercase" style={{ color: reviewsPage === 1 ? detailMuted : detailText }}>
                           Previous
                         </Text>
                       </Pressable>
 
-                      <Text className="text-xs font-bold text-slate-500 dark:text-zinc-400">
+                      <Text className="text-xs font-bold" style={{ color: detailMuted }}>
                         {reviewsPage} / {reviewsData.pages}
                       </Text>
 
                       <Pressable
                         onPress={() => setReviewsPage(prev => Math.min(prev + 1, reviewsData.pages))}
                         disabled={reviewsPage >= reviewsData.pages}
-                        className={`h-9 px-4 rounded-xl items-center justify-center border ${
-                          reviewsPage >= reviewsData.pages
-                            ? 'border-slate-100 dark:border-zinc-900 bg-slate-50 dark:bg-zinc-950 opacity-40'
-                            : 'border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 active:scale-95'
-                        }`}
+                        className={`h-9 px-4 rounded-xl items-center justify-center border ${reviewsPage >= reviewsData.pages ? 'opacity-40' : 'active:scale-95'}`}
+                        style={{ backgroundColor: reviewsPage >= reviewsData.pages ? detailSoft : detailSurface, borderColor: detailBorder }}
                       >
-                        <Text className={`text-[10px] font-black uppercase ${
-                          reviewsPage >= reviewsData.pages ? 'text-slate-300 dark:text-zinc-700' : 'text-foreground'
-                        }`}>
+                        <Text className="text-[10px] font-black uppercase" style={{ color: reviewsPage >= reviewsData.pages ? detailMuted : detailText }}>
                           Next
                         </Text>
                       </Pressable>
@@ -929,8 +922,8 @@ export default function ProductDetailScreen() {
         </View>
 
         {relatedProducts.length > 0 ? (
-          <View className="px-4 py-6 bg-background">
-            <Text className="text-xl font-black text-foreground uppercase italic mb-4">
+          <View className="px-4 py-6" style={{ backgroundColor: detailBg }}>
+            <Text className="text-xl font-black uppercase italic mb-4" style={{ color: detailText }}>
               Related Products
             </Text>
             <View className="-mx-1 flex-row flex-wrap">
@@ -992,8 +985,8 @@ export default function ProductDetailScreen() {
           >
             <Heart
               size={20}
-              color={isFavorited ? '#EF4444' : '#64748B'}
-              fill={isFavorited ? '#EF4444' : 'transparent'}
+              color={isFavorited ? dangerColor : detailMuted}
+              fill={isFavorited ? dangerColor : 'transparent'}
             />
           </Pressable>
 
@@ -1030,7 +1023,7 @@ export default function ProductDetailScreen() {
               adjustsFontSizeToFit
               minimumFontScale={0.7}
               className="text-center text-[10px] font-black uppercase tracking-wider"
-              style={{ color: '#FFFFFF' }}
+              style={{ color: onPrimary }}
             >
               Buy Now
             </Text>

@@ -3,12 +3,13 @@ import { Pressable, Text, View, Modal, ScrollView, ActivityIndicator } from 'rea
 import { Image } from 'expo-image';
 import { Heart, Star, ImageOff, ShoppingCart, Zap, Plus, Minus } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { showMessage } from 'react-native-flash-message';
 import { useCartStore } from '../../store/cartStore';
 import { useAuthStore } from '../../store/authStore';
 import { useAppStore } from '../../store/appStore';
 import { getImageUrl } from '../../lib/api';
-import { brandColors, getBrandScheme } from '../../constants/designSystem';
+import { getBrandTokens } from '../../constants/designSystem';
 
 interface Product {
   _id: string;
@@ -34,6 +35,7 @@ interface ProductCardProps {
 
 function ProductCardBase({ product, className = '' }: ProductCardProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const theme = useAppStore((s) => s.theme);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isFavorited = useCartStore(
@@ -51,13 +53,19 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
   const reviewCount = product.totalReviews || 0;
   const showReviews = product.showReviews !== false && product.showReviews !== 'false';
   const currency = '\u09F3';
-  const colors = getBrandScheme(theme);
-  const cardBg = theme === 'dark' ? brandColors.primary : colors.surface;
-  const cardText = theme === 'dark' ? '#FFFFFF' : colors.text;
-  const cardMuted = theme === 'dark' ? '#D8C8BA' : colors.textSecondary;
-  const cardBorder = theme === 'dark' ? '#5B4331' : colors.border;
+  const colors = getBrandTokens(theme);
+  const isDark = theme === 'dark';
+  const cardBg = theme === 'dark' ? colors.primary : colors.surface;
+  const cardText = colors.text;
+  const cardMuted = colors.textSecondary;
+  const cardBorder = colors.border;
+  const dangerColor = colors.danger;
+  const softBg = colors.surfaceSoft;
+  const goldColor = colors.warning;
+  const mutedIconColor = colors.iconMuted;
 
   const handlePress = () => {
+    queryClient.setQueryData(['productPreview', product.slug], product);
     router.push(`/product/${product.slug}`);
   };
 
@@ -138,7 +146,7 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
         className={`m-1 flex-1 overflow-hidden rounded-card border border-border bg-card active:scale-[0.98] shadow-card ${className}`}
         style={{ backgroundColor: cardBg, borderColor: cardBorder }}
       >
-        <View className="relative aspect-[1/1.12] w-full bg-surface-soft" style={{ backgroundColor: theme === 'dark' ? '#3A2A20' : '#F1ECE7' }}>
+        <View className="relative aspect-[1/1.12] w-full bg-surface-soft" style={{ backgroundColor: softBg }}>
           {product.images && product.images.length > 0 ? (
             <Image
               source={{ uri: getImageUrl(product.images[0]) }}
@@ -168,12 +176,12 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
           <Pressable
             onPress={handleWishlist}
             className="absolute right-2.5 top-2.5 z-10 h-8 w-8 items-center justify-center rounded-full bg-card/90 active:scale-90"
-            style={{ backgroundColor: theme === 'dark' ? '#2C2C2E' : '#FFFFFF' }}
+            style={{ backgroundColor: colors.surface }}
           >
             <Heart
               size={15}
-              color={isFavorited ? '#EF4444' : '#64748B'}
-              fill={isFavorited ? '#EF4444' : 'transparent'}
+              color={isFavorited ? dangerColor : mutedIconColor}
+              fill={isFavorited ? dangerColor : 'transparent'}
             />
           </Pressable>
         </View>
@@ -212,9 +220,9 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
             </View>
 
             {showReviews && reviewCount > 0 ? (
-              <View className="flex-row items-center gap-1 rounded-full bg-accent px-2 py-1" style={{ backgroundColor: brandColors.accent }}>
-                <Star size={10} color="#F59E0B" fill="#F59E0B" />
-                <Text className="text-[10px] font-black text-accent-foreground" style={{ color: brandColors.primary }}>
+              <View className="flex-row items-center gap-1 rounded-full bg-accent px-2 py-1" style={{ backgroundColor: colors.accent }}>
+                <Star size={10} color={goldColor} fill={goldColor} />
+                <Text className="text-[10px] font-black text-accent-foreground" style={{ color: colors.primary }}>
                   {avgRating.toFixed(1)}
                 </Text>
               </View>
@@ -225,16 +233,16 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
             <Pressable
               onPress={handleAddToCart}
               className="h-10 flex-1 items-center justify-center rounded-button bg-accent active:scale-95"
-              style={{ backgroundColor: brandColors.accent }}
+              style={{ backgroundColor: colors.accent }}
             >
-              <ShoppingCart size={16} color="#1A1A1A" strokeWidth={2.4} />
+              <ShoppingCart size={16} color={isDark ? colors.onPrimary : colors.primary} strokeWidth={2.4} />
             </Pressable>
             <Pressable
               onPress={handleInstantBuy}
               className="h-10 flex-1 items-center justify-center rounded-button bg-primary active:scale-95"
-              style={{ backgroundColor: theme === 'dark' ? '#2C1D14' : brandColors.primary }}
+              style={{ backgroundColor: isDark ? colors.surfaceSoft : colors.primary }}
             >
-              <Zap size={16} color="#FFFFFF" fill="#FFFFFF" strokeWidth={2.4} />
+              <Zap size={16} color={colors.onPrimary} fill={colors.onPrimary} strokeWidth={2.4} />
             </Pressable>
           </View>
         </View>
@@ -379,7 +387,7 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
               className="h-12 w-full items-center justify-center rounded-button bg-primary active:scale-95 shadow-card"
             >
               {loadingCart ? (
-                <ActivityIndicator size="small" color={selectorAction === 'buy' ? '#0F172A' : '#FFFFFF'} />
+                <ActivityIndicator size="small" color={selectorAction === 'buy' ? colors.primary : colors.onPrimary} />
               ) : (
                 <Text className="text-xs font-black uppercase tracking-widest text-primary-foreground">
                   {selectorAction === 'buy' ? 'Confirm Buy Now' : 'Confirm Add to Cart'}

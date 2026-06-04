@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TextInputProps, Pressable } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
-
-const placeholderColor = '#8D7B68';
+import { useAppStore } from '../../store/appStore';
+import { getBrandTokens } from '../../constants/designSystem';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -19,15 +19,19 @@ export function Input({
   containerClassName = '',
   className = '',
   secureTextEntry,
+  style: inputStyle,
   ...props
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const theme = useAppStore((s) => s.theme);
+  const palette = getBrandTokens(theme);
+  const borderColor = error ? palette.danger : isFocused ? palette.accent : palette.border;
 
   return (
     <View className={`w-full mb-4 ${containerClassName}`}>
       {label ? (
-        <Text className="mb-1.5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+        <Text className="mb-1.5 text-[10px] font-black uppercase tracking-wider" style={{ color: palette.textSecondary }}>
           {label}
         </Text>
       ) : null}
@@ -40,6 +44,7 @@ export function Input({
             ? 'border-ring'
             : 'border-border'
         }`}
+        style={{ backgroundColor: palette.surface, borderColor }}
       >
         <TextInput
           onFocus={(e) => {
@@ -51,8 +56,9 @@ export function Input({
             if (props.onBlur) props.onBlur(e);
           }}
           secureTextEntry={isPassword && !showPassword}
-          className={`flex-1 px-4 py-3.5 text-sm font-semibold text-main ${className}`}
-          placeholderTextColor={placeholderColor}
+          className={`flex-1 px-4 py-3.5 text-sm font-semibold ${className}`}
+          style={[{ color: palette.text }, inputStyle]}
+          placeholderTextColor={palette.iconMuted}
           {...props}
         />
         
@@ -62,16 +68,16 @@ export function Input({
             className="px-4 py-3.5"
           >
             {showPassword ? (
-              <EyeOff size={20} className="text-muted-foreground" />
+              <EyeOff size={20} color={palette.iconMuted} />
             ) : (
-              <Eye size={20} className="text-muted-foreground" />
+              <Eye size={20} color={palette.iconMuted} />
             )}
           </Pressable>
         ) : null}
       </View>
       
       {error ? (
-        <Text className="mt-1 text-xs font-semibold text-danger">
+        <Text className="mt-1 text-xs font-semibold" style={{ color: palette.danger }}>
           {error}
         </Text>
       ) : null}

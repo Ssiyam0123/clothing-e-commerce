@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, ScrollView, Image, Pressable, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Calendar, User } from 'lucide-react-native';
 import { api, getImageUrl } from '../../lib/api';
+import { getBrandTokens } from '../../constants/designSystem';
+import { useAppStore } from '../../store/appStore';
 import { Button } from '../../components/ui/Button';
 import { safeBack } from '../../utils/navigation';
 
@@ -20,31 +22,32 @@ const cleanHtml = (htmlStr?: string) => {
 };
 
 export default function BlogDetailScreen() {
-  const router = useRouter();
   const { slug } = useLocalSearchParams();
+  const theme = useAppStore((s) => s.theme);
+  const palette = getBrandTokens(theme);
 
   // Fetch specific blog details by slug
   const { data: blog, isLoading, error } = useQuery({
     queryKey: ['blogDetails', slug],
     queryFn: async () => {
       const { data } = await api.get(`/blogs/${slug}`);
-      return data;
+      return data?.blog || data?.data || data;
     },
     enabled: !!slug,
   });
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator size="large" color="#0F0F11" />
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: palette.background }}>
+        <ActivityIndicator size="large" color={palette.primary} />
       </View>
     );
   }
 
   if (error || !blog) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-background p-6">
-        <Text className="text-lg font-black text-foreground italic mb-4">Article Not Found</Text>
+      <SafeAreaView className="flex-1 items-center justify-center p-6" style={{ backgroundColor: palette.background }}>
+        <Text className="text-lg font-black italic mb-4" style={{ color: palette.text }}>Article Not Found</Text>
         <Button title="Go Back" onPress={safeBack} className="w-1/2" />
       </SafeAreaView>
     );
@@ -55,24 +58,25 @@ export default function BlogDetailScreen() {
   const plainBody = cleanHtml(blog.content);
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: palette.background }}>
       {/* Header bar */}
-      <View className="flex-row items-center justify-between px-4 py-3 bg-white dark:bg-zinc-950 border-b border-slate-50 dark:border-zinc-900">
+      <View className="flex-row items-center justify-between px-4 py-3 border-b" style={{ backgroundColor: palette.nav, borderColor: palette.border }}>
         <Pressable
           onPress={safeBack}
-          className="w-9 h-9 items-center justify-center bg-slate-50 dark:bg-zinc-900 rounded-full active:scale-95"
+          className="w-9 h-9 items-center justify-center rounded-full active:scale-95"
+          style={{ backgroundColor: palette.surfaceSoft }}
         >
-          <ArrowLeft size={18} className="text-foreground" />
+          <ArrowLeft size={18} color={palette.text} />
         </Pressable>
-        <Text className="text-base font-black text-foreground italic uppercase tracking-wider">
+        <Text className="text-base font-black italic uppercase tracking-wider" style={{ color: palette.navText }}>
           Article Details
         </Text>
         <View className="w-9 h-9" />
       </View>
 
-      <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false} className="flex-1">
+      <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false} className="flex-1" style={{ backgroundColor: palette.background }}>
         {/* Banner image */}
-        <View className="w-full h-56 bg-slate-50">
+        <View className="w-full h-56" style={{ backgroundColor: palette.surfaceSoft }}>
           <Image
             source={{ uri: imageUrl }}
             className="w-full h-full"
@@ -81,31 +85,31 @@ export default function BlogDetailScreen() {
         </View>
 
         {/* Content Panel */}
-        <View className="p-6 bg-white dark:bg-zinc-950">
+        <View className="p-6" style={{ backgroundColor: palette.surface }}>
           {/* Metadata Row */}
           <View className="flex-row items-center gap-4 mb-4">
             <View className="flex-row items-center gap-1">
-              <Calendar size={12} className="text-slate-400" />
-              <Text className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase">
+              <Calendar size={12} color={palette.iconMuted} />
+              <Text className="text-[10px] font-bold uppercase" style={{ color: palette.textSecondary }}>
                 {dateStr}
               </Text>
             </View>
             {blog.author ? (
               <View className="flex-row items-center gap-1">
-                <User size={12} className="text-slate-400" />
-                <Text className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase">
+                <User size={12} color={palette.iconMuted} />
+                <Text className="text-[10px] font-bold uppercase" style={{ color: palette.textSecondary }}>
                   {blog.author?.name || blog.author}
                 </Text>
               </View>
             ) : null}
           </View>
 
-          <Text className="text-2xl font-black text-foreground mb-6 leading-snug">
+          <Text className="text-2xl font-black mb-6 leading-snug" style={{ color: palette.text }}>
             {blog.title}
           </Text>
 
           {/* Body content */}
-          <Text className="text-sm font-medium text-slate-600 dark:text-zinc-400 leading-loose">
+          <Text className="text-sm font-medium leading-loose" style={{ color: palette.textSecondary }}>
             {plainBody}
           </Text>
         </View>

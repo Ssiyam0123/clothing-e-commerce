@@ -4,12 +4,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { WebView } from 'react-native-webview';
 import { ArrowLeft } from 'lucide-react-native';
+import { getBrandTokens } from '../../constants/designSystem';
+import { useAppStore } from '../../store/appStore';
 import { useCartStore } from '../../store/cartStore';
 import { safeBack } from '../../utils/navigation';
 
 export default function PaymentScreen() {
   const router = useRouter();
   const { url } = useLocalSearchParams();
+  const theme = useAppStore((s) => s.theme);
+  const palette = getBrandTokens(theme);
   const clearCart = useCartStore((s) => s.clearCart);
   const handledRedirectRef = useRef(false);
   const paymentUrl = Array.isArray(url) ? url[0] : url;
@@ -57,26 +61,27 @@ export default function PaymentScreen() {
 
   if (!paymentUrl) {
     return (
-      <SafeAreaView className="flex-1 bg-background justify-center items-center p-6" style={{ flex: 1 }}>
-        <Text className="text-sm font-semibold text-slate-500">Invalid Payment Session</Text>
-        <Pressable onPress={safeBack} className="mt-4 bg-primary py-2.5 px-6 rounded-xl">
-          <Text className="text-white font-bold">Go Back</Text>
+      <SafeAreaView className="flex-1 justify-center items-center p-6" style={{ flex: 1, backgroundColor: palette.background }}>
+        <Text className="text-sm font-semibold" style={{ color: palette.textSecondary }}>Invalid Payment Session</Text>
+        <Pressable onPress={safeBack} className="mt-4 py-2.5 px-6 rounded-xl" style={{ backgroundColor: palette.primary }}>
+          <Text className="font-bold" style={{ color: palette.onPrimary }}>Go Back</Text>
         </Pressable>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1 }}>
+    <SafeAreaView className="flex-1" style={{ flex: 1, backgroundColor: palette.background }}>
       {/* Header bar */}
-      <View className="flex-row items-center justify-between px-4 py-3 bg-white dark:bg-zinc-950 border-b border-slate-50 dark:border-zinc-900">
+      <View className="flex-row items-center justify-between px-4 py-3 border-b" style={{ backgroundColor: palette.nav, borderColor: palette.border }}>
         <Pressable
           onPress={safeBack}
-          className="w-9 h-9 items-center justify-center bg-slate-50 dark:bg-zinc-900 rounded-full active:scale-95"
+          className="w-9 h-9 items-center justify-center rounded-full active:scale-95"
+          style={{ backgroundColor: palette.surfaceSoft }}
         >
-          <ArrowLeft size={18} className="text-foreground" />
+          <ArrowLeft size={18} color={palette.text} />
         </Pressable>
-        <Text className="text-base font-black text-foreground italic uppercase tracking-wider">
+        <Text className="text-base font-black italic uppercase tracking-wider" style={{ color: palette.navText }}>
           Secure Payment
         </Text>
         <View className="w-9 h-9" />
@@ -87,8 +92,8 @@ export default function PaymentScreen() {
         onNavigationStateChange={handleNavigationChange}
         startInLoadingState={true}
         renderLoading={() => (
-          <View className="absolute inset-0 items-center justify-center bg-white dark:bg-zinc-950">
-            <ActivityIndicator size="large" color="#0F0F11" />
+          <View className="absolute inset-0 items-center justify-center" style={{ backgroundColor: palette.background }}>
+            <ActivityIndicator size="large" color={palette.primary} />
           </View>
         )}
       />

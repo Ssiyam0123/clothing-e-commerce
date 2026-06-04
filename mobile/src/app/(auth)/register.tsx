@@ -8,20 +8,22 @@ import { useAppStore } from '../../store/appStore';
 import { getTranslation } from '../../utils/i18n';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
+import { getBrandTokens } from '../../constants/designSystem';
 
 export default function RegisterScreen() {
   const router = useRouter();
   const lang = useAppStore((s) => s.lang);
+  const theme = useAppStore((s) => s.theme);
   const register = useAuthStore((s) => s.register);
   const syncGuestDataWithUser = useCartStore((s) => s.syncGuestDataWithUser);
   const t = getTranslation('auth', lang);
+  const palette = getBrandTokens(theme);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string; confirmPassword?: string }>({});
+  const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({});
 
   const validate = () => {
     const nextErrors: typeof errors = {};
@@ -38,9 +40,6 @@ export default function RegisterScreen() {
     } else if (password.length < 6) {
       nextErrors.password = 'Password must be at least 6 characters';
     }
-    if (password !== confirmPassword) {
-      nextErrors.confirmPassword = 'Passwords do not match';
-    }
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
@@ -50,10 +49,7 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       await register(name, email, password);
-      // Migrate cart data
       await syncGuestDataWithUser();
-      
-      // Navigate to tabs
       router.replace('/(tabs)');
     } catch (error: any) {
       const errMsg = error.response?.data?.message || t.establishmentFailed || 'Registration failed';
@@ -64,25 +60,29 @@ export default function RegisterScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView style={{ flex: 1, backgroundColor: palette.background }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
+        style={{ flex: 1 }}
       >
-        <ScrollView overScrollMode="never" contentContainerStyle={{ flexGrow: 1 }} className="px-6 py-10">
-          <View className="flex-1 justify-center my-4">
-            <View className="mb-8">
-              <Text className="text-3xl font-black text-foreground mb-2 italic">
-                {t.registerTitle}
+        <ScrollView
+          overScrollMode="never"
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingVertical: 40 }}
+          style={{ flex: 1, backgroundColor: palette.background }}
+        >
+          <View style={{ flex: 1, justifyContent: 'center', marginVertical: 16 }}>
+            <View style={{ marginBottom: 32 }}>
+              <Text style={{ fontSize: 30, fontWeight: '900', marginBottom: 8, fontStyle: 'italic', color: palette.text }}>
+                {t.registerTitle || 'Create Account'}
               </Text>
-              <Text className="text-sm font-medium text-slate-500 dark:text-zinc-400">
-                {t.registerSub}
+              <Text style={{ fontSize: 14, fontWeight: '500', color: palette.textSecondary }}>
+                {t.registerSub || 'Join us and start shopping'}
               </Text>
             </View>
 
-            <View className="mb-6">
+            <View style={{ marginBottom: 24 }}>
               <Input
-                label={t.nameLabel}
+                label={t.nameLabel || 'Full Name'}
                 placeholder="John Doe"
                 value={name}
                 onChangeText={(text) => {
@@ -93,7 +93,7 @@ export default function RegisterScreen() {
               />
 
               <Input
-                label={t.emailLabel}
+                label={t.emailLabel || 'Email'}
                 placeholder="you@example.com"
                 value={email}
                 onChangeText={(text) => {
@@ -106,7 +106,7 @@ export default function RegisterScreen() {
               />
 
               <Input
-                label={t.passwordLabel}
+                label={t.passwordLabel || 'Password'}
                 placeholder="••••••••"
                 value={password}
                 onChangeText={(text) => {
@@ -118,22 +118,10 @@ export default function RegisterScreen() {
                 error={errors.password}
               />
 
-              <Input
-                label={t.confirmPasswordLabel}
-                placeholder="••••••••"
-                value={confirmPassword}
-                onChangeText={(text) => {
-                  setConfirmPassword(text);
-                  if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
-                }}
-                isPassword
-                autoCapitalize="none"
-                error={errors.confirmPassword}
-              />
 
-              <View className="mt-4">
+              <View style={{ marginTop: 16 }}>
                 <Button
-                  title={loading ? t.signingUp : t.signUp}
+                  title={loading ? (t.signingUp || 'Creating Account...') : (t.signUp || 'Create Account')}
                   onPress={handleRegister}
                   loading={loading}
                 />
@@ -141,13 +129,13 @@ export default function RegisterScreen() {
             </View>
           </View>
 
-          <View className="flex-row justify-center items-center py-4 border-t border-slate-100 dark:border-zinc-800">
-            <Text className="text-sm font-medium text-slate-500 dark:text-zinc-400">
-              {t.haveAccount}{' '}
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 16, borderTopWidth: 1, borderTopColor: palette.border }}>
+            <Text style={{ fontSize: 14, fontWeight: '500', color: palette.textSecondary }}>
+              {t.haveAccount || 'Already have an account?'}{' '}
             </Text>
             <Pressable onPress={() => router.push('/(auth)/login')}>
-              <Text className="text-sm font-bold text-foreground underline">
-                {t.loginNow}
+              <Text style={{ fontSize: 14, fontWeight: '700', textDecorationLine: 'underline', color: palette.text }}>
+                {t.loginNow || 'Sign In'}
               </Text>
             </Pressable>
           </View>

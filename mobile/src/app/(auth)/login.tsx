@@ -8,13 +8,16 @@ import { useAppStore } from '../../store/appStore';
 import { getTranslation } from '../../utils/i18n';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
+import { getBrandTokens } from '../../constants/designSystem';
 
 export default function LoginScreen() {
   const router = useRouter();
   const lang = useAppStore((s) => s.lang);
+  const theme = useAppStore((s) => s.theme);
   const login = useAuthStore((s) => s.login);
   const syncGuestDataWithUser = useCartStore((s) => s.syncGuestDataWithUser);
   const t = getTranslation('auth', lang);
+  const palette = getBrandTokens(theme);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,10 +45,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await login(email, password);
-      // Migrate cart data
       await syncGuestDataWithUser();
-      
-      // Navigate to tabs
       router.replace('/(tabs)');
     } catch (error: any) {
       const errMsg = error.response?.data?.message || t.invalidCredentials || 'Login failed';
@@ -56,25 +56,29 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView style={{ flex: 1, backgroundColor: palette.background }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
+        style={{ flex: 1 }}
       >
-        <ScrollView overScrollMode="never" contentContainerStyle={{ flexGrow: 1 }} className="px-6 py-10">
-          <View className="flex-1 justify-center my-8">
-            <View className="mb-10">
-              <Text className="text-3xl font-black text-foreground mb-2 italic">
-                {t.loginTitle}
+        <ScrollView
+          overScrollMode="never"
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingVertical: 40 }}
+          style={{ flex: 1, backgroundColor: palette.background }}
+        >
+          <View style={{ flex: 1, justifyContent: 'center', marginVertical: 32 }}>
+            <View style={{ marginBottom: 40 }}>
+              <Text style={{ fontSize: 30, fontWeight: '900', marginBottom: 8, fontStyle: 'italic', color: palette.text }}>
+                {t.loginTitle || 'Welcome Back'}
               </Text>
-              <Text className="text-sm font-medium text-slate-500 dark:text-zinc-400">
-                {t.loginSub}
+              <Text style={{ fontSize: 14, fontWeight: '500', color: palette.textSecondary }}>
+                {t.loginSub || 'Sign in to your account'}
               </Text>
             </View>
 
-            <View className="mb-6">
+            <View style={{ marginBottom: 24 }}>
               <Input
-                label={t.emailLabel}
+                label={t.emailLabel || 'Email'}
                 placeholder="you@example.com"
                 value={email}
                 onChangeText={(text) => {
@@ -87,7 +91,7 @@ export default function LoginScreen() {
               />
 
               <Input
-                label={t.passwordLabel}
+                label={t.passwordLabel || 'Password'}
                 placeholder="••••••••"
                 value={password}
                 onChangeText={(text) => {
@@ -101,28 +105,28 @@ export default function LoginScreen() {
 
               <Pressable
                 onPress={() => Alert.alert('Forgot Password', 'Please use the web app to reset password.')}
-                className="align-self-end mt-1 mb-6"
+                style={{ alignSelf: 'flex-end', marginTop: 4, marginBottom: 24 }}
               >
-                <Text className="text-sm font-semibold text-slate-500 dark:text-zinc-400 text-right">
-                  {t.forgotPassword}
+                <Text style={{ fontSize: 14, fontWeight: '600', textAlign: 'right', color: palette.textSecondary }}>
+                  {t.forgotPassword || 'Forgot password?'}
                 </Text>
               </Pressable>
 
               <Button
-                title={loading ? t.signingIn : t.signIn}
+                title={loading ? (t.signingIn || 'Signing In...') : (t.signIn || 'Sign In')}
                 onPress={handleLogin}
                 loading={loading}
               />
             </View>
           </View>
 
-          <View className="flex-row justify-center items-center py-4 border-t border-slate-100 dark:border-zinc-800">
-            <Text className="text-sm font-medium text-slate-500 dark:text-zinc-400">
-              {t.noAccount}{' '}
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 16, borderTopWidth: 1, borderTopColor: palette.border }}>
+            <Text style={{ fontSize: 14, fontWeight: '500', color: palette.textSecondary }}>
+              {t.noAccount || "Don't have an account?"}{' '}
             </Text>
             <Pressable onPress={() => router.push('/(auth)/register')}>
-              <Text className="text-sm font-bold text-foreground underline">
-                {t.createAccount}
+              <Text style={{ fontSize: 14, fontWeight: '700', textDecorationLine: 'underline', color: palette.text }}>
+                {t.createAccount || 'Create Account'}
               </Text>
             </Pressable>
           </View>

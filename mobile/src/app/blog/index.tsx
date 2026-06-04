@@ -7,55 +7,60 @@ import { ArrowLeft, BookOpen, Calendar } from 'lucide-react-native';
 import { api, getImageUrl } from '../../lib/api';
 import { Button } from '../../components/ui/Button';
 import { safeBack } from '../../utils/navigation';
+import { getBrandTokens } from '../../constants/designSystem';
+import { useAppStore } from '../../store/appStore';
 
 export default function BlogListingScreen() {
   const router = useRouter();
+  const theme = useAppStore((s) => s.theme);
+  const palette = getBrandTokens(theme);
 
   // Fetch blogs list
   const { data: blogs, isLoading, error } = useQuery({
     queryKey: ['blogs'],
     queryFn: async () => {
       const { data } = await api.get('/blogs');
-      return data || [];
+      return data?.blogs || data?.data || data || [];
     },
   });
 
-  const blogsList = Array.isArray(blogs) ? blogs : blogs?.blogs || [];
+  const blogsList = Array.isArray(blogs) ? blogs : blogs?.blogs || blogs?.data || [];
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator size="large" color="#0F0F11" />
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: palette.background }}>
+        <ActivityIndicator size="large" color={palette.primary} />
       </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: palette.background }}>
       {/* Header bar */}
-      <View className="flex-row items-center justify-between px-4 py-3 bg-white dark:bg-zinc-950 border-b border-slate-50 dark:border-zinc-900">
+      <View className="flex-row items-center justify-between px-4 py-3 border-b" style={{ backgroundColor: palette.nav, borderColor: palette.border }}>
         <Pressable
           onPress={safeBack}
-          className="w-9 h-9 items-center justify-center bg-slate-50 dark:bg-zinc-900 rounded-full active:scale-95"
+          className="w-9 h-9 items-center justify-center rounded-full active:scale-95"
+          style={{ backgroundColor: palette.surfaceSoft }}
         >
-          <ArrowLeft size={18} className="text-foreground" />
+          <ArrowLeft size={18} color={palette.text} />
         </Pressable>
-        <Text className="text-base font-black text-foreground italic uppercase tracking-wider">
+        <Text className="text-base font-black italic uppercase tracking-wider" style={{ color: palette.navText }}>
           Blog & Articles
         </Text>
         <View className="w-9 h-9" />
       </View>
 
       {error || blogsList.length === 0 ? (
-        <View className="flex-1 items-center justify-center p-8 bg-background">
-          <BookOpen size={48} className="text-slate-300 mb-4" />
-          <Text className="text-sm font-semibold text-slate-500 mb-6 text-center">
+        <View className="flex-1 items-center justify-center p-8" style={{ backgroundColor: palette.background }}>
+          <BookOpen size={48} color={palette.iconMuted} />
+          <Text className="mt-4 text-sm font-semibold mb-6 text-center" style={{ color: palette.textSecondary }}>
             No articles published yet. Check back later!
           </Text>
           <Button title="Go Back" onPress={() => router.back()} className="w-1/2" />
         </View>
       ) : (
-        <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false} className="flex-1 px-5 py-4">
+        <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false} className="flex-1 px-5 py-4" style={{ backgroundColor: palette.background }}>
           {blogsList.map((post: any) => {
             const dateStr = post.createdAt ? new Date(post.createdAt).toLocaleDateString() : '';
             const imageUrl = getImageUrl(post.featuredImage || post.image || post.thumbnail);
@@ -64,9 +69,10 @@ export default function BlogListingScreen() {
               <Pressable
                 key={post._id}
                 onPress={() => router.push(`/blog/${post.slug}`)}
-                className="bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800/40 rounded-3xl overflow-hidden mb-5 active:scale-[0.99]"
+                className="border rounded-3xl overflow-hidden mb-5 active:scale-[0.99]"
+                style={{ backgroundColor: palette.surface, borderColor: palette.border }}
               >
-                <View className="w-full h-44 bg-slate-50">
+                <View className="w-full h-44" style={{ backgroundColor: palette.surfaceSoft }}>
                   <Image
                     source={{ uri: imageUrl }}
                     className="w-full h-full"
@@ -76,18 +82,18 @@ export default function BlogListingScreen() {
 
                 <View className="p-5">
                   <View className="flex-row items-center gap-1.5 mb-2.5">
-                    <Calendar size={12} className="text-slate-400" />
-                    <Text className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase">
+                    <Calendar size={12} color={palette.iconMuted} />
+                    <Text className="text-[10px] font-bold uppercase" style={{ color: palette.textSecondary }}>
                       {dateStr}
                     </Text>
                   </View>
 
-                  <Text className="text-lg font-black text-foreground mb-2 leading-snug">
+                  <Text className="text-lg font-black mb-2 leading-snug" style={{ color: palette.text }}>
                     {post.title}
                   </Text>
 
                   {post.excerpt ? (
-                    <Text numberOfLines={2} className="text-xs font-semibold text-slate-500 dark:text-zinc-400 leading-relaxed">
+                    <Text numberOfLines={2} className="text-xs font-semibold leading-relaxed" style={{ color: palette.textSecondary }}>
                       {post.excerpt}
                     </Text>
                   ) : null}

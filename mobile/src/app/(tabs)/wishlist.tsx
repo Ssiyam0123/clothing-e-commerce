@@ -9,6 +9,7 @@ import { useAppStore } from '../../store/appStore';
 import { Button } from '../../components/ui/Button';
 import { safeBack } from '../../utils/navigation';
 import { getImageUrl } from '../../lib/api';
+import { getBrandTokens } from '../../constants/designSystem';
 
 export default function WishlistScreen() {
   const router = useRouter();
@@ -16,6 +17,8 @@ export default function WishlistScreen() {
   const toggleWishlist = useCartStore((s) => s.toggleWishlist);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const lang = useAppStore((s) => s.lang);
+  const theme = useAppStore((s) => s.theme);
+  const palette = getBrandTokens(theme);
 
   const isBn = lang === 'bn';
 
@@ -29,40 +32,40 @@ export default function WishlistScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1 }}>
+    <SafeAreaView className="flex-1" style={{ flex: 1, backgroundColor: palette.background }}>
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-2 bg-white dark:bg-zinc-950 border-b border-slate-100 dark:border-zinc-900 h-14 z-10">
+      <View className="flex-row items-center justify-between px-4 py-2 border-b h-14 z-10" style={{ backgroundColor: palette.nav, borderColor: palette.border }}>
         <Pressable
           onPress={safeBack}
           className="w-9 h-9 items-center justify-center rounded-full active:scale-95"
         >
-          <ArrowLeft size={22} className="text-foreground" />
+          <ArrowLeft size={22} color={palette.navText} />
         </Pressable>
 
-        <Text className="text-base font-black text-foreground uppercase tracking-widest">
+        <Text className="text-base font-black uppercase tracking-widest" style={{ color: palette.navText }}>
           {t.title}
         </Text>
 
         <View className="w-9 h-9 items-center justify-center">
-          <Heart size={22} className="text-foreground" />
+          <Heart size={22} color={palette.navText} />
         </View>
       </View>
 
       {/* Main Content */}
       {wishlistItems.length === 0 ? (
-        <View className="flex-1 items-center justify-center p-8 bg-background">
-          <View className="w-16 h-16 bg-slate-50 dark:bg-zinc-900 rounded-full items-center justify-center mb-4 border border-slate-100 dark:border-zinc-800">
-            <Heart size={28} className="text-slate-400 dark:text-zinc-500" />
+        <View className="flex-1 items-center justify-center p-8" style={{ backgroundColor: palette.background }}>
+          <View className="w-16 h-16 rounded-full items-center justify-center mb-4 border" style={{ backgroundColor: palette.surfaceSoft, borderColor: palette.border }}>
+            <Heart size={28} color={palette.iconMuted} />
           </View>
-          <Text className="text-lg font-black text-foreground italic mb-2 text-center uppercase tracking-wider">
+          <Text className="text-lg font-black italic mb-2 text-center uppercase tracking-wider" style={{ color: palette.text }}>
             {t.emptyTitle}
           </Text>
-          <Text className="text-xs text-slate-500 dark:text-zinc-400 text-center mb-8 max-w-[280px]">
+          <Text className="text-xs text-center mb-8 max-w-[280px]" style={{ color: palette.textSecondary }}>
             {t.emptySub}
           </Text>
           <Button
             title={t.startShopping}
-            onPress={() => router.push('/shop')}
+            onPress={() => router.push('/(tabs)/shop')}
             className="w-48"
           />
         </View>
@@ -71,26 +74,29 @@ export default function WishlistScreen() {
           data={wishlistItems}
           keyExtractor={(item) => item._id}
           contentContainerStyle={{ padding: 16 }}
+          style={{ backgroundColor: palette.background }}
           renderItem={({ item }) => {
             const imageUrl = getImageUrl(item.images?.[0]);
             return (
               <Pressable
                 onPress={() => router.push(`/product/${item.slug}`)}
-                className="flex-row bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800/40 p-3 rounded-2xl mb-3 items-center"
+                className="flex-row border p-3 rounded-2xl mb-3 items-center"
+                style={{ backgroundColor: palette.surface, borderColor: palette.border }}
               >
                 {/* Left Product Image */}
                 <Image
                   source={{ uri: imageUrl }}
-                  className="w-20 h-20 rounded-xl bg-slate-50 dark:bg-zinc-950"
+                  className="w-20 h-20 rounded-xl"
+                  style={{ backgroundColor: palette.surfaceSoft }}
                   resizeMode="cover"
                 />
 
                 {/* Middle details */}
                 <View className="flex-1 ml-4 pr-1">
-                  <Text numberOfLines={1} className="text-sm font-bold text-foreground mb-1">
+                  <Text numberOfLines={1} className="text-sm font-bold mb-1" style={{ color: palette.text }}>
                     {item.name}
                   </Text>
-                  <Text className="text-sm font-black text-foreground italic">
+                  <Text className="text-sm font-black italic" style={{ color: palette.text }}>
                     ৳{Math.round(item.price).toLocaleString()}
                   </Text>
                 </View>
@@ -102,7 +108,7 @@ export default function WishlistScreen() {
                     onPress={() => toggleWishlist(item, isAuthenticated)}
                     className="p-1 active:scale-90"
                   >
-                    <Heart size={20} color="#EF4444" fill="#EF4444" />
+                    <Heart size={20} color={palette.danger} fill={palette.danger} />
                   </Pressable>
 
                   {/* Share button */}
@@ -118,7 +124,7 @@ export default function WishlistScreen() {
                     }}
                     className="p-1 active:scale-90"
                   >
-                    <Share2 size={16} className="text-slate-400 dark:text-zinc-500" />
+                    <Share2 size={16} color={palette.iconMuted} />
                   </Pressable>
                 </View>
               </Pressable>

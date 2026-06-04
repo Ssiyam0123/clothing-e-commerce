@@ -1,10 +1,14 @@
 import React from 'react';
 import { ScrollView, View, Text, Platform } from 'react-native';
 import { Truck, ShieldCheck, RefreshCw, Package } from 'lucide-react-native';
+import { getBrandScheme } from '../../constants/designSystem';
 import { useAppStore } from '../../store/appStore';
 
 export function MobileUspCards({ config }: { config: any }) {
   const lang = useAppStore((s) => s.lang);
+  const theme = useAppStore((s) => s.theme);
+  const colors = getBrandScheme(theme);
+  const isDark = theme === 'dark';
 
   const defaultItems = [
     {
@@ -53,13 +57,10 @@ export function MobileUspCards({ config }: { config: any }) {
             width: 200,
             backgroundColor: Platform.select({
               ios: 'rgba(248,250,252,0.75)',
-              default: '#F8FAFC',
+              default: colors.surface,
             }),
             borderWidth: 1,
-            borderColor: Platform.select({
-              ios: 'rgba(0,0,0,0.04)',
-              default: 'rgba(0,0,0,0.05)',
-            }),
+            borderColor: colors.border,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: 0.03,
@@ -74,7 +75,7 @@ export function MobileUspCards({ config }: { config: any }) {
             style={{
               backgroundColor: Platform.select({
                 ios: 'rgba(255,255,255,0.9)',
-                default: '#FFFFFF',
+                default: colors.surface,
               }),
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 1 },

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import FlashMessage from 'react-native-flash-message';
 import { VariableContextProvider } from 'nativewind';
+import { StatusBar } from 'expo-status-bar';
 
 import '../global.css';
 import { AnimatedSplashOverlay } from '../components/animated-icon';
@@ -12,9 +13,9 @@ import { useAppStore } from '../store/appStore';
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
 import { Button } from '../components/ui/Button';
-import { getBrandScheme, getNativeThemeVars } from '../constants/designSystem';
+import { brandColors, getBrandTokens, getNativeThemeVars } from '../constants/designSystem';
 
-const loaderColor = '#4A3525';
+const loaderColor = brandColors.primary;
 
 // Setup TanStack Query
 const queryClient = new QueryClient({
@@ -85,13 +86,19 @@ export default function RootLayout() {
   // Determine active color theme
   const activeTheme = theme === 'dark' ? DarkTheme : DefaultTheme;
   const nativeThemeVars = useMemo(() => getNativeThemeVars(theme), [theme]);
-  const scheme = getBrandScheme(theme);
+  const palette = getBrandTokens(theme);
 
   if (!isInitialized) {
     return (
-      <View className="flex-1 items-center justify-center bg-background" style={{ backgroundColor: scheme.background }}>
-        <ActivityIndicator size="large" color={loaderColor} />
-      </View>
+      <SafeAreaProvider>
+        <VariableContextProvider value={nativeThemeVars as any}>
+          <ThemeProvider value={activeTheme}>
+            <View className="flex-1 items-center justify-center" style={{ backgroundColor: palette.background }}>
+              <ActivityIndicator size="large" color={loaderColor} />
+            </View>
+          </ThemeProvider>
+        </VariableContextProvider>
+      </SafeAreaProvider>
     );
   }
 
@@ -99,7 +106,7 @@ export default function RootLayout() {
   if (maintenanceMode) {
     return (
       <ThemeProvider value={activeTheme}>
-        <View className="flex-1 items-center justify-center bg-background px-6" style={{ backgroundColor: scheme.background }}>
+        <View className="flex-1 items-center justify-center bg-background px-6">
           <Text className="mb-4 text-center font-heading text-3xl font-black text-main">
             Maintenance Mode
           </Text>
@@ -117,13 +124,13 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <VariableContextProvider value={nativeThemeVars as any}>
           <ThemeProvider value={activeTheme}>
-            <View className="flex-1 bg-background" style={{ backgroundColor: scheme.background }}>
+            <View className="flex-1" style={{ backgroundColor: palette.background }}>
+              <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
               <AnimatedSplashOverlay />
 
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="(auth)/login" />
-                <Stack.Screen name="(auth)/register" />
+                <Stack.Screen name="(auth)" />
                 <Stack.Screen name="product/[slug]" />
                 <Stack.Screen name="checkout/index" />
                 <Stack.Screen name="checkout/payment" />
