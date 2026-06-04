@@ -114,11 +114,16 @@ export default function ProductDetailScreen() {
   const [reviewComment, setReviewComment] = useState('');
   const [reviewError, setReviewError] = useState('');
 
+  const [reviewsPage, setReviewsPage] = useState(1);
+  useEffect(() => {
+    setReviewsPage(1);
+  }, [product?._id]);
+
   // Fetch product reviews
   const { data: reviewsData } = useQuery({
-    queryKey: ['productReviews', product?._id],
+    queryKey: ['productReviews', product?._id, reviewsPage],
     queryFn: async () => {
-      const { data } = await api.get(`/reviews/product/${product._id}?page=1&limit=10`);
+      const { data } = await api.get(`/reviews/product/${product._id}?page=${reviewsPage}&limit=5`);
       return data || {};
     },
     enabled: !!product?._id,
@@ -833,24 +838,67 @@ export default function ProductDetailScreen() {
                   {t.noReviews || 'No reviews yet for this product.'}
                 </Text>
               ) : (
-                reviewsList.map((rev: any) => (
-                  <View key={rev._id} className="mb-3 bg-slate-50 dark:bg-zinc-900/40 p-3.5 rounded-2xl">
-                    <View className="flex-row justify-between items-center mb-1.5">
-                      <Text className="text-xs font-bold text-foreground">
-                        {rev.user?.name || 'Customer'}
-                      </Text>
-                      <View className="flex-row items-center">
-                        <Star size={10} color="#D4AF37" fill="#D4AF37" />
-                        <Text className="text-[10px] font-bold text-foreground ml-1">
-                          {rev.rating || 5}
+                <>
+                  {reviewsList.map((rev: any) => (
+                    <View key={rev._id} className="mb-3 bg-slate-50 dark:bg-zinc-900/40 p-3.5 rounded-2xl">
+                      <View className="flex-row justify-between items-center mb-1.5">
+                        <Text className="text-xs font-bold text-foreground">
+                          {rev.user?.name || 'Customer'}
                         </Text>
+                        <View className="flex-row items-center">
+                          <Star size={10} color="#D4AF37" fill="#D4AF37" />
+                          <Text className="text-[10px] font-bold text-foreground ml-1">
+                            {rev.rating || 5}
+                          </Text>
+                        </View>
                       </View>
+                      <Text className="text-xs font-semibold text-slate-500 dark:text-zinc-400 leading-normal">
+                        {rev.comment}
+                      </Text>
                     </View>
-                    <Text className="text-xs font-semibold text-slate-500 dark:text-zinc-400 leading-normal">
-                      {rev.comment}
-                    </Text>
-                  </View>
-                ))
+                  ))}
+
+                  {/* Reviews Pagination Controls */}
+                  {reviewsData?.pages && reviewsData.pages > 1 && (
+                    <View className="flex-row items-center justify-between mt-4 px-1">
+                      <Pressable
+                        onPress={() => setReviewsPage(prev => Math.max(prev - 1, 1))}
+                        disabled={reviewsPage === 1}
+                        className={`h-9 px-4 rounded-xl items-center justify-center border ${
+                          reviewsPage === 1
+                            ? 'border-slate-100 dark:border-zinc-900 bg-slate-50 dark:bg-zinc-950 opacity-40'
+                            : 'border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 active:scale-95'
+                        }`}
+                      >
+                        <Text className={`text-[10px] font-black uppercase ${
+                          reviewsPage === 1 ? 'text-slate-300 dark:text-zinc-700' : 'text-foreground'
+                        }`}>
+                          Previous
+                        </Text>
+                      </Pressable>
+
+                      <Text className="text-xs font-bold text-slate-500 dark:text-zinc-400">
+                        {reviewsPage} / {reviewsData.pages}
+                      </Text>
+
+                      <Pressable
+                        onPress={() => setReviewsPage(prev => Math.min(prev + 1, reviewsData.pages))}
+                        disabled={reviewsPage >= reviewsData.pages}
+                        className={`h-9 px-4 rounded-xl items-center justify-center border ${
+                          reviewsPage >= reviewsData.pages
+                            ? 'border-slate-100 dark:border-zinc-900 bg-slate-50 dark:bg-zinc-950 opacity-40'
+                            : 'border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 active:scale-95'
+                        }`}
+                      >
+                        <Text className={`text-[10px] font-black uppercase ${
+                          reviewsPage >= reviewsData.pages ? 'text-slate-300 dark:text-zinc-700' : 'text-foreground'
+                        }`}>
+                          Next
+                        </Text>
+                      </Pressable>
+                    </View>
+                  )}
+                </>
               )}
             </View>
           ) : null}
@@ -861,10 +909,10 @@ export default function ProductDetailScreen() {
             <Text className="text-xl font-black text-foreground uppercase italic mb-4">
               Related Products
             </Text>
-            <View className="flex-row flex-wrap" style={{ gap: 8 }}>
+            <View className="-mx-1 flex-row flex-wrap">
               {relatedProducts.map((item: any) => (
-                <View key={item._id} style={{ width: '48%' }}>
-                  <ProductCard product={item} />
+                <View key={item._id} className="w-1/2 p-1">
+                  <ProductCard product={item} className="m-0" />
                 </View>
               ))}
             </View>
