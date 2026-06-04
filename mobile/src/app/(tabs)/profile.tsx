@@ -31,17 +31,7 @@ export default function ProfileScreen() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
   const t = getTranslation('profile', lang);
-  const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active');
   const isDark = theme === 'dark';
-
-  const { data: orders, isLoading } = useQuery({
-    queryKey: ['myOrders', user?._id],
-    queryFn: async () => {
-      const { data } = await api.get('/orders/my-orders');
-      return data || [];
-    },
-    enabled: isAuthenticated,
-  });
 
   const handleLogout = () => {
     const performLogout = async () => {
@@ -63,17 +53,6 @@ export default function ProfileScreen() {
     ]);
   };
 
-  const ordersList = Array.isArray(orders) ? orders : orders?.orders || [];
-  const activeOrders = ordersList.filter(
-    (order: any) =>
-      order.orderStatus === 'Pending' ||
-      order.orderStatus === 'Processing' ||
-      order.orderStatus === 'Shipped',
-  );
-  const completedOrders = ordersList.filter(
-    (order: any) => order.orderStatus === 'Delivered' || order.orderStatus === 'Cancelled',
-  );
-  const displayedOrders = activeTab === 'active' ? activeOrders : completedOrders;
   const roleLabel = typeof user?.role === 'object' ? user.role?.name : user?.role;
 
   return (
@@ -119,101 +98,7 @@ export default function ProfileScreen() {
           </View>
         )}
 
-        {isAuthenticated ? (
-          <View className="mb-6">
-            <View className="mb-4 flex-row items-center justify-between">
-              <Text className="text-xs font-black uppercase tracking-widest text-main">
-                {t.orders || 'Order History'}
-              </Text>
-              <Pressable
-                onPress={() => router.push('/order')}
-                className="flex-row items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5"
-              >
-                <Text className="text-[9px] font-black uppercase tracking-widest text-primary">
-                  {lang === 'bn' ? 'সব দেখুন' : 'View All'}
-                </Text>
-                <ChevronRight size={12} className="text-primary" />
-              </Pressable>
-            </View>
 
-            <View className="mb-4 flex-row rounded-field border border-border bg-surface-soft p-1">
-              <Pressable
-                onPress={() => setActiveTab('active')}
-                className={`flex-1 items-center rounded-button py-2.5 ${activeTab === 'active' ? 'bg-card shadow-sm' : ''}`}
-              >
-                <Text
-                  className={`text-xs font-bold uppercase tracking-wider ${
-                    activeTab === 'active' ? 'text-card-foreground' : 'text-muted-foreground'
-                  }`}
-                >
-                  {t.activeOrders || 'Active'} ({activeOrders.length})
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={() => setActiveTab('completed')}
-                className={`flex-1 items-center rounded-button py-2.5 ${activeTab === 'completed' ? 'bg-card shadow-sm' : ''}`}
-              >
-                <Text
-                  className={`text-xs font-bold uppercase tracking-wider ${
-                    activeTab === 'completed' ? 'text-card-foreground' : 'text-muted-foreground'
-                  }`}
-                >
-                  {t.completedOrders || 'Completed'} ({completedOrders.length})
-                </Text>
-              </Pressable>
-            </View>
-
-            {isLoading ? (
-              <ActivityIndicator size="small" color={brandColors.primary} className="py-4" />
-            ) : displayedOrders.length === 0 ? (
-              <Text className="py-4 text-center text-xs font-semibold italic text-muted-foreground">
-                {lang === 'bn' ? 'কোনো অর্ডার নেই।' : 'No orders listed.'}
-              </Text>
-            ) : (
-              displayedOrders.map((order: any) => (
-                <View key={order._id} className="mb-3 rounded-card border border-border bg-card p-4">
-                  <View className="mb-2.5 flex-row items-center justify-between">
-                    <Text className="font-mono text-xs font-bold text-card-foreground">
-                      ID: {order._id.slice(-10).toUpperCase()}
-                    </Text>
-                    <View className="rounded-md bg-surface-soft px-2.5 py-1">
-                      <Text className="text-[9px] font-black uppercase text-primary">
-                        {order.orderStatus}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <Text className="mb-4 text-[10px] font-bold text-muted-foreground">
-                    Date: {new Date(order.createdAt).toLocaleDateString()} | Items:{' '}
-                    {order.orderItems?.length || 1}
-                  </Text>
-
-                  <View className="flex-row items-center justify-between border-t border-border pt-3">
-                    <Text className="text-base font-black text-card-foreground">
-                      ৳{Math.round(order.totalPrice).toLocaleString()}
-                    </Text>
-                    {order.orderStatus !== 'Cancelled' ? (
-                      <Pressable
-                        onPress={() =>
-                          router.push({
-                            pathname: '/order/track',
-                            params: { orderId: order._id },
-                          })
-                        }
-                        className="flex-row items-center gap-1 rounded-button border border-border bg-surface-soft px-4 py-1.5 active:scale-95"
-                      >
-                        <Package size={12} className="text-card-foreground" />
-                        <Text className="text-[10px] font-bold uppercase tracking-wide text-card-foreground">
-                          {lang === 'bn' ? 'ট্র্যাক' : 'Track'}
-                        </Text>
-                      </Pressable>
-                    ) : null}
-                  </View>
-                </View>
-              ))
-            )}
-          </View>
-        ) : null}
 
         <View className="mb-10">
           <Text className="mb-4 text-xs font-black uppercase tracking-widest text-main">
@@ -287,14 +172,22 @@ export default function ProfileScreen() {
               icon={<BookOpen size={18} className="text-muted-foreground" />}
               label={lang === 'bn' ? 'ব্লগ ও আর্টিকেল' : 'Blog & Articles'}
               onPress={() => router.push('/blog')}
+              isLast={!isAuthenticated}
             />
             {isAuthenticated ? (
-              <MenuRow
-                icon={<MessageSquare size={18} className="text-muted-foreground" />}
-                label={t.supportChat || 'Live Support Chat'}
-                onPress={() => router.push('/support/chat')}
-                isLast
-              />
+              <>
+                <MenuRow
+                  icon={<Package size={18} className="text-muted-foreground" />}
+                  label={lang === 'bn' ? 'অর্ডার ইতিহাস' : 'Order History'}
+                  onPress={() => router.push('/order')}
+                />
+                <MenuRow
+                  icon={<MessageSquare size={18} className="text-muted-foreground" />}
+                  label={t.supportChat || 'Live Support Chat'}
+                  onPress={() => router.push('/support/chat')}
+                  isLast
+                />
+              </>
             ) : null}
           </View>
 

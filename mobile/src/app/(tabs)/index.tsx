@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/api';
 import { useAppStore } from '../../store/appStore';
+import { getBrandScheme } from '../../constants/designSystem';
 import {
   MobileHeroSlider,
   MobileUspCards,
@@ -35,6 +36,7 @@ export default function HomeScreen() {
   const toggleTheme = useAppStore((s) => s.toggleTheme);
   const siteName = useAppStore((s) => s.settings?.branding?.siteName) || 'VANGUARD';
   const isDark = theme === 'dark';
+  const colors = getBrandScheme(theme);
 
   // Fetch dynamic home layout configuration from backend
   const {
@@ -139,12 +141,19 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-brand-light-bg dark:bg-brand-dark-bg">
+    <SafeAreaView className="flex-1 bg-brand-light-bg dark:bg-brand-dark-bg" style={{ backgroundColor: colors.background }}>
       {/* 🍎 Premium Glass Header Bar */}
-      <View className="h-14 flex-row items-center justify-between bg-brand-light-surface px-4 py-2.5 dark:bg-brand-dark-surface">
+      <View
+        className="h-14 flex-row items-center justify-between px-4 py-2.5"
+        style={{ backgroundColor: colors.surface }}
+      >
         {/* Brand / Menu */}
         <View className="min-w-0 flex-1 flex-row items-center gap-2">
-          <Text className="text-base font-black uppercase tracking-[0.15em] text-brand-light-text dark:text-brand-dark-text" numberOfLines={1}>
+          <Text
+            className="text-base font-black uppercase tracking-[0.15em]"
+            style={{ color: colors.text }}
+            numberOfLines={1}
+          >
             {siteName}
           </Text>
         </View>

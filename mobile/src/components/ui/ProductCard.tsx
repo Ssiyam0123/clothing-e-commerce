@@ -6,7 +6,9 @@ import { useRouter } from 'expo-router';
 import { showMessage } from 'react-native-flash-message';
 import { useCartStore } from '../../store/cartStore';
 import { useAuthStore } from '../../store/authStore';
+import { useAppStore } from '../../store/appStore';
 import { getImageUrl } from '../../lib/api';
+import { brandColors, getBrandScheme } from '../../constants/designSystem';
 
 interface Product {
   _id: string;
@@ -32,6 +34,7 @@ interface ProductCardProps {
 
 function ProductCardBase({ product, className = '' }: ProductCardProps) {
   const router = useRouter();
+  const theme = useAppStore((s) => s.theme);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isFavorited = useCartStore(
     useCallback((s) => s.wishlistSet.has(product._id), [product._id]),
@@ -48,6 +51,11 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
   const reviewCount = product.totalReviews || 0;
   const showReviews = product.showReviews !== false && product.showReviews !== 'false';
   const currency = '\u09F3';
+  const colors = getBrandScheme(theme);
+  const cardBg = theme === 'dark' ? brandColors.primary : colors.surface;
+  const cardText = theme === 'dark' ? '#FFFFFF' : colors.text;
+  const cardMuted = theme === 'dark' ? '#D8C8BA' : colors.textSecondary;
+  const cardBorder = theme === 'dark' ? '#5B4331' : colors.border;
 
   const handlePress = () => {
     router.push(`/product/${product.slug}`);
@@ -128,8 +136,9 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
       <Pressable
         onPress={handlePress}
         className={`m-1 flex-1 overflow-hidden rounded-card border border-border bg-card active:scale-[0.98] shadow-card ${className}`}
+        style={{ backgroundColor: cardBg, borderColor: cardBorder }}
       >
-        <View className="relative aspect-[1/1.12] w-full bg-surface-soft">
+        <View className="relative aspect-[1/1.12] w-full bg-surface-soft" style={{ backgroundColor: theme === 'dark' ? '#3A2A20' : '#F1ECE7' }}>
           {product.images && product.images.length > 0 ? (
             <Image
               source={{ uri: getImageUrl(product.images[0]) }}
@@ -159,6 +168,7 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
           <Pressable
             onPress={handleWishlist}
             className="absolute right-2.5 top-2.5 z-10 h-8 w-8 items-center justify-center rounded-full bg-card/90 active:scale-90"
+            style={{ backgroundColor: theme === 'dark' ? '#2C2C2E' : '#FFFFFF' }}
           >
             <Heart
               size={15}
@@ -172,24 +182,29 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
           {product.brand || product.category?.name ? (
             <Text
               className="mb-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground"
+              style={{ color: cardMuted }}
               numberOfLines={1}
             >
               {product.brand || product.category?.name}
             </Text>
           ) : null}
 
-          <Text numberOfLines={2} className="min-h-[32px] text-[12px] font-black leading-[1.25] text-card-foreground">
+          <Text
+            numberOfLines={2}
+            className="min-h-[32px] text-[12px] font-black leading-[1.25] text-card-foreground"
+            style={{ color: cardText }}
+          >
             {product.name}
           </Text>
 
           <View className="mt-2 flex-row items-center justify-between gap-1.5">
             <View className="flex-row items-baseline gap-1.5 flex-1">
-              <Text className="text-[15px] font-black tracking-tight text-card-foreground">
+              <Text className="text-[15px] font-black tracking-tight text-card-foreground" style={{ color: cardText }}>
                 {currency}
                 {Math.round(discountedPrice).toLocaleString()}
               </Text>
               {discount > 0 ? (
-                <Text className="text-[11px] font-semibold text-muted-foreground line-through">
+                <Text className="text-[11px] font-semibold text-muted-foreground line-through" style={{ color: cardMuted }}>
                   {currency}
                   {Math.round(productPrice).toLocaleString()}
                 </Text>
@@ -197,9 +212,9 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
             </View>
 
             {showReviews && reviewCount > 0 ? (
-              <View className="flex-row items-center gap-1 rounded-full bg-accent px-2 py-1">
+              <View className="flex-row items-center gap-1 rounded-full bg-accent px-2 py-1" style={{ backgroundColor: brandColors.accent }}>
                 <Star size={10} color="#F59E0B" fill="#F59E0B" />
-                <Text className="text-[10px] font-black text-accent-foreground">
+                <Text className="text-[10px] font-black text-accent-foreground" style={{ color: brandColors.primary }}>
                   {avgRating.toFixed(1)}
                 </Text>
               </View>
@@ -210,14 +225,16 @@ function ProductCardBase({ product, className = '' }: ProductCardProps) {
             <Pressable
               onPress={handleAddToCart}
               className="h-10 flex-1 items-center justify-center rounded-button bg-accent active:scale-95"
+              style={{ backgroundColor: brandColors.accent }}
             >
-              <ShoppingCart size={16} className="text-accent-foreground" strokeWidth={2.4} />
+              <ShoppingCart size={16} color="#1A1A1A" strokeWidth={2.4} />
             </Pressable>
             <Pressable
               onPress={handleInstantBuy}
               className="h-10 flex-1 items-center justify-center rounded-button bg-primary active:scale-95"
+              style={{ backgroundColor: theme === 'dark' ? '#2C1D14' : brandColors.primary }}
             >
-              <Zap size={16} className="text-primary-foreground" fill="#FFFFFF" strokeWidth={2.4} />
+              <Zap size={16} color="#FFFFFF" fill="#FFFFFF" strokeWidth={2.4} />
             </Pressable>
           </View>
         </View>

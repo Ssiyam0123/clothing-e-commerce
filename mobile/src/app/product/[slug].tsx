@@ -30,12 +30,14 @@ import { useAppStore } from '../../store/appStore';
 import { getTranslation } from '../../utils/i18n';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { safeBack } from '../../utils/navigation';
+import { brandColors, getBrandScheme } from '../../constants/designSystem';
 
 export default function ProductDetailScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { slug } = useLocalSearchParams();
   const lang = useAppStore((s) => s.lang);
+  const theme = useAppStore((s) => s.theme);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const addToCart = useCartStore((s) => s.addToCart);
@@ -369,6 +371,16 @@ export default function ProductDetailScreen() {
   const currency = '\u09F3';
   const showReviews = product.showReviews !== false && product.showReviews !== 'false';
   const isFavorited = wishlistSet.has(product._id);
+  const colors = getBrandScheme(theme);
+  const isDark = theme === 'dark';
+  const detailBg = colors.background;
+  const detailSurface = colors.surface;
+  const detailSoft = isDark ? '#241E1A' : '#F1ECE7';
+  const detailText = colors.text;
+  const detailMuted = colors.textSecondary;
+  const detailBorder = colors.border;
+  const detailPrimary = brandColors.primary;
+  const detailAccent = brandColors.accent;
 
   // Average Rating calculation
   const reviewsList = reviewsData?.reviews || [];
@@ -404,17 +416,20 @@ export default function ProductDetailScreen() {
     ];
 
   return (
-    <SafeAreaView style={{ flex: 1 }} className="bg-background">
+    <SafeAreaView style={{ flex: 1, backgroundColor: detailBg }} className="bg-background">
       {/* Top Header Bar */}
-      <View className="flex-row items-center justify-between px-4 py-2 bg-white dark:bg-zinc-950 border-b border-slate-100 dark:border-zinc-900 h-14 z-10">
+      <View
+        className="z-10 h-14 flex-row items-center justify-between border-b px-4 py-2"
+        style={{ backgroundColor: detailSurface, borderBottomColor: detailBorder }}
+      >
         <Pressable
           onPress={safeBack}
           className="w-9 h-9 items-center justify-center rounded-full active:scale-95"
         >
-          <ArrowLeft size={22} className="text-foreground" />
+          <ArrowLeft size={22} color={detailText} />
         </Pressable>
 
-        <Text className="text-base font-black text-foreground uppercase tracking-widest">
+        <Text className="text-base font-black uppercase tracking-widest" style={{ color: detailText }}>
           Product Details
         </Text>
 
@@ -422,7 +437,7 @@ export default function ProductDetailScreen() {
           onPress={() => router.push('/(tabs)/cart')}
           className="w-9 h-9 items-center justify-center rounded-full active:scale-95 relative"
         >
-          <ShoppingCart size={22} className="text-foreground" />
+          <ShoppingCart size={22} color={detailText} />
           {totalCartItems > 0 ? (
             <View className="absolute top-1 right-1 bg-red-500 rounded-full h-4 min-w-4 px-1 items-center justify-center">
               <Text className="text-white text-[8px] font-black text-center">{totalCartItems}</Text>
@@ -433,10 +448,13 @@ export default function ProductDetailScreen() {
 
       <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
         {/* ENLARGED Image Gallery Section */}
-        <View className="w-full bg-gradient-to-b from-slate-50 to-white dark:from-zinc-900 dark:to-zinc-950">
+        <View className="w-full" style={{ backgroundColor: detailBg }}>
           {/* Main Large Display */}
           <View className="px-4 pt-6 pb-4">
-            <View className="w-full aspect-[3/4] rounded-3xl overflow-hidden border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl relative">
+            <View
+              className="relative aspect-[3/4] w-full overflow-hidden rounded-3xl border shadow-xl"
+              style={{ backgroundColor: detailSurface, borderColor: detailBorder }}
+            >
               {images.length > 0 ? (
                 <ScrollView overScrollMode="never"
                   ref={imageScrollRef}
@@ -460,8 +478,8 @@ export default function ProductDetailScreen() {
                   ))}
                 </ScrollView>
               ) : (
-                <View className="w-full h-full items-center justify-center bg-slate-100 dark:bg-zinc-800">
-                  <Text className="text-slate-400 text-xs font-bold uppercase">No Image Available</Text>
+                <View className="h-full w-full items-center justify-center" style={{ backgroundColor: detailSoft }}>
+                  <Text className="text-xs font-bold uppercase" style={{ color: detailMuted }}>No Image Available</Text>
                 </View>
               )}
 
@@ -523,14 +541,14 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Info panel */}
-        <View className="p-5 bg-white dark:bg-zinc-950">
+        <View className="p-5" style={{ backgroundColor: detailSurface }}>
           {product.brand ? (
-            <Text className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">
+            <Text className="mb-1.5 text-[10px] font-black uppercase tracking-widest" style={{ color: detailMuted }}>
               {product.brand}
             </Text>
           ) : null}
 
-          <Text className="text-2xl font-black text-foreground mb-3 leading-tight">
+          <Text className="mb-3 text-2xl font-black leading-tight" style={{ color: detailText }}>
             {product.name}
           </Text>
 
@@ -927,31 +945,39 @@ export default function ProductDetailScreen() {
       </ScrollView>
 
       {/* Sticky Bottom Panel */}
-      <View className="px-5 py-4 border-t border-slate-100 dark:border-zinc-900 bg-white dark:bg-zinc-950 flex-col gap-4">
+      <View
+        className="flex-col gap-4 border-t px-5 py-4"
+        style={{ backgroundColor: detailSurface, borderTopColor: detailBorder }}
+      >
         {/* Row 1: Quantity selector */}
         <View className="flex-row items-center justify-between">
-          <Text className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+          <Text className="text-xs font-bold uppercase tracking-wider" style={{ color: detailMuted }}>
             Quantity
           </Text>
-          <View className="flex-row items-center bg-slate-50 dark:bg-zinc-900 rounded-2xl py-1 px-1.5 border border-slate-100 dark:border-zinc-800 h-10">
+          <View
+            className="h-10 flex-row items-center rounded-2xl border px-1.5 py-1"
+            style={{ backgroundColor: detailSoft, borderColor: detailBorder }}
+          >
             <Pressable
               onPress={() => {
                 if (quantity > 1) setQuantity(quantity - 1);
               }}
-              className="w-7 h-7 items-center justify-center rounded-lg bg-white dark:bg-zinc-950 border border-slate-150 dark:border-zinc-800/60"
+              className="h-7 w-7 items-center justify-center rounded-lg border"
+              style={{ backgroundColor: detailSurface, borderColor: detailBorder }}
             >
-              <Minus size={12} className="text-foreground" />
+              <Minus size={12} color={detailText} />
             </Pressable>
 
-            <Text className="text-xs font-black text-foreground px-4 text-center min-w-[30px]">
+            <Text className="min-w-[30px] px-4 text-center text-xs font-black" style={{ color: detailText }}>
               {quantity}
             </Text>
 
             <Pressable
               onPress={() => setQuantity(quantity + 1)}
-              className="w-7 h-7 items-center justify-center rounded-lg bg-white dark:bg-zinc-950 border border-slate-150 dark:border-zinc-800/60"
+              className="h-7 w-7 items-center justify-center rounded-lg border"
+              style={{ backgroundColor: detailSurface, borderColor: detailBorder }}
             >
-              <Plus size={12} className="text-foreground" />
+              <Plus size={12} color={detailText} />
             </Pressable>
           </View>
         </View>
@@ -961,7 +987,8 @@ export default function ProductDetailScreen() {
           {/* Wishlist toggle */}
           <Pressable
             onPress={handleToggleWishlist}
-            className="w-12 h-12 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 items-center justify-center active:scale-95"
+            className="h-12 w-12 items-center justify-center rounded-2xl border active:scale-95"
+            style={{ backgroundColor: detailSurface, borderColor: detailBorder }}
           >
             <Heart
               size={20}
@@ -974,17 +1001,18 @@ export default function ProductDetailScreen() {
           <Pressable
             onPress={handleAddToCart}
             disabled={loadingCart}
-            className="flex-1 h-12 rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 items-center justify-center active:scale-95"
-            style={{ opacity: loadingCart ? 0.5 : 1 }}
+            className="h-12 flex-1 items-center justify-center rounded-2xl border active:scale-95"
+            style={{ backgroundColor: detailSurface, borderColor: detailBorder, opacity: loadingCart ? 0.5 : 1 }}
           >
             {loadingCart ? (
-              <ActivityIndicator size="small" color="#0F172A" />
+              <ActivityIndicator size="small" color={detailText} />
             ) : (
               <Text
                 numberOfLines={1}
                 adjustsFontSizeToFit
                 minimumFontScale={0.7}
-                className="text-[10px] font-black uppercase text-foreground tracking-wider px-1 text-center"
+                className="px-1 text-center text-[10px] font-black uppercase tracking-wider"
+                style={{ color: detailText }}
               >
                 {t.addToCart || 'Add to Cart'}
               </Text>
@@ -994,13 +1022,15 @@ export default function ProductDetailScreen() {
           {/* Buy Now */}
           <Pressable
             onPress={handleBuyNow}
-            className="flex-1 h-12 rounded-2xl bg-zinc-900 dark:bg-white items-center justify-center active:scale-95 px-1"
+            className="h-12 flex-1 items-center justify-center rounded-2xl px-1 active:scale-95"
+            style={{ backgroundColor: detailPrimary }}
           >
             <Text
               numberOfLines={1}
               adjustsFontSizeToFit
               minimumFontScale={0.7}
-              className="text-[10px] font-black uppercase text-white dark:text-zinc-900 tracking-wider text-center"
+              className="text-center text-[10px] font-black uppercase tracking-wider"
+              style={{ color: '#FFFFFF' }}
             >
               Buy Now
             </Text>
